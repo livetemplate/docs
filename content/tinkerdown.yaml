@@ -1,0 +1,55 @@
+title: "LiveTemplate Docs"
+description: "Documentation for the LiveTemplate framework — build interactive web apps in Go"
+type: "site"
+
+site:
+  home: "index.md"
+  repository: "https://github.com/livetemplate/docs"
+
+navigation:
+  - title: "Getting Started"
+    path: "getting-started"
+    collapsed: false
+    pages:
+      - title: "Install"
+        path: "getting-started/install.md"
+
+  - title: "Reference"
+    path: "reference"
+    collapsed: false
+    pages:
+      - title: "Placeholder"
+        path: "reference/placeholder.md"
+
+  - title: "Patterns"
+    path: "patterns"
+    collapsed: false
+    pages:
+      - title: "Catalog"
+        path: "patterns/index.md"
+
+  - title: "Recipes"
+    path: "recipes"
+    collapsed: false
+    pages:
+      - title: "Placeholder"
+        path: "recipes/placeholder.md"
+
+server:
+  port: 8080
+  host: "localhost"
+  debug: true
+
+styling:
+  theme: "clean"
+  primary_color: "#5a67d8"
+  font: "system-ui"
+
+blocks:
+  auto_id: true
+  id_format: "kebab-case"
+  show_line_numbers: false
+
+features:
+  hot_reload: true
+  sidebar: true

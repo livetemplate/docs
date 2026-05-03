@@ -1,0 +1,23 @@
+name: build
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.26'
+
+      - name: Install tinkerdown
+        run: go install github.com/livetemplate/tinkerdown/cmd/tinkerdown@latest
+
+      - name: Validate content
+        run: tinkerdown validate content/

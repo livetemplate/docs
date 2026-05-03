@@ -1,0 +1,20 @@
+# Worktrees (per workspace convention)
+.worktrees/
+
+# Build output
+dist/
+*.exe
+
+# Local tinkerdown data
+*.db
+*.db-journal
+
+# Editor / OS
+.DS_Store
+.idea/
+.vscode/
+*.swp
+
+# Local env
+.env
+.env.local
