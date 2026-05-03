@@ -1,7 +1,5 @@
 ---
 title: "Install"
-source_repo: "https://github.com/livetemplate/livetemplate"
-source_path: "README.md"
 ---
 
 # Install
