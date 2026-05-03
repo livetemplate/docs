@@ -29,3 +29,7 @@ jobs:
 
       - name: Validate content
         run: tinkerdown validate content/
+
+      - name: Test sync tool
+        working-directory: cmd/sync
+        run: go test ./... -count=1

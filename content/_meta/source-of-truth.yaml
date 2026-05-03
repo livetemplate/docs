@@ -15,12 +15,11 @@
 # native to this repo; the sync action skips it.
 
 pages:
-  # ---- Getting Started ----
-  - site_url: /getting-started/install
-    source_repo: https://github.com/livetemplate/livetemplate
-    source_path: README.md
-    split_section: quick-start
-    transform: extract
+  # NOTE: /getting-started/install is intentionally NOT here — that page is
+  # a hybrid (extracted Quick Start + docs-site authored "What next?"
+  # additions). It lives natively in the docs repo. See "Hybrid pages —
+  # design tension surfaced" in learnings/phase-2.md and the deferred
+  # `mirror_mode: extract` schema work for Phase 3.
 
   # ---- Guides ----
   - site_url: /guides/progressive-complexity
