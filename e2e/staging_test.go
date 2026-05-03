@@ -172,22 +172,55 @@ func TestThemeAccentInjected(t *testing.T) {
 
 // TestPatternsCatalogIsNative verifies the docs site's catalog page is
 // served from local markdown (NOT proxied), even though sub-paths like
-// /patterns/forms/* are.
+// /patterns/forms/* are. After Phase 4 the catalog lists all 33
+// patterns, so this also serves as a count-regression check.
 func TestPatternsCatalogIsNative(t *testing.T) {
 	ctx, cancel := newCtx(t)
 	defer cancel()
 
+	var linkCount int
 	var bodyText string
 	if err := chromedp.Run(ctx,
 		chromedp.Navigate(baseURL()+"/patterns/"),
 		chromedp.Text("body", &bodyText, chromedp.ByQuery),
+		chromedp.Evaluate(`document.querySelectorAll('a[href^="/patterns/"]').length`, &linkCount),
 	); err != nil {
 		t.Fatalf("navigate: %v", err)
 	}
-	// The native markdown page contains this phrase; the upstream patterns
-	// app does not.
-	if !strings.Contains(bodyText, "Phase 4 builds the full") {
+	// Catalog phrase only present on the native page (the upstream
+	// patterns app's index says "31 UI patterns demonstrating
+	// progressive complexity", different wording).
+	if !strings.Contains(bodyText, "33 reactive") {
 		t.Errorf("catalog page does not look native: body excerpt:\n%s", bodyText[:min(500, len(bodyText))])
+	}
+	// Phase 4: 33 individual pattern links (5 are also rendered as
+	// section headers in the sidebar; that's fine, the assertion is on
+	// links into /patterns/<category>/<slug>).
+	if linkCount < 33 {
+		t.Errorf("catalog has %d pattern links; want >= 33", linkCount)
+	}
+}
+
+// TestPatternsAPIReachable verifies the upstream patterns app is
+// serving the JSON catalog endpoint that powers (or could power) the
+// docs catalog. If this breaks, the docs catalog is at risk of
+// silently going stale relative to what's actually deployed.
+func TestPatternsAPIReachable(t *testing.T) {
+	warmupStaging(t)
+	client := &http.Client{Timeout: 15 * time.Second}
+	resp, err := client.Get("https://lt-patterns.fly.dev/api/index.json")
+	if err != nil {
+		t.Fatalf("fetch /api/index.json: %v", err)
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != 200 {
+		t.Errorf("status = %d, want 200", resp.StatusCode)
+	}
+	if ct := resp.Header.Get("Content-Type"); ct != "application/json" {
+		t.Errorf("content-type = %q, want application/json", ct)
+	}
+	if cors := resp.Header.Get("Access-Control-Allow-Origin"); cors != "*" {
+		t.Errorf("Access-Control-Allow-Origin = %q, want * (cross-origin docs fetch needs it)", cors)
 	}
 }
 
