@@ -1,0 +1,34 @@
+# Production fly.io config for the LiveTemplate docs site.
+# Deployed on merge to main via .github/workflows/deploy.yml.
+#
+# Staging config lives in fly.toml — kept separate so manual `flyctl deploy`
+# from a developer's laptop targets staging by default and can't accidentally
+# push to prod without `--config fly.production.toml`.
+
+app = "livetemplate"
+primary_region = "sjc"
+
+[build]
+  dockerfile = "Dockerfile"
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  auto_stop_machines = "stop"
+  auto_start_machines = true
+  # Keep one machine warm so the first request doesn't eat 10-25s of
+  # cold-start latency. Cheap on shared 1cpu/512mb. Set to 0 to save
+  # cost in exchange for slower first response.
+  min_machines_running = 1
+
+  [[http_service.checks]]
+    grace_period = "10s"
+    interval = "30s"
+    method = "GET"
+    timeout = "5s"
+    path = "/health"
+
+[[vm]]
+  cpu_kind = "shared"
+  cpus = 1
+  memory_mb = 512

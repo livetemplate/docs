@@ -5,6 +5,9 @@ type: "site"
 site:
   home: "index.md"
   repository: "https://github.com/livetemplate/docs"
+  # Canonical absolute base URL — drives sitemap.xml + OpenGraph og:url
+  # + canonical link tags. No trailing slash.
+  url: "https://livetemplate.fly.dev"
 
 navigation:
   - title: "Getting Started"

@@ -1,5 +1,6 @@
 ---
 title: "LiveTemplate"
+description: "Build interactive web applications in Go using a simplified programming model. Write server-side code, get reactive UIs automatically."
 ---
 
 # LiveTemplate
