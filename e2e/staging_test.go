@@ -170,34 +170,45 @@ func TestThemeAccentInjected(t *testing.T) {
 	}
 }
 
-// TestPatternsCatalogIsNative verifies the docs site's catalog page is
-// served from local markdown (NOT proxied), even though sub-paths like
-// /patterns/forms/* are. After Phase 4 the catalog lists all 33
-// patterns, so this also serves as a count-regression check.
-func TestPatternsCatalogIsNative(t *testing.T) {
+// TestRecipe1_CatalogHydratesFromREST verifies Phase 5 recipe 1: the
+// /patterns/ catalog is a tinkerdown <div lvt-source="patterns"> block
+// that renders a "Connecting..." placeholder server-side, then hydrates
+// over WebSocket from https://lt-patterns.fly.dev/api/index.json.
+//
+// We must NOT inspect the curl body — it would only show the loading
+// shell. Instead, wait for a [data-test="pattern-row"] element (only
+// produced by the post-hydration template) to appear, then count rows.
+//
+// This test also pulls double duty as a Phase 4 regression check: if
+// the upstream pattern count drops below 30 (someone deleted patterns
+// without updating data.go) OR the WS bind silently breaks (sources
+// config typo, network, CORS), we catch it here.
+func TestRecipe1_CatalogHydratesFromREST(t *testing.T) {
 	ctx, cancel := newCtx(t)
 	defer cancel()
 
-	var linkCount int
-	var bodyText string
+	var rowCount int
+	var summary string
 	if err := chromedp.Run(ctx,
 		chromedp.Navigate(baseURL()+"/patterns/"),
-		chromedp.Text("body", &bodyText, chromedp.ByQuery),
-		chromedp.Evaluate(`document.querySelectorAll('a[href^="/patterns/"]').length`, &linkCount),
+		// Hydration is gated on a successful WS source fetch; if the
+		// REST source ever fails, this WaitVisible deadlocks until the
+		// per-test timeout — exactly the observable failure we want.
+		chromedp.WaitVisible(`[data-test="pattern-row"]`, chromedp.ByQuery),
+		chromedp.Text(`[data-test="catalog-summary"]`, &summary, chromedp.ByQuery),
+		chromedp.Evaluate(
+			`document.querySelectorAll('[data-test="pattern-row"]').length`,
+			&rowCount,
+		),
 	); err != nil {
-		t.Fatalf("navigate: %v", err)
+		t.Fatalf("hydrate: %v\nsummary so far: %q", err, summary)
 	}
-	// Catalog phrase only present on the native page (the upstream
-	// patterns app's index says "31 UI patterns demonstrating
-	// progressive complexity", different wording).
-	if !strings.Contains(bodyText, "33 reactive") {
-		t.Errorf("catalog page does not look native: body excerpt:\n%s", bodyText[:min(500, len(bodyText))])
+
+	if rowCount < 30 {
+		t.Errorf("catalog hydrated with %d pattern rows; want >= 30 (drift between upstream API and docs catalog?)", rowCount)
 	}
-	// Phase 4: 33 individual pattern links (5 are also rendered as
-	// section headers in the sidebar; that's fine, the assertion is on
-	// links into /patterns/<category>/<slug>).
-	if linkCount < 33 {
-		t.Errorf("catalog has %d pattern links; want >= 33", linkCount)
+	if !strings.Contains(summary, "categories from the upstream API") {
+		t.Errorf("catalog summary did not render expected text: %q", summary)
 	}
 }
 
@@ -266,6 +277,8 @@ func TestSidebarWalk(t *testing.T) {
 		"/examples/flash-messages",
 		"/examples/progressive-enhancement",
 		"/examples/ws-disabled",
+		"/recipes/architecture-flow",
+		"/recipes/patterns-stats",
 		"/contributing/livetemplate",
 		"/contributing/client",
 		"/contributing/cli",
@@ -321,6 +334,85 @@ func TestEditLinkForSyncedPage(t *testing.T) {
 	want := "https://github.com/livetemplate/livetemplate/edit/main/docs/guides/progressive-complexity.md"
 	if href != want {
 		t.Errorf("synced page edit link = %q, want %q\n  (frontmatter source_repo+source_path should win over site repo)", href, want)
+	}
+}
+
+// TestRecipe2_ArchitectureFlowDiagramRenders verifies Phase 5 recipe 2:
+// the architecture page contains a Mermaid sequence diagram that
+// renders to inline SVG client-side, and the presentation-mode chrome
+// that lets the page be walked as a slide deck.
+//
+// Mermaid hydrates after page load — wait for an <svg> to appear
+// inside the rendered block. The presence of the .presentation-btn
+// in the page chrome proves the second feature is wired.
+func TestRecipe2_ArchitectureFlowDiagramRenders(t *testing.T) {
+	ctx, cancel := newCtx(t)
+	defer cancel()
+
+	var svgCount, presentBtnCount int
+	if err := chromedp.Run(ctx,
+		chromedp.Navigate(baseURL()+"/recipes/architecture-flow"),
+		chromedp.WaitVisible("h1", chromedp.ByQuery),
+		// Mermaid initializes asynchronously after DOMContentLoaded.
+		// Poll until at least one rendered <svg> appears or the
+		// per-test timeout fires.
+		chromedp.Poll(
+			`document.querySelectorAll('.mermaid svg, [data-tinkerdown-block] svg').length > 0`,
+			nil,
+			chromedp.WithPollingTimeout(20*time.Second),
+		),
+		chromedp.Evaluate(
+			`document.querySelectorAll('.mermaid svg, [data-tinkerdown-block] svg').length`,
+			&svgCount,
+		),
+		chromedp.Evaluate(
+			`document.querySelectorAll('.presentation-btn').length`,
+			&presentBtnCount,
+		),
+	); err != nil {
+		t.Fatalf("hydrate: %v", err)
+	}
+
+	if svgCount == 0 {
+		t.Errorf("no Mermaid SVG rendered on architecture-flow recipe; mermaid bundle wired?")
+	}
+	if presentBtnCount == 0 {
+		t.Errorf("no .presentation-btn in chrome; presentation-mode feature regressed?")
+	}
+}
+
+// TestRecipe3_StatsViewSharesPatternsSource verifies Phase 5 recipe 3:
+// the stats page binds to the SAME patterns source as the catalog and
+// hydrates a different view (table with category rows) from it. This
+// proves the "one source, many views" pattern is wired — the source
+// is reachable from a second page without redeclaration.
+//
+// If this passes but TestRecipe1 fails, something is wrong with the
+// catalog template specifically. If both fail, the source itself is
+// likely broken (network, sources config, CORS).
+func TestRecipe3_StatsViewSharesPatternsSource(t *testing.T) {
+	ctx, cancel := newCtx(t)
+	defer cancel()
+
+	var rowCount int
+	var summary string
+	if err := chromedp.Run(ctx,
+		chromedp.Navigate(baseURL()+"/recipes/patterns-stats"),
+		chromedp.WaitVisible(`[data-test="cat-row"]`, chromedp.ByQuery),
+		chromedp.Text(`[data-test="stats-summary"]`, &summary, chromedp.ByQuery),
+		chromedp.Evaluate(
+			`document.querySelectorAll('[data-test="cat-row"]').length`,
+			&rowCount,
+		),
+	); err != nil {
+		t.Fatalf("hydrate: %v", err)
+	}
+
+	if rowCount < 5 {
+		t.Errorf("stats page hydrated with %d category rows; want >= 5", rowCount)
+	}
+	if !strings.Contains(summary, "categories") {
+		t.Errorf("stats summary did not render expected text: %q", summary)
 	}
 }
 

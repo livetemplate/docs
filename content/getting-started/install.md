@@ -80,6 +80,8 @@ See the [CLI guide](/cli) for the full command reference.
 ## What next?
 
 - [Progressive Complexity](/guides/progressive-complexity) — the framework's two-tier model (start with standard HTML, layer on `lvt-*` attributes only when needed).
+- [How a LiveTemplate Update Flows](/recipes/architecture-flow) — interactive walkthrough of what happens between a click and a DOM patch (with sequence diagram).
 - [Server API reference](/reference/api) — `New`, `Handle`, `Context`, action method dispatch.
 - [Client Attributes reference](/reference/client-attributes) — the full `lvt-*` attribute catalog.
 - [Examples](/examples/) — runnable apps for every common pattern.
+- [Patterns catalog](/patterns/) — 30+ live, reactive UI idioms you can copy.

@@ -89,10 +89,14 @@ navigation:
 
   - title: "Recipes"
     path: "recipes"
-    collapsed: true
+    collapsed: false
     pages:
-      - title: "Coming in Phase 5"
-        path: "recipes/placeholder.md"
+      - title: "Live Patterns Catalog"
+        path: "patterns/index.md"
+      - title: "How a LiveTemplate Update Flows"
+        path: "recipes/architecture-flow.md"
+      - title: "Anatomy of the Patterns Catalog"
+        path: "recipes/patterns-stats.md"
 
   - title: "Examples"
     path: "examples"
@@ -134,6 +138,16 @@ navigation:
     pages:
       - title: "All Changes"
         path: "changelog.md"
+
+sources:
+  # Phase 5 recipe 1: live patterns catalog from the deployed examples/patterns app.
+  # /patterns/index.md binds to this via <div lvt-source="patterns">.
+  patterns:
+    type: rest
+    from: https://lt-patterns.fly.dev/api/index.json
+    result_path: categories
+    cache:
+      ttl: 5m
 
 routes:
   # External-app router (Phase 1 PR-D): pattern category subtrees proxy
