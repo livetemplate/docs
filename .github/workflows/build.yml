@@ -16,8 +16,16 @@ jobs:
         with:
           go-version: '1.26'
 
-      - name: Install tinkerdown
-        run: go install github.com/livetemplate/tinkerdown/cmd/tinkerdown@latest
+      # `go install github.com/livetemplate/tinkerdown/cmd/tinkerdown@latest`
+      # is broken: the published module ZIP excludes internal/assets/vendor/*
+      # (mermaid.min.js exceeds Go's per-file size limit) so the embed.FS
+      # directive fails to compile. Build from source until upstream fixes it.
+      - name: Build tinkerdown from source
+        run: |
+          git clone --depth=1 https://github.com/livetemplate/tinkerdown.git /tmp/tk
+          cd /tmp/tk
+          go build -o /usr/local/bin/tinkerdown ./cmd/tinkerdown
+          tinkerdown version
 
       - name: Validate content
         run: tinkerdown validate content/
