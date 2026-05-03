@@ -6,11 +6,138 @@ site:
   home: "index.md"
   repository: "https://github.com/livetemplate/docs"
 
-# External-app router: /patterns/* is served by the deployed patterns
-# showcase, NOT resolved as markdown. The catalog index at /patterns
-# (no trailing slash) still works because content/patterns/index.md
-# wins over the prefix match in tinkerdown's exact-match-first dispatch.
+navigation:
+  - title: "Getting Started"
+    path: "getting-started"
+    collapsed: false
+    pages:
+      - title: "Install"
+        path: "getting-started/install.md"
+
+  - title: "Guides"
+    path: "guides"
+    collapsed: false
+    pages:
+      - title: "Progressive Complexity"
+        path: "guides/progressive-complexity.md"
+      - title: "Standard HTML Reactivity"
+        path: "guides/standard-html-reactivity.md"
+      - title: "Ephemeral Components"
+        path: "guides/ephemeral-components.md"
+      - title: "Observability"
+        path: "guides/observability.md"
+      - title: "Scaling"
+        path: "guides/scaling.md"
+
+  - title: "Reference"
+    path: "reference"
+    collapsed: false
+    pages:
+      - title: "Server API (Go)"
+        path: "reference/api.md"
+      - title: "Client Attributes"
+        path: "reference/client-attributes.md"
+      - title: "Configuration"
+        path: "reference/configuration.md"
+      - title: "Session"
+        path: "reference/session.md"
+      - title: "Server Actions"
+        path: "reference/server-actions.md"
+      - title: "Authentication"
+        path: "reference/authentication.md"
+      - title: "Uploads"
+        path: "reference/uploads.md"
+      - title: "Pub/Sub"
+        path: "reference/pubsub.md"
+      - title: "Error Handling"
+        path: "reference/error-handling.md"
+      - title: "Controller Pattern"
+        path: "reference/controller-pattern.md"
+      - title: "Navigate"
+        path: "reference/navigate.md"
+      - title: "Template Support"
+        path: "reference/template-support-matrix.md"
+      - title: "Limitations"
+        path: "reference/limitations.md"
+
+  - title: "CLI (lvt)"
+    path: "cli"
+    collapsed: true
+    pages:
+      - title: "Overview"
+        path: "cli/index.md"
+      - title: "Auth Customization"
+        path: "cli/auth-customization.md"
+      - title: "Components"
+        path: "cli/components.md"
+      - title: "Testing"
+        path: "cli/testing.md"
+
+  - title: "TypeScript Client"
+    path: "client"
+    collapsed: true
+    pages:
+      - title: "Overview"
+        path: "client/index.md"
+
+  - title: "Patterns"
+    path: "patterns"
+    collapsed: true
+    pages:
+      - title: "Catalog"
+        path: "patterns/index.md"
+
+  - title: "Recipes"
+    path: "recipes"
+    collapsed: true
+    pages:
+      - title: "Coming in Phase 5"
+        path: "recipes/placeholder.md"
+
+  - title: "Examples"
+    path: "examples"
+    collapsed: true
+    pages:
+      - title: "All Examples"
+        path: "examples/index.md"
+      - title: "Counter"
+        path: "examples/counter.md"
+      - title: "Todos"
+        path: "examples/todos.md"
+      - title: "Chat"
+        path: "examples/chat.md"
+      - title: "Avatar Upload"
+        path: "examples/avatar-upload.md"
+      - title: "Flash Messages"
+        path: "examples/flash-messages.md"
+      - title: "Progressive Enhancement"
+        path: "examples/progressive-enhancement.md"
+      - title: "WS Disabled"
+        path: "examples/ws-disabled.md"
+
+  - title: "Contributing"
+    path: "contributing"
+    collapsed: true
+    pages:
+      - title: "livetemplate"
+        path: "contributing/livetemplate.md"
+      - title: "client"
+        path: "contributing/client.md"
+      - title: "lvt (CLI)"
+        path: "contributing/cli.md"
+      - title: "examples"
+        path: "contributing/examples.md"
+
+  - title: "Changelog"
+    path: "changelog.md"
+    collapsed: true
+    pages:
+      - title: "All Changes"
+        path: "changelog.md"
+
 routes:
+  # External-app router (Phase 1 PR-D): pattern category subtrees proxy
+  # to the deployed examples/patterns app, NOT resolved as markdown.
   - pattern: "/patterns/forms/"
     type: "proxy"
     upstream: "https://lt-patterns.fly.dev"
@@ -32,35 +159,6 @@ routes:
   - pattern: "/patterns/search/"
     type: "proxy"
     upstream: "https://lt-patterns.fly.dev"
-
-navigation:
-  - title: "Getting Started"
-    path: "getting-started"
-    collapsed: false
-    pages:
-      - title: "Install"
-        path: "getting-started/install.md"
-
-  - title: "Reference"
-    path: "reference"
-    collapsed: false
-    pages:
-      - title: "Placeholder"
-        path: "reference/placeholder.md"
-
-  - title: "Patterns"
-    path: "patterns"
-    collapsed: false
-    pages:
-      - title: "Catalog"
-        path: "patterns/index.md"
-
-  - title: "Recipes"
-    path: "recipes"
-    collapsed: false
-    pages:
-      - title: "Placeholder"
-        path: "recipes/placeholder.md"
 
 server:
   port: 8080

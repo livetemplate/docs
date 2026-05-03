@@ -1,0 +1,146 @@
+# Machine-readable source-of-truth matrix consumed by the Phase 3 sync
+# action. The human-readable companion at source-of-truth.md is the
+# canonical reference; this file mirrors it in a format the Go sync
+# script can iterate without parsing markdown tables.
+#
+# Schema:
+#   pages:
+#     - site_url: <path on docs site>
+#       source_repo: <github org/repo>     # full URL form
+#       source_path: <path within repo>
+#       split_section: <optional anchor>   # for split-from-readme entries
+#       transform: <none|extract>          # how to extract content
+#
+# When source_repo == https://github.com/livetemplate/docs the page is
+# native to this repo; the sync action skips it.
+
+pages:
+  # ---- Getting Started ----
+  - site_url: /getting-started/install
+    source_repo: https://github.com/livetemplate/livetemplate
+    source_path: README.md
+    split_section: quick-start
+    transform: extract
+
+  # ---- Guides ----
+  - site_url: /guides/progressive-complexity
+    source_repo: https://github.com/livetemplate/livetemplate
+    source_path: docs/guides/progressive-complexity.md
+  - site_url: /guides/standard-html-reactivity
+    source_repo: https://github.com/livetemplate/livetemplate
+    source_path: docs/guides/standard-html-reactivity.md
+  - site_url: /guides/ephemeral-components
+    source_repo: https://github.com/livetemplate/livetemplate
+    source_path: docs/guides/ephemeral-components.md
+  - site_url: /guides/observability
+    source_repo: https://github.com/livetemplate/livetemplate
+    source_path: docs/guides/OBSERVABILITY.md
+  - site_url: /guides/scaling
+    source_repo: https://github.com/livetemplate/livetemplate
+    source_path: docs/guides/SCALING.md
+
+  # ---- Reference ----
+  - site_url: /reference/api
+    source_repo: https://github.com/livetemplate/livetemplate
+    source_path: docs/references/api-reference.md
+  - site_url: /reference/client-attributes
+    source_repo: https://github.com/livetemplate/livetemplate
+    source_path: docs/references/client-attributes.md
+  - site_url: /reference/configuration
+    source_repo: https://github.com/livetemplate/livetemplate
+    source_path: docs/references/CONFIGURATION.md
+  - site_url: /reference/session
+    source_repo: https://github.com/livetemplate/livetemplate
+    source_path: docs/references/session.md
+  - site_url: /reference/server-actions
+    source_repo: https://github.com/livetemplate/livetemplate
+    source_path: docs/references/server-actions.md
+  - site_url: /reference/authentication
+    source_repo: https://github.com/livetemplate/livetemplate
+    source_path: docs/references/authentication.md
+  - site_url: /reference/uploads
+    source_repo: https://github.com/livetemplate/livetemplate
+    source_path: docs/references/uploads.md
+  - site_url: /reference/pubsub
+    source_repo: https://github.com/livetemplate/livetemplate
+    source_path: docs/references/pubsub.md
+  - site_url: /reference/error-handling
+    source_repo: https://github.com/livetemplate/livetemplate
+    source_path: docs/references/error-handling.md
+  - site_url: /reference/controller-pattern
+    source_repo: https://github.com/livetemplate/livetemplate
+    source_path: docs/references/controller-pattern.md
+  - site_url: /reference/navigate
+    source_repo: https://github.com/livetemplate/livetemplate
+    source_path: docs/references/navigate.md
+  - site_url: /reference/template-support-matrix
+    source_repo: https://github.com/livetemplate/livetemplate
+    source_path: docs/references/template-support-matrix.md
+  - site_url: /reference/limitations
+    source_repo: https://github.com/livetemplate/livetemplate
+    source_path: docs/references/current-limitations.md
+  - site_url: /reference/progressive-complexity
+    source_repo: https://github.com/livetemplate/livetemplate
+    source_path: docs/references/progressive-complexity-reference.md
+
+  # ---- CLI (lvt) ----
+  - site_url: /cli
+    source_repo: https://github.com/livetemplate/lvt
+    source_path: docs/guides/lvt-cli-guide.md
+  - site_url: /cli/auth-customization
+    source_repo: https://github.com/livetemplate/lvt
+    source_path: docs/guides/auth-customization.md
+  - site_url: /cli/components
+    source_repo: https://github.com/livetemplate/lvt
+    source_path: components/README.md
+  - site_url: /cli/testing
+    source_repo: https://github.com/livetemplate/lvt
+    source_path: testing/README.md
+  - site_url: /cli/ai-assistants
+    source_repo: https://github.com/livetemplate/lvt
+    source_path: .github/copilot-instructions.md
+
+  # ---- TypeScript Client ----
+  - site_url: /client
+    source_repo: https://github.com/livetemplate/client
+    source_path: README.md
+
+  # ---- Examples ----
+  - site_url: /examples/
+    source_repo: https://github.com/livetemplate/examples
+    source_path: README.md
+  - site_url: /examples/counter
+    source_repo: https://github.com/livetemplate/examples
+    source_path: counter/README.md
+  - site_url: /examples/todos
+    source_repo: https://github.com/livetemplate/examples
+    source_path: todos/README.md
+  - site_url: /examples/chat
+    source_repo: https://github.com/livetemplate/examples
+    source_path: chat/README.md
+  - site_url: /examples/avatar-upload
+    source_repo: https://github.com/livetemplate/examples
+    source_path: avatar-upload/README.md
+  - site_url: /examples/flash-messages
+    source_repo: https://github.com/livetemplate/examples
+    source_path: flash-messages/README.md
+  - site_url: /examples/progressive-enhancement
+    source_repo: https://github.com/livetemplate/examples
+    source_path: progressive-enhancement/README.md
+  - site_url: /examples/ws-disabled
+    source_repo: https://github.com/livetemplate/examples
+    source_path: ws-disabled/README.md
+
+  # ---- Contributing ----
+  - site_url: /contributing/livetemplate
+    source_repo: https://github.com/livetemplate/livetemplate
+    source_path: CONTRIBUTING.md
+  - site_url: /contributing/client
+    source_repo: https://github.com/livetemplate/client
+    source_path: CONTRIBUTING.md
+  - site_url: /contributing/cli
+    source_repo: https://github.com/livetemplate/lvt
+    source_path: CONTRIBUTING.md
+  - site_url: /contributing/examples
+    source_repo: https://github.com/livetemplate/examples
+    source_path: CONTRIBUTING.md

@@ -6,15 +6,23 @@ title: "LiveTemplate"
 
 Build interactive web applications in Go using a simplified programming model. Write server-side code, get reactive UIs automatically.
 
-This site is a placeholder. Real content lands in Phase 2 of the build plan.
+## Get started
 
-## Try it
+- [Install](/getting-started/install) — `go get`, a counter app, three steps to a running page
+- [Progressive Complexity](/guides/progressive-complexity) — start with standard HTML; add `lvt-*` attributes only when needed
+- [Server API reference](/reference/api) — `New`, `Handle`, `Context`, action method dispatch
+- [Client Attributes reference](/reference/client-attributes) — the full `lvt-*` attribute catalog
 
-- [Install](/getting-started/install) — get the toolchain
-- [Reference](/reference/placeholder) — API and attributes
-- [Patterns](/patterns) — browsable catalog of UI patterns
-- [Recipes](/recipes/placeholder) — interactive walkthroughs
+## Browse
 
-## About this site
+- [Guides](/guides/progressive-complexity) — conceptual walkthroughs, scaling, observability
+- [Reference](/reference/api) — types, attributes, configuration
+- [CLI (lvt)](/cli) — code generator, dev server, kit system
+- [TypeScript Client](/client) — npm package, browser-side runtime
+- [Patterns](/patterns/) — 31 interactive UI patterns served live by `examples/patterns`
+- [Examples](/examples/) — runnable apps for every common pattern
+- [Changelog](/changelog) — releases across all four repos
 
-Built with [tinkerdown](https://github.com/livetemplate/tinkerdown). Source lives at [livetemplate/docs](https://github.com/livetemplate/docs); content is mirrored from [livetemplate](https://github.com/livetemplate/livetemplate), [client](https://github.com/livetemplate/client), [lvt](https://github.com/livetemplate/lvt), and [examples](https://github.com/livetemplate/examples) on each release.
+## How this site is built
+
+This is a [tinkerdown](https://github.com/livetemplate/tinkerdown) site. Most pages are mirrored from canonical files in the source repos ([livetemplate](https://github.com/livetemplate/livetemplate), [client](https://github.com/livetemplate/client), [lvt](https://github.com/livetemplate/lvt), [examples](https://github.com/livetemplate/examples)) and re-published on each release. Pattern detail pages are reverse-proxied to a deployed [livetemplate/examples/patterns](https://github.com/livetemplate/examples/tree/main/patterns) showcase. The "Edit this page on GitHub" link in every footer points to the canonical source — that's where corrections should land.
