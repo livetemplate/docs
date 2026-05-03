@@ -47,7 +47,10 @@ func main() {
 
 	viewports := []viewport{
 		{name: "desktop", width: 1280, height: 800, mobile: false},
-		{name: "mobile", width: 375, height: 667, mobile: true},
+		{name: "tablet", width: 768, height: 1024, mobile: true},
+		{name: "iphone-se", width: 375, height: 667, mobile: true},
+		{name: "iphone-14", width: 393, height: 852, mobile: true},
+		{name: "iphone-14-pro-max", width: 430, height: 932, mobile: true},
 	}
 
 	ctx, cancel := chromedp.NewContext(context.Background())
