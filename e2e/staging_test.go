@@ -191,6 +191,106 @@ func TestPatternsCatalogIsNative(t *testing.T) {
 	}
 }
 
+// TestSidebarWalk visits every URL emitted by the sidebar nav and
+// asserts none returns an error status. Phase 2 brings this from the
+// 5 placeholder pages to the full ~40-page site, so the walk is the
+// canary for "did the manual port land cleanly without breaking refs".
+func TestSidebarWalk(t *testing.T) {
+	warmupStaging(t)
+
+	urls := []string{
+		"/",
+		"/getting-started/install",
+		"/guides/progressive-complexity",
+		"/guides/standard-html-reactivity",
+		"/guides/ephemeral-components",
+		"/guides/observability",
+		"/guides/scaling",
+		"/reference/api",
+		"/reference/client-attributes",
+		"/reference/configuration",
+		"/reference/session",
+		"/reference/server-actions",
+		"/reference/authentication",
+		"/reference/uploads",
+		"/reference/pubsub",
+		"/reference/error-handling",
+		"/reference/controller-pattern",
+		"/reference/navigate",
+		"/reference/template-support-matrix",
+		"/reference/limitations",
+		"/cli/",
+		"/cli/auth-customization",
+		"/cli/components",
+		"/cli/testing",
+		"/client/",
+		"/patterns/",
+		"/examples/",
+		"/examples/counter",
+		"/examples/todos",
+		"/examples/chat",
+		"/examples/avatar-upload",
+		"/examples/flash-messages",
+		"/examples/progressive-enhancement",
+		"/examples/ws-disabled",
+		"/contributing/livetemplate",
+		"/contributing/client",
+		"/contributing/cli",
+		"/contributing/examples",
+		"/changelog",
+	}
+
+	// Browser-only walk would re-allocate Chrome 39 times; fall back to a
+	// plain HTTP GET per URL with the test's existing client. Each URL
+	// visited via 200 status is sufficient for the regression — chromedp
+	// covers behaviour-level checks in the other tests.
+	client := &http.Client{Timeout: 15 * time.Second}
+	failures := 0
+	for _, u := range urls {
+		full := baseURL() + u
+		resp, err := client.Get(full)
+		if err != nil {
+			t.Errorf("%s: %v", u, err)
+			failures++
+			continue
+		}
+		resp.Body.Close()
+		// 303 is acceptable: tinkerdown redirects /cli to /cli/ when
+		// only the index variant exists. Anything else outside 2xx
+		// counts as a failure.
+		ok := (resp.StatusCode >= 200 && resp.StatusCode < 300) || resp.StatusCode == 303
+		if !ok {
+			t.Errorf("%s: HTTP %d", u, resp.StatusCode)
+			failures++
+		}
+	}
+	if failures > 0 {
+		t.Errorf("%d of %d sidebar URLs failed", failures, len(urls))
+	}
+}
+
+// TestEditLinkForSyncedPage asserts that a page mirrored from another
+// repo (frontmatter source_repo + source_path set) renders an edit link
+// pointing at THAT repo, not the docs site. Without this, "Edit this
+// page" sends contributors to the wrong repo and edits get lost when
+// the next sync overwrites them.
+func TestEditLinkForSyncedPage(t *testing.T) {
+	ctx, cancel := newCtx(t)
+	defer cancel()
+
+	var href string
+	if err := chromedp.Run(ctx,
+		chromedp.Navigate(baseURL()+"/guides/progressive-complexity"),
+		chromedp.AttributeValue(".page-edit-link a", "href", &href, nil, chromedp.ByQuery),
+	); err != nil {
+		t.Fatalf("locate edit link: %v", err)
+	}
+	want := "https://github.com/livetemplate/livetemplate/edit/main/docs/guides/progressive-complexity.md"
+	if href != want {
+		t.Errorf("synced page edit link = %q, want %q\n  (frontmatter source_repo+source_path should win over site repo)", href, want)
+	}
+}
+
 // TestPatternProxiedAndInteractive verifies PR-D end-to-end. Visiting
 // /patterns/forms/click-to-edit on the docs site reverse-proxies to
 // the lt-patterns app, the upstream's interactive UI loads, and we can
