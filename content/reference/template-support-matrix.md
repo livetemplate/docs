@@ -1,8 +1,8 @@
 ---
-title: "Template Support Matrix"
+title: "LiveTemplate Go Template Support Matrix"
 source_repo: "https://github.com/livetemplate/livetemplate"
 source_path: "docs/references/template-support-matrix.md"
-source_commit: "4f5cba316c0574fe6a4a55792ad6edab30d7e8fc"
+source_commit: "5635ad1e94063d00766ff925126d146ecd3ff3de"
 ---
 
 # LiveTemplate Go Template Support Matrix

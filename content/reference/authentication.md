@@ -1,8 +1,8 @@
 ---
-title: "Authentication"
+title: "Authentication Reference"
 source_repo: "https://github.com/livetemplate/livetemplate"
 source_path: "docs/references/authentication.md"
-source_commit: "5f0f711cfbe838babd3103ae85140cc249bb38a8"
+source_commit: "5635ad1e94063d00766ff925126d146ecd3ff3de"
 ---
 
 # Authentication Reference

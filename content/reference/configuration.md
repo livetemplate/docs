@@ -1,8 +1,8 @@
 ---
-title: "Configuration"
+title: "LiveTemplate Configuration Guide"
 source_repo: "https://github.com/livetemplate/livetemplate"
 source_path: "docs/references/CONFIGURATION.md"
-source_commit: "8eefd56da4c1f4b8b461fd915cfd943c96fb2dc4"
+source_commit: "5635ad1e94063d00766ff925126d146ecd3ff3de"
 ---
 
 # LiveTemplate Configuration Guide

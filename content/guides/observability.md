@@ -1,8 +1,8 @@
 ---
-title: "Observability"
+title: "LiveTemplate Observability Guide"
 source_repo: "https://github.com/livetemplate/livetemplate"
 source_path: "docs/guides/OBSERVABILITY.md"
-source_commit: "e05652492ea15534981c680b08033646c7a3f2c9"
+source_commit: "5635ad1e94063d00766ff925126d146ecd3ff3de"
 ---
 
 # LiveTemplate Observability Guide

@@ -1,8 +1,8 @@
 ---
-title: "Contributing to livetemplate"
+title: "Contributing to LiveTemplate Core Library"
 source_repo: "https://github.com/livetemplate/livetemplate"
 source_path: "CONTRIBUTING.md"
-source_commit: "ad292561c1b90844de5c3ffb4f762f30e6a90b54"
+source_commit: "5635ad1e94063d00766ff925126d146ecd3ff3de"
 ---
 
 # Contributing to LiveTemplate Core Library
@@ -14,9 +14,9 @@ Thank you for your interest in contributing to the LiveTemplate core library! Th
 LiveTemplate is distributed across multiple repositories. Please use the appropriate contribution guide:
 
 - **[Core Library](https://github.com/livetemplate/livetemplate)** (this repo) - Go server-side library
-- **[Client Library](https://github.com/livetemplate/client)** - TypeScript client for browsers → [Client CONTRIBUTING.md](https://github.com/livetemplate/client/blob/main/CONTRIBUTING.md)
-- **[CLI Tool (lvt)](https://github.com/livetemplate/lvt)** - Code generator and dev server → [LVT CONTRIBUTING.md](https://github.com/livetemplate/lvt/blob/main/CONTRIBUTING.md)
-- **[Examples](https://github.com/livetemplate/examples)** - Example applications → [Examples CONTRIBUTING.md](https://github.com/livetemplate/examples/blob/main/CONTRIBUTING.md)
+- **[Client Library](https://github.com/livetemplate/client)** - TypeScript client for browsers → [Client CONTRIBUTING.md](/contributing/client)
+- **[CLI Tool (lvt)](https://github.com/livetemplate/lvt)** - Code generator and dev server → [LVT CONTRIBUTING.md](/contributing/cli)
+- **[Examples](https://github.com/livetemplate/examples)** - Example applications → [Examples CONTRIBUTING.md](/contributing/examples)
 
 ---
 
