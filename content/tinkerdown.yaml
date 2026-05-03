@@ -211,3 +211,8 @@ blocks:
 features:
   hot_reload: true
   sidebar: true
+  # G16: pre-render mermaid diagrams to inline SVG via Kroki at parse
+  # time so we can skip the 3.3MB client-side runtime on pages where
+  # all blocks render successfully. Falls back to client-side runtime
+  # for any block Kroki refuses (graceful degradation).
+  prerender_diagrams: true
