@@ -18,3 +18,4 @@ dist/
 # Local env
 .env
 .env.local
+cmd/sync/sync

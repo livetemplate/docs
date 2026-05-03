@@ -83,7 +83,7 @@ pages:
     source_path: docs/references/progressive-complexity-reference.md
 
   # ---- CLI (lvt) ----
-  - site_url: /cli
+  - site_url: /cli/
     source_repo: https://github.com/livetemplate/lvt
     source_path: docs/guides/lvt-cli-guide.md
   - site_url: /cli/auth-customization
@@ -100,7 +100,7 @@ pages:
     source_path: .github/copilot-instructions.md
 
   # ---- TypeScript Client ----
-  - site_url: /client
+  - site_url: /client/
     source_repo: https://github.com/livetemplate/client
     source_path: README.md
 
