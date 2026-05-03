@@ -75,7 +75,9 @@ func newCtx(t *testing.T) (context.Context, context.CancelFunc) {
 }
 
 // TestHomeRenders is the canary — if this fails the rest can't trust
-// anything else.
+// anything else. Uses ByQuery (not NodeVisible) because tinkerdown's
+// presentation-mode CSS may visually hide the toolbar's h1 without
+// removing it from the DOM, which would deadlock NodeVisible.
 func TestHomeRenders(t *testing.T) {
 	ctx, cancel := newCtx(t)
 	defer cancel()
@@ -83,8 +85,9 @@ func TestHomeRenders(t *testing.T) {
 	var title, h1 string
 	if err := chromedp.Run(ctx,
 		chromedp.Navigate(baseURL()+"/"),
+		chromedp.WaitReady("body", chromedp.ByQuery),
 		chromedp.Title(&title),
-		chromedp.Text("h1", &h1, chromedp.NodeVisible),
+		chromedp.Text("h1", &h1, chromedp.ByQuery),
 	); err != nil {
 		t.Fatalf("navigate: %v", err)
 	}
