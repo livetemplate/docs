@@ -1,8 +1,8 @@
 ---
-title: "Testing Helpers (CLI)"
+title: "LiveTemplate Testing Framework"
 source_repo: "https://github.com/livetemplate/lvt"
 source_path: "testing/README.md"
-source_commit: "89cb00dd733d216947584ec18707a9ef1ef22f78"
+source_commit: "91211b7f0565d357db29bf390d39ea484bf96eb8"
 ---
 
 # LiveTemplate Testing Framework
