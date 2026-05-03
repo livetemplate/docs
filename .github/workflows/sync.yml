@@ -80,17 +80,18 @@ jobs:
         if: steps.changes.outputs.has_changes == 'true'
         uses: peter-evans/create-pull-request@v6
         with:
+          # Prefer a fine-scoped PAT (DOCS_BOT_TOKEN) so the PR can be
+          # created in orgs whose policy blocks GITHUB_TOKEN from doing
+          # so. If no PAT is configured the action will still push the
+          # branch via GITHUB_TOKEN, then fail at the PR-create step —
+          # the operator can `gh pr create --head sync/...` manually
+          # until the PAT is set up. See CONTRIBUTING.md → Sync workflow.
+          token: ${{ secrets.DOCS_BOT_TOKEN || secrets.GITHUB_TOKEN }}
           commit-message: "Sync from ${{ steps.slug.outputs.slug }}@${{ steps.inputs.outputs.ref }}"
           branch: sync/${{ steps.slug.outputs.slug }}-${{ steps.inputs.outputs.ref }}
           title: "Sync from ${{ steps.slug.outputs.slug }}@${{ steps.inputs.outputs.ref }}"
           body: |
             Automated sync from `${{ steps.inputs.outputs.source_repo }}` at ref `${{ steps.inputs.outputs.ref }}`.
-
-            Sync output:
-
-            ```
-            ${{ steps.changes.outputs.summary }}
-            ```
 
             See [content/_meta/source-of-truth.yaml](../blob/main/content/_meta/source-of-truth.yaml) for the page mapping that drives this sync. Bring concerns about a specific change to the source repo, not this PR — edits made directly here will be overwritten on the next sync.
           delete-branch: true

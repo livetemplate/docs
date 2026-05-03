@@ -56,6 +56,18 @@ gh workflow run sync.yml \
 
 Or use the GitHub Actions UI at `https://github.com/livetemplate/docs/actions/workflows/sync.yml`.
 
+### One-time PAT setup (so syncs auto-open PRs)
+
+The `peter-evans/create-pull-request` step uses `GITHUB_TOKEN` by default, but org-level policy ("Allow GitHub Actions to create and approve pull requests") may block that token from creating PRs. The workflow falls through to a `DOCS_BOT_TOKEN` secret if it exists; configure that PAT once and every sync auto-opens a PR thereafter.
+
+1. Create a fine-grained PAT at https://github.com/settings/personal-access-tokens with:
+   - Repository access: `livetemplate/docs` only
+   - Repository permissions: `Contents: Read and write`, `Pull requests: Read and write`
+2. Add as a repo secret: `gh secret set DOCS_BOT_TOKEN --repo livetemplate/docs --body <token>`
+3. Confirm: trigger the workflow manually and verify the "Open sync PR" step succeeds.
+
+Until the PAT is set up, syncs still push their branches; open the PR manually with `gh pr create --head sync/<slug>-<ref> --base main`.
+
 ### Resolving sync-vs-manual edit conflicts
 
 Sometimes a docs page needs a one-off edit that the next sync would clobber. Two paths:
