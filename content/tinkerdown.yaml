@@ -16,6 +16,8 @@ navigation:
     pages:
       - title: "Install"
         path: "getting-started/install.md"
+      - title: "Your First App"
+        path: "getting-started/your-first-app.md"
 
   - title: "Guides"
     path: "guides"
