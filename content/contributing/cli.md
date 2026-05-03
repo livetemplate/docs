@@ -1,8 +1,8 @@
 ---
-title: "Contributing to lvt"
+title: "Contributing to LVT CLI"
 source_repo: "https://github.com/livetemplate/lvt"
 source_path: "CONTRIBUTING.md"
-source_commit: "b0c25323f6c1573d0872dcf16bb7e00a4cfbaad8"
+source_commit: "91211b7f0565d357db29bf390d39ea484bf96eb8"
 ---
 
 # Contributing to LVT CLI
@@ -72,7 +72,7 @@ cd lvt
 go test ./...  # Automatically uses ../livetemplate
 ```
 
-The workspace setup is done once and affects all repositories. See the [core library CONTRIBUTING.md](https://github.com/livetemplate/livetemplate/blob/main/CONTRIBUTING.md#testing-core-changes-with-lvtexamples) for details.
+The workspace setup is done once and affects all repositories. See the [core library CONTRIBUTING.md](/contributing/livetemplate#testing-core-changes-with-lvtexamples) for details.
 
 #### Alternative: Manual Replace Directives
 

@@ -1,8 +1,8 @@
 ---
-title: "Auth Customization (CLI)"
+title: "Customizing Auth Templates"
 source_repo: "https://github.com/livetemplate/lvt"
 source_path: "docs/guides/auth-customization.md"
-source_commit: "fceda5ee6d66d36118df6d4e8f97d3b0aabfbc42"
+source_commit: "91211b7f0565d357db29bf390d39ea484bf96eb8"
 ---
 
 # Customizing Auth Templates
