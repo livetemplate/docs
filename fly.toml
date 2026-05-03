@@ -1,0 +1,20 @@
+# Phase 1 staging deployment for the LiveTemplate docs site.
+# Production target livetemplate.fly.dev arrives in Phase 6.
+
+app = "livetemplate-docs-staging"
+primary_region = "sjc"
+
+[build]
+  dockerfile = "Dockerfile"
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  auto_stop_machines = "stop"
+  auto_start_machines = true
+  min_machines_running = 0
+
+[[vm]]
+  cpu_kind = "shared"
+  cpus = 1
+  memory_mb = 512

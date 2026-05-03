@@ -1,0 +1,10 @@
+.git
+.github
+.worktrees
+.vscode
+.idea
+*.md.swp
+*.swp
+.DS_Store
+README.md
+CONTRIBUTING.md
