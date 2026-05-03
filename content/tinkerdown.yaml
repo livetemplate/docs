@@ -95,8 +95,16 @@ navigation:
         path: "patterns/index.md"
       - title: "How a LiveTemplate Update Flows"
         path: "recipes/architecture-flow.md"
+      - title: "When to Reach for lvt-* (Decision Tree)"
+        path: "recipes/progressive-complexity-tree.md"
+      - title: "Sync, Broadcast & Multi-User Sessions"
+        path: "recipes/sync-and-broadcast.md"
       - title: "Anatomy of the Patterns Catalog"
         path: "recipes/patterns-stats.md"
+      - title: "Live Framework Releases"
+        path: "recipes/live-releases.md"
+      - title: "How This Docs Site Works (Meta)"
+        path: "recipes/how-this-site-works.md"
 
   - title: "Examples"
     path: "examples"
@@ -148,6 +156,14 @@ sources:
     result_path: categories
     cache:
       ttl: 5m
+  # Phase 5 recipe 6: live LiveTemplate releases from GitHub API.
+  # /recipes/live-releases.md binds to this. 1h cache keeps us under
+  # GitHub's 60-req/h unauthenticated rate limit.
+  releases:
+    type: rest
+    from: https://api.github.com/repos/livetemplate/livetemplate/releases
+    cache:
+      ttl: 1h
 
 routes:
   # External-app router (Phase 1 PR-D): pattern category subtrees proxy

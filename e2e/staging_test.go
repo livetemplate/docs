@@ -278,7 +278,11 @@ func TestSidebarWalk(t *testing.T) {
 		"/examples/progressive-enhancement",
 		"/examples/ws-disabled",
 		"/recipes/architecture-flow",
+		"/recipes/progressive-complexity-tree",
+		"/recipes/sync-and-broadcast",
 		"/recipes/patterns-stats",
+		"/recipes/live-releases",
+		"/recipes/how-this-site-works",
 		"/contributing/livetemplate",
 		"/contributing/client",
 		"/contributing/cli",
@@ -413,6 +417,123 @@ func TestRecipe3_StatsViewSharesPatternsSource(t *testing.T) {
 	}
 	if !strings.Contains(summary, "categories") {
 		t.Errorf("stats summary did not render expected text: %q", summary)
+	}
+}
+
+// TestRecipe4_ProgressiveComplexityTreeRenders verifies the
+// progressive-complexity decision-tree recipe (mermaid flowchart).
+// Same client-side mermaid hydration assertion as recipe 2 — a single
+// rendered <svg> proves the bundle wired and the markdown parsed.
+func TestRecipe4_ProgressiveComplexityTreeRenders(t *testing.T) {
+	ctx, cancel := newCtx(t)
+	defer cancel()
+
+	var svgCount int
+	if err := chromedp.Run(ctx,
+		chromedp.Navigate(baseURL()+"/recipes/progressive-complexity-tree"),
+		chromedp.WaitVisible("h1", chromedp.ByQuery),
+		chromedp.Poll(
+			`document.querySelectorAll('.mermaid svg, [data-tinkerdown-block] svg').length > 0`,
+			nil,
+			chromedp.WithPollingTimeout(20*time.Second),
+		),
+		chromedp.Evaluate(
+			`document.querySelectorAll('.mermaid svg, [data-tinkerdown-block] svg').length`,
+			&svgCount,
+		),
+	); err != nil {
+		t.Fatalf("hydrate: %v", err)
+	}
+	if svgCount == 0 {
+		t.Errorf("no Mermaid SVG on progressive-complexity tree recipe")
+	}
+}
+
+// TestRecipe5_SyncBroadcastDiagramRenders verifies the sync+broadcast
+// recipe renders both of its mermaid sequence diagrams. The page has
+// two ```mermaid blocks, so we expect at least 2 SVGs once hydrated.
+func TestRecipe5_SyncBroadcastDiagramRenders(t *testing.T) {
+	ctx, cancel := newCtx(t)
+	defer cancel()
+
+	var svgCount int
+	if err := chromedp.Run(ctx,
+		chromedp.Navigate(baseURL()+"/recipes/sync-and-broadcast"),
+		chromedp.WaitVisible("h1", chromedp.ByQuery),
+		chromedp.Poll(
+			`document.querySelectorAll('.mermaid svg, [data-tinkerdown-block] svg').length >= 2`,
+			nil,
+			chromedp.WithPollingTimeout(20*time.Second),
+		),
+		chromedp.Evaluate(
+			`document.querySelectorAll('.mermaid svg, [data-tinkerdown-block] svg').length`,
+			&svgCount,
+		),
+	); err != nil {
+		t.Fatalf("hydrate: %v", err)
+	}
+	if svgCount < 2 {
+		t.Errorf("sync-and-broadcast recipe rendered %d SVGs; expected 2 (sync + broadcast)", svgCount)
+	}
+}
+
+// TestRecipe6_LiveReleasesHydratesFromGitHub verifies the live-releases
+// recipe binds to the GitHub Releases API and renders rows. GitHub may
+// rate-limit (60/h unauth) — if THIS test starts flaking specifically
+// (and other recipes hold), the cause is likely shared-IP rate limit
+// from CI runners or fly's edge IPs, not a regression.
+func TestRecipe6_LiveReleasesHydratesFromGitHub(t *testing.T) {
+	ctx, cancel := newCtx(t)
+	defer cancel()
+
+	var rowCount int
+	var summary string
+	if err := chromedp.Run(ctx,
+		chromedp.Navigate(baseURL()+"/recipes/live-releases"),
+		chromedp.WaitVisible(`[data-test="release-row"], [data-test="releases-summary"]`, chromedp.ByQuery),
+		chromedp.Text(`[data-test="releases-summary"]`, &summary, chromedp.ByQuery, chromedp.AtLeast(0)),
+		chromedp.Evaluate(
+			`document.querySelectorAll('[data-test="release-row"]').length`,
+			&rowCount,
+		),
+	); err != nil {
+		t.Fatalf("hydrate: %v", err)
+	}
+	if rowCount == 0 {
+		t.Errorf("live-releases recipe rendered 0 rows; GitHub API rate-limited or upstream changed?\n  summary: %q", summary)
+	}
+}
+
+// TestRecipe7_MetaPageHasMermaidAndLiveCount verifies the meta recipe
+// renders both its mermaid diagram AND the live patterns-source count
+// (proving its embedded source bind works alongside the diagram).
+func TestRecipe7_MetaPageHasMermaidAndLiveCount(t *testing.T) {
+	ctx, cancel := newCtx(t)
+	defer cancel()
+
+	var svgCount int
+	var summary string
+	if err := chromedp.Run(ctx,
+		chromedp.Navigate(baseURL()+"/recipes/how-this-site-works"),
+		chromedp.WaitVisible(`[data-test="meta-summary"]`, chromedp.ByQuery),
+		chromedp.Poll(
+			`document.querySelectorAll('.mermaid svg, [data-tinkerdown-block] svg').length > 0`,
+			nil,
+			chromedp.WithPollingTimeout(20*time.Second),
+		),
+		chromedp.Text(`[data-test="meta-summary"]`, &summary, chromedp.ByQuery),
+		chromedp.Evaluate(
+			`document.querySelectorAll('.mermaid svg, [data-tinkerdown-block] svg').length`,
+			&svgCount,
+		),
+	); err != nil {
+		t.Fatalf("hydrate: %v", err)
+	}
+	if svgCount == 0 {
+		t.Errorf("meta recipe missing mermaid SVG")
+	}
+	if !strings.Contains(summary, "pattern categories") {
+		t.Errorf("meta summary did not include live patterns count: %q", summary)
 	}
 }
 
