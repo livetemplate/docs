@@ -1,8 +1,8 @@
 ---
-title: "Error Handling"
+title: "Error Handling Reference"
 source_repo: "https://github.com/livetemplate/livetemplate"
 source_path: "docs/references/error-handling.md"
-source_commit: "212c8b3c3fe8eeb18324bd0e57bac1997b169990"
+source_commit: "5635ad1e94063d00766ff925126d146ecd3ff3de"
 ---
 
 # Error Handling Reference

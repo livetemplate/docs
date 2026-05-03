@@ -1,8 +1,8 @@
 ---
-title: "Server Actions"
+title: "Server Actions Reference"
 source_repo: "https://github.com/livetemplate/livetemplate"
 source_path: "docs/references/server-actions.md"
-source_commit: "48834819d4db753daac98828f1af958eaa9e8a54"
+source_commit: "5635ad1e94063d00766ff925126d146ecd3ff3de"
 ---
 
 # Server Actions Reference

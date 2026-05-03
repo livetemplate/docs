@@ -1,8 +1,8 @@
 ---
-title: "Session"
+title: "Session Reference"
 source_repo: "https://github.com/livetemplate/livetemplate"
 source_path: "docs/references/session.md"
-source_commit: "c99ed1f0a8807a0d606ab5dddcd7ce88e325e6d5"
+source_commit: "5635ad1e94063d00766ff925126d146ecd3ff3de"
 ---
 
 # Session Reference

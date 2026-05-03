@@ -1,8 +1,8 @@
 ---
-title: "Pub/Sub & Broadcasting"
+title: "PubSub Reference"
 source_repo: "https://github.com/livetemplate/livetemplate"
 source_path: "docs/references/pubsub.md"
-source_commit: "13a8f766a1f5ef8b93dbf1c23ee5260c4dfdfc5a"
+source_commit: "5635ad1e94063d00766ff925126d146ecd3ff3de"
 ---
 
 # PubSub Reference

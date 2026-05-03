@@ -2,7 +2,7 @@
 title: "Current Limitations"
 source_repo: "https://github.com/livetemplate/livetemplate"
 source_path: "docs/references/current-limitations.md"
-source_commit: "8232af5f1daa697dfbcaebaf15657fdfc5efeca0"
+source_commit: "5635ad1e94063d00766ff925126d146ecd3ff3de"
 ---
 
 # Current Limitations

@@ -2,7 +2,7 @@
 title: "Standard HTML Reactivity"
 source_repo: "https://github.com/livetemplate/livetemplate"
 source_path: "docs/guides/standard-html-reactivity.md"
-source_commit: "9465400d337022ddcc8591d1981b4c9fac9f39d2"
+source_commit: "5635ad1e94063d00766ff925126d146ecd3ff3de"
 ---
 
 # Standard HTML Reactivity
