@@ -6,6 +6,33 @@ site:
   home: "index.md"
   repository: "https://github.com/livetemplate/docs"
 
+# External-app router: /patterns/* is served by the deployed patterns
+# showcase, NOT resolved as markdown. The catalog index at /patterns
+# (no trailing slash) still works because content/patterns/index.md
+# wins over the prefix match in tinkerdown's exact-match-first dispatch.
+routes:
+  - pattern: "/patterns/forms/"
+    type: "proxy"
+    upstream: "https://lt-patterns.fly.dev"
+  - pattern: "/patterns/lists/"
+    type: "proxy"
+    upstream: "https://lt-patterns.fly.dev"
+  - pattern: "/patterns/loading/"
+    type: "proxy"
+    upstream: "https://lt-patterns.fly.dev"
+  - pattern: "/patterns/feedback/"
+    type: "proxy"
+    upstream: "https://lt-patterns.fly.dev"
+  - pattern: "/patterns/navigation/"
+    type: "proxy"
+    upstream: "https://lt-patterns.fly.dev"
+  - pattern: "/patterns/realtime/"
+    type: "proxy"
+    upstream: "https://lt-patterns.fly.dev"
+  - pattern: "/patterns/search/"
+    type: "proxy"
+    upstream: "https://lt-patterns.fly.dev"
+
 navigation:
   - title: "Getting Started"
     path: "getting-started"
