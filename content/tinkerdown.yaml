@@ -195,6 +195,13 @@ routes:
     type: "proxy"
     upstream: "https://lt-patterns.fly.dev"
 
+  # Landing-page demo: same-origin proxy to the deployed
+  # lt-landing-demo app so the home page can iframe a real
+  # LiveTemplate counter without cross-origin friction.
+  - pattern: "/demo/counter/"
+    type: "proxy"
+    upstream: "https://lt-landing-demo.fly.dev"
+
 server:
   port: 8080
   host: "localhost"

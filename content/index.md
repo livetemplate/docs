@@ -1,12 +1,6 @@
 ---
 title: "LiveTemplate"
 description: "A Go library for reactive web UIs. Write a Go template and a controller struct; when state changes, only the diff is sent to the browser. The same code runs over a plain form POST, fetch, or WebSocket."
-sources:
-  landing_tasks:
-    type: markdown
-    file: "./_data/landing-tasks.md"
-    anchor: "#tasks"
-    readonly: false
 ---
 
 # Reactive web UIs in standard HTML and Go
@@ -17,60 +11,65 @@ LiveTemplate is a Go library for building reactive web UIs from standard `html/t
 
 ## Try it
 
-```lvt
-<div lvt-source="landing_tasks" style="border:1px solid var(--border-color,#ddd);border-radius:8px;padding:1rem 1.25rem;background:var(--card-background-color,#fff);">
-{{if .Error}}
-<p><mark>{{.Error}}</mark></p>
-{{else}}
-<ul style="list-style:none;padding:0;margin:0 0 .5rem 0;">
-{{range .Data}}
-<li style="display:flex;gap:.5rem;align-items:center;padding:.25rem 0;">
-  <input type="checkbox" {{if .Done}}checked{{end}} lvt-on:click="Toggle" data-id="{{.Id}}">
-  <span {{if .Done}}style="text-decoration:line-through;opacity:.6"{{end}}>{{.Text}}</span>
-</li>
-{{end}}
-</ul>
-<small>Open this page in another tab and toggle a checkbox — both tabs stay in sync.</small>
-{{end}}
-</div>
-```
+<iframe src="/demo/counter/" title="Live LiveTemplate counter — click the buttons" loading="lazy" style="width:100%;height:340px;border:1px solid #ddd;border-radius:8px;background:#fff;"></iframe>
 
-Click any checkbox above. The server diffs the new render against the previous one, sends only the changed attributes to the browser, and the DOM is patched in place — the input you just clicked never re-renders, so focus and scroll position are preserved. Open the page in a second tab and toggle there: both tabs update over WebSocket.
+Click the buttons. Each click POSTs the action to the Go server; the server runs `Increment`, re-renders the template, diffs against the previous render, and sends only the changed text node back. The form, the buttons, and the count display are never re-created — only the count's text changes. Open the page in a second tab in the same browser session: clicks in one tab show up in the other over WebSocket, because the state is keyed to your session.
 
-## The same pattern, written directly in LiveTemplate
+This iframe loads a real, deployed [LiveTemplate app](https://github.com/livetemplate/examples/tree/main/landing-demo) — the same code you'd write yourself, deployed standalone at `lt-landing-demo.fly.dev` and proxied same-origin by this docs site so the iframe satisfies CSP.
 
-The block above is rendered through tinkerdown, which wraps LiveTemplate. Without that wrapper, the same demo in raw LiveTemplate is a controller struct and a template:
+## The code that runs the demo above
 
-The template:
-
-```html
-<ul>
-{{range .Tasks}}
-<li>
-    <input type="checkbox" {{if .Done}}checked{{end}} lvt-on:click="Toggle" data-id="{{.ID}}">
-    <span>{{.Text}}</span>
-</li>
-{{end}}
-</ul>
-```
-
-The controller:
+The whole app is two files. **The controller**:
 
 ```go
-type TaskController struct{}
+type CounterController struct{}
 
-func (c *TaskController) Toggle(state TaskState, ctx *livetemplate.Context) (TaskState, error) {
-    id := ctx.GetString("id")
-    for i, t := range state.Tasks {
-        if t.ID == id {
-            state.Tasks[i].Done = !state.Tasks[i].Done
-        }
-    }
-    return state, nil
+type CounterState struct {
+    Count int `json:"count" lvt:"persist"`
+}
+
+func (c *CounterController) Increment(s CounterState, ctx *livetemplate.Context) (CounterState, error) {
+    s.Count++
+    return s, nil
+}
+
+func (c *CounterController) Decrement(s CounterState, ctx *livetemplate.Context) (CounterState, error) {
+    s.Count--
+    return s, nil
+}
+
+func (c *CounterController) Reset(s CounterState, ctx *livetemplate.Context) (CounterState, error) {
+    s.Count = 0
+    return s, nil
 }
 ```
 
-The `lvt-on:click="Toggle"` attribute names the routing key; LiveTemplate dispatches to the controller's `Toggle` method using the form data and `data-*` attributes the browser already sends. The wire is HTTP and the message format is HTML.
+**The template**:
+
+```html
+<p class="count">{{.Count}}</p>
+<form method="POST">
+    <fieldset role="group">
+        <button name="decrement">−1</button>
+        <button name="reset">Reset</button>
+        <button name="increment">+1</button>
+    </fieldset>
+</form>
+```
+
+**The wire-up** (the rest of `main.go`):
+
+```go
+tmpl := livetemplate.Must(livetemplate.New("counter",
+    livetemplate.WithParseFiles("counter.tmpl"),
+))
+handler := tmpl.Handle(&CounterController{}, livetemplate.AsState(&CounterState{}))
+http.ListenAndServe(":8080", handler)
+```
+
+A button's `name` attribute IS the routing key — `<button name="increment">` posts `increment` and LiveTemplate dispatches to the `Increment` method on the controller. The protocol between HTML and Go is just the form data the browser already sends. The `lvt:"persist"` tag on `Count` makes the field survive WebSocket reconnects and propagate across tabs in the same session.
+
+[See the full source on GitHub →](https://github.com/livetemplate/examples/tree/main/landing-demo)
 
 ## What happens between a click and a DOM update
 
