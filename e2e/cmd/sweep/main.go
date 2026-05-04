@@ -158,7 +158,10 @@ func visit(parent context.Context, target string, v viewport, outDir string) pag
 		chromedp.WaitVisible("body", chromedp.ByQuery),
 		chromedp.Sleep(900*time.Millisecond),
 		chromedp.Evaluate(`document.documentElement.clientWidth`, &clientW),
-		chromedp.Evaluate(`document.body.scrollWidth`, &scrollW),
+		// documentElement.scrollWidth is the document's full scroll
+		// extent — body.scrollWidth alone misses overflow caused by
+		// body's margin pushing it past the viewport (see PR #246).
+		chromedp.Evaluate(`Math.max(document.body.scrollWidth, document.documentElement.scrollWidth)`, &scrollW),
 		chromedp.Evaluate(`document.body.innerText.length`, &bodyChars),
 		chromedp.ActionFunc(func(ctx context.Context) error {
 			b, err := page.CaptureScreenshot().WithCaptureBeyondViewport(true).Do(ctx)
