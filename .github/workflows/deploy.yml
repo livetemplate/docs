@@ -25,3 +25,20 @@ jobs:
         run: flyctl deploy --config fly.production.toml --remote-only
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+
+      # Post-deploy responsive verification — catches the class of bug
+      # shipped in v0.1.13 (body collapsed to 33px on mobile because
+      # the desktop width override wasn't reset under the mobile media
+      # query). Runs 5 representative pages × 3 viewports against the
+      # just-deployed prod site, ~30s total. A red workflow run after
+      # deploy means the new tinkerdown pin broke something visible —
+      # roll back the Dockerfile and redeploy.
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.26'
+
+      - name: Verify responsive layout against production
+        working-directory: e2e
+        env:
+          E2E_BASE_URL: https://livetemplate.fly.dev
+        run: go test -run TestResponsiveLayoutAcrossViewports -v -timeout 300s
