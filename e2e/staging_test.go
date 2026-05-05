@@ -95,8 +95,12 @@ func TestHomeRenders(t *testing.T) {
 	if !strings.Contains(title, "LiveTemplate") {
 		t.Errorf("title %q does not contain LiveTemplate", title)
 	}
-	if !strings.Contains(strings.ToLower(h1), "livetemplate") {
-		t.Errorf("h1 %q does not mention LiveTemplate", h1)
+	// h1 is the page's own lede, deliberately product-name-free since
+	// the marketing rewrite — the title check above is what asserts the
+	// product is on the page. Keep this assertion only strong enough to
+	// catch a rendering regression where the h1 is missing or empty.
+	if strings.TrimSpace(h1) == "" {
+		t.Errorf("h1 is empty — page failed to render content")
 	}
 }
 
