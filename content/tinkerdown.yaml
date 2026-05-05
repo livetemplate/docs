@@ -195,6 +195,14 @@ routes:
     type: "proxy"
     upstream: "https://lt-patterns.fly.dev"
 
+# Landing-page demo iframes lt-landing-demo.fly.dev cross-origin so its
+# embedded LiveTemplate client connects to its own host (a same-origin
+# proxy can't satisfy that — the client auto-derives the WS URL from
+# window.location). The CSP frame-src directive below is the opt-in.
+security:
+  frame_src:
+    - "https://lt-landing-demo.fly.dev"
+
 server:
   port: 8080
   host: "localhost"

@@ -1,39 +1,75 @@
 ---
 title: "LiveTemplate"
-description: "Reactive web UIs in standard HTML and Go. No custom template language. No client-side framework. No persistent connection required."
+description: "A Go library for reactive web UIs. Write a Go template and a controller struct; when state changes, only the diff is sent to the browser. The same code runs over a plain form POST, fetch, or WebSocket."
 ---
 
 # Reactive web UIs in standard HTML and Go
 
-No custom template language. No client-side framework. No persistent connection required. Forms POST. Buttons submit. Add the JS client and the DOM patches in place. Add a WebSocket and other tabs sync automatically.
+LiveTemplate is a Go library for building reactive web UIs from standard `html/template` templates. You write a template and a controller struct; when state changes, the template re-renders on the server and only the diff is sent to the browser. The same code runs three ways: a plain `<form>` POST that reloads the page, a `fetch()` request that patches the DOM in place, or a WebSocket session where other tabs sync automatically.
 
 > **Alpha** — core features work and are tested, but the API may change before v1.0.
 
-## A todo list, end to end
+## Try it
 
-The HTML:
+<iframe src="https://lt-landing-demo.fly.dev/" title="Live LiveTemplate counter — click the buttons" loading="lazy" style="width:100%;height:340px;border:1px solid #ddd;border-radius:8px;background:#fff;"></iframe>
 
-```html
-<form method="POST">
-    <input type="text" name="title" required placeholder="What needs to be done?">
-    <button name="add">Add Todo</button>
-</form>
-<ul>
-{{range .Items}}<li>{{.Title}}</li>{{end}}
-</ul>
-```
+Click the buttons. Each click POSTs the action to the Go server; the server runs `Increment`, re-renders the template, diffs against the previous render, and sends only the changed text node back. The form, the buttons, and the count display are never re-created — only the count's text changes. Open the page in a second tab in the same browser session: clicks in one tab show up in the other over WebSocket, because the state is keyed to your session.
 
-The Go:
+The iframe loads a real, deployed [LiveTemplate app](https://github.com/livetemplate/examples/tree/main/landing-demo) running standalone at `lt-landing-demo.fly.dev` — the same code you'd write yourself.
+
+## The code that runs the demo above
+
+The whole app is two files. **The controller**:
 
 ```go
-func (c *TodoController) Add(state TodoState, ctx *livetemplate.Context) (TodoState, error) {
-    state.Items = append(state.Items, Todo{Title: ctx.GetString("title")})
-    ctx.BroadcastAction("Refresh", nil) // pushes the update to other WS-connected tabs
-    return state, nil
+type CounterController struct{}
+
+type CounterState struct {
+    Count int `json:"count" lvt:"persist"`
+}
+
+func (c *CounterController) Increment(s CounterState, ctx *livetemplate.Context) (CounterState, error) {
+    s.Count++
+    return s, nil
+}
+
+func (c *CounterController) Decrement(s CounterState, ctx *livetemplate.Context) (CounterState, error) {
+    s.Count--
+    return s, nil
+}
+
+func (c *CounterController) Reset(s CounterState, ctx *livetemplate.Context) (CounterState, error) {
+    s.Count = 0
+    return s, nil
 }
 ```
 
-The button's `name` IS the action — `<button name="add">` routes to `Add()`. No custom attributes, no JavaScript wiring. Without JS the form POSTs normally; with the JS client the DOM patches in place.
+**The template**:
+
+```html
+<p class="count">{{.Count}}</p>
+<form method="POST">
+    <fieldset role="group">
+        <button name="decrement">−1</button>
+        <button name="reset">Reset</button>
+        <button name="increment">+1</button>
+    </fieldset>
+</form>
+```
+
+**The wire-up** (the rest of `main.go`):
+
+```go
+tmpl := livetemplate.Must(livetemplate.New("counter",
+    livetemplate.WithParseFiles("counter.tmpl"),
+))
+handler := tmpl.Handle(&CounterController{}, livetemplate.AsState(&CounterState{}))
+http.ListenAndServe(":8080", handler)
+```
+
+A button's `name` attribute IS the routing key — `<button name="increment">` posts `increment` and LiveTemplate dispatches to the `Increment` method on the controller. The protocol between HTML and Go is just the form data the browser already sends. The `lvt:"persist"` tag on `Count` makes the field survive WebSocket reconnects and propagate across tabs in the same session.
+
+[See the full source on GitHub →](https://github.com/livetemplate/examples/tree/main/landing-demo)
 
 ## What happens between a click and a DOM update
 

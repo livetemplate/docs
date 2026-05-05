@@ -1,0 +1,36 @@
+name: deploy-staging
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - "staging-**"
+
+concurrency:
+  group: deploy-staging
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    name: Deploy to livetemplate-docs-staging.fly.dev
+    runs-on: ubuntu-latest
+    environment: staging
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: superfly/flyctl-actions/setup-flyctl@master
+
+      - name: Deploy
+        run: flyctl deploy --config fly.toml --remote-only
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.26'
+
+      - name: Verify responsive layout against staging
+        working-directory: e2e
+        env:
+          E2E_BASE_URL: https://livetemplate-docs-staging.fly.dev
+        run: go test -run TestResponsiveLayoutAcrossViewports -v -timeout 300s
