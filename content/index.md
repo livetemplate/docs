@@ -11,11 +11,11 @@ LiveTemplate is a Go library for building reactive web UIs from standard `html/t
 
 ## Try it
 
-<iframe src="/demo/counter/" title="Live LiveTemplate counter — click the buttons" loading="lazy" style="width:100%;height:340px;border:1px solid #ddd;border-radius:8px;background:#fff;"></iframe>
+<iframe src="https://lt-landing-demo.fly.dev/" title="Live LiveTemplate counter — click the buttons" loading="lazy" style="width:100%;height:340px;border:1px solid #ddd;border-radius:8px;background:#fff;"></iframe>
 
 Click the buttons. Each click POSTs the action to the Go server; the server runs `Increment`, re-renders the template, diffs against the previous render, and sends only the changed text node back. The form, the buttons, and the count display are never re-created — only the count's text changes. Open the page in a second tab in the same browser session: clicks in one tab show up in the other over WebSocket, because the state is keyed to your session.
 
-This iframe loads a real, deployed [LiveTemplate app](https://github.com/livetemplate/examples/tree/main/landing-demo) — the same code you'd write yourself, deployed standalone at `lt-landing-demo.fly.dev` and proxied same-origin by this docs site so the iframe satisfies CSP.
+The iframe loads a real, deployed [LiveTemplate app](https://github.com/livetemplate/examples/tree/main/landing-demo) running standalone at `lt-landing-demo.fly.dev` — the same code you'd write yourself.
 
 ## The code that runs the demo above
 
