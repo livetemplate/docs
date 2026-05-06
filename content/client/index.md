@@ -1,13 +1,15 @@
 ---
-title: "TypeScript Client"
+title: "@livetemplate/client"
 source_repo: "https://github.com/livetemplate/client"
 source_path: "README.md"
-source_commit: "54ebdec9d9b453455a8064a7485e6dc44324afeb"
+source_commit: "cc4a352028f53555ad62929d863cf286dd955982"
 ---
 
 # @livetemplate/client
 
 TypeScript/JavaScript client library for LiveTemplate - reactive HTML over the wire.
+
+📚 **Framework documentation:** **<https://livetemplate.fly.dev>** — guides, recipes, patterns catalog. The `/client` section of the docs site covers this package's browser API.
 
 ## Overview
 
