@@ -19,7 +19,7 @@ sequenceDiagram
     participant State as Controller state
     participant Diff as Diff engine
 
-    Browser->>Client: User clicks <button name="Save">
+    Browser->>Client: User clicks &lt;button name="Save"&gt;
     Client->>Server: WebSocket frame: {action: "Save", form: {...}}
     Server->>State: Resolve session, route to Save() handler
     State->>State: Mutate state.Items
