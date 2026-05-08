@@ -1,5 +1,7 @@
 ---
 title: "How a LiveTemplate Update Flows"
+source_repo: https://github.com/livetemplate/docs
+source_path: content/recipes/architecture-flow.md
 ---
 
 # How a LiveTemplate Update Flows
@@ -67,6 +69,15 @@ The patches travel back to the browser as a single WebSocket frame, typically un
 ## 5. The client applies patches
 
 `@livetemplate/client` walks the patch list and mutates the live DOM in place. There is no React-style reconciliation step, no full innerHTML reset. The browser keeps focus, keeps scroll position, keeps in-flight CSS animations.
+
+## See the flow in action
+
+The widget below is a real LiveTemplate counter — the same one from [Your First App](/getting-started/your-first-app), embedded inline. Click `+1`. Every step of the diagram above happens, every time:
+
+```embed-lvt path="/apps/counter/" upstream="https://lt-firstapp.fly.dev" height="220px"
+```
+
+Open browser DevTools → Network → WS to watch the WebSocket frames flow. The action frame goes up; the patch frame comes back. No reload, no full re-render — just the changed text node.
 
 ## What you can change to see this in action
 

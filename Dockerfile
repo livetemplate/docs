@@ -3,7 +3,7 @@
 # until upstream fixes the vendored asset embed (Phase 0 finding T0-1).
 # `TINKERDOWN_REF` selects which branch/tag to clone and is overridable.
 
-ARG TINKERDOWN_REF=v0.1.20
+ARG TINKERDOWN_REF=v0.2.0
 
 # ---- Stage 1: Build TypeScript client assets for tinkerdown ----
 FROM node:20-alpine AS client-builder
