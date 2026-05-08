@@ -2,8 +2,10 @@ package main
 
 import "github.com/livetemplate/livetemplate"
 
-// CounterState is per-session state — pure data, cloned by livetemplate
-// per connection so two readers never see each other's count.
+// CounterState is per-session state — pure data, cloned per session by
+// livetemplate. The tutorial app deliberately broadcasts every action
+// (see BroadcastAction below) and uses a shared-group authenticator
+// (main.go) so visible counts across embeds stay in lockstep.
 type CounterState struct {
 	Counter int
 }

@@ -25,21 +25,21 @@ You'll have a `go.mod` and an empty directory. We'll add three files: `counter.g
 
 Create `counter.go`. First the state:
 
-```go include="./_app/counter/counter.go" lines="5-9"
+```go include="./_app/counter/counter.go" lines="5-11"
 ```
 
 State is a value type, not a pointer — controllers receive a copy and return a (possibly modified) copy. The framework manages the swap.
 
 Then a controller and two action methods:
 
-```go include="./_app/counter/counter.go" lines="11-31"
+```go include="./_app/counter/counter.go" lines="13-33"
 ```
 
 Action methods are exported on the controller, and their names ARE the action names — `Increment` and `Decrement` are what the template will reference. The `BroadcastAction` calls are how multi-tab sync works (Step 6).
 
 Now wire it up in `main.go`:
 
-```go include="./_app/counter/main.go" lines="25-45"
+```go include="./_app/counter/main.go" lines="25-52"
 ```
 
 `livetemplate.New("counter")` parses `counter.tmpl` from the same directory. `tmpl.Handle(controller, AsState(initial))` is the standard wiring — controller for actions, initial state for new sessions.
@@ -63,7 +63,7 @@ The two `<link>` and `<script>` tags in `<head>` load the LiveTemplate JS client
 go run .
 ```
 
-Open `http://localhost:9090` in your browser. Or click `+1` and `-1` right here — it's the same code you just wrote, running below:
+Open `http://localhost:9090` in your browser to see your local counter. Or click `+1` and `-1` right here — a hosted copy of the same source files (`lt-firstapp.fly.dev`) running below:
 
 ```embed-lvt path="/apps/counter/" upstream="https://lt-firstapp.fly.dev"
 ```
@@ -89,7 +89,7 @@ Same Go code. Same template. Two lines of HTML promote the experience from serve
 
 Look at the handlers from Step 2 — note the highlighted lines:
 
-```go include="./_app/counter/counter.go" lines="20-31" highlight="22,29"
+```go include="./_app/counter/counter.go" lines="22-33" highlight="24,31"
 ```
 
 `ctx.BroadcastAction("Increment", nil)` (and the matching `Decrement`) tells LiveTemplate to apply the same action on every other connected client — multiple tabs, multiple embeds, multiple users. Without it, each session has its own count; with it, they stay in lockstep.

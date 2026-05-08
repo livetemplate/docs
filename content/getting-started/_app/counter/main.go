@@ -26,10 +26,17 @@ func main() {
 	tmpl := livetemplate.Must(livetemplate.New("counter",
 		livetemplate.WithParseFiles("counter.tmpl"),
 		livetemplate.WithAuthenticator(sharedAuth{}),
-		// Tinkerdown's reverse-proxy rewrites Host but the browser's
-		// Origin header stays as the docs origin. Permissive is the
-		// right posture for a tutorial counter served alongside docs.
-		livetemplate.WithPermissiveOriginCheck(),
+		// Browser WS Origin stays as the docs origin (tinkerdown's
+		// reverse-proxy rewrites Host but not Origin). Allowlist the
+		// docs site origins plus common local-dev hosts; a permissive
+		// check would let any third-party site drive the shared demo.
+		livetemplate.WithAllowedOrigins([]string{
+			"https://livetemplate.fly.dev",
+			"https://livetemplate-docs-staging.fly.dev",
+			"http://localhost:8080",
+			"http://localhost:8084",
+			"http://devbox:8084",
+		}),
 	))
 	handler := tmpl.Handle(&CounterController{}, livetemplate.AsState(&CounterState{}))
 
