@@ -3,7 +3,7 @@
 # Deployed to lt-firstapp.fly.dev; embedded into the docs site via
 # embed-lvt blocks pointing at upstream="https://lt-firstapp.fly.dev".
 
-FROM golang:1.22-alpine AS build
+FROM golang:1.26-alpine AS build
 RUN apk add --no-cache ca-certificates
 WORKDIR /app
 COPY go.mod go.sum ./

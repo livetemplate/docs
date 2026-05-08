@@ -1,6 +1,6 @@
 module example.com/firstapp-counter
 
-go 1.22
+go 1.26.0
 
 require github.com/livetemplate/livetemplate v0.8.23
 
