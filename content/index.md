@@ -1,6 +1,8 @@
 ---
 title: "LiveTemplate"
 description: "A Go library for reactive web UIs. Write a Go template and a controller struct; when state changes, only the diff is sent to the browser. The same code runs over a plain form POST, fetch, or WebSocket."
+source_repo: https://github.com/livetemplate/docs
+source_path: content/index.md
 ---
 
 # Reactive web UIs in standard HTML and Go
@@ -11,65 +13,33 @@ LiveTemplate is a Go library for building reactive web UIs from standard `html/t
 
 ## Try it
 
-<iframe src="https://lt-landing-demo.fly.dev/" title="Live LiveTemplate counter — click the buttons" loading="lazy" style="width:100%;height:340px;border:1px solid #ddd;border-radius:8px;background:#fff;"></iframe>
+```embed-lvt path="/apps/counter/" upstream="https://lt-firstapp.fly.dev" height="320px"
+```
 
-Click the buttons. Each click POSTs the action to the Go server; the server runs `Increment`, re-renders the template, diffs against the previous render, and sends only the changed text node back. The form, the buttons, and the count display are never re-created — only the count's text changes. Open the page in a second tab in the same browser session: clicks in one tab show up in the other over WebSocket, because the state is keyed to your session.
+Click the buttons. Each click POSTs the action to the Go server; the server runs `Increment`, re-renders the template, diffs against the previous render, and sends only the changed text node back. The form, the buttons, and the count display are never re-created — only the count's text changes. Open this page in a second tab on the same machine: clicks in one tab show up in the other in real time, because every handler ends with `ctx.BroadcastAction(...)`.
 
-The iframe loads a real, deployed [LiveTemplate app](https://github.com/livetemplate/examples/tree/main/landing-demo) running standalone at `lt-landing-demo.fly.dev` — the same code you'd write yourself.
+The widget above is a real, deployed LiveTemplate app — the same code as the [Your First App](/getting-started/your-first-app) tutorial, embedded inline through tinkerdown's auto-proxy.
 
 ## The code that runs the demo above
 
-The whole app is two files. **The controller**:
+The state and handlers — `counter.go`:
 
-```go
-type CounterController struct{}
-
-type CounterState struct {
-    Count int `json:"count" lvt:"persist"`
-}
-
-func (c *CounterController) Increment(s CounterState, ctx *livetemplate.Context) (CounterState, error) {
-    s.Count++
-    return s, nil
-}
-
-func (c *CounterController) Decrement(s CounterState, ctx *livetemplate.Context) (CounterState, error) {
-    s.Count--
-    return s, nil
-}
-
-func (c *CounterController) Reset(s CounterState, ctx *livetemplate.Context) (CounterState, error) {
-    s.Count = 0
-    return s, nil
-}
+```go include="./getting-started/_app/counter/counter.go" lines="5-33"
 ```
 
-**The template**:
+The template — `counter.tmpl`:
 
-```html
-<p class="count">{{.Count}}</p>
-<form method="POST">
-    <fieldset role="group">
-        <button name="decrement">−1</button>
-        <button name="reset">Reset</button>
-        <button name="increment">+1</button>
-    </fieldset>
-</form>
+```html include="./getting-started/_app/counter/counter.tmpl"
 ```
 
-**The wire-up** (the rest of `main.go`):
+The wire-up (the heart of `main.go`):
 
-```go
-tmpl := livetemplate.Must(livetemplate.New("counter",
-    livetemplate.WithParseFiles("counter.tmpl"),
-))
-handler := tmpl.Handle(&CounterController{}, livetemplate.AsState(&CounterState{}))
-http.ListenAndServe(":8080", handler)
+```go include="./getting-started/_app/counter/main.go" lines="26-41"
 ```
 
-A button's `name` attribute IS the routing key — `<button name="increment">` posts `increment` and LiveTemplate dispatches to the `Increment` method on the controller. The protocol between HTML and Go is just the form data the browser already sends. The `lvt:"persist"` tag on `Count` makes the field survive WebSocket reconnects and propagate across tabs in the same session.
+A button's `name` attribute IS the routing key — `<button name="increment">` posts `increment` and LiveTemplate dispatches to the `Increment` method on the controller. The protocol between HTML and Go is just the form data the browser already sends.
 
-[See the full source on GitHub →](https://github.com/livetemplate/examples/tree/main/landing-demo)
+[Read the full walkthrough →](/getting-started/your-first-app)
 
 ## What happens between a click and a DOM update
 

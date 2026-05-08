@@ -1,5 +1,7 @@
 ---
 title: "Sync, Broadcast & Multi-User Sessions"
+source_repo: https://github.com/livetemplate/docs
+source_path: content/recipes/sync-and-broadcast.md
 ---
 
 # Sync, Broadcast & Multi-User Sessions
@@ -83,6 +85,22 @@ func (c *ChatController) Refresh(state *State, ctx *livetemplate.Context) error 
     return nil
 }
 ```
+
+## Watch broadcast in action
+
+Two embeds against the same upstream counter, sharing `session="recipe-broadcast"`. The upstream calls `ctx.BroadcastAction("Increment", nil)` (and `Decrement`) inside each handler — that's what makes the two embeds stay in lockstep:
+
+<div class="recipe-broadcast-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+
+```embed-lvt path="/apps/counter/" upstream="https://lt-firstapp.fly.dev" session="recipe-broadcast" height="200px"
+```
+
+```embed-lvt path="/apps/counter/" upstream="https://lt-firstapp.fly.dev" session="recipe-broadcast" height="200px"
+```
+
+</div>
+
+Click `+1` in either widget; the other moves at the same time. The `session=` attribute is authoring intent (it groups the embeds visually); the actual cross-region sync comes from `BroadcastAction` plus a constant-groupID authenticator on the upstream — see the [`sharedAuth` definition in main.go](/getting-started/your-first-app#step-6).
 
 ## When to pick which
 
