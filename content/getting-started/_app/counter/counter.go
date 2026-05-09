@@ -1,11 +1,11 @@
-package main
+package counter
 
 import "github.com/livetemplate/livetemplate"
 
 // CounterState is per-session state — pure data, cloned per session by
-// livetemplate. The tutorial app deliberately broadcasts every action
-// (see BroadcastAction below) and uses a shared-group authenticator
-// (main.go) so visible counts across embeds stay in lockstep.
+// livetemplate. AnonymousAuthenticator (handler.go) keeps state private
+// per browser; BroadcastAction (below) keeps a single user's tabs in
+// sync without leaking state to other visitors.
 type CounterState struct {
 	Counter int
 }

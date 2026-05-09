@@ -74,7 +74,7 @@ The patches travel back to the browser as a single WebSocket frame, typically un
 
 The widget below is a real LiveTemplate counter — the same one from [Your First App](/getting-started/your-first-app), embedded inline. Click `+1`. Every step of the diagram above happens, every time:
 
-```embed-lvt path="/apps/counter/" upstream="https://lt-firstapp.fly.dev" height="220px"
+```embed-lvt path="/apps/counter/" upstream="http://localhost:9091" height="220px"
 ```
 
 Open browser DevTools → Network → WS to watch the WebSocket frames flow. The action frame goes up; the patch frame comes back. No reload, no full re-render — just the changed text node.

@@ -92,10 +92,10 @@ Two embeds against the same upstream counter, sharing `session="recipe-broadcast
 
 <div class="recipe-broadcast-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
 
-```embed-lvt path="/apps/counter/" upstream="https://lt-firstapp.fly.dev" session="recipe-broadcast" height="200px"
+```embed-lvt path="/apps/counter/" upstream="http://localhost:9091" session="recipe-broadcast" height="200px"
 ```
 
-```embed-lvt path="/apps/counter/" upstream="https://lt-firstapp.fly.dev" session="recipe-broadcast" height="200px"
+```embed-lvt path="/apps/counter/" upstream="http://localhost:9091" session="recipe-broadcast" height="200px"
 ```
 
 </div>

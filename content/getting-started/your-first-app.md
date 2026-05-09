@@ -63,9 +63,9 @@ The two `<link>` and `<script>` tags in `<head>` load the LiveTemplate JS client
 go run .
 ```
 
-Open `http://localhost:9090` in your browser to see your local counter. Or click `+1` and `-1` right here — a hosted copy of the same source files (`lt-firstapp.fly.dev`) running below:
+Open `http://localhost:9090` in your browser to see your local counter. Or click `+1` and `-1` right here — the same source files, served by this docs site, running below:
 
-```embed-lvt path="/apps/counter/" upstream="https://lt-firstapp.fly.dev"
+```embed-lvt path="/apps/counter/" upstream="http://localhost:9091"
 ```
 
 Click and the count changes — no full-page reload, just a DOM patch streamed over WebSocket. That's the JS client at work.
@@ -98,10 +98,10 @@ To prove it, here are two embeds against the same counter, side by side:
 
 <div class="firstapp-side-by-side" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
 
-```embed-lvt path="/apps/counter/" upstream="https://lt-firstapp.fly.dev" session="counter-tour" height="200px"
+```embed-lvt path="/apps/counter/" upstream="http://localhost:9091" session="counter-tour" height="200px"
 ```
 
-```embed-lvt path="/apps/counter/" upstream="https://lt-firstapp.fly.dev" session="counter-tour" height="200px"
+```embed-lvt path="/apps/counter/" upstream="http://localhost:9091" session="counter-tour" height="200px"
 ```
 
 </div>
