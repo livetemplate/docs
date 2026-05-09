@@ -187,6 +187,90 @@ These don't currently exist anywhere and must be written from scratch — likely
 
 ---
 
+## Literate primitives in mirrored content
+
+Mirrored upstream READMEs may use tinkerdown's literate authoring
+primitives (since tinkerdown v0.2.0). The sync tool passes them through
+byte-for-byte and mirrors a single adjacency convention so they resolve
+correctly post-sync.
+
+### Fence attributes and block kinds (passthrough)
+
+The sync tool's link rewriter operates on full URL matches only. It
+does **not** touch fence attributes or non-default block kinds, so
+upstream content can use:
+
+| Primitive | Example |
+|---|---|
+| `include="..."` fence attribute | `` ```go include="./_app/counter.go" lines="5-15" highlight="7" `` |
+| `embed-lvt` block | `` ```embed-lvt path="/apps/counter/" upstream="https://lt-firstapp.fly.dev" `` |
+| `show-source` / `hide-source` flag | `` ```lvt show-source `` |
+
+These survive sync without modification.
+
+### Frontmatter contract
+
+The sync tool **owns** five provenance keys; whatever the upstream sets
+for these is overridden:
+
+- `title` — extracted from upstream (frontmatter `title:`, first H1, or filename fallback)
+- `source_repo` — from `source-of-truth.yaml`
+- `source_path` — from `source-of-truth.yaml`
+- `source_ref` — the `--ref` sync was invoked with (typically a release tag); drives tinkerdown's source-link footer URLs for `include=` blocks
+- `source_commit` — `git rev-parse HEAD` at sync time (immutable provenance record)
+
+The sync tool **preserves** an explicit allowlist of upstream keys
+(passed through verbatim, with YAML types respected):
+
+- `description` (string)
+- `lvt_show_source` (bool — enables show-source default for the page)
+- `sidebar` (bool / string)
+
+Anything else upstream sets in frontmatter is **dropped**. This is
+intentional — the docs site stays in control of its frontmatter
+contract; new keys are added to the allowlist deliberately, in
+`cmd/sync/sync.go`.
+
+### `_app/` adjacency rule
+
+When an upstream README uses `include="./_app/<file>"` (the canonical
+literate-counter shape from `tinkerdown/examples/literate-counter-include/`),
+the sync tool mirrors the entire `_app/` directory next to the README
+into the same relative position next to the destination markdown.
+
+Sync semantics for `_app/`:
+
+- **Authoritative mirror** — the destination `_app/` is cleared and
+  repopulated on every sync. Orphaned files (removed upstream but still
+  present in the mirror) are pruned.
+- **Symlinks rejected** — any symlink found inside `_app/` aborts the
+  mirror with an error. (Tinkerdown's include resolver canonicalises
+  paths anyway, so symlinked content wouldn't render correctly.)
+- **No filtering** — the entire subtree is copied. Don't put secrets,
+  large binaries, or anything you wouldn't publish on the docs site
+  into `_app/`.
+
+### Trailing-slash convention for `_app/` pages
+
+A page that mirrors `_app/` adjacency MUST use the trailing-slash form
+for its `site_url` in `source-of-truth.yaml`:
+
+```yaml
+- site_url: /examples/counter/      # NOT /examples/counter
+  source_repo: https://github.com/livetemplate/examples
+  source_path: counter/README.md
+```
+
+This makes `destFor()` resolve to `content/examples/counter/index.md`
+instead of `content/examples/counter.md`, so the mirrored `_app/`
+lands at `content/examples/counter/_app/`. Without the trailing slash,
+all examples' `_app/` directories would collide on
+`content/examples/_app/`. This convention is enforced by sync's
+behavior, not by validation — set the trailing slash any time you add
+literate primitives to a mirrored page.
+
+---
+
 ## Cross-repo link rewrite rules
 
 Any markdown content sourced from another repo must have these rewrites applied during port (or by the Phase 3 sync script):

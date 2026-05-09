@@ -1,6 +1,8 @@
 package main
 
 import (
+	"os"
+	"path/filepath"
 	"strings"
 	"testing"
 )
@@ -101,13 +103,14 @@ func TestDestFor(t *testing.T) {
 }
 
 func TestComposeWithFrontmatter(t *testing.T) {
-	got := composeWithFrontmatter("My Title", "https://github.com/x/y", "docs/foo.md", "abc123", "Body content\n")
+	got := composeWithFrontmatter("My Title", "https://github.com/x/y", "docs/foo.md", "v1.2.3", "abc123", nil, "Body content\n")
 
 	wantLines := []string{
 		`---`,
 		`title: "My Title"`,
 		`source_repo: "https://github.com/x/y"`,
 		`source_path: "docs/foo.md"`,
+		`source_ref: "v1.2.3"`,
 		`source_commit: "abc123"`,
 		`---`,
 		``,
@@ -123,12 +126,299 @@ func TestComposeStripsLeadingBlankLines(t *testing.T) {
 	// After stripFrontmatter the remaining body often has a leading
 	// blank line. Compose should swallow it so the page doesn't render
 	// with an awkward gap above its first heading.
-	got := composeWithFrontmatter("T", "r", "p", "c", "\n\n# Hello\n")
+	got := composeWithFrontmatter("T", "r", "p", "v0", "c", nil, "\n\n# Hello\n")
 	if !strings.Contains(got, "---\n\n# Hello") {
 		t.Errorf("leading blanks not stripped: %q", got)
 	}
 	if strings.Contains(got, "---\n\n\n# Hello") {
 		t.Errorf("too many leading blanks: %q", got)
+	}
+}
+
+func TestComposeWithFrontmatter_PreservesUpstreamLvtShowSource(t *testing.T) {
+	// lvt_show_source must round-trip as a YAML bool (true), not a
+	// quoted string ("true") — tinkerdown reads it with bool semantics.
+	upstream := map[string]any{"lvt_show_source": true}
+	got := composeWithFrontmatter("T", "r", "p", "v0", "c", upstream, "body\n")
+	if !strings.Contains(got, "lvt_show_source: true\n") {
+		t.Errorf("expected unquoted bool, got:\n%s", got)
+	}
+	if strings.Contains(got, "lvt_show_source: \"true\"") {
+		t.Errorf("emitted as string instead of bool:\n%s", got)
+	}
+}
+
+func TestComposeWithFrontmatter_PreservesUpstreamDescription(t *testing.T) {
+	upstream := map[string]any{"description": "A walkthrough of the counter app"}
+	got := composeWithFrontmatter("T", "r", "p", "v0", "c", upstream, "body\n")
+	if !strings.Contains(got, `description: "A walkthrough of the counter app"`+"\n") {
+		t.Errorf("description not preserved:\n%s", got)
+	}
+}
+
+func TestComposeWithFrontmatter_PreservesUpstreamSidebar(t *testing.T) {
+	upstream := map[string]any{"sidebar": false}
+	got := composeWithFrontmatter("T", "r", "p", "v0", "c", upstream, "body\n")
+	if !strings.Contains(got, "sidebar: false\n") {
+		t.Errorf("sidebar bool not preserved:\n%s", got)
+	}
+}
+
+func TestComposeWithFrontmatter_DropsUnknownUpstreamFrontmatter(t *testing.T) {
+	// Anything outside the explicit allowlist is dropped — proves the
+	// docs site stays in control of its frontmatter contract.
+	upstream := map[string]any{
+		"description":     "kept",
+		"random_key":      "dropped",
+		"weight":          42,
+		"lvt_show_source": true,
+	}
+	got := composeWithFrontmatter("T", "r", "p", "v0", "c", upstream, "body\n")
+	if !strings.Contains(got, `description: "kept"`) {
+		t.Errorf("allowlisted description not preserved")
+	}
+	if !strings.Contains(got, "lvt_show_source: true") {
+		t.Errorf("allowlisted lvt_show_source not preserved")
+	}
+	if strings.Contains(got, "random_key") {
+		t.Errorf("non-allowlisted key leaked through:\n%s", got)
+	}
+	if strings.Contains(got, "weight") {
+		t.Errorf("non-allowlisted weight leaked through:\n%s", got)
+	}
+}
+
+func TestComposeWithFrontmatter_OverridesUpstreamProvenanceKeys(t *testing.T) {
+	// If upstream sets title/source_repo/source_path/source_ref/source_commit
+	// (e.g. because it was previously synced from another mirror), sync's
+	// values still win — those four are sync-owned.
+	upstream := map[string]any{
+		"title":         "stale upstream title",
+		"source_repo":   "https://github.com/wrong/repo",
+		"source_path":   "wrong/path.md",
+		"source_ref":    "v0.0.0",
+		"source_commit": "deadbeef",
+	}
+	got := composeWithFrontmatter("Sync Title", "https://github.com/right/repo", "right/path.md", "v9.9.9", "abc123", upstream, "body\n")
+	if !strings.Contains(got, `title: "Sync Title"`) {
+		t.Errorf("sync title should override upstream")
+	}
+	if strings.Contains(got, "stale upstream title") {
+		t.Errorf("upstream title leaked through:\n%s", got)
+	}
+	if strings.Contains(got, "wrong/repo") || strings.Contains(got, "wrong/path.md") {
+		t.Errorf("upstream provenance leaked through:\n%s", got)
+	}
+	if !strings.Contains(got, `source_ref: "v9.9.9"`) {
+		t.Errorf("sync source_ref should override upstream")
+	}
+}
+
+func TestParseFrontmatter(t *testing.T) {
+	cases := []struct {
+		name, in       string
+		wantKeys       []string
+		wantBodyPrefix string
+	}{
+		{
+			name:           "no frontmatter",
+			in:             "# Hello\nbody",
+			wantKeys:       nil,
+			wantBodyPrefix: "# Hello\nbody",
+		},
+		{
+			name:           "basic frontmatter",
+			in:             "---\ntitle: Hello\nlvt_show_source: true\n---\n# H1\n",
+			wantKeys:       []string{"title", "lvt_show_source"},
+			wantBodyPrefix: "# H1",
+		},
+		{
+			name:           "frontmatter with description",
+			in:             "---\ndescription: \"A page\"\n---\n\nbody\n",
+			wantKeys:       []string{"description"},
+			wantBodyPrefix: "\nbody",
+		},
+	}
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			m, body, err := parseFrontmatter(c.in)
+			if err != nil {
+				t.Fatalf("parseFrontmatter: %v", err)
+			}
+			for _, k := range c.wantKeys {
+				if _, ok := m[k]; !ok {
+					t.Errorf("expected key %q in parsed map; got %v", k, m)
+				}
+			}
+			if !strings.HasPrefix(body, c.wantBodyPrefix) {
+				t.Errorf("body prefix mismatch: got %q want prefix %q", body, c.wantBodyPrefix)
+			}
+		})
+	}
+}
+
+func TestLinkRewriter_PreservesIncludeFenceAttribute(t *testing.T) {
+	// The link rewriter MUST NOT touch tinkerdown fence attributes.
+	// `include="./_app/foo.go"` is byte-identical post-sync.
+	cfg := &SourceOfTruth{
+		Pages: []PageEntry{
+			{SiteURL: "/x", SourceRepo: "https://github.com/livetemplate/livetemplate", SourcePath: "docs/x.md"},
+		},
+	}
+	r := newLinkRewriter(cfg)
+	body := "```go include=\"./_app/counter.go\" lines=\"5-15\" highlight=\"7\"\n```\n"
+	if got := r.Rewrite(body); got != body {
+		t.Errorf("include= fence attribute mutated:\nbefore: %q\nafter:  %q", body, got)
+	}
+}
+
+func TestLinkRewriter_PreservesEmbedLvtBlock(t *testing.T) {
+	cfg := &SourceOfTruth{
+		Pages: []PageEntry{
+			{SiteURL: "/x", SourceRepo: "https://github.com/livetemplate/livetemplate", SourcePath: "docs/x.md"},
+		},
+	}
+	r := newLinkRewriter(cfg)
+	body := "```embed-lvt path=\"/apps/counter/\" upstream=\"https://lt-firstapp.fly.dev\" session=\"counter-tour\" height=\"220px\"\n```\n"
+	if got := r.Rewrite(body); got != body {
+		t.Errorf("embed-lvt block mutated:\nbefore: %q\nafter:  %q", body, got)
+	}
+}
+
+func TestLinkRewriter_PreservesShowSourceFlag(t *testing.T) {
+	cfg := &SourceOfTruth{
+		Pages: []PageEntry{
+			{SiteURL: "/x", SourceRepo: "https://github.com/livetemplate/livetemplate", SourcePath: "docs/x.md"},
+		},
+	}
+	r := newLinkRewriter(cfg)
+	body := "```lvt show-source\n{{define \"main\"}}<p>{{.X}}</p>{{end}}\n```\n"
+	if got := r.Rewrite(body); got != body {
+		t.Errorf("show-source fence mutated:\nbefore: %q\nafter:  %q", body, got)
+	}
+}
+
+func TestMirrorAdjacentApp_NoOpWhenAbsent(t *testing.T) {
+	// If upstream has no _app/ next to the README, the mirror is a no-op
+	// (no error, no destination directory created).
+	src := t.TempDir()
+	dest := t.TempDir()
+	srcReadme := filepath.Join(src, "README.md")
+	if err := os.WriteFile(srcReadme, []byte("# x\n"), 0o644); err != nil {
+		t.Fatalf("write src readme: %v", err)
+	}
+	destReadme := filepath.Join(dest, "x.md")
+	if err := os.WriteFile(destReadme, []byte("# x\n"), 0o644); err != nil {
+		t.Fatalf("write dest readme: %v", err)
+	}
+	if err := mirrorAdjacentApp(srcReadme, destReadme); err != nil {
+		t.Fatalf("expected no error, got %v", err)
+	}
+	if _, err := os.Stat(filepath.Join(dest, "_app")); !os.IsNotExist(err) {
+		t.Errorf("dest _app should not exist when upstream has no _app/")
+	}
+}
+
+func TestMirrorAdjacentApp_CopiesTree(t *testing.T) {
+	src := t.TempDir()
+	dest := t.TempDir()
+	if err := os.MkdirAll(filepath.Join(src, "_app", "subdir"), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(src, "README.md"), []byte("# x\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(src, "_app", "counter.go"), []byte("package main\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(src, "_app", "subdir", "x.tmpl"), []byte("{{.}}\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(dest, "x.md"), []byte("# x\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+
+	if err := mirrorAdjacentApp(filepath.Join(src, "README.md"), filepath.Join(dest, "x.md")); err != nil {
+		t.Fatalf("mirror: %v", err)
+	}
+
+	got, err := os.ReadFile(filepath.Join(dest, "_app", "counter.go"))
+	if err != nil {
+		t.Fatalf("expected mirrored counter.go: %v", err)
+	}
+	if string(got) != "package main\n" {
+		t.Errorf("counter.go content drift: %q", got)
+	}
+	if _, err := os.Stat(filepath.Join(dest, "_app", "subdir", "x.tmpl")); err != nil {
+		t.Errorf("subdir file not mirrored: %v", err)
+	}
+}
+
+func TestMirrorAdjacentApp_PrunesRemovedFiles(t *testing.T) {
+	// Mirror is authoritative — if upstream removes a file from _app/,
+	// sync removes it from the mirror too. Stale files are a worse failure
+	// mode (silent inclusion of orphan code) than the cost of a clean rebuild.
+	src := t.TempDir()
+	dest := t.TempDir()
+	if err := os.MkdirAll(filepath.Join(src, "_app"), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(src, "README.md"), []byte("# x\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(src, "_app", "kept.go"), []byte("kept\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(dest, "x.md"), []byte("# x\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	// Pre-existing orphan in the destination _app/.
+	if err := os.MkdirAll(filepath.Join(dest, "_app"), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(dest, "_app", "orphan.go"), []byte("orphan\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+
+	if err := mirrorAdjacentApp(filepath.Join(src, "README.md"), filepath.Join(dest, "x.md")); err != nil {
+		t.Fatalf("mirror: %v", err)
+	}
+
+	if _, err := os.Stat(filepath.Join(dest, "_app", "orphan.go")); !os.IsNotExist(err) {
+		t.Errorf("orphan should have been pruned: err=%v", err)
+	}
+	if _, err := os.Stat(filepath.Join(dest, "_app", "kept.go")); err != nil {
+		t.Errorf("kept file should remain: %v", err)
+	}
+}
+
+func TestMirrorAdjacentApp_RejectsSymlinks(t *testing.T) {
+	src := t.TempDir()
+	dest := t.TempDir()
+	if err := os.MkdirAll(filepath.Join(src, "_app"), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(src, "README.md"), []byte("# x\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	// Create a target outside _app/ and a symlink pointing at it.
+	outsideTarget := filepath.Join(src, "secret.go")
+	if err := os.WriteFile(outsideTarget, []byte("secret\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.Symlink(outsideTarget, filepath.Join(src, "_app", "linked.go")); err != nil {
+		t.Skipf("symlink unsupported in test env: %v", err)
+	}
+	if err := os.WriteFile(filepath.Join(dest, "x.md"), []byte("# x\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+
+	err := mirrorAdjacentApp(filepath.Join(src, "README.md"), filepath.Join(dest, "x.md"))
+	if err == nil {
+		t.Fatalf("expected symlink rejection, got nil")
+	}
+	if !strings.Contains(err.Error(), "symlink not allowed") {
+		t.Errorf("expected symlink-rejection error, got: %v", err)
 	}
 }
 
