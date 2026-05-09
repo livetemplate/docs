@@ -10,10 +10,18 @@
 //     Handler() time, mirroring the counter recipe pattern. livetemplate
 //     parses templates by filesystem path, so the extract is required.
 //
-//   - All hrefs that need to point inside this package render via
-//     {{basePath}}/<route>. basePath is registered as a template func
-//     (via Template.Funcs after New). The closure reads pkgBasePath,
-//     set once at Handler() invocation time.
+//   - {{basePath}} in templates is a literal token, NOT a template func.
+//     extractTemplates() does a string substitution as each template is
+//     written from the embedded FS to the tmpdir. We can't use a Funcs-
+//     based approach because livetemplate.New parses immediately when
+//     given WithParseFiles, and html/template's parser rejects unknown
+//     funcs at parse time — by the time you could call .Funcs() the
+//     parse has already failed.
+//
+//   - relPath is exposed as a method on PatternLink (data.go) for the
+//     same reason: html/template can call methods on values without
+//     prior registration, but a template func has to be registered
+//     before parse, which we don't get with livetemplate.New.
 //
 //   - Inner mux registrations DROP the "/patterns/" prefix that the
 //     upstream examples/patterns/ uses. cmd/site StripPrefix strips
@@ -40,9 +48,9 @@ import (
 )
 
 // stripPatternsPrefix turns "/patterns/forms/click-to-edit" into
-// "/forms/click-to-edit". Used by the relPath template func so the
-// catalog index can navigate within the docs container at any mount
-// prefix without the data.go entries hardcoding any specific prefix.
+// "/forms/click-to-edit". Used by PatternLink.RelPath() so the catalog
+// index can navigate within the docs container at any mount prefix
+// without the data.go entries hardcoding any specific prefix.
 func stripPatternsPrefix(p string) string {
 	return strings.TrimPrefix(p, "/patterns")
 }
@@ -83,12 +91,25 @@ func Handler(basePath string) http.Handler {
 		pkgBaseOpts = []livetemplate.Option{
 			livetemplate.WithAuthenticator(&livetemplate.AnonymousAuthenticator{}),
 			livetemplate.WithDevMode(true),
-			livetemplate.WithPermissiveOriginCheck(),
+			// Allowlist matches counter recipe (handler.go:57-63).
+			// Public docs origins + the dev origins manual testing
+			// hits over Tailscale and localhost. Permissive-origin
+			// would let any site initiate a WS upgrade against this
+			// handler — fine for an open-data demo, but inconsistent
+			// with the rest of the recipe surface.
+			livetemplate.WithAllowedOrigins([]string{
+				"https://livetemplate.fly.dev",
+				"https://livetemplate-docs-staging.fly.dev",
+				"http://localhost:8080",
+				"http://localhost:8084",
+				"http://devbox:8084",
+			}),
 		}
 		// pkgFuncs is unused for now — every template-time helper this
-		// package needs (relPath) is now a method on PatternLink so
-		// livetemplate.New's eager parse doesn't need to know about it.
-		// Kept declared so a future func-based helper has a slot.
+		// package needs is either a literal token substitution at
+		// extract time (basePath) or a method on a state-typed value
+		// (PatternLink.RelPath). Kept declared so a future helper that
+		// genuinely needs a func registration has a slot.
 		pkgFuncs = template.FuncMap{}
 		extractTemplates()
 		rootHandler = buildMux()
@@ -101,10 +122,12 @@ func Handler(basePath string) http.Handler {
 // "{{basePath}}" is substituted with pkgBasePath as each file is
 // written — html/template's Parse rejects unknown funcs, so we have
 // to bake basePath into the template source before livetemplate sees
-// it. relPath stays a template func because it takes a .Path arg
-// known only at render time. Idempotent — guarded by tmplOnce. The
-// tmpdir survives until the OS reaps /tmp; the binary's lifecycle
-// equals the container's.
+// it. Cross-pattern hrefs that need a runtime computation (stripping
+// "/patterns" off PatternLink.Path) call PatternLink.RelPath() — a
+// method, not a template func, so html/template doesn't need it
+// pre-registered. Idempotent — guarded by tmplOnce. The tmpdir
+// survives until the OS reaps /tmp; the binary's lifecycle equals the
+// container's.
 func extractTemplates() {
 	tmplOnce.Do(func() {
 		dir, err := os.MkdirTemp("", "patterns-tmpl-*")
