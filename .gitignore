@@ -19,3 +19,7 @@ dist/
 .env
 .env.local
 cmd/sync/sync
+
+# Built docs-site binary
+cmd/site/site
+/site
