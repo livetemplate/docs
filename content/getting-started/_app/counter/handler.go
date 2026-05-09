@@ -25,7 +25,9 @@ var (
 
 // extractTemplate writes the embedded template to a temp file so
 // livetemplate's file-based loader can parse it at runtime. Done once
-// per process; the temp dir is process-scoped (cleaned up on exit).
+// per process. The temp dir survives until the OS reaps /tmp — this
+// program does not delete it explicitly, which is fine because it's a
+// few-KB file and the binary's lifecycle is the container's lifecycle.
 func extractTemplate() string {
 	tmplOnce.Do(func() {
 		dir, err := os.MkdirTemp("", "counter-tmpl-*")

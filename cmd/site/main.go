@@ -1,7 +1,12 @@
 // Command site hosts the docs-site recipe apps on an internal HTTP
 // listener. The public-facing docs server is the tinkerdown binary,
 // running in the same container; tinkerdown auto-proxies embed-lvt
-// blocks here via `upstream="http://localhost:9091/<slug>/"`.
+// blocks here. The block usage on docs pages is:
+//
+//	embed-lvt path="/apps/<slug>/" upstream="http://localhost:9091"
+//
+// tinkerdown concatenates upstream + path and fetches
+// http://localhost:9091/apps/<slug>/, which this mux serves.
 //
 // Recipes are imported as Go packages — each exposes `Handler() http.Handler`.
 // Adding a recipe is two lines here plus a Go package under
