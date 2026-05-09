@@ -19,6 +19,7 @@ import (
 	"os"
 
 	counter "github.com/livetemplate/docs/content/recipes/counter/_app"
+	patterns "github.com/livetemplate/docs/content/recipes/patterns/_app"
 )
 
 func main() {
@@ -30,6 +31,12 @@ func main() {
 	//   → tinkerdown fetches http://localhost:9091/apps/counter/
 	//   → mux routes to counter.Handler()
 	mux.Handle("/apps/counter/", http.StripPrefix("/apps/counter", counter.Handler()))
+
+	// patterns.Handler takes the external mount path so its templates
+	// can render absolute hrefs ({{basePath}}/realtime/broadcasting →
+	// /apps/patterns/realtime/broadcasting). The B2 catalog flip will
+	// add a second mount at /patterns/ with basePath="/patterns".
+	mux.Handle("/apps/patterns/", http.StripPrefix("/apps/patterns", patterns.Handler("/apps/patterns")))
 
 	addr := ":" + getenv("RECIPES_PORT", "9091")
 	log.Printf("docs-site recipes listening on %s", addr)
