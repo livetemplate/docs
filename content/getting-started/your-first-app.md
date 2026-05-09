@@ -25,32 +25,51 @@ You'll have a `go.mod` and an empty directory. We'll add three files: `counter.g
 
 Create `counter.go`. First the state:
 
-```go include="./_app/counter/counter.go" lines="5-11"
+```go include="../recipes/counter/_app/counter.go" lines="5-11"
 ```
 
 State is a value type, not a pointer — controllers receive a copy and return a (possibly modified) copy. The framework manages the swap.
 
 Then a controller and two action methods:
 
-```go include="./_app/counter/counter.go" lines="13-33"
+```go include="../recipes/counter/_app/counter.go" lines="13-33"
 ```
 
 Action methods are exported on the controller, and their names ARE the action names — `Increment` and `Decrement` are what the template will reference. The `BroadcastAction` calls are how multi-tab sync works (Step 6).
 
 Now wire it up in `main.go`:
 
-```go include="./_app/counter/main.go" lines="25-52"
+```go
+package main
+
+import (
+	"log"
+	"net/http"
+
+	"github.com/livetemplate/livetemplate"
+)
+
+func main() {
+	tmpl := livetemplate.Must(livetemplate.New("counter",
+		livetemplate.WithParseFiles("counter.tmpl"),
+	))
+	handler := tmpl.Handle(&CounterController{}, livetemplate.AsState(&CounterState{}))
+
+	mux := http.NewServeMux()
+	mux.Handle("/", handler)
+	log.Fatal(http.ListenAndServe(":9090", mux))
+}
 ```
 
 `livetemplate.New("counter")` parses `counter.tmpl` from the same directory. `tmpl.Handle(controller, AsState(initial))` is the standard wiring — controller for actions, initial state for new sessions.
 
-The `WithAuthenticator(sharedAuth{})` option uses a constant-groupID authenticator so all connections share state — Step 6 has the why and the `sharedAuth` definition.
+By default LiveTemplate uses `AnonymousAuthenticator`, which gives each browser a stable session group via cookie. Two consequences worth knowing about now: each browser gets its own state (no cross-user leaks), and tabs from the same browser share state — that's what makes the broadcast demo at Step 6 work.
 
 ## Step 3 — Write the template
 
 Create `counter.tmpl`:
 
-```html include="./_app/counter/counter.tmpl"
+```html include="../recipes/counter/_app/counter.tmpl"
 ```
 
 The `<button name="increment">` attribute is the routing trigger — clicking that button posts the form and the framework calls `Increment()` on the controller.
@@ -89,10 +108,10 @@ Same Go code. Same template. Two lines of HTML promote the experience from serve
 
 Look at the handlers from Step 2 — note the highlighted lines:
 
-```go include="./_app/counter/counter.go" lines="22-33" highlight="24,31"
+```go include="../recipes/counter/_app/counter.go" lines="22-33" highlight="24,31"
 ```
 
-`ctx.BroadcastAction("Increment", nil)` (and the matching `Decrement`) tells LiveTemplate to apply the same action on every other connected client — multiple tabs, multiple embeds, multiple users. Without it, each session has its own count; with it, they stay in lockstep.
+`ctx.BroadcastAction("Increment", nil)` (and the matching `Decrement`) tells LiveTemplate to apply the same action on every other connection in the same session group — multiple tabs and embeds within your browser. Without it, each tab has its own count; with it, they stay in lockstep.
 
 To prove it, here are two embeds against the same counter, side by side:
 
@@ -108,12 +127,7 @@ To prove it, here are two embeds against the same counter, side by side:
 
 Click `+1` in one — watch the other update in real time. They're talking to the same upstream session, and `BroadcastAction` is what makes them stay synced. (On a narrow viewport the embeds stack vertically — the broadcast still works.)
 
-> **Why constant-groupID auth?** Here's the `sharedAuth` referenced in `main.go`:
->
-> ```go include="./_app/counter/main.go" lines="11-23"
-> ```
->
-> Every connection lands in the same session group, so `BroadcastAction` from any one client reaches all the others. A real app uses a per-user authenticator; for a tutorial counter served alongside the docs, putting everyone in one group is what makes the side-by-side demo visible to every reader.
+> **Why does this stay scoped to your browser?** LiveTemplate's default authenticator (`AnonymousAuthenticator`) uses a cookie to assign each browser a stable session group. Tabs from the same browser share that group — that's why the two embeds above sync. Different browsers — or an incognito window in the same browser — get different cookies, different groups, and isolated state. For a public docs site this is the right default: every visitor gets a clean slate, and the broadcast demo still proves the feature within their own browser. See [Recipes/Counter, deeper](/recipes/counter) for the full session-group + scaling story.
 
 ## What you just built
 

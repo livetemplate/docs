@@ -18,7 +18,7 @@ import (
 	"net/http"
 	"os"
 
-	counter "github.com/livetemplate/docs/content/getting-started/_app/counter"
+	counter "github.com/livetemplate/docs/content/recipes/counter/_app"
 )
 
 func main() {

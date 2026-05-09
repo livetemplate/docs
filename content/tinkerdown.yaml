@@ -96,6 +96,8 @@ navigation:
     path: "recipes"
     collapsed: false
     pages:
+      - title: "Counter, deeper"
+        path: "recipes/counter/index.md"
       - title: "Live Patterns Catalog"
         path: "patterns/index.md"
       - title: "How a LiveTemplate Update Flows"
