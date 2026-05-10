@@ -35,7 +35,7 @@ func main() {
 	if port == "" {
 		port = "8080"
 	}
-	h := todos.Handler("/",
+	h := todos.Handler(
 		livetemplate.WithDevMode(true),
 		livetemplate.WithPermissiveOriginCheck(),
 	)

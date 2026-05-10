@@ -1,6 +1,8 @@
 package todos
 
 import (
+	_ "embed"
+
 	"database/sql"
 	"fmt"
 	"log"
@@ -8,6 +10,15 @@ import (
 	"github.com/livetemplate/docs/content/recipes/todos/_app/db"
 	_ "modernc.org/sqlite"
 )
+
+// schemaSQL is the canonical schema definition shared with sqlc — both
+// the runtime migration here and the generated query layer in db/ read
+// the same source file. Inlining a Go-string copy of the schema (the
+// upstream pattern) creates a drift hazard if either side gets edited
+// independently; embed eliminates the second source of truth.
+//
+//go:embed db/schema.sql
+var schemaSQL string
 
 var (
 	database *sql.DB
@@ -55,20 +66,7 @@ func runMigrations(db *sql.DB) error {
 		}
 	}
 
-	schema := `
-CREATE TABLE IF NOT EXISTS todos (
-  id TEXT PRIMARY KEY,
-  user_id TEXT NOT NULL,
-  text TEXT NOT NULL,
-  completed BOOLEAN NOT NULL DEFAULT 0,
-  created_at DATETIME NOT NULL
-);
-
-CREATE INDEX IF NOT EXISTS idx_todos_created_at ON todos(created_at);
-CREATE INDEX IF NOT EXISTS idx_todos_completed ON todos(completed);
-CREATE INDEX IF NOT EXISTS idx_todos_user_id ON todos(user_id);
-`
-	_, err := db.Exec(schema)
+	_, err := db.Exec(schemaSQL)
 	return err
 }
 

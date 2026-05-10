@@ -215,6 +215,11 @@ func (c *TodoController) loadTodos(ctx context.Context, state TodoState, userID 
 		return state, fmt.Errorf("failed to load todos: %w", err)
 	}
 
+	// Refresh on every render path (Mount/OnConnect/Sync + every action)
+	// so the footer's "Last updated" line reflects this session, not the
+	// handler's process-start time.
+	state.LastUpdated = formatTime()
+
 	if state.SearchQuery == "" {
 		state.FilteredTodos = todos
 	} else {

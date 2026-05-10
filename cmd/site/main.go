@@ -62,7 +62,7 @@ func main() {
 	// like patterns). Auth is intrinsic to the recipe (BasicAuth with
 	// alice/bob inside todos.Handler), so cmd/site only supplies the
 	// origin allowlist for the docs deploy targets.
-	mux.Handle("/apps/todos/", http.StripPrefix("/apps/todos", todos.Handler("/apps/todos",
+	mux.Handle("/apps/todos/", http.StripPrefix("/apps/todos", todos.Handler(
 		livetemplate.WithAllowedOrigins([]string{
 			"https://livetemplate.fly.dev",
 			"https://livetemplate-docs-staging.fly.dev",

@@ -71,11 +71,12 @@ func extractTemplate() string {
 	return tmplPath
 }
 
-// Handler returns the todos app as an http.Handler ready to mount. The
-// basePath argument is reserved for parity with the patterns recipe;
-// todos.tmpl uses absolute paths and current-URL form posts, so the
-// value is unused here — kept in the signature so future cross-recipe
-// hrefs slot in without a breaking API change.
+// Handler returns the todos app as an http.Handler ready to mount.
+// todos.tmpl uses absolute paths and current-URL form posts (single-page
+// app, no internal cross-routes), so no basePath substitution is needed
+// — the recipe matches counter's signature shape rather than patterns'
+// (patterns takes basePath because its catalog renders cross-pattern
+// hrefs that must resolve to the live mount prefix).
 //
 // Production callers (cmd/site) supply WithAllowedOrigins; test-server
 // callers supply WithPermissiveOriginCheck + WithDevMode for random-port
@@ -84,8 +85,7 @@ func extractTemplate() string {
 // Calling Handler more than once returns the same first-call handler
 // (handlerOnce); the package-level state (DB, template) is one-shot
 // per process.
-func Handler(basePath string, opts ...livetemplate.Option) http.Handler {
-	_ = basePath
+func Handler(opts ...livetemplate.Option) http.Handler {
 	handlerOnce.Do(func() {
 		queries, err := InitDB(":memory:")
 		if err != nil {

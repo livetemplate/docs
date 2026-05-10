@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"context"
 	"encoding/base64"
 	"encoding/json"
@@ -56,6 +57,13 @@ func TestTodosE2E(t *testing.T) {
 	// LVT_DEV_MODE=true so the spawned process uses the local client library
 	serverCmd.Env = append(os.Environ(), "PORT="+portStr, "TEST_MODE=1", "LVT_DEV_MODE=true")
 
+	// Capture server stdout/stderr so failures (panic, port conflict,
+	// db init) leave a breadcrumb. exec.Cmd defaults stdio to /dev/null,
+	// so without this a crashed server is silent.
+	var serverLog bytes.Buffer
+	serverCmd.Stdout = &serverLog
+	serverCmd.Stderr = &serverLog
+
 	if err := serverCmd.Start(); err != nil {
 		t.Fatalf("Failed to start server: %v", err)
 	}
@@ -64,6 +72,10 @@ func TestTodosE2E(t *testing.T) {
 			serverCmd.Process.Kill()
 		}
 	}()
+
+	// Cap individual readiness probes at 1s so a hung server (accepts
+	// the connection but never responds) can't stall the loop.
+	readyClient := &http.Client{Timeout: 1 * time.Second}
 
 	// Wait for server to be ready with consecutive successful responses
 	ready := false
@@ -74,7 +86,7 @@ func TestTodosE2E(t *testing.T) {
 	for i := 0; i < 50; i++ { // 10 seconds max (50 * 200ms)
 		req, _ := http.NewRequest("GET", serverURL, nil)
 		req.SetBasicAuth("alice", "password")
-		resp, err := http.DefaultClient.Do(req)
+		resp, err := readyClient.Do(req)
 		if err == nil {
 			resp.Body.Close()
 			if resp.StatusCode == 200 {
@@ -98,6 +110,7 @@ func TestTodosE2E(t *testing.T) {
 
 	if !ready {
 		serverCmd.Process.Kill()
+		t.Logf("--- server stdout/stderr ---\n%s\n--- end server output ---", serverLog.String())
 		t.Fatalf("Server failed to start within 10 seconds. Last error: %v", lastErr)
 	}
 
