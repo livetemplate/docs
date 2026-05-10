@@ -44,14 +44,14 @@ The catalog this site exposes is itself driven by the same `lvt-source="patterns
     {{else}}
     <p data-test="meta-summary">
         Right now: <strong>{{len .Data}}</strong> pattern categories, served from
-        <a href="https://lt-patterns.fly.dev/api/index.json"><code>lt-patterns.fly.dev/api/index.json</code></a>,
-        cached 5 minutes at the docs-site edge.
+        the docs-site recipes binary's <code>/patterns/api/index.json</code>
+        endpoint, cached 5 minutes at the docs-site edge.
     </p>
     {{end}}
 </div>
 ```
 
-That number isn't hardcoded. It's a server-side template render, executed when this page loaded, against a live JSON endpoint of a separate fly.io deployment.
+That number isn't hardcoded. It's a server-side template render, executed when this page loaded, against a live JSON endpoint of the same docs binary that's serving you this page.
 
 ## What's in the site that isn't in tinkerdown core
 

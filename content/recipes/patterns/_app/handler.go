@@ -80,31 +80,22 @@ var (
 // has to happen at extract time because livetemplate.New parses
 // immediately and rejects unknown template funcs.
 //
-// Calling Handler more than once with a different basePath returns
-// the same first-call handler; the package-level state is one-shot.
-// (B2's eventual second mount at /patterns/ would need a different
-// approach — likely a second package init or relaxing handlerOnce
-// to scope per-basePath. Out of scope for B1.)
-func Handler(basePath string) http.Handler {
+// Calling Handler more than once returns the same first-call handler
+// (handlerOnce); the package-level state is one-shot per process.
+// Pass extra livetemplate.Options as opts — these are appended to
+// every internal template construction. Production callers (cmd/site)
+// supply WithAuthenticator + WithAllowedOrigins; test-server callers
+// (docs/e2e/patterns/main.go) supply WithPermissiveOriginCheck so
+// random per-test ports work over the WS upgrade.
+//
+// Why options aren't hardcoded here: production wants strict origin
+// allowlisting, but the e2e test framework spins up servers on random
+// ports the allowlist can't anticipate. Letting callers pick the
+// origin policy keeps both cases first-class.
+func Handler(basePath string, opts ...livetemplate.Option) http.Handler {
 	handlerOnce.Do(func() {
 		pkgBasePath = basePath
-		pkgBaseOpts = []livetemplate.Option{
-			livetemplate.WithAuthenticator(&livetemplate.AnonymousAuthenticator{}),
-			livetemplate.WithDevMode(true),
-			// Allowlist matches counter recipe (handler.go:57-63).
-			// Public docs origins + the dev origins manual testing
-			// hits over Tailscale and localhost. Permissive-origin
-			// would let any site initiate a WS upgrade against this
-			// handler — fine for an open-data demo, but inconsistent
-			// with the rest of the recipe surface.
-			livetemplate.WithAllowedOrigins([]string{
-				"https://livetemplate.fly.dev",
-				"https://livetemplate-docs-staging.fly.dev",
-				"http://localhost:8080",
-				"http://localhost:8084",
-				"http://devbox:8084",
-			}),
-		}
+		pkgBaseOpts = opts
 		// pkgFuncs is unused for now — every template-time helper this
 		// package needs is either a literal token substitution at
 		// extract time (basePath) or a method on a state-typed value

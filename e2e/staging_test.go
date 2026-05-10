@@ -177,16 +177,16 @@ func TestThemeAccentInjected(t *testing.T) {
 // TestRecipe1_CatalogHydratesFromREST verifies Phase 5 recipe 1: the
 // /patterns/ catalog is a tinkerdown <div lvt-source="patterns"> block
 // that renders a "Connecting..." placeholder server-side, then hydrates
-// over WebSocket from https://lt-patterns.fly.dev/api/index.json.
+// over WebSocket from the in-process recipes binary's
+// /patterns/api/index.json endpoint.
 //
 // We must NOT inspect the curl body — it would only show the loading
 // shell. Instead, wait for a [data-test="pattern-row"] element (only
 // produced by the post-hydration template) to appear, then count rows.
 //
-// This test also pulls double duty as a Phase 4 regression check: if
-// the upstream pattern count drops below 30 (someone deleted patterns
-// without updating data.go) OR the WS bind silently breaks (sources
-// config typo, network, CORS), we catch it here.
+// Doubles as a regression check: if the pattern count drops below 30
+// (someone deleted patterns without updating data.go) or the WS bind
+// silently breaks (sources config typo, network), we catch it here.
 func TestRecipe1_CatalogHydratesFromREST(t *testing.T) {
 	ctx, cancel := newCtx(t)
 	defer cancel()
@@ -209,33 +209,10 @@ func TestRecipe1_CatalogHydratesFromREST(t *testing.T) {
 	}
 
 	if rowCount < 30 {
-		t.Errorf("catalog hydrated with %d pattern rows; want >= 30 (drift between upstream API and docs catalog?)", rowCount)
+		t.Errorf("catalog hydrated with %d pattern rows; want >= 30 (drift between data.go and docs catalog?)", rowCount)
 	}
-	if !strings.Contains(summary, "categories from the upstream API") {
+	if !strings.Contains(summary, "categories from the in-process patterns endpoint") {
 		t.Errorf("catalog summary did not render expected text: %q", summary)
-	}
-}
-
-// TestPatternsAPIReachable verifies the upstream patterns app is
-// serving the JSON catalog endpoint that powers (or could power) the
-// docs catalog. If this breaks, the docs catalog is at risk of
-// silently going stale relative to what's actually deployed.
-func TestPatternsAPIReachable(t *testing.T) {
-	warmupStaging(t)
-	client := &http.Client{Timeout: 15 * time.Second}
-	resp, err := client.Get("https://lt-patterns.fly.dev/api/index.json")
-	if err != nil {
-		t.Fatalf("fetch /api/index.json: %v", err)
-	}
-	defer resp.Body.Close()
-	if resp.StatusCode != 200 {
-		t.Errorf("status = %d, want 200", resp.StatusCode)
-	}
-	if ct := resp.Header.Get("Content-Type"); ct != "application/json" {
-		t.Errorf("content-type = %q, want application/json", ct)
-	}
-	if cors := resp.Header.Get("Access-Control-Allow-Origin"); cors != "*" {
-		t.Errorf("Access-Control-Allow-Origin = %q, want * (cross-origin docs fetch needs it)", cors)
 	}
 }
 
@@ -541,10 +518,11 @@ func TestRecipe7_MetaPageHasMermaidAndLiveCount(t *testing.T) {
 	}
 }
 
-// TestPatternProxiedAndInteractive verifies PR-D end-to-end. Visiting
+// TestPatternProxiedAndInteractive verifies the routing pipeline:
 // /patterns/forms/click-to-edit on the docs site reverse-proxies to
-// the lt-patterns app, the upstream's interactive UI loads, and we can
-// see its expected DOM (an Edit button and a name field).
+// the in-process recipes binary's patterns mount, the click-to-edit
+// page renders, and we can see its expected DOM (an Edit button and
+// a name field).
 func TestPatternProxiedAndInteractive(t *testing.T) {
 	ctx, cancel := newCtx(t)
 	defer cancel()
@@ -557,7 +535,7 @@ func TestPatternProxiedAndInteractive(t *testing.T) {
 		t.Fatalf("navigate: %v", err)
 	}
 
-	// Markers from the lt-patterns app's click-to-edit page.
+	// Markers from the patterns recipe app's click-to-edit page.
 	for _, want := range []string{"<form", "Edit"} {
 		if !strings.Contains(html, want) {
 			t.Errorf("proxied pattern body missing %q\nbody excerpt:\n%s",

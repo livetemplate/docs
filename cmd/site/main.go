@@ -18,6 +18,8 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/livetemplate/livetemplate"
+
 	counter "github.com/livetemplate/docs/content/recipes/counter/_app"
 	patterns "github.com/livetemplate/docs/content/recipes/patterns/_app"
 )
@@ -32,11 +34,28 @@ func main() {
 	//   → mux routes to counter.Handler()
 	mux.Handle("/apps/counter/", http.StripPrefix("/apps/counter", counter.Handler()))
 
-	// patterns.Handler takes the external mount path so its templates
-	// can render absolute hrefs ({{basePath}}/realtime/broadcasting →
-	// /apps/patterns/realtime/broadcasting). The B2 catalog flip will
-	// add a second mount at /patterns/ with basePath="/patterns".
-	mux.Handle("/apps/patterns/", http.StripPrefix("/apps/patterns", patterns.Handler("/apps/patterns")))
+	// patterns is mounted at /patterns/ (no /apps/ prefix) because it's
+	// also the public catalog URL space — tinkerdown's proxy routes for
+	// /patterns/forms/, /patterns/lists/, etc. forward there. The recipe
+	// page's embed-lvt block uses the same /patterns/... path so a
+	// single mount handles both surfaces. Templates render absolute
+	// hrefs as {{basePath}}/realtime/broadcasting → /patterns/realtime/broadcasting.
+	//
+	// Production options: AnonymousAuthenticator (default — per-browser
+	// session group), explicit origin allowlist for the docs deploy
+	// targets. The handler package's Handler signature accepts opts so
+	// the e2e test-server (docs/e2e/patterns/main.go) can supply
+	// WithPermissiveOriginCheck for random-port test setups.
+	mux.Handle("/patterns/", http.StripPrefix("/patterns", patterns.Handler("/patterns",
+		livetemplate.WithAuthenticator(&livetemplate.AnonymousAuthenticator{}),
+		livetemplate.WithAllowedOrigins([]string{
+			"https://livetemplate.fly.dev",
+			"https://livetemplate-docs-staging.fly.dev",
+			"http://localhost:8080",
+			"http://localhost:8084",
+			"http://devbox:8084",
+		}),
+	)))
 
 	addr := ":" + getenv("RECIPES_PORT", "9091")
 	log.Printf("docs-site recipes listening on %s", addr)
