@@ -22,6 +22,7 @@ import (
 
 	counter "github.com/livetemplate/docs/content/recipes/counter/_app"
 	patterns "github.com/livetemplate/docs/content/recipes/patterns/_app"
+	pe "github.com/livetemplate/docs/content/recipes/progressive-enhancement/_app"
 	todos "github.com/livetemplate/docs/content/recipes/todos/_app"
 )
 
@@ -62,14 +63,30 @@ func main() {
 	// like patterns). Auth is intrinsic to the recipe (BasicAuth with
 	// alice/bob inside todos.Handler), so cmd/site only supplies the
 	// origin allowlist for the docs deploy targets.
+	allowedOrigins := []string{
+		"https://livetemplate.fly.dev",
+		"https://livetemplate-docs-staging.fly.dev",
+		"http://localhost:8080",
+		"http://localhost:8084",
+		"http://devbox:8084",
+	}
 	mux.Handle("/apps/todos/", http.StripPrefix("/apps/todos", todos.Handler(
-		livetemplate.WithAllowedOrigins([]string{
-			"https://livetemplate.fly.dev",
-			"https://livetemplate-docs-staging.fly.dev",
-			"http://localhost:8080",
-			"http://localhost:8084",
-			"http://devbox:8084",
-		}),
+		livetemplate.WithAllowedOrigins(allowedOrigins),
+	)))
+
+	// progressive-enhancement is mounted twice from one handler package
+	// — the only difference is WithWebSocketDisabled on the /no-ws/
+	// mount. Tier A (default) demonstrates JS+WS; Tier B (no-ws) shows
+	// the client falling back to HTTP fetch when the server rejects WS
+	// upgrades; Tier C (no-JS) is the same Tier A URL viewed with
+	// JavaScript disabled in the browser — the recipe page describes
+	// how to try it.
+	mux.Handle("/apps/progressive-enhancement/", http.StripPrefix("/apps/progressive-enhancement", pe.Handler(
+		livetemplate.WithAllowedOrigins(allowedOrigins),
+	)))
+	mux.Handle("/apps/progressive-enhancement/no-ws/", http.StripPrefix("/apps/progressive-enhancement/no-ws", pe.Handler(
+		livetemplate.WithAllowedOrigins(allowedOrigins),
+		livetemplate.WithWebSocketDisabled(),
 	)))
 
 	addr := ":" + getenv("RECIPES_PORT", "9091")

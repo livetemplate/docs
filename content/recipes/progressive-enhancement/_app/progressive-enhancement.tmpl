@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="light dark">
+    <title>Progressive Enhancement — LiveTemplate</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
+    {{if .lvt.DevMode}}
+    <link rel="stylesheet" href="/livetemplate.css">
+    <script defer src="/livetemplate-client.js"></script>
+    {{else}}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@livetemplate/client@latest/livetemplate.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/@livetemplate/client@latest/dist/livetemplate-client.browser.js"></script>
+    {{end}}
+</head>
+<body>
+    <main class="container">
+        <article>
+            <header>
+                <hgroup>
+                    <h1>{{.Title}}</h1>
+                    <p>This app works with or without JavaScript enabled</p>
+                </hgroup>
+            </header>
+
+            <!-- region:noscript-banner -->
+            <noscript>
+                <mark>
+                    <strong>No JavaScript Mode:</strong> Using traditional HTTP form submissions with page reloads.
+                    Each action reloads the page to show updates.
+                </mark>
+            </noscript>
+            <!-- endregion:noscript-banner -->
+
+            {{if .lvt.HasFlash "success"}}
+            <ins style="display:block;text-decoration:none">{{.lvt.Flash "success"}}</ins>
+            {{end}}
+            {{if .lvt.HasFlash "error"}}
+            <del style="display:block;text-decoration:none">{{.lvt.Flash "error"}}</del>
+            {{end}}
+
+            <!-- region:add-form -->
+            <form method="POST" name="add">
+                <fieldset role="group">
+                    <input
+                        type="text"
+                        name="title"
+                        value="{{.InputTitle}}"
+                        placeholder="What needs to be done?"
+                        {{.lvt.AriaInvalid "title"}}
+                        autofocus
+                    >
+                    <button type="submit" name="add" {{.lvt.AriaDisabled "title"}}>Add</button>
+                </fieldset>
+                {{.lvt.ErrorTag "title"}}
+            </form>
+            <!-- endregion:add-form -->
+        </article>
+
+        <article>
+            {{if not .Items}}
+            <p><small>No todos yet. Add one above!</small></p>
+            {{else}}
+            <table>
+                <tbody>
+                {{range .Items}}
+                <tr>
+                    <td>
+                        <!-- region:toggle-form -->
+                        <form method="POST" name="toggle" class="inline">
+                            <input type="hidden" name="id" value="{{.ID}}">
+                            <button type="submit" name="toggle" class="compact secondary outline">
+                                {{if .Completed}}&#10003;{{else}}&#9675;{{end}}
+                            </button>
+                        </form>
+                        <!-- endregion:toggle-form -->
+                    </td>
+                    <td>
+                        {{if .Completed}}<s>{{.Title}}</s>{{else}}{{.Title}}{{end}}
+                    </td>
+                    <td>
+                        <small>{{.CreatedAt}}</small>
+                    </td>
+                    <td>
+                        <form method="POST" name="delete" class="inline">
+                            <input type="hidden" name="id" value="{{.ID}}">
+                            <button type="submit" name="delete" class="compact contrast outline">&#10005;</button>
+                        </form>
+                    </td>
+                </tr>
+                {{end}}
+                </tbody>
+            </table>
+            {{end}}
+        </article>
+    </main>
+
+</body>
+</html>
