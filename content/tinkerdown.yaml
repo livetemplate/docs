@@ -98,6 +98,8 @@ navigation:
     pages:
       - title: "Counter, deeper"
         path: "recipes/counter/index.md"
+      - title: "Todos: a real LiveTemplate app"
+        path: "recipes/todos/index.md"
       - title: "Broadcasting, deeper"
         path: "recipes/patterns/broadcasting.md"
       - title: "Live Patterns Catalog"
@@ -203,6 +205,14 @@ routes:
   - pattern: "/patterns/search/"
     type: "proxy"
     upstream: "http://localhost:9091"
+  # Recipe apps under /apps/<slug>/ (counter, todos, future folds) are
+  # served by cmd/site too. Direct navigation via in-page links (e.g.
+  # the Todos recipe's "Launch the live demo" link) bypasses embed-lvt
+  # and hits tinkerdown's public port; this route proxies them through.
+  # WebSocket upgrade flows for /apps/<slug>/live also use this route.
+  - pattern: "/apps/"
+    type: "proxy"
+    upstream: "http://localhost:9091"
 
 # Landing-page demo iframes lt-landing-demo.fly.dev cross-origin so its
 # embedded LiveTemplate client connects to its own host (a same-origin
@@ -230,8 +240,20 @@ blocks:
 features:
   hot_reload: true
   sidebar: true
-  # G16: pre-render mermaid diagrams to inline SVG via Kroki at parse
-  # time so we can skip the 3.3MB client-side runtime on pages where
-  # all blocks render successfully. Falls back to client-side runtime
-  # for any block Kroki refuses (graceful degradation).
-  prerender_diagrams: true
+  # Mermaid renders client-side in the browser. The previous setting
+  # (prerender_diagrams: true) shipped diagram sources to kroki.io at
+  # parse time to inline SVGs and skip the ~3.3MB mermaid runtime.
+  # Two reasons we no longer use it:
+  #
+  # - Tinkerdown's "graceful degradation" path doesn't actually time
+  #   out when kroki is unreachable; it blocks discovery indefinitely
+  #   on http2ClientConn.roundTrip, and the whole site fails to start.
+  # - The third-party HTTP roundtrip leaks diagram source content
+  #   off-box at every parse, with no on-failure budget.
+  #
+  # Cost of flipping back: the 5 docs pages that currently use mermaid
+  # (landing + 4 recipes) ship the mermaid runtime to readers. That's
+  # contained and observable — pages without diagrams are unaffected.
+  # Revisit (self-host kroki / build-time pre-render / D2) if mermaid
+  # page weight ever becomes a measured concern.
+  prerender_diagrams: false
