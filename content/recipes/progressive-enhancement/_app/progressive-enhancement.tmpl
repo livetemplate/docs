@@ -70,7 +70,7 @@
                         <!-- region:toggle-form -->
                         <form method="POST" name="toggle" class="inline">
                             <input type="hidden" name="id" value="{{.ID}}">
-                            <button type="submit" name="toggle" class="compact secondary outline">
+                            <button type="submit" name="toggle" class="compact secondary outline" aria-label="{{if .Completed}}Mark incomplete{{else}}Mark complete{{end}}">
                                 {{if .Completed}}&#10003;{{else}}&#9675;{{end}}
                             </button>
                         </form>
@@ -85,7 +85,7 @@
                     <td>
                         <form method="POST" name="delete" class="inline">
                             <input type="hidden" name="id" value="{{.ID}}">
-                            <button type="submit" name="delete" class="compact contrast outline">&#10005;</button>
+                            <button type="submit" name="delete" class="compact contrast outline" aria-label="Delete todo">&#10005;</button>
                         </form>
                     </td>
                 </tr>

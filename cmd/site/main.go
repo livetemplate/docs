@@ -27,6 +27,18 @@ import (
 )
 
 func main() {
+	// Origin allowlist shared by every recipe — the docs binary serves
+	// from one of these hosts in production (Fly prod, Fly staging) or
+	// localhost / devbox during dev. Defining it once avoids drift when
+	// new origins (e.g. preview deploys) are added.
+	allowedOrigins := []string{
+		"https://livetemplate.fly.dev",
+		"https://livetemplate-docs-staging.fly.dev",
+		"http://localhost:8080",
+		"http://localhost:8084",
+		"http://devbox:8084",
+	}
+
 	mux := http.NewServeMux()
 	// Recipes are mounted under /apps/<slug>/ to match the embed-lvt
 	// `path=` attribute on docs pages. Tinkerdown's auto-proxy
@@ -50,26 +62,13 @@ func main() {
 	// WithPermissiveOriginCheck for random-port test setups.
 	mux.Handle("/patterns/", http.StripPrefix("/patterns", patterns.Handler("/patterns",
 		livetemplate.WithAuthenticator(&livetemplate.AnonymousAuthenticator{}),
-		livetemplate.WithAllowedOrigins([]string{
-			"https://livetemplate.fly.dev",
-			"https://livetemplate-docs-staging.fly.dev",
-			"http://localhost:8080",
-			"http://localhost:8084",
-			"http://devbox:8084",
-		}),
+		livetemplate.WithAllowedOrigins(allowedOrigins),
 	)))
 
 	// todos is mounted at /apps/todos/ — recipe-only (no public catalog
 	// like patterns). Auth is intrinsic to the recipe (BasicAuth with
 	// alice/bob inside todos.Handler), so cmd/site only supplies the
 	// origin allowlist for the docs deploy targets.
-	allowedOrigins := []string{
-		"https://livetemplate.fly.dev",
-		"https://livetemplate-docs-staging.fly.dev",
-		"http://localhost:8080",
-		"http://localhost:8084",
-		"http://devbox:8084",
-	}
 	mux.Handle("/apps/todos/", http.StripPrefix("/apps/todos", todos.Handler(
 		livetemplate.WithAllowedOrigins(allowedOrigins),
 	)))

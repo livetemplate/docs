@@ -38,10 +38,10 @@ type AddInput struct {
 	Title string `json:"title" validate:"required,min=3,max=100"`
 }
 
-// Mount runs once per session. It seeds the in-memory store with three
-// sample todos and forwards any flash messages from the URL — the latter
-// matters for Tier C: when JS is off, POST-Redirect-GET carries flashes
-// across the redirect via query params.
+// Mount runs once per session and seeds the in-memory store with three
+// sample todos. Flash messages are carried by the framework's lvt-flash
+// cookie across PRG redirects — no URL-param bridging needed, which
+// also avoids letting strangers spoof banners with ?success=...
 func (c *TodoController) Mount(state TodoState, ctx *livetemplate.Context) (TodoState, error) {
 	state.Title = "Progressive Enhancement Todo List"
 
@@ -51,13 +51,6 @@ func (c *TodoController) Mount(state TodoState, ctx *livetemplate.Context) (Todo
 			{ID: "2", Title: "Try the app without JavaScript", Completed: false, CreatedAt: formatTime()},
 			{ID: "3", Title: "Enable JavaScript and see the difference", Completed: false, CreatedAt: formatTime()},
 		}
-	}
-
-	if success := ctx.GetString("success"); success != "" {
-		ctx.SetFlash("success", success)
-	}
-	if errorMsg := ctx.GetString("error"); errorMsg != "" {
-		ctx.SetFlash("error", errorMsg)
 	}
 
 	return state, nil
@@ -73,16 +66,17 @@ func (c *TodoController) Add(state TodoState, ctx *livetemplate.Context) (TodoSt
 		return state, err
 	}
 
+	title := strings.TrimSpace(input.Title)
 	newID := fmt.Sprintf("%d", time.Now().UnixNano())
 	state.Items = append(state.Items, Todo{
 		ID:        newID,
-		Title:     strings.TrimSpace(input.Title),
+		Title:     title,
 		Completed: false,
 		CreatedAt: formatTime(),
 	})
 
 	state.InputTitle = ""
-	ctx.SetFlash("success", fmt.Sprintf("Added: %s", input.Title))
+	ctx.SetFlash("success", fmt.Sprintf("Added: %s", title))
 
 	return state, nil
 }

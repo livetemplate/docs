@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"context"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -14,6 +15,7 @@ import (
 
 	"github.com/chromedp/cdproto/network"
 	"github.com/chromedp/chromedp"
+	"github.com/gorilla/websocket"
 	e2etest "github.com/livetemplate/lvt/testing"
 )
 
@@ -46,14 +48,24 @@ func startServer(t *testing.T) (int, func()) {
 	cmd.Stdout = &serverLog
 	cmd.Stderr = &serverLog
 
+	// `go run .` forks a compiled child binary; SIGKILL on the `go run`
+	// parent doesn't reliably propagate to that child, so the inherited
+	// stdout pipe can stay open and stall a naive Wait() forever.
+	// WaitDelay (Go 1.20+) closes the I/O goroutines after the delay so
+	// Wait() returns even when the child holds the pipe open — bounded
+	// reap, no zombies leaked across the suite's many startServer calls.
+	cmd.WaitDelay = 2 * time.Second
+
 	if err := cmd.Start(); err != nil {
 		t.Fatalf("Failed to start server: %v", err)
 	}
 
 	cleanup := func() {
-		if cmd.Process != nil {
-			cmd.Process.Kill()
+		if cmd.Process == nil {
+			return
 		}
+		_ = cmd.Process.Kill()
+		_ = cmd.Wait()
 	}
 
 	// Cap individual readiness probes at 1s so a hung server can't
@@ -362,9 +374,9 @@ func TestPE_TierB_BrowserE2E(t *testing.T) {
 		var html string
 		err := chromedp.Run(ctx,
 			chromedp.Navigate(tierBURL),
-			chromedp.WaitReady("body"),
+			chromedp.WaitReady("body", chromedp.ByQuery),
 			waitForWSClient(10*time.Second),
-			chromedp.OuterHTML("html", &html),
+			chromedp.OuterHTML("html", &html, chromedp.ByQuery),
 		)
 		if err != nil {
 			t.Fatalf("chromedp failed: %v", err)
@@ -385,7 +397,7 @@ func TestPE_TierB_BrowserE2E(t *testing.T) {
 		err := chromedp.Run(ctx,
 			network.ClearBrowserCookies(),
 			chromedp.Navigate(tierBURL),
-			chromedp.WaitReady("body"),
+			chromedp.WaitReady("body", chromedp.ByQuery),
 			waitForWSClient(10*time.Second),
 		)
 		if err != nil {
@@ -397,7 +409,7 @@ func TestPE_TierB_BrowserE2E(t *testing.T) {
 			chromedp.SendKeys(`input[name="title"]`, "Tier B no-WS todo", chromedp.ByQuery),
 			chromedp.Click(`button[name="add"]`, chromedp.ByQuery),
 			e2etest.WaitFor(`document.body.innerText.includes('Tier B no-WS todo')`, 10*time.Second),
-			chromedp.OuterHTML("html", &htmlAfter),
+			chromedp.OuterHTML("html", &htmlAfter, chromedp.ByQuery),
 		)
 		if err != nil {
 			t.Fatalf("Form submission failed: %v", err)
@@ -422,7 +434,7 @@ func TestPE_TierB_BrowserE2E(t *testing.T) {
 		err := chromedp.Run(ctx,
 			network.ClearBrowserCookies(),
 			chromedp.Navigate(tierBURL),
-			chromedp.WaitReady("body"),
+			chromedp.WaitReady("body", chromedp.ByQuery),
 			waitForWSClient(10*time.Second),
 		)
 		if err != nil {
@@ -444,7 +456,7 @@ func TestPE_TierB_BrowserE2E(t *testing.T) {
 			chromedp.SendKeys(`input[name="title"]`, "Second B todo", chromedp.ByQuery),
 			chromedp.Click(`button[name="add"]`, chromedp.ByQuery),
 			e2etest.WaitFor(`document.body.innerText.includes('Second B todo')`, 10*time.Second),
-			chromedp.OuterHTML("html", &htmlAfterTwo),
+			chromedp.OuterHTML("html", &htmlAfterTwo, chromedp.ByQuery),
 		)
 		if err != nil {
 			t.Fatalf("Second submission failed: %v", err)
@@ -461,7 +473,7 @@ func TestPE_TierB_BrowserE2E(t *testing.T) {
 		err := chromedp.Run(ctx,
 			network.ClearBrowserCookies(),
 			chromedp.Navigate(tierBURL),
-			chromedp.WaitReady("body"),
+			chromedp.WaitReady("body", chromedp.ByQuery),
 			waitForWSClient(10*time.Second),
 			chromedp.SendKeys(`input[name="title"]`, "To delete in B", chromedp.ByQuery),
 			chromedp.Click(`button[name="add"]`, chromedp.ByQuery),
@@ -499,24 +511,24 @@ func TestPE_TierB_WebSocketRejected(t *testing.T) {
 	serverPort, cleanup := startServer(t)
 	defer cleanup()
 
-	tierBURL := fmt.Sprintf("http://localhost:%d/no-ws/", serverPort)
-
-	req, err := http.NewRequest("GET", tierBURL, nil)
-	if err != nil {
-		t.Fatalf("Failed to create request: %v", err)
+	// A real WebSocket dial — gorilla/websocket sets the Sec-WebSocket-Key
+	// and Sec-WebSocket-Version headers a valid handshake needs. Just
+	// asserting "non-101 from a hand-rolled GET with bare Upgrade
+	// headers" would false-pass even when WebSocket was enabled, since
+	// the handshake itself is malformed.
+	wsURL := fmt.Sprintf("ws://localhost:%d/no-ws/", serverPort)
+	dialer := websocket.Dialer{HandshakeTimeout: 5 * time.Second}
+	conn, resp, err := dialer.Dial(wsURL, nil)
+	if conn != nil {
+		conn.Close()
 	}
-	req.Header.Set("Upgrade", "websocket")
-	req.Header.Set("Connection", "Upgrade")
-
-	client := &http.Client{}
-	resp, err := client.Do(req)
-	if err != nil {
-		t.Fatalf("Request failed: %v", err)
+	if err == nil {
+		t.Error("WebSocket dial should have failed against the no-ws mount")
+	} else if !errors.Is(err, websocket.ErrBadHandshake) {
+		t.Logf("non-bad-handshake dial error (still acceptable): %v", err)
 	}
-	resp.Body.Close()
-
-	if resp.StatusCode == http.StatusSwitchingProtocols {
-		t.Error("WebSocket upgrade should be rejected when WebSocket is disabled")
+	if resp != nil && resp.StatusCode == http.StatusSwitchingProtocols {
+		t.Errorf("Expected non-101 response on no-ws mount, got 101")
 	}
 }
 
