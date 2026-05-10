@@ -22,10 +22,23 @@ import (
 
 	counter "github.com/livetemplate/docs/content/recipes/counter/_app"
 	patterns "github.com/livetemplate/docs/content/recipes/patterns/_app"
+	pe "github.com/livetemplate/docs/content/recipes/progressive-enhancement/_app"
 	todos "github.com/livetemplate/docs/content/recipes/todos/_app"
 )
 
 func main() {
+	// Origin allowlist shared by every recipe — the docs binary serves
+	// from one of these hosts in production (Fly prod, Fly staging) or
+	// localhost / devbox during dev. Defining it once avoids drift when
+	// new origins (e.g. preview deploys) are added.
+	allowedOrigins := []string{
+		"https://livetemplate.fly.dev",
+		"https://livetemplate-docs-staging.fly.dev",
+		"http://localhost:8080",
+		"http://localhost:8084",
+		"http://devbox:8084",
+	}
+
 	mux := http.NewServeMux()
 	// Recipes are mounted under /apps/<slug>/ to match the embed-lvt
 	// `path=` attribute on docs pages. Tinkerdown's auto-proxy
@@ -49,13 +62,7 @@ func main() {
 	// WithPermissiveOriginCheck for random-port test setups.
 	mux.Handle("/patterns/", http.StripPrefix("/patterns", patterns.Handler("/patterns",
 		livetemplate.WithAuthenticator(&livetemplate.AnonymousAuthenticator{}),
-		livetemplate.WithAllowedOrigins([]string{
-			"https://livetemplate.fly.dev",
-			"https://livetemplate-docs-staging.fly.dev",
-			"http://localhost:8080",
-			"http://localhost:8084",
-			"http://devbox:8084",
-		}),
+		livetemplate.WithAllowedOrigins(allowedOrigins),
 	)))
 
 	// todos is mounted at /apps/todos/ — recipe-only (no public catalog
@@ -63,13 +70,22 @@ func main() {
 	// alice/bob inside todos.Handler), so cmd/site only supplies the
 	// origin allowlist for the docs deploy targets.
 	mux.Handle("/apps/todos/", http.StripPrefix("/apps/todos", todos.Handler(
-		livetemplate.WithAllowedOrigins([]string{
-			"https://livetemplate.fly.dev",
-			"https://livetemplate-docs-staging.fly.dev",
-			"http://localhost:8080",
-			"http://localhost:8084",
-			"http://devbox:8084",
-		}),
+		livetemplate.WithAllowedOrigins(allowedOrigins),
+	)))
+
+	// progressive-enhancement is mounted twice from one handler package
+	// — the only difference is WithWebSocketDisabled on the /no-ws/
+	// mount. Tier A (default) demonstrates JS+WS; Tier B (no-ws) shows
+	// the client falling back to HTTP fetch when the server rejects WS
+	// upgrades; Tier C (no-JS) is the same Tier A URL viewed with
+	// JavaScript disabled in the browser — the recipe page describes
+	// how to try it.
+	mux.Handle("/apps/progressive-enhancement/", http.StripPrefix("/apps/progressive-enhancement", pe.Handler(
+		livetemplate.WithAllowedOrigins(allowedOrigins),
+	)))
+	mux.Handle("/apps/progressive-enhancement/no-ws/", http.StripPrefix("/apps/progressive-enhancement/no-ws", pe.Handler(
+		livetemplate.WithAllowedOrigins(allowedOrigins),
+		livetemplate.WithWebSocketDisabled(),
 	)))
 
 	addr := ":" + getenv("RECIPES_PORT", "9091")

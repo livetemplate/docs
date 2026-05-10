@@ -100,6 +100,8 @@ navigation:
         path: "recipes/counter/index.md"
       - title: "Todos: a real LiveTemplate app"
         path: "recipes/todos/index.md"
+      - title: "Progressive enhancement: graceful degradation"
+        path: "recipes/progressive-enhancement/index.md"
       - title: "Broadcasting, deeper"
         path: "recipes/patterns/broadcasting.md"
       - title: "Live Patterns Catalog"
