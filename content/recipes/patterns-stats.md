@@ -59,7 +59,7 @@ For richer aggregation (group_by, sum, avg) the right tool is a **computed sourc
 sources:
   patterns:
     type: rest
-    from: https://lt-patterns.fly.dev/api/index.json
+    from: http://localhost:9091/patterns/api/index.json
     result_path: categories
   patterns_by_status:
     type: computed

@@ -11,7 +11,7 @@ source_path: content/recipes/patterns/broadcasting.md
 
 Broadcasting goes further within the same scope. Counter shared one integer; this pattern shares a multi-author message log. Same `BroadcastAction` primitive, two design choices that change everything — which fields are per-connection vs persisted, and where the source of truth lives.
 
-```embed-lvt path="/apps/patterns/realtime/broadcasting" upstream="http://localhost:9091" height="380px"
+```embed-lvt path="/patterns/realtime/broadcasting" upstream="http://localhost:9091" height="380px"
 ```
 
 Open the page in a second tab. Join with a different name. Send a message from either side. Both update. Both tabs are in the same session group (same cookie), so the broadcast reaches both — but each tab keeps its own `Username` because identity is per-connection, not persisted.

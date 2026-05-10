@@ -157,11 +157,14 @@ navigation:
         path: "changelog.md"
 
 sources:
-  # Phase 5 recipe 1: live patterns catalog from the deployed examples/patterns app.
-  # /patterns/index.md binds to this via <div lvt-source="patterns">.
+  # Patterns catalog index: served by the docs-site recipes binary
+  # (cmd/site) at the in-process patterns mount. /patterns/index.md
+  # binds to this via <div lvt-source="patterns">. tinkerdown's REST
+  # source fetcher runs server-side at render/WS-connect time, so the
+  # localhost upstream is reachable.
   patterns:
     type: rest
-    from: https://lt-patterns.fly.dev/api/index.json
+    from: http://localhost:9091/patterns/api/index.json
     result_path: categories
     cache:
       ttl: 5m
@@ -175,29 +178,31 @@ sources:
       ttl: 1h
 
 routes:
-  # External-app router (Phase 1 PR-D): pattern category subtrees proxy
-  # to the deployed examples/patterns app, NOT resolved as markdown.
+  # Pattern category subtrees proxy to the docs-site recipes binary
+  # (cmd/site) at the in-process /patterns/ mount, NOT resolved as
+  # markdown. Tinkerdown forwards /patterns/<cat>/<slug> verbatim to
+  # the upstream so cmd/site sees the same path.
   - pattern: "/patterns/forms/"
     type: "proxy"
-    upstream: "https://lt-patterns.fly.dev"
+    upstream: "http://localhost:9091"
   - pattern: "/patterns/lists/"
     type: "proxy"
-    upstream: "https://lt-patterns.fly.dev"
+    upstream: "http://localhost:9091"
   - pattern: "/patterns/loading/"
     type: "proxy"
-    upstream: "https://lt-patterns.fly.dev"
+    upstream: "http://localhost:9091"
   - pattern: "/patterns/feedback/"
     type: "proxy"
-    upstream: "https://lt-patterns.fly.dev"
+    upstream: "http://localhost:9091"
   - pattern: "/patterns/navigation/"
     type: "proxy"
-    upstream: "https://lt-patterns.fly.dev"
+    upstream: "http://localhost:9091"
   - pattern: "/patterns/realtime/"
     type: "proxy"
-    upstream: "https://lt-patterns.fly.dev"
+    upstream: "http://localhost:9091"
   - pattern: "/patterns/search/"
     type: "proxy"
-    upstream: "https://lt-patterns.fly.dev"
+    upstream: "http://localhost:9091"
 
 # Landing-page demo iframes lt-landing-demo.fly.dev cross-origin so its
 # embedded LiveTemplate client connects to its own host (a same-origin
