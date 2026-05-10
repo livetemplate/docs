@@ -15,7 +15,7 @@ Pattern detail pages open the **live demo**, served by the docs-site recipes bin
     {{if .Error}}
     <p><mark>Failed to load catalog: {{.Error}}.</mark></p>
     {{else}}
-    <p data-test="catalog-summary">Loaded <strong>{{len .Data}}</strong> categories from the upstream API.</p>
+    <p data-test="catalog-summary">Loaded <strong>{{len .Data}}</strong> categories from the in-process patterns endpoint.</p>
     {{range .Data}}
     <section data-category="{{.Slug}}">
         <h2 id="cat-{{.Slug}}">{{.Name}}</h2>

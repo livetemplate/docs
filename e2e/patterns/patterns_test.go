@@ -46,8 +46,7 @@ func setupTest(t *testing.T) (context.Context, context.CancelFunc, int) {
 		}
 	})
 
-	chromeCmd := e2etest.StartDockerChrome(t, debugPort)
-	_ = chromeCmd
+	e2etest.StartDockerChrome(t, debugPort)
 	t.Cleanup(func() {
 		e2etest.StopDockerChrome(t, debugPort)
 	})

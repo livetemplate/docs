@@ -209,9 +209,9 @@ func TestRecipe1_CatalogHydratesFromREST(t *testing.T) {
 	}
 
 	if rowCount < 30 {
-		t.Errorf("catalog hydrated with %d pattern rows; want >= 30 (drift between upstream API and docs catalog?)", rowCount)
+		t.Errorf("catalog hydrated with %d pattern rows; want >= 30 (drift between data.go and docs catalog?)", rowCount)
 	}
-	if !strings.Contains(summary, "categories from the upstream API") {
+	if !strings.Contains(summary, "categories from the in-process patterns endpoint") {
 		t.Errorf("catalog summary did not render expected text: %q", summary)
 	}
 }
