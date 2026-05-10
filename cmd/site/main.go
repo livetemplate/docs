@@ -22,6 +22,7 @@ import (
 
 	counter "github.com/livetemplate/docs/content/recipes/counter/_app"
 	patterns "github.com/livetemplate/docs/content/recipes/patterns/_app"
+	todos "github.com/livetemplate/docs/content/recipes/todos/_app"
 )
 
 func main() {
@@ -48,6 +49,20 @@ func main() {
 	// WithPermissiveOriginCheck for random-port test setups.
 	mux.Handle("/patterns/", http.StripPrefix("/patterns", patterns.Handler("/patterns",
 		livetemplate.WithAuthenticator(&livetemplate.AnonymousAuthenticator{}),
+		livetemplate.WithAllowedOrigins([]string{
+			"https://livetemplate.fly.dev",
+			"https://livetemplate-docs-staging.fly.dev",
+			"http://localhost:8080",
+			"http://localhost:8084",
+			"http://devbox:8084",
+		}),
+	)))
+
+	// todos is mounted at /apps/todos/ — recipe-only (no public catalog
+	// like patterns). Auth is intrinsic to the recipe (BasicAuth with
+	// alice/bob inside todos.Handler), so cmd/site only supplies the
+	// origin allowlist for the docs deploy targets.
+	mux.Handle("/apps/todos/", http.StripPrefix("/apps/todos", todos.Handler(
 		livetemplate.WithAllowedOrigins([]string{
 			"https://livetemplate.fly.dev",
 			"https://livetemplate-docs-staging.fly.dev",

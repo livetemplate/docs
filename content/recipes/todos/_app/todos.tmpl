@@ -1,0 +1,234 @@
+{{/* Template Partials */}}
+
+{{ define "add-form" }}
+  <form method="POST" name="add">
+    <fieldset role="group">
+      <label for="new-todo-text" class="visually-hidden">New todo text</label>
+      <input
+        type="text"
+        id="new-todo-text"
+        name="text"
+        placeholder="What needs to be done?"
+        required
+        aria-required="true"
+        {{.lvt.AriaInvalid "text"}}
+      />
+      <button
+        type="submit"
+        name="add"
+        lvt-el:setAttr:on:add:pending="aria-busy:true"
+        lvt-el:setAttr:on:add:done="aria-busy:false"
+        {{.lvt.AriaDisabled "text"}}
+      >Add</button>
+    </fieldset>
+    {{.lvt.ErrorTag "text"}}
+  </form>
+{{ end }}
+
+{{ define "search-form" }}
+  <div>
+    <label for="search-todos" class="visually-hidden">Search todos</label>
+    <input
+      type="search"
+      id="search-todos"
+      name="query"
+      placeholder="Search todos..."
+      value="{{ .SearchQuery }}"
+    />
+  </div>
+{{ end }}
+
+{{ define "sort-select" }}
+  <div>
+    <label for="sort_by" class="visually-hidden">Sort by</label>
+    <select name="sort_by" id="sort_by">
+      <option value="" {{ if eq .SortBy "" }}selected{{ end }}>
+        Sort: Newest First
+      </option>
+      <option
+        value="alphabetical"
+        {{ if eq .SortBy "alphabetical" }}selected{{ end }}
+      >
+        Alphabetical (A-Z)
+      </option>
+      <option
+        value="reverse_alphabetical"
+        {{ if eq .SortBy "reverse_alphabetical" }}selected{{ end }}
+      >
+        Alphabetical (Z-A)
+      </option>
+      <option
+        value="oldest_first"
+        {{ if eq .SortBy "oldest_first" }}selected{{ end }}
+      >
+        Oldest First
+      </option>
+    </select>
+  </div>
+{{ end }}
+
+{{ define "todo-item" }}
+  <tr data-key="{{ .ID }}" lvt-fx:animate="fade" lvt-fx:highlight="flash">
+    <td>
+      <input
+        type="checkbox"
+        {{ if .Completed }}checked{{ end }}
+        lvt-on:change="toggle"
+        data-id="{{ .ID }}"
+        aria-label="Toggle completion"
+      />
+    </td>
+    <td>
+      {{ if .Completed }}<s>{{ .Text }}</s>{{ else }}{{ .Text }}{{ end }}
+    </td>
+    <td>
+      <form method="POST" name="confirmDelete" class="inline">
+        <input type="hidden" name="id" value="{{ .ID }}" />
+        <button
+          type="submit"
+          name="confirmDelete"
+          class="compact secondary outline"
+          aria-label="Delete this todo"
+        >
+          Delete
+        </button>
+      </form>
+    </td>
+  </tr>
+{{ end }}
+
+{{ define "pagination" }}
+  <nav
+    data-pagination
+    aria-label="Page navigation"
+    {{ if not .ShowPagination }}hidden{{ end }}
+  >
+    <ul>
+      <li>
+        <form method="POST">
+          <button
+            type="submit"
+            name="prevPage"
+            data-disabled="{{- if .PrevDisabled -}}true{{- else -}}false{{- end -}}"
+            {{ if .PrevDisabled }}disabled aria-disabled="true"{{ end }}
+            class="compact secondary"
+            aria-label="Go to previous page"
+          >
+            Previous
+          </button>
+        </form>
+      </li>
+      <li>
+        <small>Page {{ .CurrentPage }} of {{ .TotalPages }}</small>
+      </li>
+      <li>
+        <form method="POST">
+          <button
+            type="submit"
+            name="nextPage"
+            data-disabled="{{- if .NextDisabled -}}true{{- else -}}false{{- end -}}"
+            {{ if .NextDisabled }}disabled aria-disabled="true"{{ end }}
+            class="compact secondary"
+            aria-label="Go to next page"
+          >
+            Next
+          </button>
+        </form>
+      </li>
+    </ul>
+  </nav>
+{{ end }}
+
+{{/* Main Template */}}
+
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="light dark" />
+    <title>Todo App — LiveTemplate</title>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css"
+    />
+    {{ if .lvt.DevMode }}
+    <link rel="stylesheet" href="/livetemplate.css" />
+    <script defer src="/livetemplate-client.js"></script>
+    {{ else }}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@livetemplate/client@latest/livetemplate.css" />
+    <script defer src="https://cdn.jsdelivr.net/npm/@livetemplate/client@latest/dist/livetemplate-client.browser.js"></script>
+    {{ end }}
+  </head>
+  <body>
+    <main class="container">
+      <article>
+        <header>
+          <hgroup>
+            <h1>{{ .Title }}</h1>
+            <p>Total: <strong>{{ .TotalCount }}</strong> · Completed: <strong>{{ .CompletedCount }}</strong> · Remaining: <strong>{{ .RemainingCount }}</strong></p>
+          </hgroup>
+          {{ if .Username }}
+            <p>
+              <small>Logged in as: <strong>{{ .Username }}</strong></small>
+            </p>
+          {{ end }}
+        </header>
+
+        {{/* Add Todo Form */}}
+        {{ template "add-form" . }}
+
+        {{/* Search + Sort */}}
+        <div class="grid">
+          {{ template "search-form" . }}
+          {{ template "sort-select" . }}
+        </div>
+
+        {{/* Todo List */}}
+        <section>
+          <header><strong>Tasks</strong></header>
+          <table>
+            <tbody>
+              {{ range .PaginatedTodos }}
+                {{ template "todo-item" . }}
+              {{ end }}
+            </tbody>
+          </table>
+          <p
+            data-empty-state
+            {{ if gt (len .PaginatedTodos) 0 }}hidden{{ end }}
+          >
+            {{ if ne .SearchQuery "" }}
+              <small>No todos found matching "{{ .SearchQuery }}"</small>
+            {{ else }}
+              <small>No todos yet. Add one above!</small>
+            {{ end }}
+          </p>
+
+          {{/* Pagination Controls */}}
+          {{ template "pagination" . }}
+
+          {{ if gt .CompletedCount 0 }}
+            <form method="POST">
+              <button type="submit" name="clearCompleted" class="compact secondary outline">
+                Clear Completed ({{ .CompletedCount }})
+              </button>
+            </form>
+          {{ end }}
+        </section>
+
+        <footer>
+          <small>Last updated: {{ .LastUpdated }}</small>
+        </footer>
+      </article>
+    </main>
+
+    {{/* Delete Confirmation Modal */}}
+    {{ template "lvt:modal:confirm:v1" .DeleteConfirm }}
+
+    {{/* Toast Notifications */}}
+    {{ template "lvt:toast:container:v1" .Toasts }}
+
+  </body>
+</html>
