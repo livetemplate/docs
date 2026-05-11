@@ -5,9 +5,9 @@ source_path: "flash-messages/README.md"
 source_commit: "9572707da46acf23789b0c9c83eb1906ae2cfd51"
 ---
 
-# Flash Messages Example
+# Flash Messages App Recipe
 
-This example demonstrates flash messages in LiveTemplate - page-level notifications that show once and clear after each action.
+This app recipe demonstrates flash messages in LiveTemplate - page-level notifications that show once and clear after each action.
 
 ## Running
 

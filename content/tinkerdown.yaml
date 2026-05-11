@@ -85,60 +85,46 @@ navigation:
       - title: "Overview"
         path: "client/index.md"
 
-  - title: "Patterns"
-    path: "patterns"
-    collapsed: true
-    pages:
-      - title: "Catalog"
-        path: "patterns/index.md"
-
   - title: "Recipes"
     path: "recipes"
     collapsed: false
     pages:
-      - title: "Counter, deeper"
-        path: "recipes/counter/index.md"
-      - title: "Todos: a real LiveTemplate app"
+      - title: "Overview"
+        path: "recipes/index.md"
+      - title: "Basics: Counter"
+        path: "recipes/apps/counter.md"
+      - title: "Basics: Progressive Enhancement"
+        path: "recipes/apps/progressive-enhancement.md"
+      - title: "Basics: HTTP Only"
+        path: "recipes/apps/ws-disabled.md"
+      - title: "UI Patterns"
+        path: "recipes/ui-patterns/index.md"
+      - title: "Apps: Todos"
         path: "recipes/todos/index.md"
-      - title: "Progressive enhancement: graceful degradation"
+      - title: "Apps: Chat"
+        path: "recipes/apps/chat.md"
+      - title: "Apps: Avatar Upload"
+        path: "recipes/apps/avatar-upload.md"
+      - title: "Apps: Flash Messages"
+        path: "recipes/apps/flash-messages.md"
+      - title: "Deep Dive: Counter"
+        path: "recipes/counter/index.md"
+      - title: "Deep Dive: Progressive Enhancement"
         path: "recipes/progressive-enhancement/index.md"
-      - title: "Broadcasting, deeper"
-        path: "recipes/patterns/broadcasting.md"
-      - title: "Live Patterns Catalog"
-        path: "patterns/index.md"
-      - title: "How a LiveTemplate Update Flows"
+      - title: "Deep Dive: Broadcasting"
+        path: "recipes/broadcasting.md"
+      - title: "Deep Dive: Update Flow"
         path: "recipes/architecture-flow.md"
-      - title: "When to Reach for lvt-* (Decision Tree)"
+      - title: "Deep Dive: lvt-* Decision Tree"
         path: "recipes/progressive-complexity-tree.md"
-      - title: "Sync, Broadcast & Multi-User Sessions"
+      - title: "Deep Dive: Sync & Broadcast"
         path: "recipes/sync-and-broadcast.md"
-      - title: "Anatomy of the Patterns Catalog"
+      - title: "Deep Dive: UI Pattern Catalog"
         path: "recipes/patterns-stats.md"
-      - title: "Live Framework Releases"
+      - title: "Deep Dive: Live Releases"
         path: "recipes/live-releases.md"
-      - title: "How This Docs Site Works (Meta)"
+      - title: "Deep Dive: Docs Site"
         path: "recipes/how-this-site-works.md"
-
-  - title: "Examples"
-    path: "examples"
-    collapsed: true
-    pages:
-      - title: "All Examples"
-        path: "examples/index.md"
-      - title: "Counter"
-        path: "examples/counter.md"
-      - title: "Todos"
-        path: "examples/todos.md"
-      - title: "Chat"
-        path: "examples/chat.md"
-      - title: "Avatar Upload"
-        path: "examples/avatar-upload.md"
-      - title: "Flash Messages"
-        path: "examples/flash-messages.md"
-      - title: "Progressive Enhancement"
-        path: "examples/progressive-enhancement.md"
-      - title: "WS Disabled"
-        path: "examples/ws-disabled.md"
 
   - title: "Contributing"
     path: "contributing"
@@ -161,14 +147,14 @@ navigation:
         path: "changelog.md"
 
 sources:
-  # Patterns catalog index: served by the docs-site recipes binary
-  # (cmd/site) at the in-process patterns mount. /patterns/index.md
+  # UI pattern recipe catalog index: served by the docs-site recipes binary
+  # (cmd/site) at the in-process patterns mount. /recipes/ui-patterns/index.md
   # binds to this via <div lvt-source="patterns">. tinkerdown's REST
   # source fetcher runs server-side at render/WS-connect time, so the
   # localhost upstream is reachable.
   patterns:
     type: rest
-    from: http://localhost:9091/patterns/api/index.json
+    from: http://localhost:9091/recipes/ui-patterns/api/index.json
     result_path: categories
     cache:
       ttl: 5m
@@ -182,29 +168,32 @@ sources:
       ttl: 1h
 
 routes:
-  # Pattern category subtrees proxy to the docs-site recipes binary
-  # (cmd/site) at the in-process /patterns/ mount, NOT resolved as
-  # markdown. Tinkerdown forwards /patterns/<cat>/<slug> verbatim to
-  # the upstream so cmd/site sees the same path.
-  - pattern: "/patterns/forms/"
+  # UI pattern recipe category subtrees proxy to the docs-site recipes
+  # binary (cmd/site) at the in-process /recipes/ui-patterns/ mount,
+  # NOT resolved as markdown. Tinkerdown forwards
+  # /recipes/ui-patterns/<cat>/<slug> verbatim to the upstream.
+  - pattern: "/recipes/ui-patterns/api/"
     type: "proxy"
     upstream: "http://localhost:9091"
-  - pattern: "/patterns/lists/"
+  - pattern: "/recipes/ui-patterns/forms/"
     type: "proxy"
     upstream: "http://localhost:9091"
-  - pattern: "/patterns/loading/"
+  - pattern: "/recipes/ui-patterns/lists/"
     type: "proxy"
     upstream: "http://localhost:9091"
-  - pattern: "/patterns/feedback/"
+  - pattern: "/recipes/ui-patterns/loading/"
     type: "proxy"
     upstream: "http://localhost:9091"
-  - pattern: "/patterns/navigation/"
+  - pattern: "/recipes/ui-patterns/feedback/"
     type: "proxy"
     upstream: "http://localhost:9091"
-  - pattern: "/patterns/realtime/"
+  - pattern: "/recipes/ui-patterns/navigation/"
     type: "proxy"
     upstream: "http://localhost:9091"
-  - pattern: "/patterns/search/"
+  - pattern: "/recipes/ui-patterns/realtime/"
+    type: "proxy"
+    upstream: "http://localhost:9091"
+  - pattern: "/recipes/ui-patterns/search/"
     type: "proxy"
     upstream: "http://localhost:9091"
   # Recipe apps under /apps/<slug>/ (counter, todos, future folds) are

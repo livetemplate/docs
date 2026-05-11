@@ -13,7 +13,7 @@ Most pages are mirrored from canonical files in the source repos:
 | Reference, Guides | [livetemplate/livetemplate](https://github.com/livetemplate/livetemplate) | GitHub Action on release tag (Phase 3) |
 | TypeScript client docs | [livetemplate/client](https://github.com/livetemplate/client) | GitHub Action on release tag |
 | CLI docs | [livetemplate/lvt](https://github.com/livetemplate/lvt) | GitHub Action on release tag |
-| Examples / patterns metadata | [livetemplate/examples](https://github.com/livetemplate/examples) | GitHub Action on release tag |
+| App recipe source | [livetemplate/examples](https://github.com/livetemplate/examples) | GitHub Action on release tag |
 | Recipes (interactive) | this repo | Authored directly here |
 
 The source-of-truth matrix (Phase 2 deliverable) lives at `content/_meta/source-of-truth.md`.

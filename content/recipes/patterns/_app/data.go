@@ -267,7 +267,7 @@ type PatternLink struct {
 	Implemented bool
 }
 
-// RelPath returns Path with the "/patterns" public-catalog prefix
+// RelPath returns Path with the historical "/patterns" prefix
 // stripped, used by templates rendering hrefs that need to compose
 // with a runtime mount basePath. Defined as a method so templates
 // can call it via {{.RelPath}} without needing a registered

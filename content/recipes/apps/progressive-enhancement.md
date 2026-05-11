@@ -5,9 +5,9 @@ source_path: "progressive-enhancement/README.md"
 source_commit: "5054ed6726d9596d294a50b80f11488302b3ec2d"
 ---
 
-# Progressive Enhancement Example
+# Progressive Enhancement App Recipe
 
-This example demonstrates how LiveTemplate supports progressive enhancement - allowing apps to work both with and without JavaScript enabled.
+This app recipe demonstrates how LiveTemplate supports progressive enhancement - allowing apps to work both with and without JavaScript enabled.
 
 ## How It Works
 
@@ -62,7 +62,7 @@ Success/error messages are shown once after actions:
 - **With JS**: Messages appear in real-time
 - **Without JS**: Messages passed via query params after redirect
 
-## Running the Example
+## Running the App Recipe
 
 ```bash
 # Development mode (uses local client library)

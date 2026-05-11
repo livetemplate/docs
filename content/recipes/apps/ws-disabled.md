@@ -5,9 +5,9 @@ source_path: "ws-disabled/README.md"
 source_commit: "5054ed6726d9596d294a50b80f11488302b3ec2d"
 ---
 
-# WebSocket Disabled Example
+# WebSocket Disabled App Recipe
 
-This example demonstrates LiveTemplate's `WithWebSocketDisabled()` mode. The client library is still included and handles all interactions — but uses HTTP fetch instead of WebSocket to send actions and receive tree-based DOM updates.
+This app recipe demonstrates LiveTemplate's `WithWebSocketDisabled()` mode. The client library is still included and handles all interactions — but uses HTTP fetch instead of WebSocket to send actions and receive tree-based DOM updates.
 
 ## When to Use This Mode
 

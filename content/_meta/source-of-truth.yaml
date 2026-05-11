@@ -104,29 +104,29 @@ pages:
     source_repo: https://github.com/livetemplate/client
     source_path: README.md
 
-  # ---- Examples ----
-  - site_url: /examples/
+  # ---- App Recipes (mirrored from examples) ----
+  - site_url: /recipes/apps/
     source_repo: https://github.com/livetemplate/examples
     source_path: README.md
-  - site_url: /examples/counter
+  - site_url: /recipes/apps/counter
     source_repo: https://github.com/livetemplate/examples
     source_path: counter/README.md
-  - site_url: /examples/todos
+  - site_url: /recipes/apps/todos
     source_repo: https://github.com/livetemplate/examples
     source_path: todos/README.md
-  - site_url: /examples/chat
+  - site_url: /recipes/apps/chat
     source_repo: https://github.com/livetemplate/examples
     source_path: chat/README.md
-  - site_url: /examples/avatar-upload
+  - site_url: /recipes/apps/avatar-upload
     source_repo: https://github.com/livetemplate/examples
     source_path: avatar-upload/README.md
-  - site_url: /examples/flash-messages
+  - site_url: /recipes/apps/flash-messages
     source_repo: https://github.com/livetemplate/examples
     source_path: flash-messages/README.md
-  - site_url: /examples/progressive-enhancement
+  - site_url: /recipes/apps/progressive-enhancement
     source_repo: https://github.com/livetemplate/examples
     source_path: progressive-enhancement/README.md
-  - site_url: /examples/ws-disabled
+  - site_url: /recipes/apps/ws-disabled
     source_repo: https://github.com/livetemplate/examples
     source_path: ws-disabled/README.md
 

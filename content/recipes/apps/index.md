@@ -1,13 +1,13 @@
 ---
-title: "Examples"
+title: "App Recipes"
 source_repo: "https://github.com/livetemplate/examples"
 source_path: "README.md"
 source_commit: "8dd1b75ebabbc8a20786d3b369797a2599a1be42"
 ---
 
-# LiveTemplate Examples
+# App Recipes
 
-Example applications demonstrating LiveTemplate usage with various features and patterns.
+Runnable application recipes demonstrating LiveTemplate usage with various features and patterns. These pages are mirrored from the `livetemplate/examples` repository, but they live here as the app-focused part of Recipes.
 
 ## Showcase: Todo App
 
@@ -41,11 +41,11 @@ All examples follow the [progressive complexity](https://github.com/livetemplate
 | `shared-notepad/` | 1+2 | BasicAuth + SharedState | `lvt-form:preserve` |
 | `dialog-patterns/` | 1 | Native `<dialog>` with `command`/`commandfor` | None (polyfilled by client) |
 
-## Examples
+## App Recipes
 
-The directories listed in the table above are individual example applications. Each folder contains a minimal, self-contained project that demonstrates a specific LiveTemplate pattern or feature.
+The directories listed in the table above are individual app recipes. Each folder contains a minimal, self-contained project that demonstrates a specific LiveTemplate pattern or feature.
 
-## Running Examples
+## Running App Recipes
 
 Each example is self-contained with its own `go.mod`. To run an example:
 
@@ -55,9 +55,9 @@ go mod download
 go run main.go
 ```
 
-## Testing Examples
+## Testing App Recipes
 
-### Test All Examples
+### Test All App Recipes
 
 Run all working examples at once:
 
@@ -70,9 +70,9 @@ This script will:
 - Skip disabled examples by default (use without `--skip-disabled` to attempt them)
 - Show a summary of passed/failed/skipped tests
 
-### Test Individual Example
+### Test Individual App Recipe
 
-Examples include E2E tests using Chromedp:
+App recipes include E2E tests using Chromedp:
 
 ```bash
 cd <example-directory>
@@ -87,7 +87,7 @@ The test script is also used in GitHub Actions. See `.github/workflows/test.yml`
 
 ### Production (CDN)
 
-Examples are configured to use the CDN version of the client library:
+App recipes are configured to use the CDN version of the client library:
 
 ```html
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@livetemplate/client@latest/livetemplate.css">
@@ -112,9 +112,9 @@ For local development, examples can serve the client library locally using `gith
 
 ## Version Synchronization
 
-Examples follow the LiveTemplate core library's major.minor version:
-- Core: `v0.1.5` → Examples: `v0.1.x` (any patch version)
-- Core: `v0.2.0` → Examples: `v0.2.0` (must match major.minor)
+App recipes follow the LiveTemplate core library's major.minor version:
+- Core: `v0.1.5` -> app recipes: `v0.1.x` (any patch version)
+- Core: `v0.2.0` -> app recipes: `v0.2.0` (must match major.minor)
 
 ## Contributing
 

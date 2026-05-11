@@ -59,7 +59,7 @@ When a user clicks a button, LiveTemplate calls a method on your Go struct, diff
 1. **[Install](/getting-started/install)** — `go get`, ~30 seconds
 2. **[Your First App](/getting-started/your-first-app)** — counter app from scratch in 10 minutes
 3. **[Progressive Complexity](/guides/progressive-complexity)** — when to reach for `lvt-*` attributes (and when not to)
-4. **[Patterns catalog](/patterns/)** — 33 interactive UI patterns, live demos with source
+4. **[Recipes](/recipes/)** — basics, UI patterns, runnable apps, and deep dives
 
 ## Or browse
 
@@ -67,10 +67,9 @@ When a user clicks a button, LiveTemplate calls a method on your Go struct, diff
 - **[Reference](/reference/api)** — types, attributes, configuration, controller pattern
 - **[CLI (`lvt`)](/cli)** — code generator, dev server, kit system
 - **[TypeScript Client](/client)** — `@livetemplate/client` npm package
-- **[Examples](/examples/)** — runnable apps for every common pattern
-- **[Recipes](/recipes/architecture-flow)** — interactive walkthroughs of how the framework works
+- **[Recipes](/recipes/)** — basics, UI patterns, runnable apps, and deep dives
 - **[Changelog](/changelog)** — releases across all four repos
 
 ## How this site is built
 
-This is a [tinkerdown](https://github.com/livetemplate/tinkerdown) site. Most pages are mirrored from canonical files in the source repos ([livetemplate](https://github.com/livetemplate/livetemplate), [client](https://github.com/livetemplate/client), [lvt](https://github.com/livetemplate/lvt), [examples](https://github.com/livetemplate/examples)) and re-published on each release. Pattern detail pages are reverse-proxied to a deployed [livetemplate/examples/patterns](https://github.com/livetemplate/examples/tree/main/patterns) showcase. The "Edit this page on GitHub" link in every footer points to the canonical source — that's where corrections should land. See [How This Docs Site Works](/recipes/how-this-site-works) for the full dogfood loop.
+This is a [tinkerdown](https://github.com/livetemplate/tinkerdown) site. Most reference and package pages are mirrored from canonical files in the source repos ([livetemplate](https://github.com/livetemplate/livetemplate), [client](https://github.com/livetemplate/client), [lvt](https://github.com/livetemplate/lvt), [examples](https://github.com/livetemplate/examples)) and re-published on each release. Recipe apps and UI pattern recipes are served by the docs-site recipes binary so the examples stay interactive inside the docs. The "Edit this page on GitHub" link in every footer points to the canonical source — that's where corrections should land. See [How This Docs Site Works](/recipes/how-this-site-works) for the full dogfood loop.

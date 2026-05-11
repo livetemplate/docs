@@ -18,7 +18,7 @@ type apiCategory struct {
 type apiPattern struct {
 	Slug        string `json:"slug"`        // last URL segment, e.g. "click-to-edit"
 	Name        string `json:"name"`        // human title
-	Path        string `json:"path"`        // upstream path, e.g. "/patterns/forms/click-to-edit"
+	Path        string `json:"path"`        // public path, e.g. "/recipes/ui-patterns/forms/click-to-edit"
 	Description string `json:"description"` // one-line problem statement
 	Status      string `json:"status"`      // "stable" | "soon"
 	Category    string `json:"category"`    // human category name (denormalized for client convenience)
@@ -37,7 +37,7 @@ type apiPattern struct {
 //
 // Versioned for forward-compat: bump `version` when the schema changes
 // in a way that breaks existing consumers.
-func apiIndexHandler() http.Handler {
+func apiIndexHandler(basePath string) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// CORS preflight first: a browser fetch from the docs site will
 		// OPTIONS-preflight on any cross-origin request that the spec
@@ -78,7 +78,7 @@ func apiIndexHandler() http.Handler {
 				ac.Patterns = append(ac.Patterns, apiPattern{
 					Slug:        patternSlugFromPath(p.Path),
 					Name:        p.Name,
-					Path:        p.Path,
+					Path:        basePath + p.RelPath(),
 					Description: p.Description,
 					Status:      status,
 					Category:    c.Name,

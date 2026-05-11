@@ -32,8 +32,8 @@ It is consumed by humans deciding where to edit content, and (Phase 3 onwards) b
 | `*/CLAUDE.md` files | NEVER mirrored | They're agent instructions, not user docs |
 | `docs/proposals/`, `docs/plans/`, `docs/archive/`, `design/`, `WORKFLOWS.md`, `ROADMAP.md`, `AGENT_*.md` | NEVER mirrored | Internal RFCs / planning / agent setup |
 | `docs/performance/` | NOT mirrored in v1 | May graduate to public if stabilized |
-| `examples/<app>/README.md` | All mirrored under `/examples/<app>` | These are user-facing showcases |
-| `examples/patterns/<...>` | NOT mirrored | Served live via reverse proxy at `/patterns/*` (Phase 1 PR-D) |
+| `examples/<app>/README.md` | All mirrored under `/recipes/apps/<app>` | These are user-facing showcases |
+| `examples/patterns/<...>` | NOT mirrored | Served live via reverse proxy at `/recipes/ui-patterns/*` (Phase 1 PR-D) |
 | `*/CONTRIBUTING.md` | All mirrored under `/contributing/<repo>` | Centralizes contributor onboarding |
 | Per-repo `README.md` | Mirrored conditionally; some split (see below) | The four repos each have a different role |
 
@@ -41,7 +41,7 @@ It is consumed by humans deciding where to edit content, and (Phase 3 onwards) b
 
 ## Concept-by-concept matrix
 
-Order: getting-started → guides → reference → CLI → client → patterns/recipes → examples → contributing → changelog.
+Order: getting-started -> guides -> reference -> CLI -> client -> recipes -> contributing -> changelog.
 
 ### Getting Started (mirror)
 
@@ -101,12 +101,12 @@ Order: getting-started → guides → reference → CLI → client → patterns/
 | API surface | `client` | `README.md` (API section) | `/client/api` | yes (split) |
 | CSS utilities | `client` | `README.md` (CSS section) | `/client/css` | yes (split) |
 
-### Patterns (Phase 4 — proxied)
+### UI Pattern Recipes (proxied)
 
 | Concept | Source repo | Source path | Site URL | Mirror? |
 |---|---|---|---|---|
-| Pattern catalog | this repo | `content/patterns/index.md` | `/patterns/` | manual (this repo) |
-| Pattern detail (each of 31) | `examples` | `patterns/handlers_*.go` + templates | `/patterns/<category>/<slug>` | NO — proxied via PR-D router |
+| UI pattern catalog | this repo | `content/recipes/ui-patterns/index.md` | `/recipes/ui-patterns/` | manual (this repo) |
+| UI pattern detail | `examples` | `patterns/handlers_*.go` + templates | `/recipes/ui-patterns/<category>/<slug>` | NO — proxied via PR-D router |
 
 ### Recipes (Phase 5 — interactive)
 
@@ -114,22 +114,22 @@ Order: getting-started → guides → reference → CLI → client → patterns/
 |---|---|---|---|---|
 | Recipes (8–10 of them) | this repo | `content/recipes/*.md` | `/recipes/<slug>` | recipe (Phase 5 authors directly) |
 
-### Examples (mirror, indexed)
+### App Recipes (mirrored from examples)
 
 | Concept | Source repo | Source path | Site URL | Mirror? |
 |---|---|---|---|---|
-| Examples index | `examples` | `README.md` | `/examples/` | yes |
-| counter | `examples` | `counter/README.md` | `/examples/counter` | yes |
-| todos | `examples` | `todos/README.md` | `/examples/todos` | yes |
-| chat | `examples` | `chat/README.md` | `/examples/chat` | yes |
-| avatar-upload | `examples` | `avatar-upload/README.md` | `/examples/avatar-upload` | yes |
-| flash-messages | `examples` | `flash-messages/README.md` | `/examples/flash-messages` | yes |
-| login | `examples` | `login/README.md` (when present) | `/examples/login` | yes |
-| dialog-patterns | `examples` | `dialog-patterns/README.md` (when present) | `/examples/dialog-patterns` | yes |
-| live-preview | `examples` | `live-preview/README.md` (when present) | `/examples/live-preview` | yes |
-| progressive-enhancement | `examples` | `progressive-enhancement/README.md` | `/examples/progressive-enhancement` | yes |
-| shared-notepad | `examples` | `shared-notepad/README.md` (when present) | `/examples/shared-notepad` | yes |
-| ws-disabled | `examples` | `ws-disabled/README.md` | `/examples/ws-disabled` | yes |
+| App recipes index | `examples` | `README.md` | `/recipes/apps/` | yes |
+| counter | `examples` | `counter/README.md` | `/recipes/apps/counter` | yes |
+| todos | `examples` | `todos/README.md` | `/recipes/apps/todos` | yes |
+| chat | `examples` | `chat/README.md` | `/recipes/apps/chat` | yes |
+| avatar-upload | `examples` | `avatar-upload/README.md` | `/recipes/apps/avatar-upload` | yes |
+| flash-messages | `examples` | `flash-messages/README.md` | `/recipes/apps/flash-messages` | yes |
+| login | `examples` | `login/README.md` (when present) | `/recipes/apps/login` | yes |
+| dialog-patterns | `examples` | `dialog-patterns/README.md` (when present) | `/recipes/apps/dialog-patterns` | yes |
+| live-preview | `examples` | `live-preview/README.md` (when present) | `/recipes/apps/live-preview` | yes |
+| progressive-enhancement | `examples` | `progressive-enhancement/README.md` | `/recipes/apps/progressive-enhancement` | yes |
+| shared-notepad | `examples` | `shared-notepad/README.md` (when present) | `/recipes/apps/shared-notepad` | yes |
+| ws-disabled | `examples` | `ws-disabled/README.md` | `/recipes/apps/ws-disabled` | yes |
 
 ### Contributing (mirror, per-repo)
 
@@ -256,16 +256,16 @@ A page that mirrors `_app/` adjacency MUST use the trailing-slash form
 for its `site_url` in `source-of-truth.yaml`:
 
 ```yaml
-- site_url: /examples/counter/      # NOT /examples/counter
+- site_url: /recipes/apps/counter/      # NOT /recipes/apps/counter
   source_repo: https://github.com/livetemplate/examples
   source_path: counter/README.md
 ```
 
-This makes `destFor()` resolve to `content/examples/counter/index.md`
-instead of `content/examples/counter.md`, so the mirrored `_app/`
-lands at `content/examples/counter/_app/`. Without the trailing slash,
+This makes `destFor()` resolve to `content/recipes/apps/counter/index.md`
+instead of `content/recipes/apps/counter.md`, so the mirrored `_app/`
+lands at `content/recipes/apps/counter/_app/`. Without the trailing slash,
 all examples' `_app/` directories would collide on
-`content/examples/_app/`. This convention is enforced by sync's
+`content/recipes/apps/_app/`. This convention is enforced by sync's
 behavior, not by validation — set the trailing slash any time you add
 literate primitives to a mirrored page.
 
@@ -283,8 +283,8 @@ Any markdown content sourced from another repo must have these rewrites applied 
 | `https://github.com/livetemplate/client` | `/client` |
 | `https://github.com/livetemplate/lvt/blob/main/<path>.md` | `/cli/<computed>` |
 | `https://github.com/livetemplate/lvt` | `/cli` |
-| `https://github.com/livetemplate/examples/blob/main/<path>.md` | `/examples/<computed>` |
-| `https://github.com/livetemplate/examples` | `/examples` |
+| `https://github.com/livetemplate/examples/blob/main/<path>.md` | `/recipes/apps/<computed>` |
+| `https://github.com/livetemplate/examples` | `/recipes/apps` |
 | `https://github.com/livetemplate/<repo>/(issues|pull|commit|releases)/<n>` | KEEP AS-IS — external GitHub references |
 | `https://pkg.go.dev/...` | KEEP AS-IS — external API docs |
 

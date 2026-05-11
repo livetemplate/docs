@@ -91,8 +91,8 @@ func TestDestFor(t *testing.T) {
 		{"/", "site/content/index.md"},
 		{"/getting-started/install", "site/content/getting-started/install.md"},
 		{"/cli/", "site/content/cli/index.md"},
-		{"/examples/", "site/content/examples/index.md"},
-		{"/examples/counter", "site/content/examples/counter.md"},
+		{"/recipes/apps/", "site/content/recipes/apps/index.md"},
+		{"/recipes/apps/counter", "site/content/recipes/apps/counter.md"},
 	}
 	for _, c := range cases {
 		got := destFor("site", c.siteURL)

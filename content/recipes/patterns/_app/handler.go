@@ -2,7 +2,7 @@
 // 33 reactive UI pattern handlers exposed as a single Go package
 // consumable by docs/cmd/site. There is no main() here: production
 // runs via the docs single-binary container, mounted by cmd/site at
-// /apps/patterns/ with StripPrefix.
+// /recipes/ui-patterns/ with StripPrefix.
 //
 // Architecture notes:
 //
@@ -23,12 +23,10 @@
 //     prior registration, but a template func has to be registered
 //     before parse, which we don't get with livetemplate.New.
 //
-//   - Inner mux registrations DROP the "/patterns/" prefix that the
-//     upstream examples/patterns/ uses. cmd/site StripPrefix strips
-//     "/apps/patterns" so a request "/apps/patterns/realtime/broadcasting"
-//     reaches this mux as "/realtime/broadcasting". Public catalog
-//     URLs (in data.go's PatternEntry.Path and api_index.go's JSON)
-//     keep the "/patterns/" shape — they're a separate contract.
+//   - Inner mux registrations DROP the public recipe prefix. cmd/site
+//     StripPrefix strips "/recipes/ui-patterns" so a request
+//     "/recipes/ui-patterns/realtime/broadcasting" reaches this mux as
+//     "/realtime/broadcasting".
 package patterns
 
 import (
@@ -59,20 +57,20 @@ func stripPatternsPrefix(p string) string {
 var templateFS embed.FS
 
 var (
-	tmplRoot     string
-	tmplOnce     sync.Once
-	pkgBasePath  string
-	pkgBaseOpts  []livetemplate.Option
-	pkgFuncs     template.FuncMap
-	handlerOnce  sync.Once
-	rootHandler  http.Handler
+	tmplRoot    string
+	tmplOnce    sync.Once
+	pkgBasePath string
+	pkgBaseOpts []livetemplate.Option
+	pkgFuncs    template.FuncMap
+	handlerOnce sync.Once
+	rootHandler http.Handler
 )
 
 // Handler returns an http.Handler that serves all 33 pattern routes
 // plus /api/index.json + the dev-mode static asset routes
 // (/livetemplate-client.js, /livetemplate.css). Mount it with
 // http.StripPrefix; the basePath argument is the prefix the docs
-// container exposes externally (e.g. "/apps/patterns").
+// container exposes externally (e.g. "/recipes/ui-patterns").
 //
 // basePath has no trailing slash. Templates were authored with the
 // literal token "{{basePath}}" which extractTemplates rewrites to the
@@ -174,7 +172,7 @@ func newLayoutTmplWithOpts(files []string, extra ...livetemplate.Option) *livete
 
 // buildMux registers every pattern route, the API index, and the
 // dev-mode static asset routes. Routes are registered without the
-// "/patterns/" prefix — cmd/site's StripPrefix layer handles the
+// public recipe prefix — cmd/site's StripPrefix layer handles the
 // external mount path.
 func buildMux() http.Handler {
 	mux := http.NewServeMux()
@@ -231,7 +229,7 @@ func buildMux() http.Handler {
 
 	// JSON catalog index — same shape as upstream examples/patterns
 	// served (kept for forward-compat consumers; unused in B1).
-	mux.Handle("/api/index.json", apiIndexHandler())
+	mux.Handle("/api/index.json", apiIndexHandler(pkgBasePath))
 
 	// Dev-mode client + CSS, served from the inner mount so templates
 	// render {{basePath}}/livetemplate-client.js. lvt/testing fetches

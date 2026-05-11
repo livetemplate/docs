@@ -2,7 +2,7 @@
 title: "Broadcasting, deeper"
 description: "How ctx.BroadcastAction routes within a session group, why some state belongs on the controller and not in lvt:\"persist\", and the two mutex rules that keep it from deadlocking."
 source_repo: https://github.com/livetemplate/docs
-source_path: content/recipes/patterns/broadcasting.md
+source_path: content/recipes/broadcasting.md
 ---
 
 # Broadcasting, deeper
@@ -11,7 +11,7 @@ source_path: content/recipes/patterns/broadcasting.md
 
 Broadcasting goes further within the same scope. Counter shared one integer; this pattern shares a multi-author message log. Same `BroadcastAction` primitive, two design choices that change everything — which fields are per-connection vs persisted, and where the source of truth lives.
 
-```embed-lvt path="/patterns/realtime/broadcasting" upstream="http://localhost:9091" height="380px"
+```embed-lvt path="/recipes/ui-patterns/realtime/broadcasting" upstream="http://localhost:9091" height="380px"
 ```
 
 Open the page in a second tab. Join with a different name. Send a message from either side. Both update. Both tabs are in the same session group (same cookie), so the broadcast reaches both — but each tab keeps its own `Username` because identity is per-connection, not persisted.
@@ -20,7 +20,7 @@ Open the page in a second tab. Join with a different name. Send a message from e
 
 ## Anatomy of the state
 
-```go include="./_app/state_realtime.go" region="broadcasting-state"
+```go include="./patterns/_app/state_realtime.go" region="broadcasting-state"
 ```
 
 Note what's *not* persisted. `Username` looks like a candidate for `lvt:"persist"` — it's user identity, surely you want it to survive a reconnect? But persist storage is keyed by **session group**, so persisting `Username` would force every tab in the same browser to share one identity, defeating the demo where two tabs join as different users.
@@ -29,7 +29,7 @@ The pattern that *does* persist state across reconnects is `ReconnectionState` (
 
 ## Where the messages live
 
-```go include="./_app/handlers_realtime.go" region="broadcasting-controller"
+```go include="./patterns/_app/handlers_realtime.go" region="broadcasting-controller"
 ```
 
 The message log is on the **controller**, not in state. State is per-connection; the controller is the singleton dependency layer the [Controller+State pattern](/reference/controller-pattern) puts in front of every connection routed to this handler. `c.messages` is the source of truth — every tab reads from it under the same `RWMutex`.
@@ -38,7 +38,7 @@ The `Mount` method runs on every initial render — without it, a tab that opens
 
 ## The broadcast
 
-```go include="./_app/handlers_realtime.go" region="broadcasting-send"
+```go include="./patterns/_app/handlers_realtime.go" region="broadcasting-send"
 ```
 
 Two non-obvious mutex rules in this method:
@@ -51,7 +51,7 @@ The third rule is implicit — `c.messages` is uncapped here. Production apps wo
 
 ## What peers do
 
-```go include="./_app/handlers_realtime.go" region="broadcasting-newmessage"
+```go include="./patterns/_app/handlers_realtime.go" region="broadcasting-newmessage"
 ```
 
 `NewMessage` runs on every peer when the broadcast fires. It reads the shared log under `RLock` and copies into per-connection state. The template re-renders; the diff goes over the wire as patches, not full HTML.
@@ -66,4 +66,4 @@ Multi-replica: swap in-process broadcast for Redis Pub/Sub via [`WithPubSubBroad
 
 ## What's next
 
-The reconnection-recovery pattern (live demo at [/patterns/realtime/reconnection](/patterns/realtime/reconnection)) is the persist-state companion. Same `BroadcastAction` shape, but the demo state survives a WebSocket drop because the fields are `lvt:"persist"`-tagged. A future recipe will go deep on it; for now the live widget plus its source in the same `_app/` is the reference.
+The reconnection-recovery pattern (live demo at [/recipes/ui-patterns/realtime/reconnection](/recipes/ui-patterns/realtime/reconnection)) is the persist-state companion. Same `BroadcastAction` shape, but the demo state survives a WebSocket drop because the fields are `lvt:"persist"`-tagged. A future recipe will go deep on it; for now the live widget plus its source in the same `_app/` is the reference.

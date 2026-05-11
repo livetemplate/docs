@@ -5,7 +5,7 @@ source_path: "counter/README.md"
 source_commit: "5054ed6726d9596d294a50b80f11488302b3ec2d"
 ---
 
-# LiveTemplate Counter Example
+# LiveTemplate Counter App Recipe
 
 A real-time counter application demonstrating LiveTemplate's reactive state management and tree-based optimization.
 
@@ -18,7 +18,7 @@ A real-time counter application demonstrating LiveTemplate's reactive state mana
 - **Template-based**: HTML is generated from Go templates with conditional rendering
 - **Simple API**: Create handlers with a single method call
 
-## Running the Example
+## Running the App Recipe
 
 1. **Start the server:**
 
@@ -58,7 +58,7 @@ A real-time counter application demonstrating LiveTemplate's reactive state mana
 
 ## Configuration
 
-This example uses LiveTemplate's environment-based configuration system. All configuration is loaded from environment variables with the `LVT_` prefix:
+This app recipe uses LiveTemplate's environment-based configuration system. All configuration is loaded from environment variables with the `LVT_` prefix:
 
 | Variable | Default | Description |
 |----------|---------|-------------|

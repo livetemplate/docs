@@ -44,7 +44,7 @@ The catalog this site exposes is itself driven by the same `lvt-source="patterns
     {{else}}
     <p data-test="meta-summary">
         Right now: <strong>{{len .Data}}</strong> pattern categories, served from
-        the docs-site recipes binary's <code>/patterns/api/index.json</code>
+        the docs-site recipes binary's <code>/recipes/ui-patterns/api/index.json</code>
         endpoint, cached 5 minutes at the docs-site edge.
     </p>
     {{end}}
@@ -68,7 +68,7 @@ Everything else — proxy routing, theme tokens, mermaid bundling, `lvt-source` 
 
 ## Reading list
 
-- [Anatomy of the Patterns Catalog](/recipes/patterns-stats) — same `patterns` source, different view
+- [Anatomy of the UI Pattern Recipes](/recipes/patterns-stats) — same `patterns` source, different view
 - [How a LiveTemplate Update Flows](/recipes/architecture-flow) — what happens between a click and a DOM patch
 - [Live Framework Releases](/recipes/live-releases) — proves a 2nd REST source works
-- [The patterns catalog itself](/patterns/) — recipe 1, doubled as the catalog page
+- [The UI pattern recipes catalog itself](/recipes/ui-patterns/) — recipe 1, doubled as the catalog page
