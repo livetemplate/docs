@@ -6,7 +6,7 @@ This repo is the source for the LiveTemplate documentation website. Most content
 
 - **`content/_meta/source-of-truth.md`** (created in Phase 2) — for every page, names the canonical source file and repo. **Edit content in the canonical source repo, not here**, unless this repo is the canonical source.
 - **`content/recipes/`** — recipes are authored directly in this repo; this is the canonical home for them.
-- **`content/patterns/index.md`** — catalog page; pattern detail pages are proxied to the deployed `examples/patterns` app via tinkerdown's external-app router (Phase 4).
+- **`content/recipes/ui-patterns/index.md`** — UI pattern recipe catalog; detail pages are proxied to the docs-site recipes binary via tinkerdown's external-app router.
 - **Everything else under `content/`** — mirrored from a source repo. Don't edit here; edit the source. The Phase 3 sync action will overwrite local edits.
 
 ## Workflow

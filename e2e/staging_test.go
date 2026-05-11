@@ -175,10 +175,10 @@ func TestThemeAccentInjected(t *testing.T) {
 }
 
 // TestRecipe1_CatalogHydratesFromREST verifies Phase 5 recipe 1: the
-// /patterns/ catalog is a tinkerdown <div lvt-source="patterns"> block
+// /recipes/ui-patterns/ catalog is a tinkerdown <div lvt-source="patterns"> block
 // that renders a "Connecting..." placeholder server-side, then hydrates
 // over WebSocket from the in-process recipes binary's
-// /patterns/api/index.json endpoint.
+// /recipes/ui-patterns/api/index.json endpoint.
 //
 // We must NOT inspect the curl body — it would only show the loading
 // shell. Instead, wait for a [data-test="pattern-row"] element (only
@@ -194,7 +194,7 @@ func TestRecipe1_CatalogHydratesFromREST(t *testing.T) {
 	var rowCount int
 	var summary string
 	if err := chromedp.Run(ctx,
-		chromedp.Navigate(baseURL()+"/patterns/"),
+		chromedp.Navigate(baseURL()+"/recipes/ui-patterns/"),
 		// Hydration is gated on a successful WS source fetch; if the
 		// REST source ever fails, this WaitVisible deadlocks until the
 		// per-test timeout — exactly the observable failure we want.
@@ -249,15 +249,20 @@ func TestSidebarWalk(t *testing.T) {
 		"/cli/components",
 		"/cli/testing",
 		"/client/",
-		"/patterns/",
-		"/examples/",
-		"/examples/counter",
-		"/examples/todos",
-		"/examples/chat",
-		"/examples/avatar-upload",
-		"/examples/flash-messages",
-		"/examples/progressive-enhancement",
-		"/examples/ws-disabled",
+		"/recipes/",
+		"/recipes/counter",
+		"/recipes/todos",
+		"/recipes/progressive-enhancement",
+		"/recipes/ui-patterns/",
+		"/recipes/apps/",
+		"/recipes/apps/counter",
+		"/recipes/apps/todos",
+		"/recipes/apps/chat",
+		"/recipes/apps/avatar-upload",
+		"/recipes/apps/flash-messages",
+		"/recipes/apps/progressive-enhancement",
+		"/recipes/apps/ws-disabled",
+		"/recipes/broadcasting",
 		"/recipes/architecture-flow",
 		"/recipes/progressive-complexity-tree",
 		"/recipes/sync-and-broadcast",
@@ -519,7 +524,7 @@ func TestRecipe7_MetaPageHasMermaidAndLiveCount(t *testing.T) {
 }
 
 // TestPatternProxiedAndInteractive verifies the routing pipeline:
-// /patterns/forms/click-to-edit on the docs site reverse-proxies to
+// /recipes/ui-patterns/forms/click-to-edit on the docs site reverse-proxies to
 // the in-process recipes binary's patterns mount, the click-to-edit
 // page renders, and we can see its expected DOM (an Edit button and
 // a name field).
@@ -529,7 +534,7 @@ func TestPatternProxiedAndInteractive(t *testing.T) {
 
 	var html string
 	if err := chromedp.Run(ctx,
-		chromedp.Navigate(baseURL()+"/patterns/forms/click-to-edit"),
+		chromedp.Navigate(baseURL()+"/recipes/ui-patterns/forms/click-to-edit"),
 		chromedp.OuterHTML("body", &html, chromedp.ByQuery),
 	); err != nil {
 		t.Fatalf("navigate: %v", err)

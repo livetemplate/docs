@@ -81,7 +81,7 @@ Open browser DevTools → Network → WS to watch the WebSocket frames flow. The
 
 ## What you can change to see this in action
 
-Open the [todos example](/examples/todos) in two browser tabs. Add an item in tab 1 — it appears in tab 2 within ~30ms because the controller calls `ctx.Sync()` on every mutation, broadcasting the patch frame to every connected session for the same controller.
+Open the [todos example](/recipes/apps/todos) in two browser tabs. Add an item in tab 1 — it appears in tab 2 within ~30ms because the controller calls `ctx.Sync()` on every mutation, broadcasting the patch frame to every connected session for the same controller.
 
 ## How this page works
 

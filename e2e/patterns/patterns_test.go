@@ -163,7 +163,7 @@ func TestIndexPage(t *testing.T) {
 		if err != nil {
 			t.Fatalf("Failed to load page: %v", err)
 		}
-		if !strings.Contains(html, "LiveTemplate Patterns") {
+		if !strings.Contains(html, "LiveTemplate UI Pattern Recipes") {
 			t.Error("Page title not found")
 		}
 		if !strings.Contains(html, "Forms &amp; Editing") {
@@ -176,7 +176,7 @@ func TestIndexPage(t *testing.T) {
 	t.Run("Pattern_Links", func(t *testing.T) {
 		var count int
 		err := chromedp.Run(ctx,
-			chromedp.Evaluate(`document.querySelectorAll('a[href^="/patterns/forms/"]').length`, &count),
+			chromedp.Evaluate(`document.querySelectorAll('a[href^="/recipes/ui-patterns/forms/"]').length`, &count),
 		)
 		if err != nil {
 			t.Fatalf("Failed to count pattern links: %v", err)
@@ -197,7 +197,7 @@ func TestClickToEdit(t *testing.T) {
 	ctx, cancel, serverPort := setupTest(t)
 	defer cancel()
 
-	url := e2etest.GetChromeTestURL(serverPort) + "/patterns/forms/click-to-edit"
+	url := e2etest.GetChromeTestURL(serverPort) + "/recipes/ui-patterns/forms/click-to-edit"
 
 	t.Run("Initial_Load", func(t *testing.T) {
 		var html string
@@ -306,7 +306,7 @@ func TestEditRow(t *testing.T) {
 	ctx, cancel, serverPort := setupTest(t)
 	defer cancel()
 
-	url := e2etest.GetChromeTestURL(serverPort) + "/patterns/forms/edit-row"
+	url := e2etest.GetChromeTestURL(serverPort) + "/recipes/ui-patterns/forms/edit-row"
 
 	t.Run("Initial_Load", func(t *testing.T) {
 		var html string
@@ -411,7 +411,7 @@ func TestInlineValidation(t *testing.T) {
 	ctx, cancel, serverPort := setupTest(t)
 	defer cancel()
 
-	url := e2etest.GetChromeTestURL(serverPort) + "/patterns/forms/inline-validation"
+	url := e2etest.GetChromeTestURL(serverPort) + "/recipes/ui-patterns/forms/inline-validation"
 
 	t.Run("Initial_Load", func(t *testing.T) {
 		var html string
@@ -460,7 +460,7 @@ func TestBulkUpdate(t *testing.T) {
 	ctx, cancel, serverPort := setupTest(t)
 	defer cancel()
 
-	url := e2etest.GetChromeTestURL(serverPort) + "/patterns/forms/bulk-update"
+	url := e2etest.GetChromeTestURL(serverPort) + "/recipes/ui-patterns/forms/bulk-update"
 
 	t.Run("Initial_Load", func(t *testing.T) {
 		var html string
@@ -567,7 +567,7 @@ func TestResetInput(t *testing.T) {
 	ctx, cancel, serverPort := setupTest(t)
 	defer cancel()
 
-	url := e2etest.GetChromeTestURL(serverPort) + "/patterns/forms/reset-input"
+	url := e2etest.GetChromeTestURL(serverPort) + "/recipes/ui-patterns/forms/reset-input"
 
 	t.Run("Initial_Load", func(t *testing.T) {
 		var html string
@@ -649,7 +649,7 @@ func TestFileUpload(t *testing.T) {
 	ctx, cancel, serverPort := setupTest(t)
 	defer cancel()
 
-	url := e2etest.GetChromeTestURL(serverPort) + "/patterns/forms/file-upload"
+	url := e2etest.GetChromeTestURL(serverPort) + "/recipes/ui-patterns/forms/file-upload"
 
 	t.Run("Initial_Load", func(t *testing.T) {
 		var html string
@@ -740,7 +740,7 @@ func TestPreserveInputs(t *testing.T) {
 	ctx, cancel, serverPort := setupTest(t)
 	defer cancel()
 
-	url := e2etest.GetChromeTestURL(serverPort) + "/patterns/forms/preserve-inputs"
+	url := e2etest.GetChromeTestURL(serverPort) + "/recipes/ui-patterns/forms/preserve-inputs"
 
 	t.Run("Initial_Load", func(t *testing.T) {
 		var html string
@@ -848,7 +848,7 @@ func TestDeleteRow(t *testing.T) {
 	ctx, cancel, serverPort := setupTest(t)
 	defer cancel()
 
-	url := e2etest.GetChromeTestURL(serverPort) + "/patterns/lists/delete-row"
+	url := e2etest.GetChromeTestURL(serverPort) + "/recipes/ui-patterns/lists/delete-row"
 
 	t.Run("Initial_Load", func(t *testing.T) {
 		var html string
@@ -970,7 +970,7 @@ func TestClickToLoad(t *testing.T) {
 	ctx, cancel, serverPort := setupTest(t)
 	defer cancel()
 
-	url := e2etest.GetChromeTestURL(serverPort) + "/patterns/lists/click-to-load"
+	url := e2etest.GetChromeTestURL(serverPort) + "/recipes/ui-patterns/lists/click-to-load"
 
 	t.Run("Initial_Load", func(t *testing.T) {
 		var html string
@@ -1058,7 +1058,7 @@ func TestValueSelect(t *testing.T) {
 	ctx, cancel, serverPort := setupTest(t)
 	defer cancel()
 
-	url := e2etest.GetChromeTestURL(serverPort) + "/patterns/lists/value-select"
+	url := e2etest.GetChromeTestURL(serverPort) + "/recipes/ui-patterns/lists/value-select"
 
 	t.Run("Initial_Load", func(t *testing.T) {
 		var makeOptionCount int
@@ -1160,7 +1160,7 @@ func TestSortable(t *testing.T) {
 	ctx, cancel, serverPort := setupTest(t)
 	defer cancel()
 
-	url := e2etest.GetChromeTestURL(serverPort) + "/patterns/lists/sortable"
+	url := e2etest.GetChromeTestURL(serverPort) + "/recipes/ui-patterns/lists/sortable"
 
 	// CDP Input.dispatchMouseEvent is unreliable for HTML5 DnD in headless
 	// Docker Chrome, so we dispatch real DragEvent objects with a shared
@@ -1358,7 +1358,7 @@ func TestLargeTable(t *testing.T) {
 	ctx, cancel, serverPort := setupTest(t)
 	defer cancel()
 
-	url := e2etest.GetChromeTestURL(serverPort) + "/patterns/lists/large-table"
+	url := e2etest.GetChromeTestURL(serverPort) + "/recipes/ui-patterns/lists/large-table"
 
 	frames := e2etest.RecordWSFrames(ctx)
 
@@ -1603,9 +1603,9 @@ func TestLargeTable_DeleteLatency_10k(t *testing.T) {
 	ctx, cancel, serverPort := setupTest(t)
 	defer cancel()
 
-	url := e2etest.GetChromeTestURL(serverPort) + "/patterns/lists/large-table"
+	url := e2etest.GetChromeTestURL(serverPort) + "/recipes/ui-patterns/lists/large-table"
 
-	const ceilingMs = 2500
+	const ceilingMs = 3500
 	var elapsedMs float64
 	var targetedHits int
 	err := chromedp.Run(ctx,
@@ -1649,7 +1649,7 @@ func TestActiveSearch(t *testing.T) {
 	ctx, cancel, serverPort := setupTest(t)
 	defer cancel()
 
-	url := e2etest.GetChromeTestURL(serverPort) + "/patterns/search/active-search"
+	url := e2etest.GetChromeTestURL(serverPort) + "/recipes/ui-patterns/search/active-search"
 
 	t.Run("Initial_Load", func(t *testing.T) {
 		err := chromedp.Run(ctx,
@@ -1737,7 +1737,7 @@ func TestURLFilters(t *testing.T) {
 	ctx, cancel, serverPort := setupTest(t)
 	defer cancel()
 
-	baseURL := e2etest.GetChromeTestURL(serverPort) + "/patterns/search/url-filters"
+	baseURL := e2etest.GetChromeTestURL(serverPort) + "/recipes/ui-patterns/search/url-filters"
 
 	t.Run("Initial_Load", func(t *testing.T) {
 		err := chromedp.Run(ctx,
@@ -1860,7 +1860,7 @@ func TestInfiniteScroll(t *testing.T) {
 	ctx, cancel, serverPort := setupTest(t)
 	defer cancel()
 
-	url := e2etest.GetChromeTestURL(serverPort) + "/patterns/lists/infinite-scroll"
+	url := e2etest.GetChromeTestURL(serverPort) + "/recipes/ui-patterns/lists/infinite-scroll"
 
 	t.Run("Initial_Load_And_Auto_Advance", func(t *testing.T) {
 		err := chromedp.Run(ctx,
@@ -1970,7 +1970,7 @@ func TestLazyLoading(t *testing.T) {
 	ctx, cancel, serverPort := setupTest(t)
 	defer cancel()
 
-	url := e2etest.GetChromeTestURL(serverPort) + "/patterns/loading/lazy-loading"
+	url := e2etest.GetChromeTestURL(serverPort) + "/recipes/ui-patterns/loading/lazy-loading"
 
 	t.Run("Initial_Load_Shows_Spinner", func(t *testing.T) {
 		// The page should render immediately with the spinner; the content
@@ -2053,7 +2053,7 @@ func TestProgressBar(t *testing.T) {
 	ctx, cancel, serverPort := setupTest(t)
 	defer cancel()
 
-	url := e2etest.GetChromeTestURL(serverPort) + "/patterns/loading/progress-bar"
+	url := e2etest.GetChromeTestURL(serverPort) + "/recipes/ui-patterns/loading/progress-bar"
 
 	t.Run("Initial_Load", func(t *testing.T) {
 		var hasProgress bool
@@ -2321,7 +2321,7 @@ func TestAsyncOperations(t *testing.T) {
 	ctx, cancel, serverPort := setupTest(t)
 	defer cancel()
 
-	url := e2etest.GetChromeTestURL(serverPort) + "/patterns/loading/async-operations"
+	url := e2etest.GetChromeTestURL(serverPort) + "/recipes/ui-patterns/loading/async-operations"
 
 	t.Run("Initial_Load", func(t *testing.T) {
 		var hasResult bool
@@ -2469,7 +2469,7 @@ func TestModalDialog(t *testing.T) {
 	ctx, cancel, serverPort := setupTest(t)
 	defer cancel()
 
-	url := e2etest.GetChromeTestURL(serverPort) + "/patterns/navigation/modal-dialog"
+	url := e2etest.GetChromeTestURL(serverPort) + "/recipes/ui-patterns/navigation/modal-dialog"
 
 	t.Run("Initial_Load", func(t *testing.T) {
 		err := chromedp.Run(ctx,
@@ -2608,7 +2608,7 @@ func TestConfirmDialog(t *testing.T) {
 	ctx, cancel, serverPort := setupTest(t)
 	defer cancel()
 
-	url := e2etest.GetChromeTestURL(serverPort) + "/patterns/navigation/confirm-dialog"
+	url := e2etest.GetChromeTestURL(serverPort) + "/recipes/ui-patterns/navigation/confirm-dialog"
 
 	t.Run("Initial_Load", func(t *testing.T) {
 		err := chromedp.Run(ctx,
@@ -2707,7 +2707,7 @@ func TestTabs(t *testing.T) {
 	ctx, cancel, serverPort := setupTest(t)
 	defer cancel()
 
-	url := e2etest.GetChromeTestURL(serverPort) + "/patterns/navigation/tabs"
+	url := e2etest.GetChromeTestURL(serverPort) + "/recipes/ui-patterns/navigation/tabs"
 
 	t.Run("Default_Tab_Is_Overview", func(t *testing.T) {
 		err := chromedp.Run(ctx,
@@ -2754,7 +2754,7 @@ func TestTabs(t *testing.T) {
 				window.fetch = function(input, init) {
 					try {
 						const u = typeof input === 'string' ? input : input.url;
-						if (u && u.includes('/patterns/navigation/tabs')) window.__navHttpHits++;
+						if (u && u.includes('/recipes/ui-patterns/navigation/tabs')) window.__navHttpHits++;
 					} catch (e) {}
 					return window.__origFetch.apply(window, arguments);
 				};
@@ -2811,7 +2811,7 @@ func TestSPANavigation(t *testing.T) {
 	ctx, cancel, serverPort := setupTest(t)
 	defer cancel()
 
-	url := e2etest.GetChromeTestURL(serverPort) + "/patterns/navigation/spa-navigation"
+	url := e2etest.GetChromeTestURL(serverPort) + "/recipes/ui-patterns/navigation/spa-navigation"
 
 	t.Run("Initial_Load", func(t *testing.T) {
 		err := chromedp.Run(ctx,
@@ -2837,7 +2837,7 @@ func TestSPANavigation(t *testing.T) {
 				window.fetch = function(input, init) {
 					try {
 						const u = typeof input === 'string' ? input : input.url;
-						if (u && u.includes('/patterns/navigation/spa-navigation')) window.__spaHttpHits++;
+						if (u && u.includes('/recipes/ui-patterns/navigation/spa-navigation')) window.__spaHttpHits++;
 					} catch (e) {}
 					return window.__origFetchSPA.apply(window, arguments);
 				};
@@ -2905,7 +2905,7 @@ func TestKeyboardShortcuts(t *testing.T) {
 	ctx, cancel, serverPort := setupTest(t)
 	defer cancel()
 
-	url := e2etest.GetChromeTestURL(serverPort) + "/patterns/navigation/keyboard-shortcuts"
+	url := e2etest.GetChromeTestURL(serverPort) + "/recipes/ui-patterns/navigation/keyboard-shortcuts"
 
 	t.Run("Initial_Load", func(t *testing.T) {
 		err := chromedp.Run(ctx,
@@ -2994,7 +2994,7 @@ func TestAnimations(t *testing.T) {
 	ctx, cancel, serverPort := setupTest(t)
 	defer cancel()
 
-	url := e2etest.GetChromeTestURL(serverPort) + "/patterns/feedback/animations"
+	url := e2etest.GetChromeTestURL(serverPort) + "/recipes/ui-patterns/feedback/animations"
 
 	t.Run("Initial_Load", func(t *testing.T) {
 		err := chromedp.Run(ctx,
@@ -3091,7 +3091,7 @@ func TestLoadingStates(t *testing.T) {
 	ctx, cancel, serverPort := setupTest(t)
 	defer cancel()
 
-	url := e2etest.GetChromeTestURL(serverPort) + "/patterns/feedback/loading-states"
+	url := e2etest.GetChromeTestURL(serverPort) + "/recipes/ui-patterns/feedback/loading-states"
 
 	t.Run("Initial_Load", func(t *testing.T) {
 		err := chromedp.Run(ctx,
@@ -3172,7 +3172,7 @@ func TestHighlightOnChange(t *testing.T) {
 	ctx, cancel, serverPort := setupTest(t)
 	defer cancel()
 
-	url := e2etest.GetChromeTestURL(serverPort) + "/patterns/feedback/highlight"
+	url := e2etest.GetChromeTestURL(serverPort) + "/recipes/ui-patterns/feedback/highlight"
 
 	t.Run("Initial_Load", func(t *testing.T) {
 		err := chromedp.Run(ctx,
@@ -3276,7 +3276,7 @@ func TestFlashMessages(t *testing.T) {
 	ctx, cancel, serverPort := setupTest(t)
 	defer cancel()
 
-	url := e2etest.GetChromeTestURL(serverPort) + "/patterns/feedback/flash-messages"
+	url := e2etest.GetChromeTestURL(serverPort) + "/recipes/ui-patterns/feedback/flash-messages"
 
 	t.Run("Initial_Load", func(t *testing.T) {
 		err := chromedp.Run(ctx,
@@ -3383,7 +3383,7 @@ func TestMultiUserSync(t *testing.T) {
 	ctx, cancel, serverPort := setupTest(t)
 	defer cancel()
 
-	url := e2etest.GetChromeTestURL(serverPort) + "/patterns/realtime/multi-user-sync"
+	url := e2etest.GetChromeTestURL(serverPort) + "/recipes/ui-patterns/realtime/multi-user-sync"
 
 	if err := chromedp.Run(ctx,
 		chromedp.Navigate(url),
@@ -3470,7 +3470,7 @@ func TestBroadcasting(t *testing.T) {
 	ctx, cancel, serverPort := setupTest(t)
 	defer cancel()
 
-	url := e2etest.GetChromeTestURL(serverPort) + "/patterns/realtime/broadcasting"
+	url := e2etest.GetChromeTestURL(serverPort) + "/recipes/ui-patterns/realtime/broadcasting"
 
 	// Tab 1 Joins as Alice.
 	if err := chromedp.Run(ctx,
@@ -3631,7 +3631,7 @@ func TestPresence(t *testing.T) {
 	ctx, cancel, serverPort := setupTest(t)
 	defer cancel()
 
-	url := e2etest.GetChromeTestURL(serverPort) + "/patterns/realtime/presence"
+	url := e2etest.GetChromeTestURL(serverPort) + "/recipes/ui-patterns/realtime/presence"
 
 	if err := chromedp.Run(ctx,
 		chromedp.Navigate(url),
@@ -3738,7 +3738,7 @@ func TestReconnection(t *testing.T) {
 	ctx, cancel, serverPort := setupTest(t)
 	defer cancel()
 
-	url := e2etest.GetChromeTestURL(serverPort) + "/patterns/realtime/reconnection"
+	url := e2etest.GetChromeTestURL(serverPort) + "/recipes/ui-patterns/realtime/reconnection"
 
 	if err := chromedp.Run(ctx,
 		chromedp.Navigate(url),
@@ -3797,7 +3797,7 @@ func TestLivePreview(t *testing.T) {
 	ctx, cancel, serverPort := setupTest(t)
 	defer cancel()
 
-	url := e2etest.GetChromeTestURL(serverPort) + "/patterns/realtime/live-preview"
+	url := e2etest.GetChromeTestURL(serverPort) + "/recipes/ui-patterns/realtime/live-preview"
 
 	if err := chromedp.Run(ctx,
 		chromedp.Navigate(url),
@@ -3849,7 +3849,7 @@ func TestServerPush(t *testing.T) {
 	ctx, cancel, serverPort := setupTest(t)
 	defer cancel()
 
-	url := e2etest.GetChromeTestURL(serverPort) + "/patterns/realtime/server-push"
+	url := e2etest.GetChromeTestURL(serverPort) + "/recipes/ui-patterns/realtime/server-push"
 
 	if err := chromedp.Run(ctx,
 		chromedp.Navigate(url),

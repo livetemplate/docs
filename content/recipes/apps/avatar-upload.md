@@ -5,7 +5,7 @@ source_path: "avatar-upload/README.md"
 source_commit: "b976439626d58845129a7c3aba567d6429662a0a"
 ---
 
-# Avatar Upload Example
+# Avatar Upload App Recipe
 
 A simple example demonstrating LiveTemplate's file upload feature with avatar upload functionality.
 
@@ -17,7 +17,7 @@ A simple example demonstrating LiveTemplate's file upload feature with avatar up
 - 🎨 **Beautiful UI**: Gradient design with smooth animations
 - 🔄 **Live Updates**: Profile updates instantly without page reload
 
-## What This Example Demonstrates
+## What This App Recipe Demonstrates
 
 ### Upload Configuration
 ```go
@@ -64,7 +64,7 @@ func (s *ProfileStore) ConsumeUpload(ctx context.Context, name string, entries [
 {{end}}
 ```
 
-## Running the Example
+## Running the App Recipe
 
 ### 1. Install Dependencies
 
@@ -91,7 +91,7 @@ The server will start at http://localhost:8080
 
 ## Upload Strategies
 
-This example uses **WebSocket Chunked Upload**:
+This app recipe uses **WebSocket Chunked Upload**:
 - ✅ Real-time progress tracking
 - ✅ Handles large files efficiently (256KB chunks)
 - ✅ Non-blocking uploads
@@ -128,7 +128,7 @@ avatar-upload/
 
 ## Code Quality
 
-This example demonstrates:
+This app recipe demonstrates:
 - ✅ Clean separation of concerns (Store pattern)
 - ✅ Proper error handling
 - ✅ File validation and security
@@ -149,7 +149,7 @@ Want to extend this example?
 
 - [Upload Documentation](../../livetemplate/.worktrees/feature-uploads/docs/uploads.md)
 - [LiveTemplate Documentation](https://github.com/livetemplate/livetemplate)
-- [Other Examples](../)
+- [Other app recipes](./)
 
 ## Troubleshooting
 

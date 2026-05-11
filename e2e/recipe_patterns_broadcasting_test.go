@@ -1,4 +1,4 @@
-// Verifies the /recipes/patterns/broadcasting recipe page renders and
+// Verifies the /recipes/broadcasting recipe page renders and
 // the embed-lvt block successfully inlines the broadcasting widget.
 // The Send/NewMessage cross-tab broadcast flow is exercised by the
 // upstream patterns_test.go (in examples/patterns/); this test asserts
@@ -8,7 +8,7 @@
 //   - the embed mount div is present with the correct upstream path
 //   - tinkerdown server-side inlines the widget (broadcasting markup
 //     appears inside the mount), proving cmd/site returned 200 for
-//     /patterns/realtime/broadcasting
+//     /recipes/ui-patterns/realtime/broadcasting
 //   - no CSP violations or unexpected console errors
 //
 // Cross-tab broadcast is NOT verified here — that lives in the patterns
@@ -39,7 +39,7 @@ func TestRecipePatternsBroadcastingRenders(t *testing.T) {
 	)
 
 	if err := chromedp.Run(ctx,
-		chromedp.Navigate(baseURL()+"/recipes/patterns/broadcasting"),
+		chromedp.Navigate(baseURL()+"/recipes/broadcasting"),
 		chromedp.WaitReady("body", chromedp.ByQuery),
 		chromedp.Title(&title),
 		// tinkerdown renders embed-lvt as a div with class
@@ -67,8 +67,8 @@ func TestRecipePatternsBroadcastingRenders(t *testing.T) {
 	if !hasMount {
 		t.Fatalf("no .tinkerdown-embed-lvt mount on page")
 	}
-	if mountPath != "/patterns/realtime/broadcasting" {
-		t.Errorf("mount path = %q, want /patterns/realtime/broadcasting", mountPath)
+	if mountPath != "/recipes/ui-patterns/realtime/broadcasting" {
+		t.Errorf("mount path = %q, want /recipes/ui-patterns/realtime/broadcasting", mountPath)
 	}
 	if !hasBroadcastH {
 		t.Fatalf("broadcasting widget did not inline (no <h3>Broadcasting</h3> inside mount); console errors: %v", consoleErrs())

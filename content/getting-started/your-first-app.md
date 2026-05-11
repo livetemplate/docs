@@ -143,7 +143,7 @@ You wrote a counter that:
 
 - [Progressive Complexity](/guides/progressive-complexity) — when to reach for `lvt-*` attributes (Tier 2) and when to stay in Tier 1.
 - [How a LiveTemplate Update Flows](/recipes/architecture-flow) — the sequence diagram of what happened between your click and the DOM patch.
-- [Patterns catalog](/patterns/) — 33 live, reactive UI idioms you can copy. Forms, lists, search, real-time, navigation, feedback.
+- [UI pattern recipes](/recipes/ui-patterns/) — 33 live, reactive UI idioms you can copy. Forms, lists, search, real-time, navigation, feedback.
 - [Server API reference](/reference/api) — `New`, `Handle`, `Context`, action method dispatch.
 - [Sync, Broadcast & Multi-User Sessions](/recipes/sync-and-broadcast) — when `Sync()` vs `BroadcastAction()`, and how sessions are scoped.
-- [Examples](/examples/) — runnable apps including chat, todos, file uploads, auth.
+- [App recipes](/recipes/apps/) — runnable apps including chat, todos, file uploads, auth.

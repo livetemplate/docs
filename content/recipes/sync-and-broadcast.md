@@ -116,4 +116,4 @@ You almost always want `Sync()` for personal app interactions and `BroadcastActi
 
 Two `mermaid` sequence-diagram blocks render client-side via tinkerdown's bundled mermaid runtime. The diagrams live next to the code shapes they describe, so changing the code is a same-file edit — no out-of-tree diagram tool, no PNG that goes stale.
 
-For runnable examples, see the [chat example](/examples/chat) and the patterns under [Real-Time](/patterns/) (Multi-User Sync, Broadcasting, Presence Tracking).
+For runnable examples, see the [chat example](/recipes/apps/chat) and the patterns under [Real-Time](/recipes/ui-patterns/) (Multi-User Sync, Broadcasting, Presence Tracking).

@@ -36,6 +36,7 @@ func main() {
 		"https://livetemplate-docs-staging.fly.dev",
 		"http://localhost:8080",
 		"http://localhost:8084",
+		"http://localhost:8099",
 		"http://devbox:8084",
 	}
 
@@ -48,19 +49,19 @@ func main() {
 	//   → mux routes to counter.Handler()
 	mux.Handle("/apps/counter/", http.StripPrefix("/apps/counter", counter.Handler()))
 
-	// patterns is mounted at /patterns/ (no /apps/ prefix) because it's
-	// also the public catalog URL space — tinkerdown's proxy routes for
-	// /patterns/forms/, /patterns/lists/, etc. forward there. The recipe
-	// page's embed-lvt block uses the same /patterns/... path so a
-	// single mount handles both surfaces. Templates render absolute
-	// hrefs as {{basePath}}/realtime/broadcasting → /patterns/realtime/broadcasting.
+	// UI patterns are mounted at their recipe URL space because the
+	// catalog and detail pages are first-class recipes. Tinkerdown's proxy
+	// routes for /recipes/ui-patterns/forms/, /recipes/ui-patterns/lists/,
+	// etc. forward here. Templates render absolute hrefs as
+	// {{basePath}}/realtime/broadcasting →
+	// /recipes/ui-patterns/realtime/broadcasting.
 	//
 	// Production options: AnonymousAuthenticator (default — per-browser
 	// session group), explicit origin allowlist for the docs deploy
 	// targets. The handler package's Handler signature accepts opts so
 	// the e2e test-server (docs/e2e/patterns/main.go) can supply
 	// WithPermissiveOriginCheck for random-port test setups.
-	mux.Handle("/patterns/", http.StripPrefix("/patterns", patterns.Handler("/patterns",
+	mux.Handle("/recipes/ui-patterns/", http.StripPrefix("/recipes/ui-patterns", patterns.Handler("/recipes/ui-patterns",
 		livetemplate.WithAuthenticator(&livetemplate.AnonymousAuthenticator{}),
 		livetemplate.WithAllowedOrigins(allowedOrigins),
 	)))
