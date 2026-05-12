@@ -119,5 +119,5 @@ The `embed.FS` + temp-file dance at the top is a workaround for `livetemplate.Wi
 - [Reference — Authentication](/reference/authentication) — the full `Authenticator` interface, beyond the anonymous default.
 - [Reference — PubSub & Broadcasting](/reference/pubsub) — multi-instance broadcasting via Redis.
 - [Reference — Server Actions](/reference/server-actions) — the action lifecycle, including `BroadcastAction` ordering rules and gotchas.
-- [Sync, Broadcast & Multi-User Sessions](/recipes/sync-and-broadcast) — when `Sync()` is enough and when you need broadcast.
+- [Broadcast & Server Push](/recipes/sync-and-broadcast) — when to use explicit broadcast and server push.
 - [Your First App](/getting-started/your-first-app) — if you arrived here cold, the from-scratch walkthrough is the better starting point.
