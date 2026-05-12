@@ -4,7 +4,7 @@ go 1.26.1
 
 require (
 	github.com/go-playground/validator/v10 v10.30.2
-	github.com/livetemplate/livetemplate v0.8.23
+	github.com/livetemplate/livetemplate v0.9.0
 	github.com/livetemplate/lvt v0.1.6
 	github.com/livetemplate/lvt/components v0.1.2
 	gopkg.in/yaml.v3 v3.0.1
