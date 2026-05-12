@@ -10,7 +10,7 @@ import (
 	"github.com/livetemplate/livetemplate"
 )
 
-// --- Pattern #26: Multi-User Sync ---
+// --- Pattern #26: Multi-User Refresh ---
 
 type MultiUserSyncController struct {
 	mu      sync.RWMutex
@@ -19,7 +19,7 @@ type MultiUserSyncController struct {
 
 // Mount runs on every initial render. Without it, a tab that opens
 // AFTER other tabs have incremented would render Counter:0 and only
-// converge on the next peer action's Sync. Same fix as PresenceController.
+// converge on the next peer refresh. Same fix as PresenceController.
 func (c *MultiUserSyncController) Mount(state MultiUserSyncState, ctx *livetemplate.Context) (MultiUserSyncState, error) {
 	c.mu.RLock()
 	state.Counter = c.counter
@@ -27,12 +27,10 @@ func (c *MultiUserSyncController) Mount(state MultiUserSyncState, ctx *livetempl
 	return state, nil
 }
 
-// Sync is a reserved method name (livetemplate/mount.go:114). The framework
-// auto-dispatches it to peer connections in the same session group after any
-// action completes — Increment doesn't need to call BroadcastAction. The state
-// arg is the peer's local state; we replace its Counter from the shared
-// controller value so all tabs converge.
-func (c *MultiUserSyncController) Sync(state MultiUserSyncState, ctx *livetemplate.Context) (MultiUserSyncState, error) {
+// RefreshCounter is explicitly broadcast to peer connections after Increment.
+// The state arg is the peer's local state; we replace its Counter from the
+// shared controller value so all tabs converge.
+func (c *MultiUserSyncController) RefreshCounter(state MultiUserSyncState, ctx *livetemplate.Context) (MultiUserSyncState, error) {
 	c.mu.RLock()
 	state.Counter = c.counter
 	c.mu.RUnlock()
@@ -44,6 +42,7 @@ func (c *MultiUserSyncController) Increment(state MultiUserSyncState, ctx *livet
 	c.counter++
 	state.Counter = c.counter
 	c.mu.Unlock()
+	ctx.BroadcastAction("RefreshCounter", nil)
 	return state, nil
 }
 
