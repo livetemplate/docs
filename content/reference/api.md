@@ -2,7 +2,8 @@
 title: "Go Library API Reference"
 source_repo: "https://github.com/livetemplate/livetemplate"
 source_path: "docs/references/api-reference.md"
-source_commit: "5635ad1e94063d00766ff925126d146ecd3ff3de"
+source_ref: "v0.9.0"
+source_commit: "5b9a7cb8cb53d0ad75119ff54f70b6fdd85e05bd"
 ---
 
 # Go Library API Reference
@@ -235,10 +236,14 @@ These methods return `ErrNoHTTPContext` when called from a WebSocket action.
 ### Flash Messages
 
 ```go
-func (c *Context) SetFlash(key, message string)
+func (c *Context) SetFlash(key, message string, opts ...FlashOption)
+func (c *Context) ClearFlash(key string)
+func FlashExpiry(d time.Duration) FlashOption
 ```
 
-Sets a flash message available in templates via `.lvt.Flash(key)`. Common keys: `"success"`, `"error"`, `"info"`, `"warning"`. Flash messages are cleared after each render.
+Manages flash messages available in templates via `.lvt.Flash(key)`. Common keys: `"success"`, `"error"`, `"info"`, `"warning"`.
+
+Flash **persists until explicitly cleared** with `ClearFlash` (or until `FlashExpiry` elapses). Background updates such as `TriggerAction` or scan-loop refreshes do not touch flash. See [Flash Message Lifecycle](error-handling.md#flash-message-lifecycle) for the full lifecycle, multi-tab behavior, and v0.8 → v0.9 migration guidance.
 
 ### Context Builders
 

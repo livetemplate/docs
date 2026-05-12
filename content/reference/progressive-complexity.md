@@ -2,7 +2,8 @@
 title: "Progressive Complexity Reference"
 source_repo: "https://github.com/livetemplate/livetemplate"
 source_path: "docs/references/progressive-complexity-reference.md"
-source_commit: "5635ad1e94063d00766ff925126d146ecd3ff3de"
+source_ref: "v0.9.0"
+source_commit: "5b9a7cb8cb53d0ad75119ff54f70b6fdd85e05bd"
 ---
 
 # Progressive Complexity Reference
@@ -103,6 +104,8 @@ During form submission, the framework automatically manages loading indicators:
 | `Change()` auto-binding | N/A | Works | Works |
 | `lvt-*` attributes | N/A | Works | Works |
 | Server push (broadcast) | N/A | N/A | Works |
+
+> **Security note:** When using no-JS POST mode, implement CSRF protection (e.g., [`gorilla/csrf`](https://github.com/gorilla/csrf) or equivalent CSRF middleware). The JS transport modes send the `Origin` header that the server validates on WebSocket upgrade and fetch; plain HTML form POST does not carry the same protection.
 
 ## Tier 2: `lvt-*` Attributes
 

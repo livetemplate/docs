@@ -2,7 +2,8 @@
 title: "Progressive Complexity Guide"
 source_repo: "https://github.com/livetemplate/livetemplate"
 source_path: "docs/guides/progressive-complexity.md"
-source_commit: "5635ad1e94063d00766ff925126d146ecd3ff3de"
+source_ref: "v0.9.0"
+source_commit: "5b9a7cb8cb53d0ad75119ff54f70b6fdd85e05bd"
 ---
 
 # Progressive Complexity Guide
@@ -375,6 +376,8 @@ When JavaScript is unavailable, forms submit as standard HTML POST requests. The
 4. **On validation error**: Re-renders the page inline with errors — no redirect, so error messages appear next to the relevant fields
 
 This is why all Tier 1 examples use `<form method="POST">` — they work without JavaScript by design.
+
+> **Security note:** When using no-JS POST mode, implement CSRF protection (e.g., [`gorilla/csrf`](https://github.com/gorilla/csrf) or equivalent CSRF middleware). The JS transport modes send the `Origin` header that the server validates on WebSocket upgrade and fetch; plain HTML form POST does not carry the same protection.
 
 ### JavaScript + HTTP (fetch)
 
