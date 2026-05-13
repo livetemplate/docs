@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="light dark">
+    <title>Shared Notepad — {{.Username}}</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
+    {{if .lvt.DevMode}}
+    <link rel="stylesheet" href="/livetemplate.css">
+    <script defer src="/livetemplate-client.js"></script>
+    {{else}}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@livetemplate/client@latest/livetemplate.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/@livetemplate/client@latest/dist/livetemplate-client.browser.js"></script>
+    {{end}}
+</head>
+<body>
+    <main class="container">
+        {{/* >>> region:textarea */}}
+        <article>
+            <header>
+                <hgroup>
+                    <h1>Shared Notepad</h1>
+                    <p>Logged in as <strong>{{.Username}}</strong> — Save syncs across all your tabs</p>
+                </hgroup>
+            </header>
+
+            <form method="POST" lvt-form:preserve>
+                <label for="content">Your notes
+                    <textarea id="content" name="content" rows="12" placeholder="Start typing...">{{.Content}}</textarea>
+                </label>
+                <footer>
+                    <div class="grid">
+                        <small id="charcount">{{.CharCount}} characters{{if .SavedAt}} — saved at {{.SavedAt}}{{end}}</small>
+                        <button type="submit" name="save">Save</button>
+                    </div>
+                </footer>
+            </form>
+        </article>
+        {{/* <<< region:textarea */}}
+
+        <article>
+            <header><strong>How it works</strong></header>
+            <ul>
+                <li><strong>BasicAuth</strong> — each user gets an isolated session (alice's notes are separate from bob's)</li>
+                <li><strong>BroadcastAction</strong> — Save in one tab refreshes the others for the same user</li>
+                <li>Notes persist across page refreshes within the same server session</li>
+            </ul>
+            <small>Demo credentials: any username, password <strong>demo</strong></small>
+        </article>
+    </main>
+
+</body>
+</html>

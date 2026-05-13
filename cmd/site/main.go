@@ -21,8 +21,10 @@ import (
 	"github.com/livetemplate/livetemplate"
 
 	counter "github.com/livetemplate/docs/content/recipes/counter/_app"
+	loginrecipe "github.com/livetemplate/docs/content/recipes/login/_app"
 	patterns "github.com/livetemplate/docs/content/recipes/patterns/_app"
 	pe "github.com/livetemplate/docs/content/recipes/progressive-enhancement/_app"
+	notepad "github.com/livetemplate/docs/content/recipes/shared-notepad/_app"
 	todos "github.com/livetemplate/docs/content/recipes/todos/_app"
 )
 
@@ -87,6 +89,29 @@ func main() {
 	mux.Handle("/apps/progressive-enhancement/no-ws/", http.StripPrefix("/apps/progressive-enhancement/no-ws", pe.Handler(
 		livetemplate.WithAllowedOrigins(allowedOrigins),
 		livetemplate.WithWebSocketDisabled(),
+	)))
+
+	// login — form-based session auth (lvt-form:no-intercept POST + 303
+	// + Set-Cookie + OnConnect server-push). Embedded inline on the
+	// recipe page via embed-lvt; the full round-trip (form, cookie,
+	// redirect, WebSocket reconnect, welcome message) plays out inside
+	// the iframe. Auth is intrinsic (password "secret"); cmd/site only
+	// supplies the origin allowlist.
+	mux.Handle("/apps/login/", http.StripPrefix("/apps/login", loginrecipe.Handler(
+		livetemplate.WithAllowedOrigins(allowedOrigins),
+	)))
+
+	// shared-notepad — per-user state map + explicit peer refresh via
+	// ctx.BroadcastAction("Refresh", nil). The recipe TEACHES BasicAuth
+	// (the e2e suite + examples/shared-notepad use notepad.NewDemoBasicAuth);
+	// the embed here uses AnonymousAuthenticator because tinkerdown's
+	// embed-lvt server-side prefetch can't forward Authorization headers.
+	// Same-browser tabs share the cookie, so the BroadcastAction
+	// multi-tab refresh story still works in the embed; cross-browser
+	// users get different identities for the isolation demo.
+	mux.Handle("/apps/shared-notepad/", http.StripPrefix("/apps/shared-notepad", notepad.Handler(
+		livetemplate.WithAllowedOrigins(allowedOrigins),
+		livetemplate.WithAuthenticator(&livetemplate.AnonymousAuthenticator{}),
 	)))
 
 	addr := ":" + getenv("RECIPES_PORT", "9091")
