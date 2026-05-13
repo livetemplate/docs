@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="light dark">
+    <title>Login — LiveTemplate</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
+    {{if .lvt.DevMode}}
+    <link rel="stylesheet" href="/livetemplate.css">
+    <script defer src="/livetemplate-client.js"></script>
+    {{else}}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@livetemplate/client@latest/livetemplate.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/@livetemplate/client@latest/dist/livetemplate-client.browser.js"></script>
+    {{end}}
+</head>
+<body>
+    <main class="container">
+        {{if .IsLoggedIn}}
+        {{/* >>> region:dashboard */}}
+        <article>
+            <h1>Dashboard</h1>
+            {{if .ServerMessage}}
+            <ins id="server-welcome-message" style="display:block;text-decoration:none">{{.ServerMessage}}</ins>
+            {{end}}
+            <section>
+                <p>Welcome, <strong>{{.Username}}</strong>!</p>
+                <p>You are successfully logged in.</p>
+                {{if not .LoginTime.IsZero}}
+                <small>Logged in at: {{.LoginTime.Format "15:04:05"}}</small>
+                {{end}}
+            </section>
+            <form method="POST" lvt-form:no-intercept>
+                <button type="submit" name="logout" class="compact contrast">Logout</button>
+            </form>
+        </article>
+        {{/* <<< region:dashboard */}}
+        {{else}}
+        {{/* >>> region:loginform */}}
+        <article>
+            <h1>Login</h1>
+            {{.lvt.FlashTag "error"}}
+            <form method="POST" lvt-form:no-intercept>
+                <label for="username">Username
+                    <input type="text" id="username" name="username" placeholder="Enter username" required {{.lvt.AriaInvalid "username"}}>
+                    {{.lvt.ErrorTag "username"}}
+                </label>
+                <label for="password">Password
+                    <input type="password" id="password" name="password" placeholder="Enter password" required {{.lvt.AriaInvalid "password"}}>
+                    {{.lvt.ErrorTag "password"}}
+                </label>
+                <button type="submit" name="login" {{.lvt.AriaDisabled "username" "password"}}>Login</button>
+            </form>
+            <small>
+                Demo: Use any username with password <strong>secret</strong><br>
+                After login, the server will push a welcome message via WebSocket.
+            </small>
+        </article>
+        {{/* <<< region:loginform */}}
+        {{end}}
+    </main>
+
+</body>
+</html>
