@@ -2,8 +2,8 @@
 title: "Session Reference"
 source_repo: "https://github.com/livetemplate/livetemplate"
 source_path: "docs/references/session.md"
-source_ref: "v0.9.0"
-source_commit: "5b9a7cb8cb53d0ad75119ff54f70b6fdd85e05bd"
+source_ref: "v0.9.1"
+source_commit: "e9a44d16e52d68472e399a5a68ad8713179e9c7f"
 ---
 
 # Session Reference
@@ -45,7 +45,7 @@ In this example, `Filter` and `Page` survive page refreshes because they are per
 
 **Mount() lifecycle:** `Mount()` is called on every HTTP request (GET and POST) and every WebSocket connect (new and reconnect). It receives the current state (with persisted fields restored, ephemeral fields at zero value) and returns refreshed state. This ensures data is always fresh from the database. Keep Mount cheap -- it runs on every request.
 
-**Mount on POST:** Since Mount runs before actions on HTTP POST, it must populate ephemeral fields (e.g., `state.Items = db.GetItems(state.Filter)`). Persisted fields like `Filter` and `Page` are already restored from the SessionStore before Mount receives the state. Guard side effects with `ctx.Action() == ""` to restrict them to page loads.
+**Mount on POST:** Since Mount runs before actions on HTTP POST, it must populate ephemeral fields (e.g., `state.Items = db.GetItems(state.Filter)`). Persisted fields like `Filter` and `Page` are already restored from the SessionStore before Mount receives the state. Guard side effects with `ctx.IsInitialMount()` (preferred — true only on HTTP GET) or the older `ctx.Action() == ""` (true on GET, internal navigate POSTs, and WS connects/reconnects).
 
 ### State Persistence Matrix
 
