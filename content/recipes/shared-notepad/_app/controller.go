@@ -68,6 +68,11 @@ func (c *NotepadController) Save(state NotepadState, ctx *livetemplate.Context) 
 	c.notes[ctx.UserID()] = state
 	c.mu.Unlock()
 
+	// Propagate Publish's error rather than log-and-swallow: the only errors
+	// it can return are programmer errors (empty SelfTopic from a
+	// misconfigured Authenticator, or the per-action publish cap exceeded).
+	// Surfacing them loudly is a feature. Same pattern in every recipe app
+	// that Publishes to SelfTopic().
 	if err := ctx.Publish(ctx.SelfTopic(), "Refresh", nil); err != nil {
 		return state, err
 	}
