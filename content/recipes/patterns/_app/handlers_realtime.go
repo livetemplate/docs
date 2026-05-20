@@ -17,19 +17,24 @@ type MultiUserSyncController struct {
 	counter int
 }
 
-// Mount runs on every initial render. Without it, a tab that opens
-// AFTER other tabs have incremented would render Counter:0 and only
-// converge on the next peer refresh. Same fix as PresenceController.
+// Mount runs on every initial render. Subscribing the self-topic wires this
+// connection to receive RefreshCounter from peer Publishes. Without the
+// initial-render counter read, a tab that opens AFTER other tabs have
+// incremented would render Counter:0 and only converge on the next peer
+// publish. Same fix as PresenceController.
 func (c *MultiUserSyncController) Mount(state MultiUserSyncState, ctx *livetemplate.Context) (MultiUserSyncState, error) {
+	if err := ctx.Subscribe(ctx.SelfTopic()); err != nil {
+		return state, err
+	}
 	c.mu.RLock()
 	state.Counter = c.counter
 	c.mu.RUnlock()
 	return state, nil
 }
 
-// RefreshCounter is explicitly broadcast to peer connections after Increment.
-// The state arg is the peer's local state; we replace its Counter from the
-// shared controller value so all tabs converge.
+// RefreshCounter is the action peer connections run when Increment publishes
+// to SelfTopic(). The state arg is the peer's local state; we replace its
+// Counter from the shared controller value so all tabs converge.
 func (c *MultiUserSyncController) RefreshCounter(state MultiUserSyncState, ctx *livetemplate.Context) (MultiUserSyncState, error) {
 	c.mu.RLock()
 	state.Counter = c.counter
@@ -42,7 +47,9 @@ func (c *MultiUserSyncController) Increment(state MultiUserSyncState, ctx *livet
 	c.counter++
 	state.Counter = c.counter
 	c.mu.Unlock()
-	ctx.BroadcastAction("RefreshCounter", nil)
+	if err := ctx.Publish(ctx.SelfTopic(), "RefreshCounter", nil); err != nil {
+		return state, err
+	}
 	return state, nil
 }
 
@@ -71,6 +78,9 @@ func (c *BroadcastingController) snapshotLocked() []BroadcastMessage {
 }
 
 func (c *BroadcastingController) Mount(state BroadcastingState, ctx *livetemplate.Context) (BroadcastingState, error) {
+	if err := ctx.Subscribe(ctx.SelfTopic()); err != nil {
+		return state, err
+	}
 	c.mu.RLock()
 	state.Messages = c.snapshotLocked()
 	c.mu.RUnlock()
@@ -100,16 +110,18 @@ func (c *BroadcastingController) Send(state BroadcastingState, ctx *livetemplate
 	c.mu.Lock()
 	c.nextID++
 	// No cap on c.messages: deliberately omitted to keep the demo focused
-	// on the BroadcastAction mechanism. Production apps would ring-buffer,
-	// paginate, or persist to a store with TTL.
+	// on the Publish-to-SelfTopic mechanism. Production apps would
+	// ring-buffer, paginate, or persist to a store with TTL.
 	c.messages = append(c.messages, BroadcastMessage{ID: c.nextID, User: state.Username, Text: text})
 	state.Messages = c.snapshotLocked()
 	c.mu.Unlock()
-	// BroadcastAction must come after the lock release — holding the
-	// connection registry mutex while queuing broadcasts can deadlock with
-	// peer dispatches that take the same mutex from the other side. Peers
+	// Publish must come after the lock release — holding the connection
+	// registry mutex while queuing peer dispatches can deadlock with peer
+	// dispatches that take the same mutex from the other side. Peers
 	// receive "NewMessage" and refresh their local copy.
-	ctx.BroadcastAction("NewMessage", nil)
+	if err := ctx.Publish(ctx.SelfTopic(), "NewMessage", nil); err != nil {
+		return state, err
+	}
 	return state, nil
 }
 
@@ -144,11 +156,15 @@ func newPresenceController() *PresenceController {
 	return &PresenceController{onlineUsers: make(map[string]bool)}
 }
 
-// Mount runs on every initial render. Without it a new visitor's
-// state.OnlineCount would default to 0 even when other users are
-// already in the shared map — they'd see "0 user(s) online" until
-// the next Join/Leave broadcast updates them.
+// Mount runs on every initial render. Subscribing the self-topic wires this
+// connection to receive PresenceChanged from peer Publishes. Without the
+// initial-render OnlineCount read, a new visitor's state.OnlineCount would
+// default to 0 even when other users are already in the shared map — they'd
+// see "0 user(s) online" until the next Join/Leave publish updates them.
 func (c *PresenceController) Mount(state PresenceState, ctx *livetemplate.Context) (PresenceState, error) {
+	if err := ctx.Subscribe(ctx.SelfTopic()); err != nil {
+		return state, err
+	}
 	c.mu.RLock()
 	state.OnlineCount = len(c.onlineUsers)
 	c.mu.RUnlock()
@@ -166,7 +182,9 @@ func (c *PresenceController) Join(state PresenceState, ctx *livetemplate.Context
 	state.Joined = true
 	state.OnlineCount = len(c.onlineUsers)
 	c.mu.Unlock()
-	ctx.BroadcastAction("PresenceChanged", nil)
+	if err := ctx.Publish(ctx.SelfTopic(), "PresenceChanged", nil); err != nil {
+		return state, err
+	}
 	return state, nil
 }
 
@@ -180,13 +198,15 @@ func (c *PresenceController) Leave(state PresenceState, ctx *livetemplate.Contex
 	state.Joined = false
 	state.OnlineCount = len(c.onlineUsers)
 	c.mu.Unlock()
-	ctx.BroadcastAction("PresenceChanged", nil)
+	if err := ctx.Publish(ctx.SelfTopic(), "PresenceChanged", nil); err != nil {
+		return state, err
+	}
 	return state, nil
 }
 
 // PresenceChanged refreshes only the shared OnlineCount. Username and
 // Joined are per-connection identity and must NOT be overwritten from a
-// peer broadcast — every connection's own Join/Leave is the only thing
+// peer publish — every connection's own Join/Leave is the only thing
 // that mutates those fields locally.
 func (c *PresenceController) PresenceChanged(state PresenceState, ctx *livetemplate.Context) (PresenceState, error) {
 	c.mu.RLock()

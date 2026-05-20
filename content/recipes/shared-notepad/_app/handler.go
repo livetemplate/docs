@@ -10,10 +10,11 @@
 //     state under a sync.RWMutex. Mount + Refresh both read from it;
 //     Save writes.
 //
-//   - ctx.BroadcastAction("Refresh", nil) is the explicit peer-refresh
-//     primitive. After Save commits, every peer connection in the same
-//     session group (other tabs of the same user) runs Refresh and
-//     re-reads from the map.
+//   - ctx.Publish(ctx.SelfTopic(), "Refresh", nil) is the explicit
+//     peer-refresh primitive. After Save commits, every peer connection
+//     subscribed to the same SelfTopic() (other tabs of the same user)
+//     runs Refresh and re-reads from the map. Mount establishes the
+//     Subscribe.
 //
 // There is no main() here. Production runs via the docs single-binary
 // container, mounted by cmd/site at /apps/shared-notepad/. The example
@@ -77,9 +78,9 @@ func extractTemplate() string {
 // >>> region:basicauth
 // NewDemoBasicAuth returns the authenticator the recipe text teaches:
 // BasicAuth with password "demo", any username. The username becomes
-// both ctx.UserID() (per-user state map key) and the session-group ID
-// (BroadcastAction routing). This is the production-shaped wiring and
-// what examples/shared-notepad + the e2e suite use.
+// both ctx.UserID() (per-user state map key) and the SelfTopic() identity
+// (Publish routing key — lvt:user:<UserID>). This is the production-shaped
+// wiring and what examples/shared-notepad + the e2e suite use.
 //
 // The docs-site mount (cmd/site) uses AnonymousAuthenticator instead
 // of this — see the Handler doc comment for the reason.
@@ -105,7 +106,7 @@ func NewDemoBasicAuth() livetemplate.Authenticator {
 //     extract the LiveTemplate wrapper, and that prefetch can't
 //     forward Authorization headers — a BasicAuth mount would degrade
 //     to "live demo unavailable" in the docs page. Same-browser tabs
-//     share the cookie, so the multi-tab BroadcastAction demo still
+//     share the cookie, so the multi-tab Publish-to-SelfTopic demo still
 //     works; different browsers get different identities for isolation.
 func Handler(opts ...livetemplate.Option) http.Handler {
 	controller := &NotepadController{

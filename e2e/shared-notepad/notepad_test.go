@@ -10,9 +10,9 @@
 //	                                       beyond the original example's
 //	                                       single-user shape and asserts
 //	                                       the per-user state map.
-//	TestSharedNotepad_BroadcastRefreshAction — verifies the BroadcastAction
-//	                                            queue dispatches the
-//	                                            "Refresh" action.
+//	TestSharedNotepad_PublishRefreshAction — verifies the Publish-to-SelfTopic
+//	                                          queue dispatches the
+//	                                          "Refresh" action.
 package main
 
 import (

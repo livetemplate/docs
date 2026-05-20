@@ -102,11 +102,11 @@ func main() {
 	)))
 
 	// shared-notepad — per-user state map + explicit peer refresh via
-	// ctx.BroadcastAction("Refresh", nil). The recipe TEACHES BasicAuth
+	// ctx.Publish(ctx.SelfTopic(), "Refresh", nil). The recipe TEACHES BasicAuth
 	// (the e2e suite + examples/shared-notepad use notepad.NewDemoBasicAuth);
 	// the embed here uses AnonymousAuthenticator because tinkerdown's
 	// embed-lvt server-side prefetch can't forward Authorization headers.
-	// Same-browser tabs share the cookie, so the BroadcastAction
+	// Same-browser tabs share the cookie, so the Publish-to-SelfTopic
 	// multi-tab refresh story still works in the embed; cross-browser
 	// users get different identities for the isolation demo.
 	mux.Handle("/apps/shared-notepad/", http.StripPrefix("/apps/shared-notepad", notepad.Handler(

@@ -345,8 +345,8 @@ func allPatterns() []PatternCategory {
 		{
 			Name: "Real-Time & Multi-User",
 			Patterns: []PatternLink{
-				{Name: "Multi-User Refresh", Path: "/patterns/realtime/multi-user-sync", Description: "Explicit peer refresh via BroadcastAction", Implemented: true},
-				{Name: "Broadcasting", Path: "/patterns/realtime/broadcasting", Description: "Cross-connection updates via BroadcastAction", Implemented: true},
+				{Name: "Multi-User Refresh", Path: "/patterns/realtime/multi-user-sync", Description: "Explicit peer refresh via Publish to SelfTopic()", Implemented: true},
+				{Name: "Broadcasting", Path: "/patterns/realtime/broadcasting", Description: "Cross-connection updates via Publish to SelfTopic()", Implemented: true},
 				{Name: "Presence Tracking", Path: "/patterns/realtime/presence", Description: "Explicit join/leave with shared state", Implemented: true},
 				{Name: "Reconnection Recovery", Path: "/patterns/realtime/reconnection", Description: "State persistence across disconnects", Implemented: true},
 				{Name: "Live Preview", Path: "/patterns/realtime/live-preview", Description: "Real-time input preview via Change()", Implemented: true},
