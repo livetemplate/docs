@@ -170,7 +170,7 @@ func infiniteScrollHandler() http.Handler {
 
 // --- Sortable List ---
 
-// SortableController holds the list ordering process-wide so it persists across reloads (live multi-tab sync would need BroadcastAction).
+// SortableController holds the list ordering process-wide so it persists across reloads (live multi-tab sync would need Publish to SelfTopic()).
 type SortableController struct {
 	mu    sync.Mutex
 	items []SortableItem

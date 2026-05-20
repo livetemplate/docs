@@ -33,9 +33,14 @@ type NotepadState struct {
 
 // >>> region:mount
 // Mount runs on every fresh state (page load, reconnect with stale
-// state). It binds Username to the authenticated user and rehydrates
-// the textarea from the controller's per-user map.
+// state). It subscribes the self-topic so peer tabs of the same user
+// receive the Refresh dispatch from Save's Publish below, binds Username
+// to the authenticated user, and rehydrates the textarea from the
+// controller's per-user map.
 func (c *NotepadController) Mount(state NotepadState, ctx *livetemplate.Context) (NotepadState, error) {
+	if err := ctx.Subscribe(ctx.SelfTopic()); err != nil {
+		return state, err
+	}
 	state.Username = ctx.UserID()
 	c.mu.RLock()
 	if saved, ok := c.notes[ctx.UserID()]; ok {
@@ -50,10 +55,10 @@ func (c *NotepadController) Mount(state NotepadState, ctx *livetemplate.Context)
 // <<< region:mount
 
 // >>> region:save
-// Save writes the textarea content into the per-user map and broadcasts
-// a "Refresh" action to peer connections in the same session group
-// (other tabs of the same user). The framework drains the broadcast
-// queue after this action's response is sent.
+// Save writes the textarea content into the per-user map and Publishes a
+// "Refresh" action to peer connections subscribed to SelfTopic() (other
+// tabs of the same user). The framework drains the publish queue after
+// this action's response is sent.
 func (c *NotepadController) Save(state NotepadState, ctx *livetemplate.Context) (NotepadState, error) {
 	state.Content = ctx.GetString("content")
 	state.CharCount = utf8.RuneCountInString(state.Content)
@@ -63,7 +68,9 @@ func (c *NotepadController) Save(state NotepadState, ctx *livetemplate.Context) 
 	c.notes[ctx.UserID()] = state
 	c.mu.Unlock()
 
-	ctx.BroadcastAction("Refresh", nil)
+	if err := ctx.Publish(ctx.SelfTopic(), "Refresh", nil); err != nil {
+		return state, err
+	}
 	return state, nil
 }
 
@@ -81,11 +88,11 @@ func (c *NotepadController) Change(state NotepadState, ctx *livetemplate.Context
 }
 
 // >>> region:refresh
-// Refresh is the action peer tabs run when Save broadcasts. It re-reads
+// Refresh is the action peer tabs run when Save publishes. It re-reads
 // the latest state from the per-user map. Note this is a regular
 // controller action, not a framework-reserved name — pre-v0.9.0 the
 // framework auto-dispatched a Sync() method; that was removed in
-// livetemplate#406 in favour of explicit BroadcastAction("Refresh", nil)
+// livetemplate#406 in favour of explicit Publish-to-SelfTopic() calls
 // for clearer control over when peers actually refresh.
 func (c *NotepadController) Refresh(state NotepadState, ctx *livetemplate.Context) (NotepadState, error) {
 	c.mu.RLock()

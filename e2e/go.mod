@@ -7,7 +7,7 @@ require (
 	github.com/chromedp/chromedp v0.14.2
 	github.com/gorilla/websocket v1.5.3
 	github.com/livetemplate/docs v0.0.0-00010101000000-000000000000
-	github.com/livetemplate/livetemplate v0.9.0
+	github.com/livetemplate/livetemplate v0.9.2
 	github.com/livetemplate/lvt v0.1.6
 )
 

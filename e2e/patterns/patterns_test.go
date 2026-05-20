@@ -3396,7 +3396,7 @@ func TestMultiUserSync(t *testing.T) {
 	// chromedp.NewContext(parent) where parent is a chromedp context creates
 	// a NEW TAB in the same browser. Cookies and storage are shared, so both
 	// tabs land in the same session group — the prerequisite for
-	// BroadcastAction to dispatch to peers.
+	// Publish-to-SelfTopic to dispatch to peers.
 	peerCtx, peerCancel := chromedp.NewContext(ctx)
 	defer peerCancel()
 	if err := chromedp.Run(peerCtx,
@@ -3415,11 +3415,11 @@ func TestMultiUserSync(t *testing.T) {
 			t.Fatalf("Tab 1 did not reflect Counter: 1: %v", err)
 		}
 		// Peer must see the same value via the explicit RefreshCounter
-		// broadcast issued by Increment.
+		// dispatch issued by Increment's Publish to SelfTopic().
 		if err := chromedp.Run(peerCtx,
 			e2etest.WaitForText(`article`, "Counter: 1", 3*time.Second),
 		); err != nil {
-			t.Fatalf("Peer did not pick up Counter: 1 from BroadcastAction: %v", err)
+			t.Fatalf("Peer did not pick up Counter: 1 from Publish: %v", err)
 		}
 	})
 
