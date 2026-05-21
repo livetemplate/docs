@@ -2,8 +2,8 @@
 title: "Progressive Complexity Guide"
 source_repo: "https://github.com/livetemplate/livetemplate"
 source_path: "docs/guides/progressive-complexity.md"
-source_ref: "v0.9.1"
-source_commit: "e9a44d16e52d68472e399a5a68ad8713179e9c7f"
+source_ref: "v0.10.1"
+source_commit: "bb97bdc17f4c0795b31efff0d6c97ea9de85ce10"
 ---
 
 # Progressive Complexity Guide
@@ -387,7 +387,7 @@ This transport is also used as the automatic fallback when a WebSocket connectio
 
 ### JavaScript + WebSocket
 
-Full bidirectional communication. Actions are sent as WebSocket messages, and the server can push updates at any time. Server push (`Session.TriggerAction()`, `ctx.BroadcastAction()`) is only available in this mode.
+Full bidirectional communication. Actions are sent as WebSocket messages, and the server can push updates at any time. Server push (`Session.TriggerAction()`) and peer fan-out (`ctx.Publish()` on a subscribed topic) reach peer tabs only in this mode.
 
 ### How the Server Detects Transport
 

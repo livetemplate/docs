@@ -2,8 +2,8 @@
 title: "Current Limitations"
 source_repo: "https://github.com/livetemplate/livetemplate"
 source_path: "docs/references/current-limitations.md"
-source_ref: "v0.9.1"
-source_commit: "e9a44d16e52d68472e399a5a68ad8713179e9c7f"
+source_ref: "v0.10.1"
+source_commit: "bb97bdc17f4c0795b31efff0d6c97ea9de85ce10"
 ---
 
 # Current Limitations
@@ -64,7 +64,7 @@ See [Session Reference — State Safety](session.md#state-safety) for the full e
 
 | Limitation | Detail | Workaround |
 |-----------|--------|-----------|
-| Tabs don't update each other by default | Each connection owns its state independently | Use `ctx.BroadcastAction()` to explicitly refresh peer connections |
+| Tabs don't update each other by default | Each connection owns its state independently (peer fan-out is opt-in) | Subscribe to `ctx.SelfTopic()` in `Mount`, then `ctx.Publish(ctx.SelfTopic(), "Action", data)` from the action that mutated shared state |
 | Concurrent HTTP requests serialized | Per-group mutex in HTTP mode processes one action at a time | By design — prevents data races on shared state |
 
 See [Session Reference](session.md) for session stores and connection management.
@@ -77,7 +77,7 @@ Some features are only available in one transport mode. This is by design — ea
 
 | HTTP-Only | WebSocket-Only |
 |-----------|---------------|
-| `ctx.SetCookie()` / `ctx.GetCookie()` / `ctx.DeleteCookie()` | `ctx.BroadcastAction()` |
+| `ctx.SetCookie()` / `ctx.GetCookie()` / `ctx.DeleteCookie()` | `ctx.Publish()` peer fan-out (HTTP POSTs queue+drain locally; cross-tab dispatch requires a live WS receiver) |
 | `ctx.Redirect()` | Server push via `Session.TriggerAction()` |
 | Query params merged with form data | Real-time bidirectional communication |
 
