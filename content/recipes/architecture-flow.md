@@ -81,7 +81,7 @@ Open browser DevTools → Network → WS to watch the WebSocket frames flow. The
 
 ## What you can change to see this in action
 
-Open the [todos example](/recipes/apps/todos) in two browser tabs. Add an item in tab 1 — it appears in tab 2 within ~30ms because the controller calls `ctx.BroadcastAction("RefreshTodos", nil)` after each shared mutation.
+Open the [todos example](/recipes/apps/todos) in two browser tabs. Add an item in tab 1 — it appears in tab 2 within ~30ms because each tab opted into peer fan-out via `ctx.Subscribe(ctx.SelfTopic())` in `Mount`, and the controller calls `ctx.Publish(ctx.SelfTopic(), "RefreshTodos", nil)` after each shared mutation.
 
 ## How this page works
 

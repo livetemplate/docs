@@ -1,15 +1,15 @@
 ---
 title: "Counter, deeper"
-description: "Past the +1 button: how BroadcastAction routes between sessions, why AnonymousAuthenticator is the right default for public demos, and where this pattern stops scaling."
+description: "Past the +1 button: how Subscribe + Publish route between session connections, why AnonymousAuthenticator is the right default for public demos, and where this pattern stops scaling."
 source_repo: https://github.com/livetemplate/docs
 source_path: content/recipes/counter/index.md
 ---
 
 # Counter, deeper
 
-Most "counter" demos stop at "click +1, see number tick." Useful for proving the framework works; not so useful when you actually have to ship one. This recipe goes past the demo into the production-shaped questions: how `BroadcastAction` routes between sessions, why the cookie-bound session group matters for "multi-tab sync without leaking to other users," and what breaks first when this pattern meets real load.
+Most "counter" demos stop at "click +1, see number tick." Useful for proving the framework works; not so useful when you actually have to ship one. This recipe goes past the demo into the production-shaped questions: how `Subscribe` + `Publish` route between the connections of a single session, why the cookie-bound session group matters for "multi-tab sync without leaking to other users," and what breaks first when this pattern meets real load.
 
-The code is the same counter from [Your First App](/getting-started/your-first-app) — but the framing is different. Where that walkthrough builds the counter from scratch, this one stares at the four lines that do the actual work and unpacks them.
+The code is the same counter from [Your First App](/getting-started/your-first-app) — but the framing is different. Where that walkthrough builds the counter from scratch, this one stares at the five lines that do the actual work and unpacks them.
 
 ```embed-lvt path="/apps/counter/" upstream="http://localhost:9091" height="180px"
 ```
@@ -30,11 +30,11 @@ There's not much to it. The choices that matter for production are the two `live
 
 ## Why `AnonymousAuthenticator` is the production default
 
-LiveTemplate's `Authenticator` interface answers a single question on every HTTP and WebSocket request: *"who is this client, and which session group do they belong to?"* The session group is what `BroadcastAction` routes between. Two requests with the same group ID share state; different group IDs don't.
+LiveTemplate's `Authenticator` interface answers a single question on every HTTP and WebSocket request: *"who is this client, and which session group do they belong to?"* The session group is what `SelfTopic()` resolves to — `Subscribe(SelfTopic())` opts a connection into that group's topic, and `Publish(SelfTopic(), ...)` fans out to every subscribed connection in it. Two requests with the same group ID share the same topic string; different group IDs get different strings.
 
 `AnonymousAuthenticator` (the framework's default, what this recipe uses) issues a cookie-bound group ID on first contact:
 
-- Same browser, multiple tabs → same cookie → same group → broadcast works
+- Same browser, multiple tabs → same cookie → same group → same `SelfTopic()` → peer fan-out works
 - Different browser → different cookie → different group → isolated state
 - Incognito window → its own cookie → its own group → clean slate
 
@@ -50,21 +50,24 @@ livetemplate.WithAuthenticator(sharedAuth{})
 livetemplate.WithAuthenticator(&livetemplate.AnonymousAuthenticator{})
 ```
 
-The `BroadcastAction` calls didn't change. The state struct didn't change. Only the routing rule for "who counts as the same session" changed, and that one swap converted a demo into a production-shaped widget.
+The `Subscribe` + `Publish` calls didn't change. The state struct didn't change. Only the routing rule for "who counts as the same session" changed, and that one swap converted a demo into a production-shaped widget.
 
-## How `BroadcastAction` routes
+## How `Subscribe` + `Publish` route
 
-The two action methods do the obvious thing — bump the counter, return the new state — and then call `ctx.BroadcastAction`:
+The work happens in two places: `Mount` opts each connection in via `ctx.Subscribe(ctx.SelfTopic())`, and the action methods bump the counter and fan out via `ctx.Publish(ctx.SelfTopic(), ...)`:
 
-```go include="./_app/counter.go" lines="22-33" highlight="24,31"
+```go include="./_app/counter.go" lines="18-43" highlight="20,30,37"
 ```
 
-`BroadcastAction("Increment", nil)` adds an action to the broadcast queue. It does **not** apply the action immediately to other connections; it queues it. After the current request's response is sent, the framework drains the queue: for every other connection in the same session group, run `Increment` against that connection's local state.
+The two-step shape matters. Peer fan-out is **opt-in** — a connection that never called `Subscribe` would not receive the published action even if every other tab in the same group did. `SelfTopic()` resolves to a reserved-namespace topic string (`lvt:session:<groupID>`) that's ACL-exempt, so `Subscribe(SelfTopic())` always succeeds and matches whatever other Mount-time `Subscribe(SelfTopic())` calls produced in this session.
 
-Two consequences worth knowing:
+`Publish("Increment", nil)` adds an action to the per-action publish queue. It does **not** apply the action immediately to other connections; it queues it. After the current request's response is sent, the framework drains the queue: for every other connection that subscribed to this topic, run `Increment` against that connection's local state.
 
-- **Each connection still has its own state copy.** Broadcast doesn't share state — it replays actions. A connection that's been disconnected for a while doesn't get a magical state update; it gets the actions it missed when it reconnects, applied in order.
-- **The broadcast is fire-and-forget within a request.** The current request's caller doesn't wait for the broadcast to finish. If you broadcast and then return, the response goes to the originating client immediately; the other clients see the update milliseconds later as the queue drains.
+Three consequences worth knowing:
+
+- **Each connection still has its own state copy.** Publish doesn't share state — it replays actions. A connection that's been disconnected for a while doesn't get a magical state update; it gets the actions it missed when it reconnects, applied in order against its own local state.
+- **Fan-out is fire-and-forget within a request.** The current request's caller doesn't wait for the publish to finish. If you publish and then return, the response goes to the originating client immediately; the other clients see the update milliseconds later as the queue drains.
+- **No `Subscribe`, no fan-out.** If you forget the `Mount`-side `Subscribe(SelfTopic())`, `Publish` runs without errors but reaches zero peer connections. The "my peer tabs stopped updating" troubleshooting question is almost always "did the receiver subscribe?"
 
 To prove the routing, here are two embeds against the same recipe app, side by side:
 
@@ -118,6 +121,6 @@ The `embed.FS` + temp-file dance at the top is a workaround for `livetemplate.Wi
 
 - [Reference — Authentication](/reference/authentication) — the full `Authenticator` interface, beyond the anonymous default.
 - [Reference — PubSub & Broadcasting](/reference/pubsub) — multi-instance broadcasting via Redis.
-- [Reference — Server Actions](/reference/server-actions) — the action lifecycle, including `BroadcastAction` ordering rules and gotchas.
-- [Broadcast & Server Push](/recipes/sync-and-broadcast) — when to use explicit broadcast and server push.
+- [Reference — Server Actions](/reference/server-actions) — the action lifecycle, including `Publish` ordering rules and gotchas.
+- [Sync & Server Push](/recipes/sync-and-broadcast) — when to use Subscribe/Publish peer fan-out vs server-initiated TriggerAction.
 - [Your First App](/getting-started/your-first-app) — if you arrived here cold, the from-scratch walkthrough is the better starting point.

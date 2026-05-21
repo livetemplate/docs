@@ -1,6 +1,6 @@
 ---
 title: "Shared notepad: BasicAuth + per-user state + explicit peer refresh"
-description: "BasicAuth turns the Authorization header into ctx.UserID() and a stable session group; a controller-owned map keys per-user state by that ID; and ctx.BroadcastAction(\"Refresh\", nil) keeps every tab of the same user in sync after a Save. The recipe sits between the [login recipe](../login/) (form-based session auth) and the [sync-and-broadcast deep dive](../sync-and-broadcast) (the general broadcast vs. trigger model)."
+description: "BasicAuth turns the Authorization header into ctx.UserID() and a stable session group; a controller-owned map keys per-user state by that ID; and an opt-in ctx.Subscribe(ctx.SelfTopic()) in Mount plus ctx.Publish(ctx.SelfTopic(), \"Refresh\", nil) in Save keeps every tab of the same user in sync. The recipe sits between the [login recipe](../login/) (form-based session auth) and the [sync-and-broadcast deep dive](../sync-and-broadcast) (peer fan-out vs. server-initiated trigger)."
 source_repo: https://github.com/livetemplate/docs
 source_path: content/recipes/shared-notepad/index.md
 ---
@@ -13,9 +13,9 @@ What makes this recipe worth a page is the *seam* between three independently-us
 
 - **`BasicAuthenticator`** turns the HTTP `Authorization` header into a stable identity. Username becomes both `ctx.UserID()` and the session-group ID.
 - **A controller-owned map keyed by `ctx.UserID()`** is enough to isolate per-user state without a database. Alice's notes never leak to Bob.
-- **`ctx.BroadcastAction("Refresh", nil)`** is the explicit peer-refresh primitive. After a Save, every other tab of the same user runs `Refresh` and re-reads from the map.
+- **`ctx.Subscribe(ctx.SelfTopic())` in `Mount` plus `ctx.Publish(ctx.SelfTopic(), "Refresh", nil)` in `Save`** is the explicit peer-refresh pattern. Peer fan-out is opt-in: each tab that wants to receive updates registers via the Mount-side Subscribe; the action that mutated shared state fans out via Publish. Every subscribed tab of the same user runs `Refresh` and re-reads from the map.
 
-That last one is the v0.9.0 shape. Earlier versions of LiveTemplate auto-dispatched a controller method named `Sync` on every peer after every action; [livetemplate#406](https://github.com/livetemplate/livetemplate/pull/406) removed that auto-dispatch in favour of explicit broadcasts so authors control *when* peers refresh, not the framework.
+That two-step shape is the v0.10.0 surface. Earlier versions of LiveTemplate auto-dispatched a controller method named `Sync` on every peer after every action; [livetemplate#406](https://github.com/livetemplate/livetemplate/pull/406) removed that auto-dispatch in favour of explicit peer fan-out. The v0.10.0 split made the receiver-side opt-in explicit too.
 
 Try it right here. Type some text and click Save:
 
@@ -45,43 +45,46 @@ The handler exposes two authenticator flavours and lets the caller pick. Product
 `BasicAuthenticator` answers two questions for every request:
 
 - **`Authenticate(...)`** — does the credential pass? Here, any username with password `demo`. A real app would check against a user table.
-- **`GroupID(...)`** — what session-group does this client belong to? `BasicAuthenticator` returns the username, so two tabs authenticated as alice land in the same group and broadcasts between them work; alice and bob land in different groups and nothing crosses.
+- **`GroupID(...)`** — what session-group does this client belong to? `BasicAuthenticator` returns the username, so two tabs authenticated as alice land in the same group and `ctx.SelfTopic()` resolves to the same topic string for both — Publish from one reaches the other. Alice and bob land in different groups, get different `SelfTopic()` strings, and nothing crosses.
 
 `ctx.UserID()` in any action handler returns whatever the authenticator decided — username here.
 
-## Mount: rehydrate from the per-user map
+## Mount: subscribe + rehydrate
 
-`Mount` runs on every fresh state — first page load, reconnect with stale state, or a state-restoring navigation. It binds `Username` to whoever just authenticated, then re-reads the textarea content from the per-user map:
+`Mount` runs on every fresh state — first page load, reconnect with stale state, or a state-restoring navigation. Three things happen: opt this connection into peer fan-out via `ctx.Subscribe(ctx.SelfTopic())`, bind `Username` to whoever just authenticated, and re-read the textarea content from the per-user map:
 
 ```go include="./_app/controller.go" region="mount"
 ```
 
+The `Subscribe` line is the receiver-side opt-in. Without it, the Publish in Save would have no subscribers in this session group and the peer tab wouldn't refresh. `SelfTopic()` is ACL-exempt — it always succeeds — and the explicit `_ =` documents that we've considered the return value (a denied developer topic would surface as a `*TopicForbiddenError`; the self-topic can't be denied).
+
 The `c.mu.RLock` is the only concurrency primitive in the recipe. Save takes the write lock; Mount, Refresh, and the implicit page-load reads take the read lock. For a production app this would be a database transaction, not a `map[string]NotepadState` — but the controller-shape is the same.
 
-## Save: write through, then broadcast
+## Save: write through, then publish
 
 The interesting line is the last one before the return:
 
 ```go include="./_app/controller.go" region="save"
 ```
 
-`ctx.BroadcastAction("Refresh", nil)` doesn't run `Refresh` immediately on other connections — it *enqueues* the action for the framework's broadcast pipeline. After the current request's response is sent back to the originating tab, the framework drains the queue: for every peer connection in the same session group (other tabs of the same authenticated user), it dispatches `Refresh` against that connection's local state.
+`ctx.Publish(ctx.SelfTopic(), "Refresh", nil)` doesn't run `Refresh` immediately on other connections — it *enqueues* the action for the framework's publish pipeline. After the current request's response is sent back to the originating tab, the framework drains the queue: for every peer connection that subscribed to `SelfTopic()` (other tabs of the same authenticated user), it dispatches `Refresh` against that connection's local state.
 
-Two consequences worth knowing:
+Three consequences worth knowing:
 
-- **Each connection still has its own state copy.** Broadcast doesn't share state; it *replays an action*. A disconnected peer doesn't magically get a state update — it gets the missed actions applied in order when it reconnects.
-- **The broadcast is fire-and-forget within a request.** The Save response goes to the originating tab immediately; peer tabs see the refresh milliseconds later as the queue drains.
+- **Each connection still has its own state copy.** Publish doesn't share state; it *replays an action*. A disconnected peer doesn't magically get a state update — it gets the missed actions applied in order when it reconnects.
+- **Fan-out is fire-and-forget within a request.** The Save response goes to the originating tab immediately; peer tabs see the refresh milliseconds later as the queue drains.
+- **No `Subscribe`, no fan-out.** If `Mount` doesn't subscribe, `Publish` runs cleanly but reaches zero peer connections in the group. The Mount-side opt-in is the receiver-side contract.
 
-For the deeper model — when to broadcast versus when to use `session.TriggerAction` for server-owned work — see [Broadcast & Server Push](/recipes/sync-and-broadcast).
+For the deeper model — when to use Subscribe/Publish peer fan-out versus `session.TriggerAction` for server-owned work — see [Sync & Server Push](/recipes/sync-and-broadcast).
 
 ## Refresh: a regular controller action
 
-`Refresh` is the action peer tabs run when Save broadcasts. It's just a regular controller method — not a framework-reserved name:
+`Refresh` is the action peer tabs run when Save publishes. It's just a regular controller method — not a framework-reserved name:
 
 ```go include="./_app/controller.go" region="refresh"
 ```
 
-The `Refresh` *name* is convention; the framework doesn't care. What matters is the `BroadcastAction("Refresh", nil)` call in Save naming this same string. Renaming the method also requires updating the broadcast call — and *every* peer connection that's running an older controller will see the broadcast and fail to route it.
+The `Refresh` *name* is convention; the framework doesn't care. What matters is the `Publish(SelfTopic(), "Refresh", nil)` call in Save naming this same string. Renaming the method also requires updating the publish call — and *every* peer connection that's running an older controller will see the published action and fail to route it.
 
 ## The form: persistence across re-render
 
@@ -102,7 +105,7 @@ Three production extensions that don't change the recipe's shape:
 |---|---|---|
 | Persistence | `map[string]NotepadState` in process memory | File-backed SQLite or Postgres; per-user rows; `Save` becomes an `UPDATE` |
 | Auth | BasicAuth with hardcoded password check | `BasicAuthenticator` with bcrypt password compare, or a custom `Authenticator` that validates session tokens |
-| Multi-instance broadcast | Single Fly machine, in-memory peer registry | `WithPubSubBroadcaster` (Redis) so `BroadcastAction("Refresh", ...)` reaches peer instances |
+| Multi-instance fan-out | Single Fly machine, in-memory peer registry | `WithPubSubBroadcaster` (Redis) so `Publish(SelfTopic(), "Refresh", ...)` reaches peer instances |
 | Audit | No event log | Append-only `audit` table; `Save` writes the event before returning |
 
 None of those changes the four action methods on `NotepadController`. The shape carries over.
@@ -110,7 +113,7 @@ None of those changes the four action methods on `NotepadController`. The shape 
 ## What next?
 
 - [Login: form-based session auth](../login/) — cookies + `OnConnect` + `session.TriggerAction` instead of header auth.
-- [Broadcast & Server Push](/recipes/sync-and-broadcast) — when to use explicit broadcast vs. server push.
-- [Broadcasting, deeper](/recipes/broadcasting) — the broadcast pipeline in detail.
+- [Sync & Server Push](/recipes/sync-and-broadcast) — when to use Subscribe/Publish peer fan-out vs. server-initiated TriggerAction.
+- [Broadcasting, deeper](/recipes/broadcasting) — the publish pipeline in detail.
 - [Patterns › Preserve inputs](/recipes/ui-patterns/forms/preserve-inputs) — the `lvt-form:preserve` story by itself.
 - [Reference — Authentication](/reference/authentication) — the full `Authenticator` interface.

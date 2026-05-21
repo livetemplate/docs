@@ -1,7 +1,7 @@
 {{define "content"}}
 <article>
     <h3>Multi-User Refresh</h3>
-    <p><small><code>Increment</code> updates the shared counter, then explicitly calls <code>BroadcastAction("RefreshCounter", nil)</code> so peer connections reload from the controller's mutex-protected state.</small></p>
+    <p><small>Mount opts each connection in via <code>ctx.Subscribe(ctx.SelfTopic())</code>; <code>Increment</code> updates the shared counter, then explicitly calls <code>ctx.Publish(ctx.SelfTopic(), "RefreshCounter", nil)</code> so peer connections that subscribed reload from the controller's mutex-protected state.</small></p>
 
     <p>Counter: <strong>{{.Counter}}</strong></p>
 
