@@ -30,7 +30,7 @@ Three of those `livetemplate.With*` options carry teaching weight. Origins (`opt
 
 Every action handler in the controller filters database queries by `ctx.UserID()`. That `UserID` comes from the authenticator: `BasicAuthenticator` returns the username that authenticated the request as both the user identity *and* the session group ID. The framework guarantees:
 
-- **Same user, multiple tabs** → same group → explicit `BroadcastAction` keeps tabs in sync within one logged-in user
+- **Same user, multiple tabs** → same group → an opt-in `ctx.Subscribe(ctx.SelfTopic())` in Mount plus `ctx.Publish(ctx.SelfTopic(), "RefreshTodos", nil)` from each mutating action keeps tabs in sync within one logged-in user
 - **Different users on the same machine** → different groups → no leakage
 - **Same user across devices** → still the same group (the username is the group), so a logged-in alice on phone + laptop sees the same list
 
@@ -86,7 +86,7 @@ This is the smallest app that exercises the full LiveTemplate idiom. A real prod
 |---|---|---|
 | Persistence | `:memory:` SQLite, lost on restart | File-backed SQLite or Postgres; daily backup |
 | Auth | Hardcoded alice/bob with plaintext passwords | OAuth/SSO + an `Authenticator` impl that validates session tokens |
-| Multi-instance broadcast | Single Fly machine | `WithPubSubBroadcaster` (Redis) so `BroadcastAction` reaches peer instances |
+| Multi-instance fan-out | Single Fly machine | `WithPubSubBroadcaster` (Redis) so `Publish` reaches peer instances |
 | User registration | None | Companion endpoint + `lvt/components/form` validation |
 | Audit trail | None | Append-only log table; query layer logs writes |
 
@@ -94,7 +94,7 @@ None of those changes the recipe's *shape* — the same controller methods, the 
 
 ## What next?
 
-- [Counter, deeper](/recipes/counter) — the same `BroadcastAction` mechanism this app uses for multi-tab refresh, in isolation.
+- [Counter, deeper](/recipes/counter) — the same `Subscribe(SelfTopic())` + `Publish` peer-fan-out pattern this app uses for multi-tab refresh, in isolation.
 - [Reference — Authentication](/reference/authentication) — the full `Authenticator` interface and the contracts `BasicAuthenticator` implements.
 - [Reference — Components](/reference/components) — the modal + toast APIs, plus the rest of `lvt/components`.
 - [Broadcast & Server Push](/recipes/sync-and-broadcast) — when to use explicit broadcast and server push.

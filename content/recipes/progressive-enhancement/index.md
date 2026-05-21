@@ -110,7 +110,7 @@ Three tiers from one controller is a lot of mileage from one option flag, but th
 
 - **Tier C requires `<form method="POST">` for every action.** Pure-button no-form interactions (e.g., `<button onclick="...">`) skip the browser's form-encoding step and have no Tier C path.
 - **`Change()` is JS-only.** Live debounced input updates on every keystroke can't happen without JS — Tier C readers won't see incremental feedback. The `submit`-on-blur fallback is what they get.
-- **Multi-user broadcast is WS-only by default.** `BroadcastAction` to other connections needs a transport channel; HTTP fetch is request-scoped. Tier B users see *their own* updates, not peers'.
+- **Multi-user peer fan-out is WS-only by default.** `Publish` to a subscribed topic reaches other connections via the WebSocket transport; HTTP fetch is request-scoped. Tier B users see *their own* updates, not peers'.
 - **Streamed responses require WS.** Anything range-streamed (SSE-style) needs the persistent connection.
 
 These are the cliffs. For the 80% of CRUD forms that don't need any of them, the recipe shape — one controller, three transports, one option flag — covers all three tiers without conditionals.

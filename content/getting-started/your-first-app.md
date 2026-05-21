@@ -35,7 +35,7 @@ Then a controller and two action methods:
 ```go include="../recipes/counter/_app/counter.go" lines="13-33"
 ```
 
-Action methods are exported on the controller, and their names ARE the action names — `Increment` and `Decrement` are what the template will reference. The `BroadcastAction` calls are how multi-tab sync works (Step 6).
+Action methods are exported on the controller, and their names ARE the action names — `Increment` and `Decrement` are what the template will reference. The `Mount` + `Publish` calls are how multi-tab sync works (Step 6).
 
 Now wire it up in `main.go`:
 
@@ -111,7 +111,7 @@ Look at the handlers from Step 2 — note the highlighted lines:
 ```go include="../recipes/counter/_app/counter.go" lines="22-33" highlight="24,31"
 ```
 
-`ctx.BroadcastAction("Increment", nil)` (and the matching `Decrement`) tells LiveTemplate to apply the same action on every other connection in the same session group — multiple tabs and embeds within your browser. Without it, each tab has its own count; with it, they stay in lockstep.
+Two things make multi-tab sync work. In `Mount`, `ctx.Subscribe(ctx.SelfTopic())` opts the connection in to peer fan-out for its own session (`SelfTopic()` resolves to the reserved-namespace string `lvt:session:<groupID>` and is ACL-exempt). Then in each action, `ctx.Publish(ctx.SelfTopic(), "Increment", nil)` (and the matching `Decrement`) fans the named action out to every other connection that subscribed. Without the Subscribe, the Publish has no receiver; without the Publish, no peer ever runs the action. With both, the tabs stay in lockstep.
 
 To prove it, here are two embeds against the same counter, side by side:
 
@@ -125,7 +125,7 @@ To prove it, here are two embeds against the same counter, side by side:
 
 </div>
 
-Click `+1` in one — watch the other update in real time. They're talking to the same upstream session, and `BroadcastAction` is what makes them stay synced. (On a narrow viewport the embeds stack vertically — the broadcast still works.)
+Click `+1` in one — watch the other update in real time. They're talking to the same upstream session, and the Mount-side `Subscribe(SelfTopic())` plus action-side `Publish(SelfTopic(), ...)` are what makes them stay synced. (On a narrow viewport the embeds stack vertically — the fan-out still works.)
 
 > **Why does this stay scoped to your browser?** LiveTemplate's default authenticator (`AnonymousAuthenticator`) uses a cookie to assign each browser a stable session group. Tabs from the same browser share that group — that's why the two embeds above sync. Different browsers — or an incognito window in the same browser — get different cookies, different groups, and isolated state. For a public docs site this is the right default: every visitor gets a clean slate, and the broadcast demo still proves the feature within their own browser. See [Recipes/Counter, deeper](/recipes/counter) for the full session-group + scaling story.
 
@@ -145,5 +145,5 @@ You wrote a counter that:
 - [How a LiveTemplate Update Flows](/recipes/architecture-flow) — the sequence diagram of what happened between your click and the DOM patch.
 - [UI pattern recipes](/recipes/ui-patterns/) — 33 live, reactive UI idioms you can copy. Forms, lists, search, real-time, navigation, feedback.
 - [Server API reference](/reference/api) — `New`, `Handle`, `Context`, action method dispatch.
-- [Broadcast & Server Push](/recipes/sync-and-broadcast) — when to use `BroadcastAction()` vs `TriggerAction()`, and how sessions are scoped.
+- [Sync & Server Push](/recipes/sync-and-broadcast) — when to use `Subscribe`/`Publish` peer fan-out vs `TriggerAction()`, and how sessions are scoped.
 - [App recipes](/recipes/apps/) — runnable apps including chat, todos, file uploads, auth.
