@@ -14,6 +14,7 @@ package e2e
 import (
 	"context"
 	"fmt"
+	"strings"
 	"testing"
 	"time"
 
@@ -75,16 +76,28 @@ func TestResponsiveLayoutAcrossViewports(t *testing.T) {
 					bodyWidth   int64
 				)
 
-				err := chromedp.Run(ctx,
-					emulation.SetDeviceMetricsOverride(vc.width, vc.height, 1.0, vc.mobile),
-					chromedp.Navigate(baseURL()+path),
-					chromedp.WaitReady("body", chromedp.ByQuery),
-					chromedp.Sleep(800*time.Millisecond),
-					chromedp.Evaluate(`document.documentElement.clientWidth`, &clientWidth),
-					chromedp.Evaluate(`document.documentElement.scrollWidth`, &htmlScroll),
-					chromedp.Evaluate(`document.body.scrollWidth`, &bodyScroll),
-					chromedp.Evaluate(`document.body.getBoundingClientRect().width`, &bodyWidth),
-				)
+				run := func() error {
+					return chromedp.Run(ctx,
+						emulation.SetDeviceMetricsOverride(vc.width, vc.height, 1.0, vc.mobile),
+						chromedp.Navigate(baseURL()+path),
+						chromedp.WaitReady("body", chromedp.ByQuery),
+						chromedp.Sleep(800*time.Millisecond),
+						chromedp.Evaluate(`document.documentElement.clientWidth`, &clientWidth),
+						chromedp.Evaluate(`document.documentElement.scrollWidth`, &htmlScroll),
+						chromedp.Evaluate(`document.body.scrollWidth`, &bodyScroll),
+						chromedp.Evaluate(`document.body.getBoundingClientRect().width`, &bodyWidth),
+					)
+				}
+				err := run()
+				// One bounded retry for transient Chromium-internal flakes
+				// (cert-verifier service restart mid-navigate). Only
+				// retries the named errors — assertion failures and real
+				// network errors are NOT retried, so this can't hide a
+				// regression.
+				if err != nil && isTransientNavErr(err) {
+					t.Logf("retrying %s @ %s after transient nav error: %v", path, vc.name, err)
+					err = run()
+				}
 				if err != nil {
 					t.Fatalf("navigate %s @ %s: %v", path, vc.name, err)
 				}
@@ -140,6 +153,27 @@ func slug(p string) string {
 		out = out[:len(out)-1]
 	}
 	return string(out)
+}
+
+// isTransientNavErr reports whether err is a known transient
+// Chromium-internal startup/navigation flake worth one retry. Kept
+// narrow on purpose: anything not listed here is treated as a real
+// failure so regressions stay visible.
+func isTransientNavErr(err error) bool {
+	if err == nil {
+		return false
+	}
+	s := err.Error()
+	switch {
+	case strings.Contains(s, "ERR_CERT_VERIFIER_CHANGED"):
+		// Chromium cert-verifier service restart mid-navigate. Seen on
+		// GH runners after several short-lived Chrome launches.
+		return true
+	case strings.Contains(s, "ERR_NETWORK_CHANGED"):
+		// Same family: transient network-stack reinit inside Chromium.
+		return true
+	}
+	return false
 }
 
 // Avoid "imported and not used: context" — context is used inside

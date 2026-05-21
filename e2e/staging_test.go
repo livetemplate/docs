@@ -63,6 +63,10 @@ func newCtx(t *testing.T) (context.Context, context.CancelFunc) {
 		chromedp.Flag("headless", true),
 		chromedp.Flag("disable-gpu", true),
 		chromedp.Flag("no-sandbox", true),
+		// GH-runner cold-start can take >20s to print the DevTools WS
+		// URL; chromedp's 20s default produced "websocket url timeout
+		// reached" failures right at 20.0s on the first test of a run.
+		chromedp.WSURLReadTimeout(45*time.Second),
 	)
 	allocCtx, allocCancel := chromedp.NewExecAllocator(context.Background(), allocOpts...)
 	ctx, cancel := chromedp.NewContext(allocCtx)
