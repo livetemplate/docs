@@ -2,7 +2,8 @@
 title: "Contributing to LVT CLI"
 source_repo: "https://github.com/livetemplate/lvt"
 source_path: "CONTRIBUTING.md"
-source_commit: "91211b7f0565d357db29bf390d39ea484bf96eb8"
+source_ref: "v0.1.8"
+source_commit: "dc7d1a4ddc7fd3d3ac9f3a1c51c9ea74c4f5ccf3"
 ---
 
 # Contributing to LVT CLI
