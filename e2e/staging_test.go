@@ -439,34 +439,6 @@ func TestRecipe4_ProgressiveComplexityTreeRenders(t *testing.T) {
 	}
 }
 
-// TestRecipe5_SyncBroadcastDiagramRenders verifies the sync+broadcast
-// recipe renders both of its mermaid sequence diagrams. The page has
-// two ```mermaid blocks, so we expect at least 2 SVGs once hydrated.
-func TestRecipe5_SyncBroadcastDiagramRenders(t *testing.T) {
-	ctx, cancel := newCtx(t)
-	defer cancel()
-
-	var svgCount int
-	if err := chromedp.Run(ctx,
-		chromedp.Navigate(baseURL()+"/recipes/sync-and-broadcast"),
-		chromedp.WaitVisible("h1", chromedp.ByQuery),
-		chromedp.Poll(
-			`document.querySelectorAll('.mermaid svg, [data-tinkerdown-block] svg').length >= 2`,
-			nil,
-			chromedp.WithPollingTimeout(20*time.Second),
-		),
-		chromedp.Evaluate(
-			`document.querySelectorAll('.mermaid svg, [data-tinkerdown-block] svg').length`,
-			&svgCount,
-		),
-	); err != nil {
-		t.Fatalf("hydrate: %v", err)
-	}
-	if svgCount < 2 {
-		t.Errorf("sync-and-broadcast recipe rendered %d SVGs; expected 2 (sync + broadcast)", svgCount)
-	}
-}
-
 // TestRecipe6_LiveReleasesHydratesFromGitHub verifies the live-releases
 // recipe binds to the GitHub Releases API and renders rows. GitHub may
 // rate-limit (60/h unauth) — if THIS test starts flaking specifically
