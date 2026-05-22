@@ -38,7 +38,7 @@ LiveTemplate's `Authenticator` interface answers a single question on every HTTP
 - Different browser → different cookie → different group → isolated state
 - Incognito window → its own cookie → its own group → clean slate
 
-For a public docs site, that's the right shape. Every reader gets their own private counter on first visit, can prove broadcast within their own browser, and the demo can't be polluted by a stranger's clicks.
+For a public docs site, that's the right shape. Every reader gets their own private counter on first visit, can prove peer fan-out within their own browser, and the demo can't be polluted by a stranger's clicks.
 
 The alternative — a constant-group authenticator that puts every visitor in one shared group — is a demo-flavored shortcut. It makes a global ticker visible to all visitors, which is punchy on a marketing page but fails the "clean slate for thousands of users" test. We used it briefly during early development; the production switch to `AnonymousAuthenticator` was a one-line change with no other code impact:
 
@@ -81,7 +81,7 @@ To prove the routing, here are two embeds against the same recipe app, side by s
 
 </div>
 
-Click `+1` on one. The other ticks too — same browser, same cookie, same group, broadcast routes between them. Open this page in an incognito window: that incognito counter starts at zero and won't see your normal-window clicks. Different cookie, different group.
+Click `+1` on one. The other ticks too — same browser, same cookie, same group, `ctx.Publish(ctx.SelfTopic(), ...)` routes between them. Open this page in an incognito window: that incognito counter starts at zero and won't see your normal-window clicks. Different cookie, different group.
 
 ## Session group lifecycle
 
@@ -90,7 +90,7 @@ Worth pausing on what "session group" actually means in time.
 1. **First visit**: the browser has no cookie. `AnonymousAuthenticator.GetSessionGroup` issues a fresh group ID and sets it as a cookie. The connection joins that group.
 2. **Subsequent requests** (next tab, page refresh, WebSocket reconnect): the cookie is sent, the same group ID is returned, the connection joins the existing group.
 3. **Cookie cleared / different browser**: a new group ID is issued. Old state is unreachable from the new group.
-4. **Server restart**: cookies persist but in-memory session state is gone. New connections start fresh; broadcast queue is empty until clients reconnect and trigger new actions.
+4. **Server restart**: cookies persist but in-memory session state is gone. New connections start fresh; the publish dispatch queue is empty until clients reconnect and trigger new actions.
 
 The group ID is the *only* thing tying a connection to its peers. Two browsers that somehow had the same cookie value would be in the same group. Two tabs from one browser are in the same group not because of the same TCP connection or anything similar — purely because of the shared cookie.
 
@@ -100,10 +100,10 @@ This recipe is a deliberately small slice. The scaling story behind it is real:
 
 | Scenario | Works? | Notes |
 |---|---|---|
-| One user, multiple tabs, single instance | ✅ Trivially. The broadcast queue runs in-process, the cost is one `Increment` call per connected tab. |
-| Multiple users, single instance | ✅ Each user has their own session group; broadcasts stay scoped. |
-| Multiple users, multiple instances (Fly machines, Kubernetes replicas) | ⚠️ Needs `WithPubSubBroadcaster` — by default a broadcast only reaches connections on the *same* instance. With Redis-backed broadcasting the broadcast fans out across instances. See [PubSub Reference](/reference/pubsub). |
-| One group with thousands of connections (everyone broadcasting at high frequency) | ❌ Broadcast cost is O(N) per action; thousand-connection groups broadcasting at 100Hz mean 100k+ in-process calls per second. Either shard the group or use a different sync primitive. |
+| One user, multiple tabs, single instance | ✅ Trivially. The publish dispatch queue runs in-process, the cost is one `Increment` call per subscribed tab. |
+| Multiple users, single instance | ✅ Each user has their own session group; `SelfTopic()` fan-outs stay scoped. |
+| Multiple users, multiple instances (Fly machines, Kubernetes replicas) | ⚠️ Needs `WithPubSubBroadcaster` — by default a `Publish` only reaches connections on the *same* instance. With Redis-backed `pubsub.Broadcaster` the publish fans out across instances. See [PubSub Reference](/reference/pubsub). |
+| One group with thousands of connections (everyone publishing at high frequency) | ❌ Publish cost is O(N) per action; thousand-connection groups publishing at 100Hz mean 100k+ in-process calls per second. Either shard the group or use a different sync primitive. |
 | Cross-user shared state (everyone sees everyone) | ⚠️ Possible — write a custom `Authenticator` that returns a constant group ID — but you've now built a write-amplification machine that any visitor can poke. Production examples need rate limiting, read-only modes, or moderation. |
 
 `AnonymousAuthenticator` keeps you on the easy side of every row: per-user groups bound the fan-out, and the multi-instance question only matters once you've outgrown a single Fly machine.
@@ -120,7 +120,7 @@ The `embed.FS` + temp-file dance at the top is a workaround for `livetemplate.Wi
 ## What next?
 
 - [Reference — Authentication](/reference/authentication) — the full `Authenticator` interface, beyond the anonymous default.
-- [Reference — PubSub & Broadcasting](/reference/pubsub) — multi-instance broadcasting via Redis.
+- [Reference — PubSub & Peer Fan-Out](/reference/pubsub) — multi-instance peer fan-out via Redis.
 - [Reference — Server Actions](/reference/server-actions) — the action lifecycle, including `Publish` ordering rules and gotchas.
 - [Sync & Server Push](/recipes/sync-and-broadcast) — when to use Subscribe/Publish peer fan-out vs server-initiated TriggerAction.
 - [Your First App](/getting-started/your-first-app) — if you arrived here cold, the from-scratch walkthrough is the better starting point.

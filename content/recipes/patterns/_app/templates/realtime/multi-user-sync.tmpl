@@ -9,6 +9,6 @@
         <button name="increment">Increment</button>
     </form>
 
-    <p><small><strong>Try:</strong> Open this page in a second tab. Click Increment in either tab — both stay in sync because the action explicitly broadcasts a peer refresh.</small></p>
+    <p><small><strong>Try:</strong> Open this page in a second tab. Click Increment in either tab — both stay in sync because the action explicitly publishes a peer refresh via <code>ctx.Publish(ctx.SelfTopic(), "RefreshCounter", nil)</code>.</small></p>
 </article>
 {{end}}

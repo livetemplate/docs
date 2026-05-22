@@ -1,6 +1,6 @@
 ---
 title: "Your First App"
-description: "Build a counter from scratch in 10 minutes. Walks through Tier 1 (no JavaScript) → JS client (in-place DOM patching) → multi-tab broadcast."
+description: "Build a counter from scratch in 10 minutes. Walks through Tier 1 (no JavaScript) → JS client (in-place DOM patching) → multi-tab peer fan-out via Subscribe/Publish."
 source_repo: https://github.com/livetemplate/docs
 source_path: content/getting-started/your-first-app.md
 ---
@@ -63,7 +63,7 @@ func main() {
 
 `livetemplate.New("counter")` parses `counter.tmpl` from the same directory. `tmpl.Handle(controller, AsState(initial))` is the standard wiring — controller for actions, initial state for new sessions.
 
-By default LiveTemplate uses `AnonymousAuthenticator`, which gives each browser a stable session group via cookie. Two consequences worth knowing about now: each browser gets its own state (no cross-user leaks), and tabs from the same browser share state — that's what makes the broadcast demo at Step 6 work.
+By default LiveTemplate uses `AnonymousAuthenticator`, which gives each browser a stable session group via cookie. Two consequences worth knowing about now: each browser gets its own state (no cross-user leaks), and tabs from the same browser share state — that's what makes the peer-fan-out demo at Step 6 work.
 
 ## Step 3 — Write the template
 
@@ -104,7 +104,7 @@ This is LiveTemplate's Tier 1: forms POST, server re-renders, browser navigates.
 
 Same Go code. Same template. Two lines of HTML promote the experience from server-rendered-with-reload to in-place reactive.
 
-## Step 6 — Multi-tab sync (broadcast)
+## Step 6 — Multi-tab sync (peer fan-out)
 
 Look at the handlers from Step 2 — note the highlighted lines:
 
@@ -127,7 +127,7 @@ To prove it, here are two embeds against the same counter, side by side:
 
 Click `+1` in one — watch the other update in real time. They're talking to the same upstream session, and the Mount-side `Subscribe(SelfTopic())` plus action-side `Publish(SelfTopic(), ...)` are what makes them stay synced. (On a narrow viewport the embeds stack vertically — the fan-out still works.)
 
-> **Why does this stay scoped to your browser?** LiveTemplate's default authenticator (`AnonymousAuthenticator`) uses a cookie to assign each browser a stable session group. Tabs from the same browser share that group — that's why the two embeds above sync. Different browsers — or an incognito window in the same browser — get different cookies, different groups, and isolated state. For a public docs site this is the right default: every visitor gets a clean slate, and the broadcast demo still proves the feature within their own browser. See [Recipes/Counter, deeper](/recipes/counter) for the full session-group + scaling story.
+> **Why does this stay scoped to your browser?** LiveTemplate's default authenticator (`AnonymousAuthenticator`) uses a cookie to assign each browser a stable session group. Tabs from the same browser share that group — that's why the two embeds above sync. Different browsers — or an incognito window in the same browser — get different cookies, different groups, and isolated state. For a public docs site this is the right default: every visitor gets a clean slate, and the peer-fan-out demo still proves the feature within their own browser. See [Recipes/Counter, deeper](/recipes/counter) for the full session-group + scaling story.
 
 ## What you just built
 
@@ -137,7 +137,7 @@ You wrote a counter that:
 - patches the DOM in place when the JS client is loaded
 - syncs across browser tabs and embedded widgets in real time
 
-…in about 50 lines of Go and HTML, with no build step, no client-side framework, no custom template language. The two embeds above? They're the same code rendered live. Every click you've done has gone through your handler, broadcast across, and patched the DOM.
+…in about 50 lines of Go and HTML, with no build step, no client-side framework, no custom template language. The two embeds above? They're the same code rendered live. Every click you've done has gone through your handler, published to peer tabs via `ctx.Publish`, and patched the DOM.
 
 ## What next?
 
