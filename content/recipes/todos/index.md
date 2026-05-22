@@ -97,4 +97,4 @@ None of those changes the recipe's *shape* — the same controller methods, the 
 - [Counter, deeper](/recipes/counter) — the same `Subscribe(SelfTopic())` + `Publish` peer-fan-out pattern this app uses for multi-tab refresh, in isolation.
 - [Reference — Authentication](/reference/authentication) — the full `Authenticator` interface and the contracts `BasicAuthenticator` implements.
 - [Reference — Components](/reference/components) — the modal + toast APIs, plus the rest of `lvt/components`.
-- [Broadcast & Server Push](/recipes/sync-and-broadcast) — when to use explicit broadcast and server push.
+- [Sync & Server Push](/recipes/sync-and-broadcast) — when to use explicit `Publish` peer fan-out and `TriggerAction` server push.

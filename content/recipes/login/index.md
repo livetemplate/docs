@@ -60,7 +60,7 @@ After the redirect, the dashboard page loads, the JS client connects the WebSock
 ```go include="./_app/controller.go" region="onconnect"
 ```
 
-Two things to notice. First, `ctx.Session()` returns the live session handle — the same one that broadcasts and triggers actions run through. Storing it in the controller's sessions map is a stand-in for what a real app would do via `SessionStore` and a background pub/sub channel.
+Two things to notice. First, `ctx.Session()` returns the live session handle — the same one that `ctx.Publish` peer fan-outs and `session.TriggerAction` server-pushes flow through. Storing it in the controller's sessions map is a stand-in for what a real app would do via `SessionStore` and a background pub/sub channel.
 
 Second, the actual welcome push happens in a goroutine. `OnConnect` returns immediately so the framework can finish the WebSocket handshake; the goroutine sleeps long enough for the dashboard to paint, then fires:
 
@@ -69,7 +69,7 @@ Second, the actual welcome push happens in a goroutine. `OnConnect` returns imme
 
 `session.TriggerAction("serverWelcome", data)` enqueues an action on the session as if the client had dispatched it. The framework routes it to the controller's `ServerWelcome` method, runs the standard state-mutation-and-diff pipeline, and patches the dashboard — specifically the `<ins id="server-welcome-message">` block — with the new message. The client never asked for it; the server decided to update.
 
-The same pattern is how you push subscription updates, completed background-job results, or any "the server learned something new" event. For the deeper model of when to broadcast (peer connections in the same session group) versus trigger (server-owned work on one session), see [Broadcast & Server Push](/recipes/sync-and-broadcast).
+The same pattern is how you push subscription updates, completed background-job results, or any "the server learned something new" event. For the deeper model of when to use `Publish` (peer connections in the same session group that opted in via `Subscribe`) versus `TriggerAction` (server-owned work on one session), see [Sync & Server Push](/recipes/sync-and-broadcast).
 
 ## Logout: symmetric to login
 
@@ -97,4 +97,4 @@ For a header-driven alternative that does have an `Authenticator`, see the [Shar
 - [Reference — Authentication](/reference/authentication) — the full `Authenticator` interface contract.
 - [Reference — Session](/reference/session) — `session.TriggerAction`, `SessionStore`, and the session group model.
 - [Shared notepad](../shared-notepad/) — BasicAuth + per-user state + explicit peer refresh.
-- [Broadcast & Server Push](/recipes/sync-and-broadcast) — when to broadcast vs. trigger.
+- [Sync & Server Push](/recipes/sync-and-broadcast) — when to use `Publish` peer fan-out vs. `TriggerAction` server-push.

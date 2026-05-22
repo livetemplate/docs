@@ -34,7 +34,7 @@ The template — `counter.tmpl`:
 
 A button's `name` attribute IS the routing key — `<button name="increment">` posts `increment` and LiveTemplate dispatches to the `Increment` method on the controller. The protocol between HTML and Go is just the form data the browser already sends.
 
-[Read the full walkthrough →](/getting-started/your-first-app) — or jump to [Counter, deeper](/recipes/counter) for the production-shaped story (broadcast routing, session models, scaling).
+[Read the full walkthrough →](/getting-started/your-first-app) — or jump to [Counter, deeper](/recipes/counter) for the production-shaped story (peer fan-out routing, session models, scaling).
 
 ## What happens between a click and a DOM update
 

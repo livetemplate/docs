@@ -17,7 +17,7 @@
         {{range .Messages}}
         <p data-key="{{.ID}}"><strong>{{.User}}:</strong> {{.Text}}</p>
         {{else}}
-        <p><small><em>No messages yet — send one to broadcast it to all connected peers.</em></small></p>
+        <p><small><em>No messages yet — send one to publish it to all subscribed peers.</em></small></p>
         {{end}}
     </div>
 
@@ -29,7 +29,7 @@
     </form>
     {{end}}
 
-    <p><small><strong>Try:</strong> Open this page in a second tab and Join with a different name. Sending in either tab broadcasts to both. The shared log lives on the controller; each tab's <code>Username</code> is per-connection (not persisted) so two tabs in the same browser stay independent — see <a href="{{basePath}}/realtime/reconnection">Reconnection Recovery</a> for the persist case.</small></p>
-    <p><small><strong>Limitation:</strong> The shared message log is in-memory and uncapped — production apps would ring-buffer, paginate, or persist to a TTL store. Kept simple here to focus on the broadcast mechanism itself.</small></p>
+    <p><small><strong>Try:</strong> Open this page in a second tab and Join with a different name. Sending in either tab publishes to both subscribed peers. The shared log lives on the controller; each tab's <code>Username</code> is per-connection (not persisted) so two tabs in the same browser stay independent — see <a href="{{basePath}}/realtime/reconnection">Reconnection Recovery</a> for the persist case.</small></p>
+    <p><small><strong>Limitation:</strong> The shared message log is in-memory and uncapped — production apps would ring-buffer, paginate, or persist to a TTL store. Kept simple here to focus on the Subscribe/Publish mechanism itself.</small></p>
 </article>
 {{end}}

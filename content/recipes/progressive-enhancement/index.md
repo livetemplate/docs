@@ -117,7 +117,7 @@ These are the cliffs. For the 80% of CRUD forms that don't need any of them, the
 
 ## What next?
 
-- [Counter, deeper](/recipes/counter) — the broadcast story Tier B doesn't get for free.
+- [Counter, deeper](/recipes/counter) — the peer-fan-out story Tier B doesn't get for free.
 - [Todos: a real LiveTemplate app](/recipes/todos) — the same form-action shape with auth, persistence, and components on top.
 - [Reference — Server Actions](/reference/server-actions) — the action resolution rules in detail (form name, button name, action priority).
 - [Reference — POST-Redirect-GET](/reference/prg) — the framework's PRG implementation, including flash cookies and redirect target rules.
