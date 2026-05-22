@@ -17,6 +17,15 @@ type AuthController struct {
 	// For server-initiated updates (per-session)
 	sessions map[string]livetemplate.Session
 	mu       sync.Mutex
+
+	// mountPath is the absolute URL prefix where this recipe is mounted
+	// (e.g. "/apps/login/" in prod, "/" in the e2e suite). It is the
+	// redirect target after Login/Logout: livetemplate.Context.Redirect
+	// requires an absolute path, and http.StripPrefix strips the prefix
+	// from r.URL.Path before the recipe sees it — so the recipe can't
+	// reconstruct its own mount from the request alone. The caller (the
+	// mount site in cmd/site or the e2e test-server) supplies it.
+	mountPath string
 }
 
 // AuthState is pure data, cloned per session.
@@ -68,8 +77,10 @@ func (c *AuthController) Login(state AuthState, ctx *livetemplate.Context) (Auth
 		return state, fmt.Errorf("failed to set cookie: %w", err)
 	}
 
-	// Redirect to dashboard (page will load, then WebSocket connects)
-	return state, ctx.Redirect("/", http.StatusSeeOther)
+	// Redirect to the recipe's mount path (POST-Redirect-GET). The new
+	// GET re-renders the template; IsLoggedIn=true is now persisted, so
+	// the dashboard branch renders and the WebSocket then connects.
+	return state, ctx.Redirect(c.mountPath, http.StatusSeeOther)
 }
 
 // <<< region:login
@@ -87,8 +98,8 @@ func (c *AuthController) Logout(state AuthState, ctx *livetemplate.Context) (Aut
 		return state, fmt.Errorf("failed to delete cookie: %w", err)
 	}
 
-	// Redirect to login page
-	return state, ctx.Redirect("/", http.StatusSeeOther)
+	// Redirect back to the login form at the recipe's mount path.
+	return state, ctx.Redirect(c.mountPath, http.StatusSeeOther)
 }
 
 // <<< region:logout

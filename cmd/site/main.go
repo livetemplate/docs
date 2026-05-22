@@ -92,12 +92,15 @@ func main() {
 	)))
 
 	// login — form-based session auth (lvt-form:no-intercept POST + 303
-	// + Set-Cookie + OnConnect server-push). Embedded inline on the
-	// recipe page via embed-lvt; the full round-trip (form, cookie,
-	// redirect, WebSocket reconnect, welcome message) plays out inside
-	// the iframe. Auth is intrinsic (password "secret"); cmd/site only
-	// supplies the origin allowlist.
-	mux.Handle("/apps/login/", http.StripPrefix("/apps/login", loginrecipe.Handler(
+	// + Set-Cookie + OnConnect server-push). The recipe page links to
+	// this URL ("Launch demo →") rather than embedding it inline,
+	// because lvt-form:no-intercept posts to the current URL — which on
+	// the docs page is the markdown route, not the recipe handler. Auth
+	// is intrinsic (password "secret"). The first argument is the mount
+	// path the recipe redirects to after Login/Logout — http.StripPrefix
+	// strips it before the handler sees the request URL, so the handler
+	// can't reconstruct it.
+	mux.Handle("/apps/login/", http.StripPrefix("/apps/login", loginrecipe.Handler("/apps/login/",
 		livetemplate.WithAllowedOrigins(allowedOrigins),
 	)))
 
