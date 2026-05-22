@@ -2,8 +2,8 @@
 title: "Contributing to LiveTemplate Core Library"
 source_repo: "https://github.com/livetemplate/livetemplate"
 source_path: "CONTRIBUTING.md"
-source_ref: "v0.10.1"
-source_commit: "bb97bdc17f4c0795b31efff0d6c97ea9de85ce10"
+source_ref: "v0.11.0"
+source_commit: "e40e30223a9bd19d1675dfd2fb99ed885820c65c"
 ---
 
 # Contributing to LiveTemplate Core Library
@@ -220,7 +220,7 @@ livetemplate/
 │   ├── keys/            # Range item key generation
 │   ├── upload/          # Upload infrastructure
 │   └── fuzz/            # Fuzz testing framework
-├── pubsub/              # Redis pub/sub for distributed broadcasting
+├── pubsub/              # Redis pub/sub for distributed peer fan-out
 ├── testdata/            # Test fixtures, golden files, fuzz corpus
 ├── docs/                # Documentation
 └── scripts/             # Development scripts

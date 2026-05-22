@@ -2,8 +2,8 @@
 title: "PubSub Reference"
 source_repo: "https://github.com/livetemplate/livetemplate"
 source_path: "docs/references/pubsub.md"
-source_ref: "v0.10.1"
-source_commit: "bb97bdc17f4c0795b31efff0d6c97ea9de85ce10"
+source_ref: "v0.11.0"
+source_commit: "e40e30223a9bd19d1675dfd2fb99ed885820c65c"
 ---
 
 # PubSub Reference
@@ -14,9 +14,9 @@ For server-initiated actions, see [Server Actions](server-actions.md). For scali
 
 ## Overview
 
-In a single-instance deployment, all WebSocket connections live in the same process. State changes and broadcasts are delivered directly via the in-memory connection registry.
+In a single-instance deployment, all WebSocket connections live in the same process. State changes and `ctx.Publish` peer fan-out are delivered directly via the in-memory connection registry.
 
-In multi-instance deployments, a user's connections may be spread across different servers. The `pubsub` package provides cross-instance messaging via Redis Pub/Sub so that broadcasts, group updates, and server actions reach all relevant connections regardless of which instance they're on.
+In multi-instance deployments, a user's connections may be spread across different servers. The `pubsub` package provides cross-instance messaging via Redis Pub/Sub so that `ctx.Publish` calls, group updates, and server actions reach all relevant connections regardless of which instance they're on.
 
 **When you need it:** Any deployment with 2+ application instances behind a load balancer.
 
