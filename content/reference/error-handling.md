@@ -2,8 +2,8 @@
 title: "Error Handling Reference"
 source_repo: "https://github.com/livetemplate/livetemplate"
 source_path: "docs/references/error-handling.md"
-source_ref: "v0.10.1"
-source_commit: "bb97bdc17f4c0795b31efff0d6c97ea9de85ce10"
+source_ref: "v0.11.0"
+source_commit: "e40e30223a9bd19d1675dfd2fb99ed885820c65c"
 ---
 
 # Error Handling Reference
@@ -482,7 +482,7 @@ Pass `livetemplate.FlashExpiry(d)` for transient feedback that should disappear 
 ctx.SetFlash("success", "Saved!", livetemplate.FlashExpiry(5*time.Second))
 ```
 
-The message is pruned on the next render that walks flash state after the duration elapses — there is no background timer, so the user must trigger a render (action, broadcast, or scan-loop refresh) to see it disappear. A duration of `0` or less disables auto-expiry, behaving as if `FlashExpiry` were not provided.
+The message is pruned on the next render that walks flash state after the duration elapses — there is no background timer, so the user must trigger a render (action, peer-fan-out publish, or scan-loop refresh) to see it disappear. A duration of `0` or less disables auto-expiry, behaving as if `FlashExpiry` were not provided.
 
 `FlashExpiry` has no observable effect on HTTP connections — HTTP flash is already one-shot per request.
 
@@ -624,7 +624,7 @@ Flash follows a **persist-until-cleared** lifecycle. On a WebSocket connection, 
 If a user has multiple tabs open (same session group):
 - Tab 1 triggers action → sets flash → Tab 1 sees flash
 - Tab 2 does NOT see Tab 1's flash (flash is per-connection)
-- State changes ARE broadcast to Tab 2 (state is shared)
+- State changes ARE published to Tab 2 when the connection has subscribed via `ctx.Subscribe(ctx.SelfTopic())` (state is shared)
 
 #### Migration: v0.8 → v0.9 (PR #344)
 

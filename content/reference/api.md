@@ -2,8 +2,8 @@
 title: "Go Library API Reference"
 source_repo: "https://github.com/livetemplate/livetemplate"
 source_path: "docs/references/api-reference.md"
-source_ref: "v0.10.1"
-source_commit: "bb97bdc17f4c0795b31efff0d6c97ea9de85ce10"
+source_ref: "v0.11.0"
+source_commit: "e40e30223a9bd19d1675dfd2fb99ed885820c65c"
 ---
 
 # Go Library API Reference
@@ -440,7 +440,7 @@ Options passed to `New()`:
 | `WithTemplateBaseDir` | `(dir string)` | Template discovery base dir |
 | `WithIgnoreTemplateDirs` | `(dirs ...string)` | Skip directories during discovery |
 | `WithUpload` | `(name string, config UploadConfig)` | Configure upload field |
-| `WithPubSubBroadcaster` | `(broadcaster pubsub.Broadcaster)` | Enable distributed broadcasting |
+| `WithPubSubBroadcaster` | `(broadcaster pubsub.Broadcaster)` | Enable cross-instance peer fan-out via Redis Pub/Sub |
 | `WithComponentTemplates` | `(sets ...*TemplateSet)` | Register component templates |
 | `WithProgressiveEnhancement` | `(enabled bool)` | Non-JS form submission support |
 
@@ -518,9 +518,9 @@ Built-in: `NewSessionStoreHealthChecker(store)`, `NewRedisHealthChecker(store)`.
 
 ---
 
-## PubSub (Distributed Broadcasting)
+## PubSub (Cross-Instance Peer Fan-Out)
 
-Package `pubsub` provides cross-instance messaging for horizontally scaled deployments. See the [PubSub Reference](pubsub.md) for the complete API including `Broadcaster`, `DynamicSubscriber`, broadcast scopes, channel schema, and subscription lifecycle.
+Package `pubsub` provides cross-instance messaging for horizontally scaled deployments. See the [PubSub Reference](pubsub.md) for the complete API including `Broadcaster`, `DynamicSubscriber`, the `livetemplate:broadcast:*` channel namespace, channel schema, and subscription lifecycle.
 
 ---
 
@@ -571,6 +571,6 @@ Converts `go-playground/validator` errors to `MultiError`.
 - [Configuration](CONFIGURATION.md) - Environment and option configuration
 - [Authentication](authentication.md) - Auth setup
 - [Session Management](session.md) - Session stores and persistence
-- [Server Actions](server-actions.md) - Broadcasting and server-initiated updates
+- [Server Actions](server-actions.md) - Peer fan-out and server-initiated updates
 - [Error Handling](error-handling.md) - Validation and error display
 - [Client Attributes](client-attributes.md) - Template attribute reference
