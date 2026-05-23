@@ -6,7 +6,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/livetemplate/docs/content/recipes/todos/_app/db"
+	"github.com/livetemplate/docs/examples/todos/db"
 	"github.com/livetemplate/livetemplate"
 	"github.com/livetemplate/lvt/components/modal"
 	"github.com/livetemplate/lvt/components/toast"

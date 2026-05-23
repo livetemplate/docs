@@ -1,4 +1,8 @@
-package main
+// External (blackbox) e2e test for the todos recipe. The test spawns
+// the recipe as a subprocess via `go run ./cmd` so chromedp drives a
+// real process, captures real stdio, and validates the same code path
+// that production runs.
+package todos_test
 
 import (
 	"bytes"
@@ -53,7 +57,7 @@ func TestTodosE2E(t *testing.T) {
 	serverURL := fmt.Sprintf("http://localhost:%d", serverPort)
 
 	t.Logf("Starting test server on port %s", portStr)
-	serverCmd := exec.Command("go", "run", ".")
+	serverCmd := exec.Command("go", "run", "./cmd")
 	// LVT_DEV_MODE=true so the spawned process uses the local client library
 	serverCmd.Env = append(os.Environ(), "PORT="+portStr, "TEST_MODE=1", "LVT_DEV_MODE=true")
 
@@ -1204,7 +1208,7 @@ func TestWebSocketBasic(t *testing.T) {
 	wsURL := fmt.Sprintf("ws://localhost:%s/", portStr)
 
 	// Start server on dynamic port
-	cmd := exec.Command("go", "run", ".")
+	cmd := exec.Command("go", "run", "./cmd")
 	cmd.Env = append(os.Environ(), "PORT="+portStr, "TEST_MODE=1")
 
 	serverLogs := e2etest.NewSafeBuffer()

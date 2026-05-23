@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/livetemplate/docs/content/recipes/todos/_app/db"
+	"github.com/livetemplate/docs/examples/todos/db"
 	_ "modernc.org/sqlite"
 )
 
