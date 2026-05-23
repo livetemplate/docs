@@ -1,4 +1,4 @@
-// Package main_test exercises the shared-notepad recipe end-to-end.
+// Package notepad_test exercises the shared-notepad recipe end-to-end.
 //
 // Three test functions:
 //
@@ -13,7 +13,7 @@
 //	TestSharedNotepad_PublishRefreshAction — verifies the Publish-to-SelfTopic
 //	                                          queue dispatches the
 //	                                          "Refresh" action.
-package main
+package notepad_test
 
 import (
 	"bytes"
@@ -54,7 +54,7 @@ func startServer(t *testing.T) (int, func()) {
 	serverURL := fmt.Sprintf("http://localhost:%d/", port)
 
 	t.Logf("Starting test server on port %s", portStr)
-	cmd := exec.Command("go", "run", ".")
+	cmd := exec.Command("go", "run", "./cmd")
 	cmd.Env = append(os.Environ(), "PORT="+portStr, "LVT_DEV_MODE=true")
 
 	var serverLog bytes.Buffer

@@ -24,8 +24,8 @@ import (
 	loginrecipe "github.com/livetemplate/docs/examples/login"
 	"github.com/livetemplate/docs/examples/patterns"
 	pe "github.com/livetemplate/docs/examples/progressive-enhancement"
+	notepad "github.com/livetemplate/docs/examples/shared-notepad"
 	"github.com/livetemplate/docs/examples/todos"
-	notepad "github.com/livetemplate/docs/content/recipes/shared-notepad/_app"
 )
 
 func main() {

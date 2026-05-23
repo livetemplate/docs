@@ -30,7 +30,7 @@ To see the peer-refresh, open this page in a second browser tab — the embed th
 
 State is pure data, cloned per session. The three `lvt:"persist"` tags keep the textarea content and metadata alive across reconnects via the framework's client-side state checksum:
 
-```go include="./_app/controller.go" region="state"
+```go include="/examples/shared-notepad/controller.go" region="state"
 ```
 
 `Username` is intentionally **not** persisted — it's re-derived from `ctx.UserID()` on every `Mount`, and trusting a client-supplied username would be an authorization bug waiting to happen.
@@ -39,7 +39,7 @@ State is pure data, cloned per session. The three `lvt:"persist"` tags keep the 
 
 The handler exposes two authenticator flavours and lets the caller pick. Production-shaped is BasicAuth:
 
-```go include="./_app/handler.go" region="basicauth"
+```go include="/examples/shared-notepad/handler.go" region="basicauth"
 ```
 
 `BasicAuthenticator` answers two questions for every request:
@@ -53,7 +53,7 @@ The handler exposes two authenticator flavours and lets the caller pick. Product
 
 `Mount` runs on every fresh state — first page load, reconnect with stale state, or a state-restoring navigation. Three things happen: opt this connection into peer fan-out via `ctx.Subscribe(ctx.SelfTopic())`, bind `Username` to whoever just authenticated, and re-read the textarea content from the per-user map:
 
-```go include="./_app/controller.go" region="mount"
+```go include="/examples/shared-notepad/controller.go" region="mount"
 ```
 
 The `Subscribe` line is the receiver-side opt-in. Without it, the Publish in Save would have no subscribers in this session group and the peer tab wouldn't refresh. `SelfTopic()` is ACL-exempt — it always succeeds — and the explicit `_ =` documents that we've considered the return value (a denied developer topic would surface as a `*TopicForbiddenError`; the self-topic can't be denied).
@@ -64,7 +64,7 @@ The `c.mu.RLock` is the only concurrency primitive in the recipe. Save takes the
 
 The interesting line is the last one before the return:
 
-```go include="./_app/controller.go" region="save"
+```go include="/examples/shared-notepad/controller.go" region="save"
 ```
 
 `ctx.Publish(ctx.SelfTopic(), "Refresh", nil)` doesn't run `Refresh` immediately on other connections — it *enqueues* the action for the framework's publish pipeline. After the current request's response is sent back to the originating tab, the framework drains the queue: for every peer connection that subscribed to `SelfTopic()` (other tabs of the same authenticated user), it dispatches `Refresh` against that connection's local state.
@@ -81,7 +81,7 @@ For the deeper model — when to use Subscribe/Publish peer fan-out versus `sess
 
 `Refresh` is the action peer tabs run when Save publishes. It's just a regular controller method — not a framework-reserved name:
 
-```go include="./_app/controller.go" region="refresh"
+```go include="/examples/shared-notepad/controller.go" region="refresh"
 ```
 
 The `Refresh` *name* is convention; the framework doesn't care. What matters is the `Publish(SelfTopic(), "Refresh", nil)` call in Save naming this same string. Renaming the method also requires updating the publish call — and *every* peer connection that's running an older controller will see the published action and fail to route it.
@@ -90,7 +90,7 @@ The `Refresh` *name* is convention; the framework doesn't care. What matters is 
 
 The textarea form uses `lvt-form:preserve`, which tells the framework to retain the form's input values across a re-render:
 
-```html include="./_app/notepad.tmpl" region="textarea"
+```html include="/examples/shared-notepad/notepad.tmpl" region="textarea"
 ```
 
 Without `lvt-form:preserve`, a Save would re-render the article with the new `SavedAt` timestamp and the textarea would briefly flash empty before the framework re-binds `{{.Content}}`. Preserve keeps the user's typing intact during the round-trip.
