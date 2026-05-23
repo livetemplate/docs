@@ -104,31 +104,11 @@ pages:
     source_repo: https://github.com/livetemplate/client
     source_path: README.md
 
-  # ---- App Recipes (mirrored from examples) ----
-  - site_url: /recipes/apps/
-    source_repo: https://github.com/livetemplate/examples
-    source_path: README.md
-  - site_url: /recipes/apps/counter
-    source_repo: https://github.com/livetemplate/examples
-    source_path: counter/README.md
-  - site_url: /recipes/apps/todos
-    source_repo: https://github.com/livetemplate/examples
-    source_path: todos/README.md
-  - site_url: /recipes/apps/chat
-    source_repo: https://github.com/livetemplate/examples
-    source_path: chat/README.md
-  - site_url: /recipes/apps/avatar-upload
-    source_repo: https://github.com/livetemplate/examples
-    source_path: avatar-upload/README.md
-  - site_url: /recipes/apps/flash-messages
-    source_repo: https://github.com/livetemplate/examples
-    source_path: flash-messages/README.md
-  - site_url: /recipes/apps/progressive-enhancement
-    source_repo: https://github.com/livetemplate/examples
-    source_path: progressive-enhancement/README.md
-  - site_url: /recipes/apps/ws-disabled
-    source_repo: https://github.com/livetemplate/examples
-    source_path: ws-disabled/README.md
+  # App recipes used to be mirrored from livetemplate/examples here.
+  # After the consolidation (see examples/<slug>/), the short summary
+  # pages at content/recipes/apps/<slug>.md are docs-native; their
+  # source-of-truth is this repo. The runnable apps themselves live at
+  # docs/examples/<slug>/ and are mounted by cmd/site.
 
   # ---- Contributing ----
   - site_url: /contributing/livetemplate
@@ -139,7 +119,4 @@ pages:
     source_path: CONTRIBUTING.md
   - site_url: /contributing/cli
     source_repo: https://github.com/livetemplate/lvt
-    source_path: CONTRIBUTING.md
-  - site_url: /contributing/examples
-    source_repo: https://github.com/livetemplate/examples
     source_path: CONTRIBUTING.md

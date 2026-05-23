@@ -129,9 +129,6 @@ func Run(opts Options) (Result, error) {
 			if err := os.WriteFile(dest, []byte(out), 0o644); err != nil {
 				return res, codedErr{fmt.Errorf("write %s: %w", dest, err), 3}
 			}
-			if err := mirrorAdjacentApp(srcAbs, dest); err != nil {
-				return res, codedErr{fmt.Errorf("mirror _app/ for %s: %w", p.SiteURL, err), 3}
-			}
 		}
 		res.Updated++
 		res.UpdatedPaths = append(res.UpdatedPaths, p.SiteURL)
@@ -354,81 +351,6 @@ func writeFrontmatterValue(b *strings.Builder, key string, v any) {
 	default:
 		fmt.Fprintf(b, "%s: %v\n", key, t)
 	}
-}
-
-// mirrorAdjacentApp copies an `_app/` directory next to the upstream
-// markdown into the same relative position next to the destination
-// file. Used for literate authoring (`include="./_app/foo.go"`) where
-// the included files live alongside the README.
-//
-// The destination `_app/` is cleared before repopulation so the docs
-// site mirrors upstream state authoritatively (orphaned files removed).
-//
-// Symlinks inside the upstream `_app/` are rejected — they're a
-// path-confinement risk and tinkerdown's include resolver canonicalises
-// paths anyway.
-func mirrorAdjacentApp(srcReadmeAbs, destReadmeAbs string) error {
-	srcAppDir := filepath.Join(filepath.Dir(srcReadmeAbs), "_app")
-	st, err := os.Stat(srcAppDir)
-	if err != nil {
-		if os.IsNotExist(err) {
-			return nil
-		}
-		return fmt.Errorf("stat %s: %w", srcAppDir, err)
-	}
-	if !st.IsDir() {
-		return nil
-	}
-	destAppDir := filepath.Join(filepath.Dir(destReadmeAbs), "_app")
-	if err := os.RemoveAll(destAppDir); err != nil {
-		return fmt.Errorf("clear %s: %w", destAppDir, err)
-	}
-	srcRoot, err := filepath.Abs(srcAppDir)
-	if err != nil {
-		return fmt.Errorf("resolve %s: %w", srcAppDir, err)
-	}
-	return filepath.WalkDir(srcAppDir, func(path string, d os.DirEntry, walkErr error) error {
-		if walkErr != nil {
-			return walkErr
-		}
-		// Reject symlinks anywhere in _app/ — they break path
-		// confinement and tinkerdown's include resolver canonicalises
-		// paths so symlinked content wouldn't survive the docs render anyway.
-		if d.Type()&os.ModeSymlink != 0 {
-			return fmt.Errorf("symlink not allowed in _app/: %s", path)
-		}
-		rel, err := filepath.Rel(srcRoot, path)
-		if err != nil {
-			return err
-		}
-		dest := filepath.Join(destAppDir, rel)
-		if d.IsDir() {
-			return os.MkdirAll(dest, 0o755)
-		}
-		if !d.Type().IsRegular() {
-			return fmt.Errorf("non-regular file in _app/: %s", path)
-		}
-		return copyFile(path, dest)
-	})
-}
-
-// copyFile copies a regular file's bytes from src to dst. The destination's
-// parent directory must exist (mirrorAdjacentApp creates it via WalkDir).
-func copyFile(src, dst string) error {
-	in, err := os.Open(src)
-	if err != nil {
-		return err
-	}
-	defer in.Close()
-	out, err := os.Create(dst)
-	if err != nil {
-		return err
-	}
-	defer out.Close()
-	if _, err := io.Copy(out, in); err != nil {
-		return err
-	}
-	return out.Close()
 }
 
 // linkRewriter rewrites cross-repo GitHub links to docs-site-relative

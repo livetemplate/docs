@@ -202,7 +202,7 @@ upstream content can use:
 
 | Primitive | Example |
 |---|---|
-| `include="..."` fence attribute | `` ```go include="./_app/counter.go" lines="5-15" highlight="7" `` |
+| `include="..."` fence attribute | `` ```go include="/examples/counter/counter.go" lines="5-15" highlight="7" `` |
 | `embed-lvt` block | `` ```embed-lvt path="/apps/counter/" upstream="https://lt-firstapp.fly.dev" `` |
 | `show-source` / `hide-source` flag | `` ```lvt show-source `` |
 
@@ -231,43 +231,27 @@ intentional — the docs site stays in control of its frontmatter
 contract; new keys are added to the allowlist deliberately, in
 `cmd/sync/sync.go`.
 
-### `_app/` adjacency rule
+### Site-rooted includes for cross-tree literate authoring
 
-When an upstream README uses `include="./_app/<file>"` (the canonical
-literate-counter shape from `tinkerdown/examples/literate-counter-include/`),
-the sync tool mirrors the entire `_app/` directory next to the README
-into the same relative position next to the destination markdown.
+Recipe pages cite code that lives outside the `content/` tree (under
+`docs/examples/<slug>/`). Tinkerdown's include resolver supports a
+site-rooted form for this:
 
-Sync semantics for `_app/`:
-
-- **Authoritative mirror** — the destination `_app/` is cleared and
-  repopulated on every sync. Orphaned files (removed upstream but still
-  present in the mirror) are pruned.
-- **Symlinks rejected** — any symlink found inside `_app/` aborts the
-  mirror with an error. (Tinkerdown's include resolver canonicalises
-  paths anyway, so symlinked content wouldn't render correctly.)
-- **No filtering** — the entire subtree is copied. Don't put secrets,
-  large binaries, or anything you wouldn't publish on the docs site
-  into `_app/`.
-
-### Trailing-slash convention for `_app/` pages
-
-A page that mirrors `_app/` adjacency MUST use the trailing-slash form
-for its `site_url` in `source-of-truth.yaml`:
-
-```yaml
-- site_url: /recipes/apps/counter/      # NOT /recipes/apps/counter
-  source_repo: https://github.com/livetemplate/examples
-  source_path: counter/README.md
+```markdown
+```go include="/examples/counter/counter.go" lines="9-33"
 ```
 
-This makes `destFor()` resolve to `content/recipes/apps/counter/index.md`
-instead of `content/recipes/apps/counter.md`, so the mirrored `_app/`
-lands at `content/recipes/apps/counter/_app/`. Without the trailing slash,
-all examples' `_app/` directories would collide on
-`content/recipes/apps/_app/`. This convention is enforced by sync's
-behavior, not by validation — set the trailing slash any time you add
-literate primitives to a mirrored page.
+A leading `/` in the include attribute is interpreted as
+project-root-relative — resolved against `filepath.Dir(siteRoot)`,
+confined to the project root (not the content root). This replaces
+the old `_app/` adjacency convention where the sync tool mirrored an
+`_app/` folder next to each synced README. Examples now live at a
+single canonical location (`docs/examples/<slug>/`); recipe markdown
+references them by site-rooted path.
+
+Page-relative includes (`./foo.go`, `../foo.go`, `foo.go`) keep their
+v1 behavior: resolved against the markdown file's directory, confined
+to the content root.
 
 ---
 
@@ -283,8 +267,6 @@ Any markdown content sourced from another repo must have these rewrites applied 
 | `https://github.com/livetemplate/client` | `/client` |
 | `https://github.com/livetemplate/lvt/blob/main/<path>.md` | `/cli/<computed>` |
 | `https://github.com/livetemplate/lvt` | `/cli` |
-| `https://github.com/livetemplate/examples/blob/main/<path>.md` | `/recipes/apps/<computed>` |
-| `https://github.com/livetemplate/examples` | `/recipes/apps` |
 | `https://github.com/livetemplate/<repo>/(issues|pull|commit|releases)/<n>` | KEEP AS-IS — external GitHub references |
 | `https://pkg.go.dev/...` | KEEP AS-IS — external API docs |
 
