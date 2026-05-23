@@ -8,6 +8,9 @@
 // Flags / environment:
 //
 //	PORT    listen port (default 8080)
+//	LVT_DEV_MODE=true   alias for --dev (set by e2etest.StartTestServer so the
+//	                    subprocess inherits dev-mode without needing to pass
+//	                    flags through the test harness)
 //	--dev   relax origin checks for localhost development (so the
 //	        WebSocket upgrader accepts requests from arbitrary
 //	        localhost ports); the production allowlist applies when
@@ -35,7 +38,7 @@ func main() {
 	}
 
 	var opts []livetemplate.Option
-	if *dev {
+	if *dev || os.Getenv("LVT_DEV_MODE") == "true" {
 		opts = append(opts,
 			livetemplate.WithDevMode(true),
 			livetemplate.WithPermissiveOriginCheck(),
