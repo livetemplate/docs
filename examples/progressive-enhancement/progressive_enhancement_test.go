@@ -1,4 +1,8 @@
-package main
+// External (blackbox) e2e test for the progressive-enhancement
+// recipe. The test spawns the recipe via `go run ./cmd` and drives
+// a real browser against the dual-mount layout (Tier A at /, Tier B
+// at /no-ws/, Tier C via JS-disabled fetch against /).
+package progressiveenhancement_test
 
 import (
 	"bytes"
@@ -39,7 +43,7 @@ func startServer(t *testing.T) (int, func()) {
 	serverURL := fmt.Sprintf("http://localhost:%d/", port)
 
 	t.Logf("Starting test server on port %s", portStr)
-	cmd := exec.Command("go", "run", ".")
+	cmd := exec.Command("go", "run", "./cmd")
 	cmd.Env = append(os.Environ(), "PORT="+portStr, "LVT_DEV_MODE=true")
 
 	// Capture stdout/stderr — exec.Cmd defaults stdio to /dev/null

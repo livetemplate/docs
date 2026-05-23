@@ -22,9 +22,9 @@ import (
 
 	"github.com/livetemplate/docs/examples/counter"
 	"github.com/livetemplate/docs/examples/patterns"
+	pe "github.com/livetemplate/docs/examples/progressive-enhancement"
 	"github.com/livetemplate/docs/examples/todos"
 	loginrecipe "github.com/livetemplate/docs/content/recipes/login/_app"
-	pe "github.com/livetemplate/docs/content/recipes/progressive-enhancement/_app"
 	notepad "github.com/livetemplate/docs/content/recipes/shared-notepad/_app"
 )
 
