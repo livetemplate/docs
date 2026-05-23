@@ -21,10 +21,10 @@ import (
 	"github.com/livetemplate/livetemplate"
 
 	"github.com/livetemplate/docs/examples/counter"
+	loginrecipe "github.com/livetemplate/docs/examples/login"
 	"github.com/livetemplate/docs/examples/patterns"
 	pe "github.com/livetemplate/docs/examples/progressive-enhancement"
 	"github.com/livetemplate/docs/examples/todos"
-	loginrecipe "github.com/livetemplate/docs/content/recipes/login/_app"
 	notepad "github.com/livetemplate/docs/content/recipes/shared-notepad/_app"
 )
 

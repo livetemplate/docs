@@ -1,7 +1,8 @@
-// Package main_test exercises the login recipe end-to-end. Test shape
-// matches the progressive-enhancement suite: a hand-rolled startServer
-// helper with bytes.Buffer log capture, cmd.WaitDelay-bounded reap, and
-// a 1s-timeout readiness probe with two-consecutive-success debouncing.
+// Package loginrecipe_test exercises the login recipe end-to-end.
+// Test shape matches the progressive-enhancement suite: a hand-rolled
+// startServer helper with bytes.Buffer log capture, cmd.WaitDelay-
+// bounded reap, and a 1s-timeout readiness probe with two-
+// consecutive-success debouncing.
 //
 // Two test functions:
 //
@@ -10,7 +11,7 @@
 //	TestLogin_HTTPCookie — raw HTTP exercising the 303 + Set-Cookie path
 //	                       without a browser (verifies the cookie shape
 //	                       and the logout-deletes-cookie shape).
-package main
+package loginrecipe_test
 
 import (
 	"bytes"
@@ -58,7 +59,7 @@ func startServerAt(t *testing.T, mountPath string) (int, func()) {
 	serverURL := fmt.Sprintf("http://localhost:%d%s", port, mountPath)
 
 	t.Logf("Starting test server on port %s (mount: %s)", portStr, mountPath)
-	cmd := exec.Command("go", "run", ".")
+	cmd := exec.Command("go", "run", "./cmd")
 	cmd.Env = append(os.Environ(), "PORT="+portStr, "LVT_DEV_MODE=true", "MOUNT_PATH="+mountPath)
 
 	var serverLog bytes.Buffer
