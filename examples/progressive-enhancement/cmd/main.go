@@ -21,6 +21,9 @@
 // Flags / environment:
 //
 //	PORT    listen port (default 8080)
+//	LVT_DEV_MODE=true   alias for --dev (set by e2etest.StartTestServer so the
+//	                    subprocess inherits dev-mode without needing to pass
+//	                    flags through the test harness)
 //	--dev   relax origin checks for localhost development and enable
 //	        livetemplate's DevMode (verbose logging tests capture).
 //	        The production allowlist applies when absent.
@@ -47,7 +50,7 @@ func main() {
 	}
 
 	var baseOpts []livetemplate.Option
-	if *dev {
+	if *dev || os.Getenv("LVT_DEV_MODE") == "true" {
 		baseOpts = append(baseOpts,
 			livetemplate.WithDevMode(true),
 			livetemplate.WithPermissiveOriginCheck(),
