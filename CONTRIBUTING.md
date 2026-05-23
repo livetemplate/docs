@@ -4,32 +4,57 @@ This repo is the source for the LiveTemplate documentation website. Most content
 
 ## Where content lives
 
-- **`content/_meta/source-of-truth.md`** (created in Phase 2) — for every page, names the canonical source file and repo. **Edit content in the canonical source repo, not here**, unless this repo is the canonical source.
-- **`content/recipes/`** — recipes are authored directly in this repo; this is the canonical home for them.
-- **`content/recipes/ui-patterns/index.md`** — UI pattern recipe catalog; detail pages are proxied to the docs-site recipes binary via tinkerdown's external-app router.
-- **Everything else under `content/`** — mirrored from a source repo. Don't edit here; edit the source. The Phase 3 sync action will overwrite local edits.
+- **`content/_meta/source-of-truth.md`** — for every page, names the canonical source file and repo. **Edit content in the canonical source repo, not here**, unless this repo is the canonical source.
+- **`content/recipes/`** — recipes (the docs *about* runnable apps) are authored directly in this repo. Markdown only — no Go code lives under `content/`.
+- **`examples/<slug>/`** — runnable apps. The single canonical home for every recipe's code, template, e2e test, and standalone runner. `cmd/site` imports these packages and mounts them at `/apps/<slug>/`; tinkerdown proxies inline `embed-lvt` blocks here.
+- **Everything else under `content/`** — mirrored from a source repo. Don't edit here; edit the source. The sync action will overwrite local edits.
 
 ## Workflow
 
 1. Determine where the content is canonical (check `content/_meta/source-of-truth.md`).
 2. If canonical here → edit, open PR.
-3. If canonical elsewhere → open a PR in the source repo. The next release will sync the change here automatically (Phase 3 onwards).
+3. If canonical elsewhere → open a PR in the source repo. The next release will sync the change here automatically.
+
+## Adding an example
+
+Every runnable app — whether it has a recipe write-up or not — lives at `examples/<slug>/`. Pattern:
+
+```
+examples/foo/
+├── handler.go              # exports Handler(opts ...livetemplate.Option) http.Handler
+├── foo.tmpl                # //go:embed-ed by handler.go
+├── foo_test.go             # chromedp e2e (package foo_test); spawns `go run ./cmd`
+└── cmd/
+    └── main.go             # standalone runner — supports PORT env + --dev flag
+```
+
+Steps:
+
+1. Create the folder + four files (use `examples/counter/` as the template — it's the smallest runnable shape).
+2. Optional: add `content/recipes/foo/index.md` if you want a recipe write-up. Cite source via site-rooted includes: `` ```go include="/examples/foo/foo.go" lines="5-15" `` ``.
+3. Wire `cmd/site/main.go`: import `"github.com/livetemplate/docs/examples/foo"` and add a `mux.Handle("/apps/foo/", ...)` line.
+4. `go build ./...` + `go test ./examples/foo` to confirm.
+
+No `livetemplate/livetemplate` CI changes required — the cross-repo workflow runs `go test ./examples/...` and picks up the new folder automatically.
 
 ## Local dev
 
 ```bash
-tinkerdown serve content/ --watch
+tinkerdown serve content/ --watch        # docs site
+go run ./examples/counter/cmd --dev      # any example, standalone
+make serve                               # both together (cmd/site + tinkerdown)
 ```
 
 ## Validation & tests
 
 ```bash
-tinkerdown validate content/         # parses every page
-cd cmd/sync && go test ./...         # sync tool unit tests
-cd e2e && go test ./...              # chromedp browser e2e against staging
+tinkerdown validate content/         # parses every page (includes resolve, etc.)
+go test ./cmd/sync/...               # sync tool unit tests
+go test ./examples/...               # all example e2e tests (chromedp)
+go test ./e2e/...                    # site-level browser tests
 ```
 
-Browser e2e tests live in `e2e/` (added in Phase 1) and run via chromedp against the live staging site at `https://livetemplate-docs-staging.fly.dev/`.
+The `examples/` tests need Docker Chrome (chromedp pulls it on first use); they pass under `-short` by compiling but skip the browser-driven parts.
 
 ## Sync workflow (Phase 3)
 

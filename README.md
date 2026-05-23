@@ -6,17 +6,24 @@ Production site: https://livetemplate.fly.dev (Phase 6 onwards)
 
 ## How content gets here
 
-Most pages are mirrored from canonical files in the source repos:
+Most reference content is mirrored from canonical files in the source repos:
 
 | Section | Source repo | Sync mechanism |
 |---|---|---|
-| Reference, Guides | [livetemplate/livetemplate](https://github.com/livetemplate/livetemplate) | GitHub Action on release tag (Phase 3) |
+| Reference, Guides | [livetemplate/livetemplate](https://github.com/livetemplate/livetemplate) | GitHub Action on release tag |
 | TypeScript client docs | [livetemplate/client](https://github.com/livetemplate/client) | GitHub Action on release tag |
 | CLI docs | [livetemplate/lvt](https://github.com/livetemplate/lvt) | GitHub Action on release tag |
-| App recipe source | [livetemplate/examples](https://github.com/livetemplate/examples) | GitHub Action on release tag |
-| Recipes (interactive) | this repo | Authored directly here |
+| Recipes (markdown) | this repo, under `content/recipes/` | Authored directly here |
+| Runnable apps + their tests | this repo, under `examples/<slug>/` | Authored directly here |
 
-The source-of-truth matrix (Phase 2 deliverable) lives at `content/_meta/source-of-truth.md`.
+The source-of-truth matrix lives at `content/_meta/source-of-truth.md`.
+
+Every runnable demo cited by a recipe lives at `examples/<slug>/` —
+one folder per app, containing the Go package, template, chromedp
+e2e test, and a `cmd/main.go` standalone runner. `cmd/site` imports
+these packages and mounts them at `/apps/<slug>/` so tinkerdown's
+inline `embed-lvt` blocks can render live widgets on docs pages. See
+`CONTRIBUTING.md` → "Adding an example" for the per-app shape.
 
 ## Local development
 

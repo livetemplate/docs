@@ -1,18 +1,30 @@
-.PHONY: help serve run-firstapp validate
+.PHONY: help serve site validate examples-test examples-list
 
 help:
 	@echo "LiveTemplate docs — local development targets:"
-	@echo "  serve         Run the docs site (tinkerdown serve content/)"
-	@echo "  run-firstapp  Run the tutorial counter locally on :9090 (use when"
-	@echo "                iterating on _app/counter/; the docs site's embeds"
-	@echo "                point at lt-firstapp.fly.dev by default)"
-	@echo "  validate      Validate every page (tinkerdown validate content/)"
+	@echo "  serve            Run the docs site (tinkerdown serve content/)"
+	@echo "  site             Run cmd/site (recipes binary on :9091, what tinkerdown proxies to)"
+	@echo "  validate         Validate every page (tinkerdown validate content/)"
+	@echo "  examples-test    Run all example tests (go test ./examples/...)"
+	@echo "  examples-list    Enumerate examples (one per line)"
+	@echo ""
+	@echo "  To run a single example standalone:"
+	@echo "      go run ./examples/<slug>/cmd --dev"
+	@echo ""
+	@echo "  To run a single example's tests:"
+	@echo "      go test ./examples/<slug>"
 
 serve:
 	tinkerdown serve content/
 
-run-firstapp:
-	cd content/getting-started/_app/counter && PORT=9090 go run .
+site:
+	go run ./cmd/site
 
 validate:
 	tinkerdown validate content/
+
+examples-test:
+	go test ./examples/...
+
+examples-list:
+	@ls -1 examples/ | grep -v '^cmd$$'
