@@ -20,7 +20,7 @@ Open the page in a second tab. Join with a different name. Send a message from e
 
 ## Anatomy of the state
 
-```go include="./patterns/_app/state_realtime.go" region="broadcasting-state"
+```go include="/examples/patterns/state_realtime.go" region="broadcasting-state"
 ```
 
 Note what's *not* persisted. `Username` looks like a candidate for `lvt:"persist"` — it's user identity, surely you want it to survive a reconnect? But persist storage is keyed by **session group**, so persisting `Username` would force every tab in the same browser to share one identity, defeating the demo where two tabs join as different users.
@@ -29,7 +29,7 @@ The pattern that *does* persist state across reconnects is `ReconnectionState` (
 
 ## Where the messages live
 
-```go include="./patterns/_app/handlers_realtime.go" region="broadcasting-controller"
+```go include="/examples/patterns/handlers_realtime.go" region="broadcasting-controller"
 ```
 
 The message log is on the **controller**, not in state. State is per-connection; the controller is the singleton dependency layer the [Controller+State pattern](/reference/controller-pattern) puts in front of every connection routed to this handler. `c.messages` is the source of truth — every tab reads from it under the same `RWMutex`.
@@ -38,7 +38,7 @@ The `Mount` method runs on every initial render — and in v0.10.0 it does **two
 
 ## Sending — Publish under the lock-release rule
 
-```go include="./patterns/_app/handlers_realtime.go" region="broadcasting-send"
+```go include="/examples/patterns/handlers_realtime.go" region="broadcasting-send"
 ```
 
 Two non-obvious mutex rules in this method:
@@ -51,7 +51,7 @@ The third rule is implicit — `c.messages` is uncapped here. Production apps wo
 
 ## What peers do
 
-```go include="./patterns/_app/handlers_realtime.go" region="broadcasting-newmessage"
+```go include="/examples/patterns/handlers_realtime.go" region="broadcasting-newmessage"
 ```
 
 `NewMessage` runs on every peer connection that subscribed to `SelfTopic()` when the Publish fires. It reads the shared log under `RLock` and copies into per-connection state. The template re-renders; the diff goes over the wire as patches, not full HTML.

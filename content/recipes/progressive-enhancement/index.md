@@ -24,7 +24,7 @@ The live demo below uses LiveTemplate's normal transport: a WebSocket per sessio
 
 The handler that produces this is the smallest possible recipe shape — no auth, no DB:
 
-```go include="./_app/handler.go" lines="77-92"
+```go include="/examples/progressive-enhancement/handler.go" lines="77-92"
 ```
 
 That's it. `WithParseFiles(extractTemplate())` ships the embedded `.tmpl` into the framework; everything else (`opts...`) is what the caller — `cmd/site` in production, the e2e harness in tests — supplies for origin policy and dev-mode static assets.
@@ -74,7 +74,7 @@ The browser follows the redirect, the next `GET` re-renders with the new state, 
 
 The template carries one piece of UX scaffolding for this mode — a `<noscript>` banner that's only visible when scripts are disabled:
 
-```html include="./_app/progressive-enhancement.tmpl" lines="27-33"
+```html include="/examples/progressive-enhancement/progressive-enhancement.tmpl" lines="27-33"
 ```
 
 To try Tier C live: open the [Tier A demo](/apps/progressive-enhancement/) in a new tab, then in DevTools (Cmd-Option-I / F12) → Settings → Debugger, check "Disable JavaScript" and refresh. The banner appears, every action causes a full page navigation, but the app remains fully functional.
@@ -85,7 +85,7 @@ Forms reset on submit. If the user types `ab` (too short), submits, and gets a v
 
 The fix is one persisted field on state and one template binding:
 
-```go include="./_app/controller.go" lines="69-89"
+```go include="/examples/progressive-enhancement/controller.go" lines="69-89"
 ```
 
 On validation failure, `state.InputTitle = ctx.GetString("title")` captures whatever the user typed; the template binds it back via `value="{{.InputTitle}}"`. After a successful submit, `state.InputTitle = ""` clears it. The same persistence works across all three tiers because state round-trips through the framework regardless of transport.
@@ -94,7 +94,7 @@ On validation failure, `state.InputTitle = ctx.GetString("title")` captures what
 
 All three forms in the template use the same shape:
 
-```html include="./_app/progressive-enhancement.tmpl" lines="41-54"
+```html include="/examples/progressive-enhancement/progressive-enhancement.tmpl" lines="41-54"
 ```
 
 The form has `name="add"` and a button with `name="add"`. Both naming the same action is intentional belt-and-suspenders:

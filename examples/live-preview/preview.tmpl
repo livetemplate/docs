@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="light dark">
+    <title>Live Preview — LiveTemplate</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
+    {{if .lvt.DevMode}}
+    <link rel="stylesheet" href="/livetemplate.css">
+    <script defer src="/livetemplate-client.js"></script>
+    {{else}}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@livetemplate/client@latest/livetemplate.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/@livetemplate/client@latest/dist/livetemplate-client.browser.js"></script>
+    {{end}}
+</head>
+<body>
+    <main class="container">
+        <article>
+            <header>
+                <hgroup>
+                    <h1>Live Preview</h1>
+                    <p>Type to see a live preview</p>
+                </hgroup>
+            </header>
+            <form method="POST">
+                <label for="name-input">Name</label>
+                <fieldset role="group">
+                    <input id="name-input" name="Name" value="{{.Name}}" placeholder="Type your name...">
+                    <button type="submit" name="submit">Save</button>
+                </fieldset>
+            </form>
+            <blockquote id="preview">{{.Preview}}</blockquote>
+        </article>
+    </main>
+
+</body>
+</html>

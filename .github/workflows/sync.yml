@@ -11,7 +11,6 @@ on:
           - https://github.com/livetemplate/livetemplate
           - https://github.com/livetemplate/client
           - https://github.com/livetemplate/lvt
-          - https://github.com/livetemplate/examples
       ref:
         description: "Git ref (tag or branch) to sync from"
         required: true

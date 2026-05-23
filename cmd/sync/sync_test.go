@@ -1,8 +1,6 @@
 package main
 
 import (
-	"os"
-	"path/filepath"
 	"strings"
 	"testing"
 )
@@ -295,130 +293,6 @@ func TestLinkRewriter_PreservesShowSourceFlag(t *testing.T) {
 	body := "```lvt show-source\n{{define \"main\"}}<p>{{.X}}</p>{{end}}\n```\n"
 	if got := r.Rewrite(body); got != body {
 		t.Errorf("show-source fence mutated:\nbefore: %q\nafter:  %q", body, got)
-	}
-}
-
-func TestMirrorAdjacentApp_NoOpWhenAbsent(t *testing.T) {
-	// If upstream has no _app/ next to the README, the mirror is a no-op
-	// (no error, no destination directory created).
-	src := t.TempDir()
-	dest := t.TempDir()
-	srcReadme := filepath.Join(src, "README.md")
-	if err := os.WriteFile(srcReadme, []byte("# x\n"), 0o644); err != nil {
-		t.Fatalf("write src readme: %v", err)
-	}
-	destReadme := filepath.Join(dest, "x.md")
-	if err := os.WriteFile(destReadme, []byte("# x\n"), 0o644); err != nil {
-		t.Fatalf("write dest readme: %v", err)
-	}
-	if err := mirrorAdjacentApp(srcReadme, destReadme); err != nil {
-		t.Fatalf("expected no error, got %v", err)
-	}
-	if _, err := os.Stat(filepath.Join(dest, "_app")); !os.IsNotExist(err) {
-		t.Errorf("dest _app should not exist when upstream has no _app/")
-	}
-}
-
-func TestMirrorAdjacentApp_CopiesTree(t *testing.T) {
-	src := t.TempDir()
-	dest := t.TempDir()
-	if err := os.MkdirAll(filepath.Join(src, "_app", "subdir"), 0o755); err != nil {
-		t.Fatal(err)
-	}
-	if err := os.WriteFile(filepath.Join(src, "README.md"), []byte("# x\n"), 0o644); err != nil {
-		t.Fatal(err)
-	}
-	if err := os.WriteFile(filepath.Join(src, "_app", "counter.go"), []byte("package main\n"), 0o644); err != nil {
-		t.Fatal(err)
-	}
-	if err := os.WriteFile(filepath.Join(src, "_app", "subdir", "x.tmpl"), []byte("{{.}}\n"), 0o644); err != nil {
-		t.Fatal(err)
-	}
-	if err := os.WriteFile(filepath.Join(dest, "x.md"), []byte("# x\n"), 0o644); err != nil {
-		t.Fatal(err)
-	}
-
-	if err := mirrorAdjacentApp(filepath.Join(src, "README.md"), filepath.Join(dest, "x.md")); err != nil {
-		t.Fatalf("mirror: %v", err)
-	}
-
-	got, err := os.ReadFile(filepath.Join(dest, "_app", "counter.go"))
-	if err != nil {
-		t.Fatalf("expected mirrored counter.go: %v", err)
-	}
-	if string(got) != "package main\n" {
-		t.Errorf("counter.go content drift: %q", got)
-	}
-	if _, err := os.Stat(filepath.Join(dest, "_app", "subdir", "x.tmpl")); err != nil {
-		t.Errorf("subdir file not mirrored: %v", err)
-	}
-}
-
-func TestMirrorAdjacentApp_PrunesRemovedFiles(t *testing.T) {
-	// Mirror is authoritative — if upstream removes a file from _app/,
-	// sync removes it from the mirror too. Stale files are a worse failure
-	// mode (silent inclusion of orphan code) than the cost of a clean rebuild.
-	src := t.TempDir()
-	dest := t.TempDir()
-	if err := os.MkdirAll(filepath.Join(src, "_app"), 0o755); err != nil {
-		t.Fatal(err)
-	}
-	if err := os.WriteFile(filepath.Join(src, "README.md"), []byte("# x\n"), 0o644); err != nil {
-		t.Fatal(err)
-	}
-	if err := os.WriteFile(filepath.Join(src, "_app", "kept.go"), []byte("kept\n"), 0o644); err != nil {
-		t.Fatal(err)
-	}
-	if err := os.WriteFile(filepath.Join(dest, "x.md"), []byte("# x\n"), 0o644); err != nil {
-		t.Fatal(err)
-	}
-	// Pre-existing orphan in the destination _app/.
-	if err := os.MkdirAll(filepath.Join(dest, "_app"), 0o755); err != nil {
-		t.Fatal(err)
-	}
-	if err := os.WriteFile(filepath.Join(dest, "_app", "orphan.go"), []byte("orphan\n"), 0o644); err != nil {
-		t.Fatal(err)
-	}
-
-	if err := mirrorAdjacentApp(filepath.Join(src, "README.md"), filepath.Join(dest, "x.md")); err != nil {
-		t.Fatalf("mirror: %v", err)
-	}
-
-	if _, err := os.Stat(filepath.Join(dest, "_app", "orphan.go")); !os.IsNotExist(err) {
-		t.Errorf("orphan should have been pruned: err=%v", err)
-	}
-	if _, err := os.Stat(filepath.Join(dest, "_app", "kept.go")); err != nil {
-		t.Errorf("kept file should remain: %v", err)
-	}
-}
-
-func TestMirrorAdjacentApp_RejectsSymlinks(t *testing.T) {
-	src := t.TempDir()
-	dest := t.TempDir()
-	if err := os.MkdirAll(filepath.Join(src, "_app"), 0o755); err != nil {
-		t.Fatal(err)
-	}
-	if err := os.WriteFile(filepath.Join(src, "README.md"), []byte("# x\n"), 0o644); err != nil {
-		t.Fatal(err)
-	}
-	// Create a target outside _app/ and a symlink pointing at it.
-	outsideTarget := filepath.Join(src, "secret.go")
-	if err := os.WriteFile(outsideTarget, []byte("secret\n"), 0o644); err != nil {
-		t.Fatal(err)
-	}
-	if err := os.Symlink(outsideTarget, filepath.Join(src, "_app", "linked.go")); err != nil {
-		t.Skipf("symlink unsupported in test env: %v", err)
-	}
-	if err := os.WriteFile(filepath.Join(dest, "x.md"), []byte("# x\n"), 0o644); err != nil {
-		t.Fatal(err)
-	}
-
-	err := mirrorAdjacentApp(filepath.Join(src, "README.md"), filepath.Join(dest, "x.md"))
-	if err == nil {
-		t.Fatalf("expected symlink rejection, got nil")
-	}
-	if !strings.Contains(err.Error(), "symlink not allowed") {
-		t.Errorf("expected symlink-rejection error, got: %v", err)
 	}
 }
 

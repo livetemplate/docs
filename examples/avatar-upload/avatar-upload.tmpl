@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="light dark">
+    <title>Avatar Upload — LiveTemplate</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
+    {{if .lvt.DevMode}}
+    <link rel="stylesheet" href="/livetemplate.css">
+    <script defer src="/livetemplate-client.js"></script>
+    {{else}}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@livetemplate/client@latest/livetemplate.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/@livetemplate/client@latest/dist/livetemplate-client.browser.js"></script>
+    {{end}}
+</head>
+<body>
+    <main class="container">
+        <article>
+            <header>
+                <hgroup>
+                    <h1>Profile Settings</h1>
+                    <p>Upload your avatar and update your profile</p>
+                </hgroup>
+            </header>
+
+            <blockquote>
+                Accepted: JPEG, PNG, GIF — Max size: 5MB — Click "Save Profile" to upload
+            </blockquote>
+
+            {{.lvt.FlashTag "success"}}
+
+            {{if .AvatarURL}}
+            <div>
+                <img src="{{.AvatarURL}}" alt="Avatar">
+            </div>
+            {{end}}
+
+            <form method="POST" name="updateProfile" enctype="multipart/form-data" lvt-form:preserve>
+                <label for="name">
+                    Name
+                    <input type="text" id="name" name="name" value="{{.Name}}" required>
+                </label>
+
+                <label for="email">
+                    Email
+                    <input type="email" id="email" name="email" value="{{.Email}}" required>
+                </label>
+
+                <label for="avatar">
+                    Avatar
+                    <input type="file"
+                           id="avatar"
+                           name="avatar"
+                           accept="image/jpeg,image/png,image/gif">
+                </label>
+
+                {{range .lvt.Uploads "avatar"}}
+                    <div>
+                        <small><strong>{{.ClientName}}</strong> — {{.Progress}}%</small>
+                        <progress value="{{.Progress}}" max="100"></progress>
+                        {{if .Error}}
+                            <del style="display:block;text-decoration:none">{{.Error}}</del>
+                        {{else if .Done}}
+                            <ins style="display:block;text-decoration:none">Upload complete!</ins>
+                        {{else}}
+                            <small>Uploading...</small>
+                        {{end}}
+                    </div>
+                {{end}}
+
+                {{if .lvt.HasUploadError "avatar"}}
+                    <del style="display:block;text-decoration:none">{{.lvt.UploadError "avatar"}}</del>
+                {{end}}
+
+                <button type="submit">Save Profile</button>
+            </form>
+
+            <footer>
+                <small>Powered by <a href="https://github.com/livetemplate/livetemplate" target="_blank">LiveTemplate</a></small>
+            </footer>
+        </article>
+    </main>
+
+</body>
+</html>

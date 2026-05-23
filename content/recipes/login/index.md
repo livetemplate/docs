@@ -23,7 +23,7 @@ The demo opens at its own URL rather than embedding inline because `lvt-form:no-
 
 The state holds only what the template needs to render either the login form or the dashboard. `lvt:"persist"` tags survive WebSocket reconnects via the framework's client-side state checksum:
 
-```go include="./_app/controller.go" region="state"
+```go include="/examples/login/controller.go" region="state"
 ```
 
 `ServerMessage` is intentionally **not** persisted — it's set every time the WebSocket connects and re-derived on reconnect, so persisting it would mean stale welcome text.
@@ -32,7 +32,7 @@ The state holds only what the template needs to render either the login form or 
 
 The login form in the template opts out of WebSocket interception with `lvt-form:no-intercept`. When the user clicks Login, the browser submits a standard HTTP POST to the page URL with `Accept: text/html`, and the framework routes the request to the controller's `Login` method:
 
-```go include="./_app/controller.go" region="login"
+```go include="/examples/login/controller.go" region="login"
 ```
 
 Three framework primitives carry the auth weight here:
@@ -49,7 +49,7 @@ The flash message API works the same way it does for non-auth flows — `ctx.Set
 
 The login form looks like a normal HTML form with one extra attribute:
 
-```html include="./_app/auth.html" region="loginform"
+```html include="/examples/login/auth.html" region="loginform"
 ```
 
 `lvt-form:no-intercept` tells the LiveTemplate JS client *not* to intercept the submit. The form posts the natural browser way — `application/x-www-form-urlencoded` body, button-name routing (`login`) — and the response is a 303 redirect. This is what makes the auth flow work identically with and without JavaScript, and what makes the `Set-Cookie` header land on a real navigation response rather than a WebSocket frame.
@@ -58,14 +58,14 @@ The login form looks like a normal HTML form with one extra attribute:
 
 After the redirect, the dashboard page loads, the JS client connects the WebSocket, and the framework calls the controller's `OnConnect` lifecycle method:
 
-```go include="./_app/controller.go" region="onconnect"
+```go include="/examples/login/controller.go" region="onconnect"
 ```
 
 Two things to notice. First, `ctx.Session()` returns the live session handle — the same one that `ctx.Publish` peer fan-outs and `session.TriggerAction` server-pushes flow through. Storing it in the controller's sessions map is a stand-in for what a real app would do via `SessionStore` and a background pub/sub channel.
 
 Second, the actual welcome push happens in a goroutine. `OnConnect` returns immediately so the framework can finish the WebSocket handshake; the goroutine sleeps long enough for the dashboard to paint, then fires:
 
-```go include="./_app/controller.go" region="serverpush"
+```go include="/examples/login/controller.go" region="serverpush"
 ```
 
 `session.TriggerAction("serverWelcome", data)` enqueues an action on the session as if the client had dispatched it. The framework routes it to the controller's `ServerWelcome` method, runs the standard state-mutation-and-diff pipeline, and patches the dashboard — specifically the `<ins id="server-welcome-message">` block — with the new message. The client never asked for it; the server decided to update.
@@ -76,7 +76,7 @@ The same pattern is how you push subscription updates, completed background-job 
 
 Logout mirrors login's shape — another `lvt-form:no-intercept` form, another action method, another redirect:
 
-```go include="./_app/controller.go" region="logout"
+```go include="/examples/login/controller.go" region="logout"
 ```
 
 `ctx.DeleteCookie` writes `Set-Cookie: session_token=; MaxAge=-1`, the browser drops the cookie, the redirect lands on the login form, and the cycle starts over.

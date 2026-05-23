@@ -21,7 +21,7 @@ Add a few todos, then open the same link in an incognito window and log in as th
 
 The handler ties together five things: BasicAuth, the in-memory database, the controller, the components, and the template. The whole orchestration is one function:
 
-```go include="./_app/handler.go" lines="87-138"
+```go include="/examples/todos/handler.go" lines="87-138"
 ```
 
 Three of those `livetemplate.With*` options carry teaching weight. Origins (`opts...`) are deployment plumbing.
@@ -36,7 +36,7 @@ Every action handler in the controller filters database queries by `ctx.UserID()
 
 The query layer enforces this at the SQL boundary too — every query takes a `user_id` parameter:
 
-```sql include="./_app/db/queries.sql" lines="1-15"
+```sql include="/examples/todos/db/queries.sql" lines="1-15"
 ```
 
 A bug in the controller that forgot to pass `ctx.UserID()` would silently return all users' todos. The compile-time signature on the generated `GetAllTodos(ctx, userID)` makes that mistake hard to write — and a real production app would also enforce it at the DB layer with a row-level security policy. Here `:memory:` SQLite skips that, but the column is laid down so the upgrade path is one-line.
@@ -47,17 +47,17 @@ The trick most LiveTemplate apps hit on day three is that **state objects must r
 
 Look at the state struct:
 
-```go include="./_app/state.go" lines="63-94"
+```go include="/examples/todos/state.go" lines="63-94"
 ```
 
 `Toasts` and `DeleteConfirm` are pointer types from `lvt/components`. They're missing the `lvt:"persist"` tag deliberately — when a connection reconnects mid-conversation, the framework rehydrates everything else (the search query, the page number, the pending delete ID) but leaves these `nil`. The controller re-creates them in three places — every entry point where state may have just been hydrated:
 
-```go include="./_app/controller.go" lines="19-34"
+```go include="/examples/todos/controller.go" lines="19-34"
 ```
 
 And the re-init function:
 
-```go include="./_app/controller.go" lines="245-266"
+```go include="/examples/todos/controller.go" lines="245-266"
 ```
 
 The pattern: **persistable plain data with `lvt:"persist"`; non-serializable runtime objects re-built in `Mount` / `OnConnect` / `Sync`.** A toast queue that was serialized would be a re-render hazard (the same notifications would repaint after every reconnect); explicit re-init at lifecycle entry points is the right shape.
@@ -66,14 +66,14 @@ The pattern: **persistable plain data with `lvt:"persist"`; non-serializable run
 
 The delete-with-confirm flow is two action handlers and the modal component handles the open/close state for you:
 
-```go include="./_app/controller.go" lines="96-131"
+```go include="/examples/todos/controller.go" lines="96-131"
 ```
 
 `ConfirmDelete` is fired when the user clicks Delete on a row — the modal is opened, no DB work yet. `ConfirmDeleteConfirm` runs only if the user clicks the destructive button inside the modal — by then `state.DeleteID` is whatever the original click captured. `CancelDeleteConfirm` clears the modal without touching the DB. The component never round-trips to the server for its own UI state changes; it's just `state.DeleteConfirm.Show()` / `.Hide()`.
 
 Toasts are even simpler — fire-and-forget from any action:
 
-```go include="./_app/controller.go" lines="36-60" highlight="57"
+```go include="/examples/todos/controller.go" lines="36-60" highlight="57"
 ```
 
 The `state.Toasts.AddSuccess(...)` call queues a notification; the rendered template walks `state.Toasts` and emits the toast container. The toast disappears client-side on its own dismiss timer; you don't write any of that.
