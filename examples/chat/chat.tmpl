@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="light dark">
+    <title>Chat — LiveTemplate</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
+    {{if .lvt.DevMode}}
+    <link rel="stylesheet" href="/livetemplate.css">
+    <script defer src="/livetemplate-client.js"></script>
+    {{else}}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@livetemplate/client@latest/livetemplate.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/@livetemplate/client@latest/dist/livetemplate-client.browser.js"></script>
+    {{end}}
+</head>
+<body>
+    <main class="container">
+        <article>
+            <header>
+                <hgroup>
+                    <h1>Chat</h1>
+                    {{if .CurrentUser}}
+                    <p>Logged in as <strong>{{.CurrentUser}}</strong> · {{.OnlineCount}} user{{if ne .OnlineCount 1}}s{{end}} online · {{.TotalMessages}} message{{if ne .TotalMessages 1}}s{{end}}</p>
+                    {{else}}
+                    <p>Welcome! Please login to join the chat</p>
+                    {{end}}
+                </hgroup>
+            </header>
+
+            {{if not .CurrentUser}}
+            <form method="POST" name="join">
+                <label>
+                    Choose your username:
+                    <input type="text" name="username" required autofocus>
+                </label>
+                <button type="submit">Join Chat</button>
+            </form>
+            {{else}}
+            <div class="messages" id="messages" lvt-fx:scroll="bottom-sticky">
+                {{if eq (len .Messages) 0}}
+                <p><small>No messages yet. Be the first to send one!</small></p>
+                {{else}}
+                {{range .Messages}}
+                <div class="message {{if eq .Username $.CurrentUser}}mine{{end}}">
+                    <small><strong>{{.Username}}</strong> · {{.Timestamp}}</small>
+                    <p>{{.Text}}</p>
+                </div>
+                {{end}}
+                {{end}}
+            </div>
+
+            <form method="POST" name="send">
+                <fieldset role="group">
+                    <input type="text" name="message" placeholder="Type your message..." autocomplete="off" autofocus>
+                    <button type="submit">Send</button>
+                </fieldset>
+            </form>
+            {{end}}
+        </article>
+    </main>
+
+</body>
+</html>
