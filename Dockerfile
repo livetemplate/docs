@@ -7,7 +7,12 @@
 # until upstream fixes the vendored asset embed (Phase 0 finding T0-1).
 # `TINKERDOWN_REF` selects which branch/tag to clone and is overridable.
 
-ARG TINKERDOWN_REF=v0.2.2
+# TEMPORARY: pinned to the unmerged feat/site-rooted-includes branch
+# until PR 0 in livetemplate/tinkerdown ships a tagged release. The
+# new tinkerdown supports `include="/examples/..."` site-rooted paths
+# that the examples/-as-canonical refactor depends on. Bump back to a
+# tag (v0.3.0 or whichever follows v0.2.2) once that tag exists.
+ARG TINKERDOWN_REF=feat/site-rooted-includes
 
 # ---- Stage 1: Build TypeScript client assets for tinkerdown ----
 FROM node:20-alpine AS client-builder
