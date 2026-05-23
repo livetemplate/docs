@@ -13,10 +13,11 @@ This recipe shows the second path. A login form posts to the same handler that r
 
 Three pieces of the framework that are easy to miss until you need them: **cookies as first-class context primitives**, **forms that opt out of WebSocket interception** for the auth round-trip, and **server-initiated state updates** for everything after the page loads.
 
-Try it right here. Any username; the password is `secret`. After the dashboard loads, watch for the welcome message — it's pushed from the server ~500ms after the WebSocket connects, no client poll involved:
+Try it in a new tab — any username; the password is `secret`. After the dashboard loads, watch for the welcome message: it's pushed from the server ~500ms after the WebSocket connects, no client poll involved.
 
-```embed-lvt path="/apps/login/" upstream="http://localhost:9091" height="520px"
-```
+**[Launch the login demo →](/apps/login/)**
+
+The demo opens at its own URL rather than embedding inline because `lvt-form:no-intercept` posts to the current URL — inside an inline embed that would be the docs page, not the recipe handler, so the `Login` action would never run. The same constraint applies to any recipe that needs real browser navigation semantics (cookies on a redirect, POST-Redirect-GET).
 
 ## The state struct
 
@@ -40,7 +41,7 @@ Three framework primitives carry the auth weight here:
 
 - **`ctx.SetCookie(&http.Cookie{...})`** — first-class cookie API on the action context. The framework writes the `Set-Cookie` header on the redirect response, so the browser stores it before the WebSocket connects. `HttpOnly`, `SameSite=Strict`, and a 1-hour `MaxAge` are sensible defaults for a session token; production would also set `Secure: true` under HTTPS.
 
-- **`ctx.Redirect("/", http.StatusSeeOther)`** — the action returns its modified state *and* a redirect. POST-Redirect-GET: the framework writes the 303, the browser follows it, and the next GET renders the dashboard branch of the template against the new state.
+- **`ctx.Redirect(c.mountPath, http.StatusSeeOther)`** — the action returns its modified state *and* a redirect. POST-Redirect-GET: the framework writes the 303, the browser follows it, and the next GET renders the dashboard branch of the template against the new state. The redirect target is the recipe's mount path because `http.StripPrefix` strips the mount before the handler sees the URL — the recipe can't reconstruct its own mount from the request, so the caller passes it in.
 
 The flash message API works the same way it does for non-auth flows — `ctx.SetFlash("error", "Invalid credentials")` stashes the message in a cookie, and the next render reads it via `{{.lvt.FlashTag "error"}}`.
 

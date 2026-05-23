@@ -34,10 +34,20 @@ func TestMain(m *testing.M) {
 	os.Exit(code)
 }
 
-// startServer launches the test-server binary on a free port and waits
-// until it's ready. Mirrors the progressive-enhancement helper exactly
-// — same WaitDelay, same readiness gate, same on-failure log dump.
+// startServer launches the test-server binary mounted at "/" on a free
+// port. It is the default for most tests; see startServerAt for tests
+// that need to exercise a non-root mount path (the mountPath redirect
+// regression).
 func startServer(t *testing.T) (int, func()) {
+	return startServerAt(t, "/")
+}
+
+// startServerAt is the non-root variant. The test-server's main.go
+// reads MOUNT_PATH and mounts the recipe under that prefix with
+// http.StripPrefix — mirroring cmd/site's mount of /apps/login/.
+// Mirrors the progressive-enhancement helper otherwise — same WaitDelay,
+// same readiness gate, same on-failure log dump.
+func startServerAt(t *testing.T, mountPath string) (int, func()) {
 	t.Helper()
 
 	port, err := e2etest.GetFreePort()
@@ -45,11 +55,11 @@ func startServer(t *testing.T) (int, func()) {
 		t.Fatalf("Failed to get free port for server: %v", err)
 	}
 	portStr := fmt.Sprintf("%d", port)
-	serverURL := fmt.Sprintf("http://localhost:%d/", port)
+	serverURL := fmt.Sprintf("http://localhost:%d%s", port, mountPath)
 
-	t.Logf("Starting test server on port %s", portStr)
+	t.Logf("Starting test server on port %s (mount: %s)", portStr, mountPath)
 	cmd := exec.Command("go", "run", ".")
-	cmd.Env = append(os.Environ(), "PORT="+portStr, "LVT_DEV_MODE=true")
+	cmd.Env = append(os.Environ(), "PORT="+portStr, "LVT_DEV_MODE=true", "MOUNT_PATH="+mountPath)
 
 	var serverLog bytes.Buffer
 	cmd.Stdout = &serverLog
@@ -294,6 +304,100 @@ func TestLogin_E2E(t *testing.T) {
 			t.Error("Login title not found after logout")
 		}
 	})
+}
+
+// TestLogin_E2E_SubpathMount is the regression guard for the bug where
+// the recipe hard-coded "/" as its post-login redirect target. When the
+// recipe is mounted at a non-root subpath (production at /apps/login/),
+// http.StripPrefix strips the prefix before the recipe sees the request
+// URL, so the recipe can't reconstruct its own mount — it must be told
+// the mount path explicitly. A "/" redirect leaks past the StripPrefix
+// boundary and lands on the domain root, not the recipe dashboard, so
+// the user logs in successfully (Set-Cookie fires) but never sees the
+// dashboard branch of the template.
+//
+// The original test suite mounts at "/" exclusively, which masks the
+// bug — "/" and the mount path happen to coincide. This test mounts
+// the same recipe at "/apps/login/" and asserts:
+//
+//   - The browser ends up at <serverURL>/apps/login/ after a successful
+//     login, not the server root.
+//   - The dashboard branch renders (so the recipe is reachable via the
+//     mount, and POST-Redirect-GET re-mounts the same recipe).
+//   - Logout also returns to <serverURL>/apps/login/, not the root.
+func TestLogin_E2E_SubpathMount(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping E2E test in short mode")
+	}
+
+	const mountPath = "/apps/login/"
+	serverPort, cleanup := startServerAt(t, mountPath)
+	defer cleanup()
+
+	debugPort, err := e2etest.GetFreePort()
+	if err != nil {
+		t.Fatalf("Failed to get free port for Chrome: %v", err)
+	}
+	_ = e2etest.StartDockerChrome(t, debugPort)
+	defer e2etest.StopDockerChrome(t, debugPort)
+
+	chromeURL := fmt.Sprintf("http://localhost:%d", debugPort)
+	allocCtx, allocCancel := chromedp.NewRemoteAllocator(context.Background(), chromeURL)
+	defer allocCancel()
+
+	ctx, cancel := chromedp.NewContext(allocCtx, chromedp.WithLogf(t.Logf))
+	defer cancel()
+	ctx, cancel = context.WithTimeout(ctx, 60*time.Second)
+	defer cancel()
+
+	mountURL := e2etest.GetChromeTestURL(serverPort) + mountPath
+
+	var postLoginURL, html string
+	if err := chromedp.Run(ctx,
+		chromedp.Navigate(mountURL),
+		chromedp.WaitVisible(`#username`, chromedp.ByQuery),
+		chromedp.SendKeys(`#username`, "testuser", chromedp.ByQuery),
+		chromedp.SendKeys(`#password`, "secret", chromedp.ByQuery),
+		chromedp.Click(`button[type="submit"]`, chromedp.ByQuery),
+		chromedp.Sleep(2*time.Second),
+		chromedp.Location(&postLoginURL),
+		chromedp.OuterHTML(`body`, &html, chromedp.ByQuery),
+	); err != nil {
+		t.Fatalf("Failed to complete login flow: %v", err)
+	}
+
+	// The bug-fix assertion: post-login URL stays at the mount path.
+	// Before the fix this would be the server root (mountURL minus the
+	// /apps/login/ suffix), where a 404 would render (no handler there
+	// in the test server).
+	if !strings.HasSuffix(postLoginURL, mountPath) {
+		t.Errorf("post-login URL should end with %q; got %q", mountPath, postLoginURL)
+	}
+	if !strings.Contains(html, "Dashboard") {
+		t.Logf("HTML content: %s", html[:min(800, len(html))])
+		t.Error("Dashboard not rendered after login at subpath mount")
+	}
+	if !strings.Contains(html, "testuser") {
+		t.Error("Username not displayed on dashboard")
+	}
+
+	// Logout must also resolve back to the mount path, not root.
+	var postLogoutURL, logoutHTML string
+	if err := chromedp.Run(ctx,
+		chromedp.WaitVisible(`button[name="logout"]`, chromedp.ByQuery),
+		chromedp.Click(`button[name="logout"]`, chromedp.ByQuery),
+		chromedp.Sleep(2*time.Second),
+		chromedp.Location(&postLogoutURL),
+		chromedp.OuterHTML(`body`, &logoutHTML, chromedp.ByQuery),
+	); err != nil {
+		t.Fatalf("Failed to complete logout: %v", err)
+	}
+	if !strings.HasSuffix(postLogoutURL, mountPath) {
+		t.Errorf("post-logout URL should end with %q; got %q", mountPath, postLogoutURL)
+	}
+	if !strings.Contains(logoutHTML, "Login") {
+		t.Error("Login form not rendered after logout at subpath mount")
+	}
 }
 
 // TestLogin_HTTPCookie covers the raw HTTP shape of the login flow
