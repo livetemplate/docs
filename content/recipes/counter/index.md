@@ -18,12 +18,12 @@ The code is the same counter from [Your First App](/getting-started/your-first-a
 
 The whole thing fits in three files. State + controller in one (the part you'd write):
 
-```go include="./_app/counter.go" lines="9-33"
+```go include="/examples/counter/counter.go" lines="9-33"
 ```
 
 And a wiring file that exposes an `http.Handler`:
 
-```go include="./_app/handler.go" lines="49-66"
+```go include="/examples/counter/handler.go" lines="49-64"
 ```
 
 There's not much to it. The choices that matter for production are the two `livetemplate.With*` options. Everything else is mechanical.
@@ -56,7 +56,7 @@ The `Subscribe` + `Publish` calls didn't change. The state struct didn't change.
 
 The work happens in two places: `Mount` opts each connection in via `ctx.Subscribe(ctx.SelfTopic())`, and the action methods bump the counter and fan out via `ctx.Publish(ctx.SelfTopic(), ...)`:
 
-```go include="./_app/counter.go" lines="18-43" highlight="20,30,37"
+```go include="/examples/counter/counter.go" lines="18-43" highlight="20,30,37"
 ```
 
 The two-step shape matters. Peer fan-out is **opt-in** — a connection that never called `Subscribe` would not receive the published action even if every other tab in the same group did. `SelfTopic()` resolves to a reserved-namespace topic string (`lvt:session:<groupID>`) that's ACL-exempt, so `Subscribe(SelfTopic())` always succeeds and matches whatever other Mount-time `Subscribe(SelfTopic())` calls produced in this session.
@@ -112,7 +112,7 @@ This recipe is a deliberately small slice. The scaling story behind it is real:
 
 The full handler in `handler.go` is just the constructor expressed as a function. It exists because this recipe is mounted by the docs site's `cmd/site` aggregator — there's no standalone `main()`. In your own app you'd write a `main()` that does the same thing inline (`livetemplate.Must(...)` → `tmpl.Handle(...)` → `http.ListenAndServe`) and call it a day. Exposing it as a `Handler()` constructor is just so it can be mounted inside another binary's HTTP server.
 
-```go include="./_app/handler.go" lines="14-46"
+```go include="/examples/counter/handler.go" lines="18-47"
 ```
 
 The `embed.FS` + temp-file dance at the top is a workaround for `livetemplate.WithParseFiles` taking filesystem paths — when the template ships inside the binary, we extract it once at first use. If you're running the standard "ship a directory of templates next to the binary" shape, you skip all this and pass the relative path directly.

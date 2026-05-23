@@ -24,12 +24,12 @@ The widget above is a real, deployed LiveTemplate app — the same code as the [
 
 The state and handlers — `counter.go`:
 
-```go include="./recipes/counter/_app/counter.go" lines="9-33"
+```go include="/examples/counter/counter.go" lines="9-33"
 ```
 
 The template — `counter.tmpl`:
 
-```html include="./recipes/counter/_app/counter.tmpl"
+```html include="/examples/counter/counter.tmpl"
 ```
 
 A button's `name` attribute IS the routing key — `<button name="increment">` posts `increment` and LiveTemplate dispatches to the `Increment` method on the controller. The protocol between HTML and Go is just the form data the browser already sends.

@@ -10,7 +10,7 @@
 //
 // Recipes are imported as Go packages — each exposes `Handler() http.Handler`.
 // Adding a recipe is two lines here plus a Go package under
-// content/recipes/<slug>/_app/.
+// examples/<slug>/.
 package main
 
 import (
@@ -20,7 +20,7 @@ import (
 
 	"github.com/livetemplate/livetemplate"
 
-	counter "github.com/livetemplate/docs/content/recipes/counter/_app"
+	"github.com/livetemplate/docs/examples/counter"
 	loginrecipe "github.com/livetemplate/docs/content/recipes/login/_app"
 	patterns "github.com/livetemplate/docs/content/recipes/patterns/_app"
 	pe "github.com/livetemplate/docs/content/recipes/progressive-enhancement/_app"
@@ -49,7 +49,9 @@ func main() {
 	//   page embed-lvt path="/apps/counter/" upstream="http://localhost:9091"
 	//   → tinkerdown fetches http://localhost:9091/apps/counter/
 	//   → mux routes to counter.Handler()
-	mux.Handle("/apps/counter/", http.StripPrefix("/apps/counter", counter.Handler()))
+	mux.Handle("/apps/counter/", http.StripPrefix("/apps/counter", counter.Handler(
+		livetemplate.WithAllowedOrigins(allowedOrigins),
+	)))
 
 	// UI patterns are mounted at their recipe URL space because the
 	// catalog and detail pages are first-class recipes. Tinkerdown's proxy
