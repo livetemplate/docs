@@ -1,4 +1,7 @@
-package main
+// External (blackbox) e2e test for the patterns recipe. The test
+// spawns the recipe as a subprocess via `go run ./cmd` and drives a
+// real browser against the running process.
+package patterns_test
 
 import (
 	"context"
@@ -39,7 +42,7 @@ func setupTest(t *testing.T) (context.Context, context.CancelFunc, int) {
 		t.Fatalf("Failed to get free port for Chrome: %v", err)
 	}
 
-	serverCmd := e2etest.StartTestServer(t, ".", serverPort)
+	serverCmd := e2etest.StartTestServer(t, "./cmd", serverPort)
 	t.Cleanup(func() {
 		if serverCmd != nil && serverCmd.Process != nil {
 			serverCmd.Process.Kill()

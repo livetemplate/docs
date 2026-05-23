@@ -21,9 +21,9 @@ import (
 	"github.com/livetemplate/livetemplate"
 
 	"github.com/livetemplate/docs/examples/counter"
+	"github.com/livetemplate/docs/examples/patterns"
 	"github.com/livetemplate/docs/examples/todos"
 	loginrecipe "github.com/livetemplate/docs/content/recipes/login/_app"
-	patterns "github.com/livetemplate/docs/content/recipes/patterns/_app"
 	pe "github.com/livetemplate/docs/content/recipes/progressive-enhancement/_app"
 	notepad "github.com/livetemplate/docs/content/recipes/shared-notepad/_app"
 )
