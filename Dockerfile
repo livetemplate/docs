@@ -55,7 +55,14 @@ RUN adduser -D -u 1000 docs
 WORKDIR /site
 COPY --from=tinkerdown-builder /out/tinkerdown /usr/local/bin/tinkerdown
 COPY --from=site-builder       /out/site       /usr/local/bin/site
-COPY content/ /site/
+# Mirror the repo layout inside /site so tinkerdown's site-rooted
+# `include="/examples/..."` paths resolve correctly. Site-rooted includes
+# resolve against filepath.Dir(servedRoot) — with servedRoot=/site/content,
+# /examples/foo.go → /site/examples/foo.go. Keeping content/ and examples/
+# as siblings under /site reproduces the in-repo layout that local
+# `tinkerdown serve content/` already relies on.
+COPY content/  /site/content/
+COPY examples/ /site/examples/
 COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh && chown -R docs:docs /site
 USER docs

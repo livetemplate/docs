@@ -25,14 +25,14 @@ You'll have a `go.mod` and an empty directory. We'll add three files: `counter.g
 
 Create `counter.go`. First the state:
 
-```go include="../recipes/counter/_app/counter.go" lines="5-11"
+```go include="/examples/counter/counter.go" lines="5-11"
 ```
 
 State is a value type, not a pointer — controllers receive a copy and return a (possibly modified) copy. The framework manages the swap.
 
 Then a controller and two action methods:
 
-```go include="../recipes/counter/_app/counter.go" lines="13-33"
+```go include="/examples/counter/counter.go" lines="13-45"
 ```
 
 Action methods are exported on the controller, and their names ARE the action names — `Increment` and `Decrement` are what the template will reference. The `Mount` + `Publish` calls are how multi-tab sync works (Step 6).
@@ -69,7 +69,7 @@ By default LiveTemplate uses `AnonymousAuthenticator`, which gives each browser 
 
 Create `counter.tmpl`:
 
-```html include="../recipes/counter/_app/counter.tmpl"
+```html include="/examples/counter/counter.tmpl"
 ```
 
 The `<button name="increment">` attribute is the routing trigger — clicking that button posts the form and the framework calls `Increment()` on the controller.
@@ -108,7 +108,7 @@ Same Go code. Same template. Two lines of HTML promote the experience from serve
 
 Look at the handlers from Step 2 — note the highlighted lines:
 
-```go include="../recipes/counter/_app/counter.go" lines="22-33" highlight="24,31"
+```go include="/examples/counter/counter.go" lines="17-45" highlight="20,32,41"
 ```
 
 Two things make multi-tab sync work. In `Mount`, `ctx.Subscribe(ctx.SelfTopic())` opts the connection in to peer fan-out for its own session (`SelfTopic()` resolves to the reserved-namespace string `lvt:session:<groupID>` and is ACL-exempt). Then in each action, `ctx.Publish(ctx.SelfTopic(), "Increment", nil)` (and the matching `Decrement`) fans the named action out to every other connection that subscribed. Without the Subscribe, the Publish has no receiver; without the Publish, no peer ever runs the action. With both, the tabs stay in lockstep.

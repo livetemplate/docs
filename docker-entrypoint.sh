@@ -23,7 +23,10 @@ RECIPES_PORT="${RECIPES_PORT}" /usr/local/bin/site &
 SITE_PID=$!
 
 echo "[entrypoint] starting tinkerdown on :${PORT}"
-/usr/local/bin/tinkerdown serve --host 0.0.0.0 --port "${PORT}" /site &
+# Serve /site/content. /site itself contains content/ + examples/ as
+# siblings so tinkerdown's site-rooted `include="/examples/..."` paths
+# resolve to /site/examples/ via filepath.Dir(/site/content).
+/usr/local/bin/tinkerdown serve --host 0.0.0.0 --port "${PORT}" /site/content &
 TINKERDOWN_PID=$!
 
 # Poll for either to exit; either way the container should die so Fly
