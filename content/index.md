@@ -13,7 +13,7 @@ LiveTemplate is a Go library for building reactive web UIs from standard `html/t
 
 ## Try it
 
-```embed-lvt path="/apps/counter/" upstream="http://localhost:9091" height="320px"
+```embed-lvt path="/apps/counter/" upstream="http://localhost:9091" height="140px"
 ```
 
 Click the buttons. Each click POSTs the action to the Go server; the server runs `Increment`, re-renders the template, diffs against the previous render, and sends only the changed text node back. The form, the buttons, and the count display are never re-created — only the count's text changes. Open this page in a second tab on the same machine: clicks in one tab show up in the other in real time, because each tab opts in to peer fan-out via `ctx.Subscribe(ctx.SelfTopic())` in `Mount` and every handler ends with `ctx.Publish(ctx.SelfTopic(), ...)`.
