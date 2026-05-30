@@ -21,6 +21,7 @@ import (
 	"github.com/livetemplate/livetemplate"
 
 	"github.com/livetemplate/docs/examples/counter"
+	counterbasic "github.com/livetemplate/docs/examples/counter-basic"
 	loginrecipe "github.com/livetemplate/docs/examples/login"
 	"github.com/livetemplate/docs/examples/patterns"
 	pe "github.com/livetemplate/docs/examples/progressive-enhancement"
@@ -50,6 +51,15 @@ func main() {
 	//   → tinkerdown fetches http://localhost:9091/apps/counter/
 	//   → mux routes to counter.Handler()
 	mux.Handle("/apps/counter/", http.StripPrefix("/apps/counter", counter.Handler(
+		livetemplate.WithAllowedOrigins(allowedOrigins),
+	)))
+
+	// counter-basic is the no-pubsub counter — the homepage "Try it" demo
+	// and Steps 2-5 of Your First App. Same template/handler as counter, but
+	// its controller omits Subscribe/Publish, so the docs can introduce
+	// single-session reactivity first and layer cross-tab sync on top via
+	// /apps/counter/ as the "next level."
+	mux.Handle("/apps/counter-basic/", http.StripPrefix("/apps/counter-basic", counterbasic.Handler(
 		livetemplate.WithAllowedOrigins(allowedOrigins),
 	)))
 
