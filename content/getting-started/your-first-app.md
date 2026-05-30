@@ -25,17 +25,17 @@ You'll have a `go.mod` and an empty directory. We'll add three files: `counter.g
 
 Create `counter.go`. First the state:
 
-```go include="/examples/counter/counter.go" lines="5-11"
+```go include="/examples/counter-basic/counter.go" lines="5-12"
 ```
 
 State is a value type, not a pointer — controllers receive a copy and return a (possibly modified) copy. The framework manages the swap.
 
 Then a controller and two action methods:
 
-```go include="/examples/counter/counter.go" lines="13-45"
+```go include="/examples/counter-basic/counter.go" lines="14-31"
 ```
 
-Action methods are exported on the controller, and their names ARE the action names — `Increment` and `Decrement` are what the template will reference. The `Mount` + `Publish` calls are how multi-tab sync works (Step 6).
+Action methods are exported on the controller, and their names ARE the action names — `Increment` and `Decrement` are what the template will reference. That's the whole app for now; we'll add multi-tab sync in Step 6 by extending this same file.
 
 Now wire it up in `main.go`:
 
@@ -63,7 +63,7 @@ func main() {
 
 `livetemplate.New("counter")` parses `counter.tmpl` from the same directory. `tmpl.Handle(controller, AsState(initial))` is the standard wiring — controller for actions, initial state for new sessions.
 
-By default LiveTemplate uses `AnonymousAuthenticator`, which gives each browser a stable session group via cookie. Two consequences worth knowing about now: each browser gets its own state (no cross-user leaks), and tabs from the same browser share state — that's what makes the peer-fan-out demo at Step 6 work.
+By default LiveTemplate uses `AnonymousAuthenticator`, which gives each browser a stable session group via cookie. Two consequences worth knowing about now: each browser gets its own state (no cross-user leaks), and tabs from the same browser share that session group — the identity the peer-fan-out demo at Step 6 builds on.
 
 ## Step 3 — Write the template
 
@@ -84,7 +84,7 @@ go run .
 
 Open `http://localhost:9090` in your browser to see your local counter. Or click `+1` and `-1` right here — the same source files, served by this docs site, running below:
 
-```embed-lvt path="/apps/counter/" upstream="http://localhost:9091"
+```embed-lvt path="/apps/counter-basic/" upstream="http://localhost:9091"
 ```
 
 Click and the count changes — no full-page reload, just a DOM patch streamed over WebSocket. That's the JS client at work.
@@ -106,7 +106,7 @@ Same Go code. Same template. Two lines of HTML promote the experience from serve
 
 ## Step 6 — Multi-tab sync (peer fan-out)
 
-Look at the handlers from Step 2 — note the highlighted lines:
+So far the counter reacts within a single tab. To make every tab of the same session stay in lockstep, go back to `counter.go` and add two things — a `Mount` method, and one line per action (highlighted):
 
 ```go include="/examples/counter/counter.go" lines="17-45" highlight="20,32,41"
 ```

@@ -13,28 +13,42 @@ LiveTemplate is a Go library for building reactive web UIs from standard `html/t
 
 ## Try it
 
-```embed-lvt path="/apps/counter/" upstream="http://localhost:9091" height="140px"
+```embed-lvt path="/apps/counter-basic/" upstream="http://localhost:9091" height="140px"
 ```
 
-Click the buttons. Each click POSTs the action to the Go server; the server runs `Increment`, re-renders the template, diffs against the previous render, and sends only the changed text node back. The form, the buttons, and the count display are never re-created — only the count's text changes. Open this page in a second tab on the same machine: clicks in one tab show up in the other in real time, because each tab opts in to peer fan-out via `ctx.Subscribe(ctx.SelfTopic())` in `Mount` and every handler ends with `ctx.Publish(ctx.SelfTopic(), ...)`.
+Click the buttons. Each click POSTs the action to the Go server; the server runs `Increment`, re-renders the template, diffs against the previous render, and sends only the changed text node back. The form, the buttons, and the count display are never re-created — only the count's text changes, patched into the page over a WebSocket with no full reload.
 
-The widget above is a real, deployed LiveTemplate app — the same code as the [Your First App](/getting-started/your-first-app) tutorial, embedded inline through tinkerdown's auto-proxy.
+The widget above is a real, deployed LiveTemplate app — the same code as Steps 1–5 of the [Your First App](/getting-started/your-first-app) tutorial, embedded inline through tinkerdown's auto-proxy.
 
 ## The code that runs the demo above
 
 The state and handlers — `counter.go`:
 
-```go include="/examples/counter/counter.go" lines="9-33"
+```go include="/examples/counter-basic/counter.go" lines="10-31"
 ```
 
 The template — `counter.tmpl`:
 
-```html include="/examples/counter/counter.tmpl"
+```html include="/examples/counter-basic/counter.tmpl"
 ```
 
 A button's `name` attribute IS the routing key — `<button name="increment">` posts `increment` and LiveTemplate dispatches to the `Increment` method on the controller. The protocol between HTML and Go is just the form data the browser already sends.
 
-[Read the full walkthrough →](/getting-started/your-first-app) — or jump to [Counter, deeper](/recipes/counter) for the production-shaped story (peer fan-out routing, session models, scaling).
+[Read the full walkthrough →](/getting-started/your-first-app)
+
+## Next level: real-time multi-tab sync
+
+The counter above reacts within a single tab. The same app becomes *real-time across tabs* by adding two server-side calls — no client-side code, no extra dependencies:
+
+```embed-lvt path="/apps/counter/" upstream="http://localhost:9091" height="140px"
+```
+
+Open this page in a second tab and click `+1` in either one — the count stays in sync across both tabs in real time. Two additions to `counter.go` make that happen: a `Mount` that opts the connection in with `ctx.Subscribe(ctx.SelfTopic())`, and a `ctx.Publish(ctx.SelfTopic(), ...)` at the end of each handler that fans the action out to every other tab in the same session (highlighted below):
+
+```go include="/examples/counter/counter.go" lines="17-45" highlight="20,32,41"
+```
+
+[Counter, deeper](/recipes/counter) unpacks the session-group routing, why `AnonymousAuthenticator` is the right default for public demos, and where peer fan-out stops scaling.
 
 ## What happens between a click and a DOM update
 
