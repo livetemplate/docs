@@ -2,8 +2,8 @@
 title: "Client Attributes Reference"
 source_repo: "https://github.com/livetemplate/livetemplate"
 source_path: "docs/references/client-attributes.md"
-source_ref: "v0.11.1"
-source_commit: "37dae7f35e960ff7647a0f1eb51d89bcc62d173a"
+source_ref: "v0.11.2"
+source_commit: "19f6e445cc03682c057d3323bfbcf99a2c13510d"
 ---
 
 # Client Attributes Reference
