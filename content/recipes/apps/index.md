@@ -1,5 +1,6 @@
 ---
 title: "App Recipes"
+description: "Runnable LiveTemplate applications that demonstrate todos, chat, auth, uploads, progressive enhancement, and other app-level patterns."
 source_repo: "https://github.com/livetemplate/examples"
 source_path: "README.md"
 source_commit: "8dd1b75ebabbc8a20786d3b369797a2599a1be42"

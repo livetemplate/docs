@@ -1,5 +1,6 @@
 ---
 title: "How a LiveTemplate Update Flows"
+description: "A step-by-step view of a LiveTemplate action: browser event, controller method, server render, tree diff, and DOM patch."
 source_repo: https://github.com/livetemplate/docs
 source_path: content/recipes/architecture-flow.md
 ---

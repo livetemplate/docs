@@ -1,5 +1,6 @@
 ---
 title: "UI Pattern Recipes"
+description: "A catalog of focused LiveTemplate UI recipes for forms, lists, loading states, feedback, navigation, realtime, and search."
 ---
 
 # UI Pattern Recipes

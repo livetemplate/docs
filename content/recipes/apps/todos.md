@@ -1,5 +1,6 @@
 ---
 title: "Todos"
+description: "A full LiveTemplate todo app with auth, SQLite persistence, validation, search, sorting, components, and realtime peer refresh."
 source_repo: "https://github.com/livetemplate/examples"
 source_path: "todos/README.md"
 source_commit: "948ce2e3c9de974e139db8b4b8a2fb27054561d8"

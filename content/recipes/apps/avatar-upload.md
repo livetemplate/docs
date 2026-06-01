@@ -1,5 +1,6 @@
 ---
 title: "Avatar Upload"
+description: "A runnable LiveTemplate avatar upload app demonstrating file upload flow, previews, progress, and validation."
 source_repo: "https://github.com/livetemplate/examples"
 source_path: "avatar-upload/README.md"
 source_commit: "b976439626d58845129a7c3aba567d6429662a0a"

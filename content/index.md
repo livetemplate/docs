@@ -7,7 +7,7 @@ source_path: content/index.md
 
 # Reactive web UIs in standard HTML and Go
 
-LiveTemplate is a Go library for building reactive web UIs from standard `html/template` templates. You write a template and a controller struct; when state changes, the template re-renders on the server and only the diff is sent to the browser. The same code runs three ways: a plain `<form>` POST that reloads the page, a `fetch()` request that patches the DOM in place, or a WebSocket session where other tabs sync automatically.
+LiveTemplate is a Go library for building reactive web UIs from standard `html/template` templates. You write a template and a controller struct; when state changes, the template re-renders on the server and only the diff is sent to the browser. The same code runs in three browser modes: JavaScript disabled, JavaScript enabled with WebSocket disabled over HTTP, and JavaScript plus WebSocket enabled.
 
 > **Alpha** — core features work and are tested, but the API may change before v1.0.
 
@@ -75,8 +75,20 @@ When a user clicks a button, LiveTemplate calls a method on your Go struct, diff
 3. **[Progressive Complexity](/guides/progressive-complexity)** — when to reach for `lvt-*` attributes (and when not to)
 4. **[Recipes](/recipes/)** — basics, UI patterns, runnable apps, and deep dives
 
+## How to place it
+
+| If you like... | LiveTemplate gives you... |
+|---|---|
+| htmx | Standard HTML actions with server-owned state and DOM diffing |
+| Livewire | Component-style server interactivity for Go templates |
+| Phoenix LiveView | Stateful server-driven UI without leaving Go |
+| React SPA | Reactive workflows without a client build step for common app screens |
+
+LiveTemplate is not trying to replace every client app. It is a better fit when the server should own state, HTML should remain the primary interface, and progressive enhancement matters. For current constraints, see [Current Limitations](/reference/limitations).
+
 ## Or browse
 
+- **[Mental Model](/getting-started/mental-model)** — how templates, controllers, sessions, transports, and pub/sub fit together
 - **[Guides](/guides/progressive-complexity)** — conceptual walkthroughs, scaling, observability
 - **[Reference](/reference/api)** — types, attributes, configuration, controller pattern
 - **[CLI (`lvt`)](/cli)** — code generator, dev server, kit system

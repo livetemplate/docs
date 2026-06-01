@@ -47,6 +47,19 @@ tinkerdown validate content/
 
 CI runs validate on every PR.
 
+## Running tests
+
+If this repo is checked out under a parent `go.work` that does not include
+`./docs`, run tests with `GOWORK=off` or use the Make targets below:
+
+```bash
+make test-unit      # fast package checks
+make test-examples  # runnable example packages
+make test-e2e       # browser-backed docs checks
+make test-e2e-local # same e2e checks against a local server on :8084
+make test           # full suite
+```
+
 ## Build & deploy
 
 Phase 1 wires up the staging Dockerfile + fly.toml. Phase 6 promotes to production at `livetemplate.fly.dev`.

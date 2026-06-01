@@ -1,5 +1,6 @@
 ---
 title: "Go Library API Reference"
+description: "Reference for the LiveTemplate Go API: templates, controllers, state, context, sessions, auth, stores, uploads, and pub/sub."
 source_repo: "https://github.com/livetemplate/livetemplate"
 source_path: "docs/references/api-reference.md"
 source_ref: "v0.11.1"
@@ -9,6 +10,17 @@ source_commit: "37dae7f35e960ff7647a0f1eb51d89bcc62d173a"
 # Go Library API Reference
 
 > **Scope:** This reference documents the **`livetemplate` Go library** (`github.com/livetemplate/livetemplate`). For the CLI tool, see the [lvt repository](https://github.com/livetemplate/lvt).
+
+## At a glance
+
+| Need | Start with | See |
+|---|---|---|
+| Parse and mount a template | `New`, `ParseFiles`, `Handle` | [Template](#template) |
+| Keep dependencies separate from UI state | Controller singleton + `AsState` | [Controller+State Pattern](#controllerstate-pattern) |
+| Read submitted form data | `ctx.GetString`, `ctx.Bind`, `ctx.BindAndValidate` | [Data Extraction](#data-extraction) |
+| Persist lightweight session fields | `lvt:"persist"` on state fields | [Session](#session) |
+| Push work to connected clients | `Session.TriggerAction` or `ctx.Publish` | [Session](#session), [PubSub](#pubsub-cross-instance-peer-fan-out) |
+| Configure auth, stores, uploads, and limits | `Option` and `HandleOption` values | [Configuration](#configuration) |
 
 ## Quick Start
 

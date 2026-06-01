@@ -1,5 +1,6 @@
 ---
 title: "Live Framework Releases"
+description: "A live REST-backed docs page that fetches recent LiveTemplate releases from GitHub through tinkerdown sources."
 ---
 
 # Live Framework Releases
