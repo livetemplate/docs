@@ -1,5 +1,6 @@
 ---
 title: "When to Reach for lvt-* (Decision Tree)"
+description: "A decision tree for choosing plain HTML first and adding lvt-* attributes only when an interaction needs them."
 ---
 
 # When to Reach for `lvt-*` (Decision Tree)

@@ -1,5 +1,6 @@
 ---
 title: "How This Docs Site Works (Meta)"
+description: "How the LiveTemplate docs site dogfoods tinkerdown, embedded recipe apps, mirrored source docs, and live data sources."
 ---
 
 # How This Docs Site Works (Meta)

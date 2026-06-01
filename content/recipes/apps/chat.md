@@ -1,5 +1,6 @@
 ---
 title: "Chat"
+description: "A runnable realtime chat app showing LiveTemplate actions, shared state, server push, and scroll behavior."
 source_repo: "https://github.com/livetemplate/examples"
 source_path: "chat/README.md"
 source_commit: "5054ed6726d9596d294a50b80f11488302b3ec2d"

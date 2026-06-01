@@ -1,5 +1,6 @@
 ---
 title: "Error Handling Reference"
+description: "How LiveTemplate propagates server errors, validation failures, form lifecycle events, template error state, and flash messages."
 source_repo: "https://github.com/livetemplate/livetemplate"
 source_path: "docs/references/error-handling.md"
 source_ref: "v0.11.1"
@@ -9,6 +10,16 @@ source_commit: "37dae7f35e960ff7647a0f1eb51d89bcc62d173a"
 # Error Handling Reference
 
 Complete guide to error handling in LiveTemplate applications.
+
+## At a glance
+
+| Need | Use | See |
+|---|---|---|
+| Stop an action and keep state unchanged | Return an error from the controller method | [Server-Side Errors](#server-side-errors) |
+| Show field-level validation messages | `FieldError`, `MultiError`, or validator integration | [Validation Errors](#validation-errors) |
+| Render errors in templates | Error helpers and error-aware template state | [Template Error Display](#template-error-display) |
+| React to failed submissions in the browser | `lvt:error` lifecycle hooks | [Client-Side Error Handling](#client-side-error-handling) |
+| Show one-shot success or failure messages | Flash helpers on `Context` | [Flash Messages](#flash-messages) |
 
 ## Table of Contents
 

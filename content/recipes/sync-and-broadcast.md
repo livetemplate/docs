@@ -1,5 +1,6 @@
 ---
 title: "Sync & Server Push"
+description: "How LiveTemplate uses Subscribe, Publish, session topics, and server-initiated actions to sync connected clients."
 source_repo: https://github.com/livetemplate/docs
 source_path: content/recipes/sync-and-broadcast.md
 ---
@@ -116,4 +117,3 @@ Nothing crosses connections implicitly. If another connection should update, the
 Two `mermaid` sequence-diagram blocks render client-side via tinkerdown's bundled mermaid runtime. The diagrams live next to the code shapes they describe, so changing the code is a same-file edit — no out-of-tree diagram tool, no PNG that goes stale.
 
 For runnable examples, see the [chat example](/recipes/apps/chat) and the patterns under [Real-Time](/recipes/ui-patterns/) (Multi-User Refresh, Broadcasting, Presence Tracking).
-

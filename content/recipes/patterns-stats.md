@@ -1,5 +1,6 @@
 ---
 title: "Anatomy of the UI Pattern Recipes"
+description: "A data-backed overview of the UI pattern catalog, showing how one tinkerdown source can power multiple docs views."
 ---
 
 # Anatomy of the UI Pattern Recipes

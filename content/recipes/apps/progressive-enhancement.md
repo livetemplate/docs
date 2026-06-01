@@ -1,5 +1,6 @@
 ---
 title: "Progressive Enhancement"
+description: "A runnable app showing the same LiveTemplate controller working with JavaScript disabled, HTTP fallback, and WebSocket mode."
 source_repo: "https://github.com/livetemplate/examples"
 source_path: "progressive-enhancement/README.md"
 source_commit: "5054ed6726d9596d294a50b80f11488302b3ec2d"

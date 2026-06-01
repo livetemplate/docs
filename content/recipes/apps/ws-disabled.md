@@ -1,5 +1,6 @@
 ---
 title: "WebSocket Disabled"
+description: "A runnable app showing LiveTemplate's HTTP fetch transport when WebSocket upgrades are disabled."
 source_repo: "https://github.com/livetemplate/examples"
 source_path: "ws-disabled/README.md"
 source_commit: "5054ed6726d9596d294a50b80f11488302b3ec2d"

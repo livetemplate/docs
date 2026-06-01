@@ -1,5 +1,6 @@
 ---
 title: "LiveTemplate CLI (`lvt`) - Complete Guide"
+description: "Complete guide to the lvt CLI for generating LiveTemplate apps, resources, views, auth, migrations, kits, and tests."
 source_repo: "https://github.com/livetemplate/lvt"
 source_path: "docs/guides/lvt-cli-guide.md"
 source_ref: "v0.1.8"
@@ -9,6 +10,17 @@ source_commit: "dc7d1a4ddc7fd3d3ac9f3a1c51c9ea74c4f5ccf3"
 # LiveTemplate CLI (`lvt`) - Complete Guide
 
 The `lvt` CLI is a Phoenix-inspired code generator for building LiveTemplate applications with CRUD functionality, authentication, and real-time features.
+
+## At a glance
+
+| Need | Command or feature | See |
+|---|---|---|
+| Create a new application | `lvt new <name>` | [Creating Applications](#creating-applications) |
+| Generate CRUD state, handlers, templates, and tests | `lvt gen <resource> ...` | [Generating Resources](#generating-resources) |
+| Add auth scaffolding | Auth generator and auth templates | [Generating Auth](#generating-auth) |
+| Manage database changes | Migration commands | [Managing Migrations](#managing-migrations) |
+| Customize generated UI | Kits and component templates | [Kits System](#kits-system) |
+| Run generated tests | Chromedp-backed testing support | [Testing](#testing) |
 
 ## Table of Contents
 

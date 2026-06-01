@@ -1,5 +1,6 @@
 ---
 title: "Counter"
+description: "A small LiveTemplate counter app demonstrating controller actions, per-session state, DOM patches, and optional realtime sync."
 source_repo: "https://github.com/livetemplate/examples"
 source_path: "counter/README.md"
 source_commit: "5054ed6726d9596d294a50b80f11488302b3ec2d"

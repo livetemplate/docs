@@ -15,6 +15,10 @@ go get github.com/livetemplate/livetemplate
 
 That's it for the server side. The TypeScript client (loaded from CDN by default) wires up the browser side automatically — you'll add a single `<script>` tag in your template; no npm step needed for getting started.
 
+## Client CDN versioning
+
+Docs examples may use `@latest` when they are demonstrating the current client quickly. For production apps, prefer a version range that matches your LiveTemplate core release policy, or pin an exact client version when you need reproducible archived behavior. The important part is to keep the server library and browser client on compatible major/minor versions.
+
 ## Optional: install the `lvt` CLI
 
 The `lvt` CLI generates LiveTemplate apps with database scaffolding, auth, and a router pre-wired. Optional — you can write apps directly in Go without it.

@@ -1,5 +1,6 @@
 ---
 title: "Changelog"
+description: "Release history across the LiveTemplate Go framework, TypeScript client, lvt CLI, examples, and docs site."
 ---
 
 # Changelog
