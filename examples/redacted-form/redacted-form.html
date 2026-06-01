@@ -46,9 +46,9 @@
 
         <article>
             <header>What the browser shows</header>
-            {{/* lvt.Redact renders the [[passport]] token; the client swaps it
-                 for the localStorage value before painting, so you see your own
-                 number here even though the server never had it. */}}
+            {{/* lvt.Redact emits an empty <span data-lvt-redact="passport">; the
+                 client fills its textContent from localStorage before painting, so
+                 you see your own number here even though the server never had it. */}}
             <p id="echo-passport">Passport on file: <strong>{{.lvt.Redact "passport"}}</strong></p>
             <p id="echo-note">Note on file: <strong>{{.Note}}</strong></p>
         </article>

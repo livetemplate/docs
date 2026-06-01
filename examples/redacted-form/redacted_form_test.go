@@ -15,7 +15,7 @@
 //     {redacted:true,field:"passport"} sentinel does.
 //   - The server-side state reflects "provided, value never received".
 //   - A non-redacted field (note) round-trips its real value normally.
-//   - On render, the [[passport]] placeholder token is hydrated back from
+//   - On render, the lvt.Redact span data-lvt-redact="passport" is filled back from
 //     localStorage so the user sees their own value.
 //
 // Per project E2E standards the test captures browser console logs, server
@@ -288,15 +288,18 @@ func TestRedactedForm_E2E(t *testing.T) {
 		t.Errorf("server-note panel = %q; expected the real note value", serverNoteHTML)
 	}
 
-	// 5. The [[passport]] echo token was hydrated from localStorage so the user
-	//    sees their own value in the browser.
+	// 5. The lvt.Redact <span data-lvt-redact="passport"> echo was filled from
+	//    localStorage (textContent), so the user sees their own value even though
+	//    the server emitted an empty marked span. The attribute being the trust
+	//    signal — not a free token — is what prevents user-posted content from
+	//    triggering substitution.
 	if !strings.Contains(echoPassportHTML, rawPassport) {
 		dumpDiag()
 		t.Errorf("echo-passport = %q; expected the hydrated real value %q", echoPassportHTML, rawPassport)
 	}
-	if strings.Contains(echoPassportHTML, "[[passport]]") {
+	if !strings.Contains(echoPassportHTML, `data-lvt-redact="passport"`) {
 		dumpDiag()
-		t.Errorf("echo-passport still shows the raw token (not hydrated): %s", echoPassportHTML)
+		t.Errorf("echo-passport = %q; expected the server-emitted data-lvt-redact span", echoPassportHTML)
 	}
 
 	// 6. localStorage holds the raw value under a redact-scoped key.
