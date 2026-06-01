@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="light dark">
+    <title>Redacted Form — LiveTemplate Preview mode</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
+    {{if .lvt.DevMode}}
+    <link rel="stylesheet" href="/livetemplate.css">
+    <script defer src="/livetemplate-client.js"></script>
+    {{else}}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@livetemplate/client@latest/livetemplate.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/@livetemplate/client@latest/dist/livetemplate-client.browser.js"></script>
+    {{end}}
+</head>
+<body>
+    <main class="container">
+        <h1>Preview mode — field redaction</h1>
+        <p>
+            The <strong>passport number</strong> below is redacted: it lives only
+            in your browser's localStorage and is never sent to the server. The
+            <strong>note</strong> is an ordinary field for contrast.
+        </p>
+
+        {{/* No lvt-form:no-intercept here: the client MUST intercept the submit
+             so it can redact the passport value before the action is sent. */}}
+        <form>
+            <label for="passport">Passport number (redacted)
+                {{/* data-lvt-redact: the client persists this input's value to
+                     localStorage and replaces it with a sentinel in the payload.
+                     The server renders no value attribute — the client fills
+                     .value from localStorage on each render. */}}
+                <input type="text" id="passport" name="passport"
+                       data-lvt-redact="passport"
+                       placeholder="e.g. X1234567" autocomplete="off">
+            </label>
+
+            <label for="note">Note (normal field)
+                <input type="text" id="note" name="note"
+                       value="{{.Note}}" placeholder="A non-sensitive note">
+            </label>
+
+            <button type="submit" name="save">Save</button>
+        </form>
+
+        <article>
+            <header>What the browser shows</header>
+            {{/* lvt.Redact emits an empty <span data-lvt-redact="passport">; the
+                 client fills its textContent from localStorage before painting, so
+                 you see your own number here even though the server never had it. */}}
+            <p id="echo-passport">Passport on file: <strong>{{.lvt.Redact "passport"}}</strong></p>
+            <p id="echo-note">Note on file: <strong>{{.Note}}</strong></p>
+        </article>
+
+        <article>
+            <header>What the server actually stores</header>
+            {{/* Verbatim server-side state. For the passport this is the literal
+                 token / presence flag — proof the raw value never arrived. */}}
+            <p id="server-passport">Passport field: <code>{{if .PassportProvided}}provided (value never received){{else}}empty{{end}}</code></p>
+            <p id="server-note">Note field: <code>{{.Note}}</code></p>
+        </article>
+    </main>
+</body>
+</html>
