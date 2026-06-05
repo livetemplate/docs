@@ -69,6 +69,8 @@ navigation:
         path: "recipes/shared-notepad/index.md"
       - title: "Chat"
         path: "recipes/apps/chat.md"
+      - title: "Seat Picker"
+        path: "recipes/apps/seat-picker.md"
       - title: "Avatar Upload"
         path: "recipes/apps/avatar-upload.md"
 

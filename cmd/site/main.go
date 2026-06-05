@@ -25,6 +25,7 @@ import (
 	loginrecipe "github.com/livetemplate/docs/examples/login"
 	"github.com/livetemplate/docs/examples/patterns"
 	pe "github.com/livetemplate/docs/examples/progressive-enhancement"
+	seatpicker "github.com/livetemplate/docs/examples/seat-picker"
 	notepad "github.com/livetemplate/docs/examples/shared-notepad"
 	"github.com/livetemplate/docs/examples/todos"
 )
@@ -51,6 +52,15 @@ func main() {
 	//   → tinkerdown fetches http://localhost:9091/apps/counter/
 	//   → mux routes to counter.Handler()
 	mux.Handle("/apps/counter/", http.StripPrefix("/apps/counter", counter.Handler(
+		livetemplate.WithAllowedOrigins(allowedOrigins),
+	)))
+
+	// seat-picker is the cross-user real-time recipe. Unlike counter (whose
+	// state is per-browser), its Controller is a process-wide singleton, so
+	// every visitor shares one seat hall — that shared state is the demo:
+	// open it in two windows and watch selections appear live across them.
+	// Same shared-state shape as the realtime UI patterns.
+	mux.Handle("/apps/seat-picker/", http.StripPrefix("/apps/seat-picker", seatpicker.Handler(
 		livetemplate.WithAllowedOrigins(allowedOrigins),
 	)))
 

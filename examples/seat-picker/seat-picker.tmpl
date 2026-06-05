@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="light dark">
+    <title>Seat Picker — LiveTemplate</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
+    {{if .lvt.DevMode}}
+    <link rel="stylesheet" href="/livetemplate.css">
+    <script defer src="/livetemplate-client.js"></script>
+    {{else}}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@livetemplate/client@latest/livetemplate.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/@livetemplate/client@latest/dist/livetemplate-client.browser.js"></script>
+    {{end}}
+</head>
+<body>
+    <main class="container">
+        <!-- Styles live INSIDE the body, not <head>: tinkerdown's embed-lvt
+             inlines only the <div data-lvt-id> wrapper into the docs page and
+             drops <head>, so head styles would never reach the embed. Kept
+             within the wrapper, they travel with it. Pico variables resolve
+             because the docs site loads Pico globally. -->
+        <style>
+            /* The hall is a CSS grid so all 8 seats in a row always stay on
+               one line, shrinking to fit narrow (mobile) viewports instead of
+               wrapping. The "8" matches the column count in newController(). */
+            .hall { max-width: 26rem; margin: 0 auto; }
+            .screen { text-align: center; background: var(--pico-muted-border-color); color: var(--pico-muted-color); border-radius: .25rem; padding: .3rem; margin: 0 0 1.25rem; font-size: .7rem; letter-spacing: .3em; }
+            .row { display: grid; grid-template-columns: 1.1rem repeat(8, 1fr); gap: .3rem; align-items: center; margin-bottom: .3rem; }
+            .row-label { text-align: center; opacity: .55; font-weight: bold; font-size: .75rem; }
+            .seat { aspect-ratio: 1; width: 100%; min-width: 0; height: auto; padding: 0; margin: 0; border: 2px solid var(--pico-primary); border-radius: .3rem; font-size: clamp(.5rem, 2.4vw, .72rem); display: flex; align-items: center; justify-content: center; background: transparent; color: var(--pico-primary); }
+            .seat:disabled { opacity: 1; }                                                  /* state is shown by colour, not dimming */
+            .seat.available { background: transparent; color: var(--pico-primary); }        /* outlined = open */
+            .seat.mine { background: var(--pico-primary); color: var(--pico-primary-inverse); border-color: var(--pico-primary); } /* solid = yours */
+            .seat.held { background: var(--pico-muted-border-color); border-color: var(--pico-muted-border-color); color: var(--pico-muted-color); } /* grey = someone else */
+            .seat.booked-mine { background: #2e7d32; border-color: #2e7d32; color: #fff; }   /* green = your booking */
+            .seat.booked { background: #b23b3b; border-color: #b23b3b; color: #fff; }        /* red = taken */
+            .legend { display: flex; flex-wrap: wrap; gap: .5rem 1rem; justify-content: center; font-size: .72rem; margin-top: 1.25rem; }
+            .legend span { display: inline-flex; align-items: center; gap: .3rem; }
+            .swatch { width: .9rem; height: .9rem; border-radius: .2rem; display: inline-block; border: 2px solid transparent; }
+            .sw-available { border-color: var(--pico-primary); }
+            .sw-mine { background: var(--pico-primary); }
+            .sw-held { background: var(--pico-muted-border-color); }
+            .sw-booked-mine { background: #2e7d32; }
+            .sw-booked { background: #b23b3b; }
+            .book-bar { margin-top: 1.25rem; text-align: center; }
+            .book-bar button { width: auto; }
+            .notice { max-width: 26rem; margin: .5rem auto 1rem; text-align: center; }
+        </style>
+        <article>
+            <header>
+                <hgroup>
+                    <h1>Pick your seats</h1>
+                    {{if .Viewer}}
+                    <p>Booking as <strong>{{.Viewer}}</strong> — open this page again as someone else to watch seats update live.</p>
+                    {{else}}
+                    <p>A live, multi-user seat map. Everyone viewing sees every selection in real time.</p>
+                    {{end}}
+                </hgroup>
+            </header>
+
+            {{if not .Viewer}}
+            <form method="POST" name="join">
+                <label>
+                    Your name
+                    <input type="text" name="name" placeholder="e.g. Alex" required autofocus>
+                </label>
+                <button type="submit">Enter the hall</button>
+            </form>
+            {{else}}
+            {{if .Message}}<p role="alert" class="notice"><mark>{{.Message}}</mark></p>{{end}}
+
+            <form method="POST" class="hall">
+                <div class="screen">SCREEN</div>
+
+                {{range .Rows}}
+                <div class="row">
+                    <span class="row-label">{{.Label}}</span>
+                    {{range .Seats}}
+                    {{if .Action}}
+                    <button class="seat {{.Status}}" name="{{.Action}}" value="{{.ID}}">{{.ID}}</button>
+                    {{else}}
+                    <button class="seat {{.Status}}" type="button" value="{{.ID}}" disabled>{{.ID}}</button>
+                    {{end}}
+                    {{end}}
+                </div>
+                {{end}}
+
+                <footer class="book-bar">
+                    <button name="confirm" {{if eq .HeldByMe 0}}disabled{{end}}>
+                        {{if eq .HeldByMe 0}}Select a seat to book{{else}}Book {{.HeldByMe}} seat{{if ne .HeldByMe 1}}s{{end}}{{end}}
+                    </button>
+                </footer>
+            </form>
+
+            <div class="legend">
+                <span><i class="swatch sw-available"></i> Available</span>
+                <span><i class="swatch sw-mine"></i> Yours (click to release)</span>
+                <span><i class="swatch sw-held"></i> Held by someone else</span>
+                <span><i class="swatch sw-booked-mine"></i> Your booking</span>
+                <span><i class="swatch sw-booked"></i> Booked</span>
+            </div>
+            {{end}}
+        </article>
+    </main>
+</body>
+</html>
