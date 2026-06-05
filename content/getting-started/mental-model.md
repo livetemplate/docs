@@ -11,6 +11,27 @@ LiveTemplate is server-driven UI for Go applications. You write standard `html/t
 
 The important constraint is also the useful part: start with HTML that works as a normal form POST, then opt into richer behavior only where the workflow needs it.
 
+## One model, every surface
+
+This is the idea the rest of the page elaborates, so it's worth stating once up front.
+
+Every reactive thing LiveTemplate does is the same four-step pipeline:
+
+```
+state changes  →  re-render the template  →  diff against the last render  →  patch the browser
+```
+
+A user clicking a button runs it. A second tab reacting to that click runs it. A *different user* seeing a live update runs it. The server pushing an update on its own — a timer, a job finishing — runs it. There is no separate "real-time engine," no client-side store, no merge logic to reconcile. The only things that differ between these cases are **when** the action is enqueued and **which** connections receive the resulting patch:
+
+| What happened | When the action runs | Who gets the patch |
+|---|---|---|
+| This user clicked | Immediately, on their connection | This connection |
+| Another tab should follow | After the action, via `ctx.Publish` | Same user's other tabs (or any subscribed connections) |
+| Another user should follow | After the action, via `ctx.Publish` to a shared topic | Everyone subscribed to that topic |
+| The server decided | Whenever the server calls `session.TriggerAction` | The target connection(s) |
+
+Because it is one pipeline, the program does not get a new shape as it grows. The counter you build in [Your First App](/getting-started/your-first-app) and a multi-user booking system are the same program with more controller methods and a `Subscribe`/`Publish` call — not a single-page app bolted onto a server. You never learn a second model.
+
 ## The three files
 
 A small LiveTemplate app usually starts with three files:
