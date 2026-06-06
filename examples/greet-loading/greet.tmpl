@@ -11,9 +11,10 @@
     <main class="container">
         <h1>Hello, {{.Name}}</h1>
         <form method="POST">
-            <input name="name" placeholder="Your name">
+            <input name="name" placeholder="Your name" required>
             <button name="greet" lvt-el:setAttr:on:pending="aria-busy:true" lvt-el:setAttr:on:done="aria-busy:false">Say hi</button>
         </form>
+        {{if .Count}}<small class="greet-count">greeted {{.Count}}×</small>{{end}}
     </main>
 </body>
 </html>

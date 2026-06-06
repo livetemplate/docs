@@ -91,21 +91,26 @@ func main() {
 	// teach. The client falls back to HTTP fetch (Step 4's "works without JS"
 	// degrades further to a plain form POST when JS itself is off).
 	//
-	//   Step 2 — greet-validate: server-side field validation (NewFieldError).
-	//   Step 3 — greet-loading:  HTML-declared loading button (disable-with).
+	//   Step 2 — greet-validate: server-side field validation (NewFieldError),
+	//            WS-disabled (a single submit; HTTP fetch is reliable here).
 	//   Step 4 — greet-nojs:     the SAME greet handler, remounted WS-disabled,
 	//                            proving transport is a config flag, not a rewrite.
 	mux.Handle("/apps/greet-validate/", http.StripPrefix("/apps/greet-validate", greetvalidate.Handler(
 		livetemplate.WithAllowedOrigins(allowedOrigins),
 		livetemplate.WithWebSocketDisabled(),
 	)))
-	mux.Handle("/apps/greet-loading/", http.StripPrefix("/apps/greet-loading", greetloading.Handler(
-		livetemplate.WithAllowedOrigins(allowedOrigins),
-		livetemplate.WithWebSocketDisabled(),
-	)))
 	mux.Handle("/apps/greet-nojs/", http.StripPrefix("/apps/greet-nojs", greet.Handler(
 		livetemplate.WithAllowedOrigins(allowedOrigins),
 		livetemplate.WithWebSocketDisabled(),
+	)))
+
+	// Step 3 — greet-loading: the HTML-declared loading spinner (aria-busy).
+	// This one stays WebSocket-ENABLED: it's the spine's first repeat-click
+	// demo, and the HTTP-fetch fallback stalls on Safari when a second submit
+	// produces no diff — over WebSocket the round-trip and aria-busy revert
+	// are reliable, and state persists so repeat clicks behave.
+	mux.Handle("/apps/greet-loading/", http.StripPrefix("/apps/greet-loading", greetloading.Handler(
+		livetemplate.WithAllowedOrigins(allowedOrigins),
 	)))
 
 	// greet-wall is the spine's climax (Steps 5-7) and the one shared,

@@ -114,7 +114,7 @@ func main() {
     <h2>Validate once, on both sides.</h2>
     <p class="lead">Write each rule once as a <b>standard HTML attribute</b> — <code>required</code>, <code>type="email"</code>, <code>minlength</code>. The browser enforces it instantly on the client, and <code>ctx.ValidateForm()</code> re-checks the <b>same</b> rules on the server — because you never trust the client. For rules HTML can't express, return a <code>FieldError</code>; it renders inline with <code>aria-invalid</code>. Submit empty (the browser stops you) or type <b>admin</b> (the server does):</p>
     <div class="live-card" style="margin-top:24px">
-      <div class="live-bar"><span class="live-badge"><span class="pulse"></span> live</span><span class="live-meta">greet-validate · WebSocket off</span></div>
+      <div class="live-bar"><span class="live-badge"><span class="pulse"></span> live</span><span class="live-meta">greet-validate · server-checked</span></div>
       <div class="live-body">
 
 ```embed-lvt path="/apps/greet-validate/" upstream="http://localhost:9091" height="220px"
@@ -153,7 +153,7 @@ func main() {
     <h2>A loading button, declared in HTML.</h2>
     <p class="lead">Slow work shouldn't mean a client-side state machine. While the action is in flight the client toggles <code>aria-busy</code> on the button — your CSS framework renders the spinner, no JavaScript. Two attributes mark the start and the end; the server code is unchanged. Click <b>Say hi</b> and watch the spinner:</p>
     <div class="live-card" style="margin-top:24px">
-      <div class="live-bar"><span class="live-badge"><span class="pulse"></span> live</span><span class="live-meta">greet-loading · WebSocket off</span></div>
+      <div class="live-bar"><span class="live-badge"><span class="pulse"></span> live</span><span class="live-meta">greet-loading · live spinner</span></div>
       <div class="live-body">
 
 ```embed-lvt path="/apps/greet-loading/" upstream="http://localhost:9091" height="200px"
@@ -163,12 +163,12 @@ func main() {
     </div>
   </div>
   <div>
-    <div class="code delta"><div class="code-bar"><span class="dots"><i></i><i></i><i></i></span><span class="file">app.tmpl · the only change</span></div>
+    <div class="code delta"><div class="code-bar"><span class="dots"><i></i><i></i><i></i></span><span class="file">app.tmpl · the loading button</span></div>
 <pre><span class="tag">&lt;button</span> <span class="attr">name</span>=<span class="str">"greet"</span>
   <span class="attr">lvt-el:setAttr:on:pending</span>=<span class="str">"aria-busy:true"</span>
   <span class="attr">lvt-el:setAttr:on:done</span>=<span class="str">"aria-busy:false"</span><span class="tag">&gt;</span>Say hi<span class="tag">&lt;/button&gt;</span></pre></div>
     <p class="demo-cap" style="margin-top:18px"><code>lvt-*</code> attributes are the escape hatch for <b>behavior HTML itself can't express</b> — a pending state, a debounce, a keyboard shortcut. The server code for this step is <b>unchanged</b>. You reach for an attribute only here, never as boilerplate to make ordinary HTML work.</p>
-    <div class="wire"><span class="wlabel">on the wire · HTTP fetch</span>
+    <div class="wire"><span class="wlabel">on the wire · WebSocket</span>
       <span class="wf up">▲ {"action":"greet","data":{"name":"Ada"}}</span>
       <span class="wf dn">▼ {"tree":{"0":"Ada"}}</span>
     </div>
@@ -202,7 +202,7 @@ func main() {
 <section class="alt"><div class="wrap">
   <div class="sec-tag">Step 5 · Sync your own tabs</div>
   <h2>Turn on real-time. Your tabs move together.</h2>
-  <p class="lead">Now WebSocket is on. Subscribe a connection to its own topic and publish after a handler runs — <b>two calls</b> — and your greeting syncs across every tab you have open. Every reactive thing LiveTemplate does is this same four-step pipeline; a second tab just runs it too.</p>
+  <p class="lead">Now put that live connection to work. Subscribe a connection to its own topic and publish after a handler runs — <b>two calls</b> — and your greeting syncs across every tab you have open. Every reactive thing LiveTemplate does is this same four-step pipeline; a second tab just runs it too.</p>
   <div class="pipe" style="margin-top:26px">
     <div class="step"><div class="k">1 · state</div><div class="v">state changes</div></div><div class="arrow">→</div>
     <div class="step"><div class="k">2 · render</div><div class="v">re-render template</div></div><div class="arrow">→</div>
