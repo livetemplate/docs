@@ -70,8 +70,11 @@ func TestSpineEmbedsMount(t *testing.T) {
 	}
 }
 
-// TestSpineValidation exercises step 2: an empty submit on greet-validate (WS
-// disabled) returns a server-side field error that renders inline.
+// TestSpineValidation exercises step 2's server-side path: typing the reserved
+// name "admin" passes the browser's HTML checks but is rejected by a server
+// FieldError that renders inline. (The empty case is enforced client-side by
+// the input's `required` attribute, so the browser blocks it before any
+// round-trip — that's the client half of the both-sides story.)
 func TestSpineValidation(t *testing.T) {
 	ctx, cancel := newCtx(t)
 	defer cancel()
@@ -79,9 +82,10 @@ func TestSpineValidation(t *testing.T) {
 	var headline, errText, ariaInvalid string
 	if err := chromedp.Run(ctx,
 		chromedp.Navigate(baseURL()+"/apps/greet-validate/"),
-		chromedp.WaitVisible(`button[name="greet"]`, chromedp.ByQuery),
+		chromedp.WaitVisible(`input[name="name"]`, chromedp.ByQuery),
 		chromedp.Sleep(800*time.Millisecond),
-		chromedp.Click(`button[name="greet"]`, chromedp.ByQuery), // submit empty
+		chromedp.SendKeys(`input[name="name"]`, "admin", chromedp.ByQuery),
+		chromedp.Click(`button[name="greet"]`, chromedp.ByQuery),
 		chromedp.Sleep(900*time.Millisecond),
 		chromedp.Text(`h1`, &headline, chromedp.ByQuery),
 		chromedp.Evaluate(`(document.querySelector('form small')||{}).innerText||''`, &errText),
@@ -93,8 +97,8 @@ func TestSpineValidation(t *testing.T) {
 	if !strings.Contains(headline, "there") {
 		t.Errorf("headline = %q, want unchanged greeting (Hello, there) on validation error", headline)
 	}
-	if !strings.Contains(strings.ToLower(errText), "enter a name") {
-		t.Errorf("error text = %q, want the field error message", errText)
+	if !strings.Contains(strings.ToLower(errText), "reserved") {
+		t.Errorf("error text = %q, want the server FieldError about a reserved name", errText)
 	}
 	if ariaInvalid != "true" {
 		t.Errorf("aria-invalid = %q, want \"true\" on the errored field", ariaInvalid)

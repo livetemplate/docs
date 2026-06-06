@@ -11,7 +11,7 @@
     <main class="container">
         <h1>Hello, {{.Name}}</h1>
         <form method="POST">
-            <input name="name" placeholder="Your name" {{.lvt.AriaInvalid "name"}}>
+            <input name="name" placeholder="Your name" required {{.lvt.AriaInvalid "name"}}>
             {{.lvt.ErrorTag "name"}}
             <button name="greet">Say hi</button>
         </form>

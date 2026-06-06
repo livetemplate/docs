@@ -114,8 +114,8 @@ func main() {
 <section><div class="wrap two code-right">
   <div>
     <div class="sec-tag">Step 2 · Validation</div>
-    <h2>Validation lives in Go.</h2>
-    <p class="lead">Return a <code>FieldError</code> from your method and it renders inline — the message and <code>aria-invalid</code>, wired for you. The rule lives in <b>one place, the server</b>, so there's no client-side validation to keep in step. Submit it empty and watch:</p>
+    <h2>Validate once, on both sides.</h2>
+    <p class="lead">Write each rule once as a <b>standard HTML attribute</b> — <code>required</code>, <code>type="email"</code>, <code>minlength</code>. The browser enforces it instantly on the client, and <code>ctx.ValidateForm()</code> re-checks the <b>same</b> rules on the server — because you never trust the client. For rules HTML can't express, return a <code>FieldError</code>; it renders inline with <code>aria-invalid</code>. Submit empty (the browser stops you) or type <b>admin</b> (the server does):</p>
     <div class="live-card" style="margin-top:24px">
       <div class="live-bar"><span class="live-badge"><span class="pulse"></span> live</span><span class="live-meta">greet-validate · WebSocket off</span></div>
       <div class="live-body">
@@ -127,22 +127,24 @@ func main() {
     </div>
   </div>
   <div>
-    <div class="code delta"><div class="code-bar"><span class="dots"><i></i><i></i><i></i></span><span class="file">app.go · Greet gains a guard</span></div>
+    <div class="code delta"><div class="code-bar"><span class="dots"><i></i><i></i><i></i></span><span class="file">app.tmpl · the rule, written once</span></div>
+<pre><span class="tag">&lt;input</span> <span class="attr">name</span>=<span class="str">"name"</span> <span class="attr">required</span> {{<span class="fn">.lvt.AriaInvalid</span> <span class="str">"name"</span>}}<span class="tag">&gt;</span>
+{{<span class="fn">.lvt.ErrorTag</span> <span class="str">"name"</span>}}</pre></div>
+    <div class="code delta"><div class="code-bar"><span class="dots"><i></i><i></i><i></i></span><span class="file">app.go · the server re-checks, then adds its own rule</span></div>
 <pre class="language-go"><code class="language-go">func (a *App) Greet(s State, ctx *lvt.Context) (State, error) {
+    if err := ctx.ValidateForm(); err != nil {   // re-runs the HTML rules server-side
+        return s, err
+    }
     name := strings.TrimSpace(ctx.GetString("name"))
-    if name == "" {
-        return s, lvt.NewFieldError("name",
-            errors.New("Please enter a name"))
+    if strings.EqualFold(name, "admin") {         // a rule HTML can't express
+        return s, lvt.NewFieldError("name", errors.New(`"admin" is reserved`))
     }
     s.Name = name
     return s, nil
 }</code></pre></div>
-    <div class="code delta"><div class="code-bar"><span class="dots"><i></i><i></i><i></i></span><span class="file">app.tmpl · where the error lands</span></div>
-<pre><span class="tag">&lt;input</span> <span class="attr">name</span>=<span class="str">"name"</span> {{<span class="fn">.lvt.AriaInvalid</span> <span class="str">"name"</span>}}<span class="tag">&gt;</span>
-{{<span class="fn">.lvt.ErrorTag</span> <span class="str">"name"</span>}}</pre></div>
     <div class="wire"><span class="wlabel">on the wire · HTTP fetch</span>
-      <span class="wf up">▲ {"action":"greet","data":{"name":""}}</span>
-      <span class="wf dn">▼ {"meta":{"errors":{"name":"Please enter a name"}}}</span>
+      <span class="wf up">▲ {"action":"greet","data":{"name":"admin"}}</span>
+      <span class="wf dn">▼ {"meta":{"errors":{"name":"\"admin\" is reserved"}}}</span>
     </div>
   </div>
 </div></section>
