@@ -12,7 +12,7 @@
         <h1>Hello, {{.Name}}</h1>
         <form method="POST">
             <input name="name" placeholder="Your name">
-            <button name="greet" lvt-form:disable-with="Saying hi…">Say hi</button>
+            <button name="greet" lvt-el:setAttr:on:pending="aria-busy:true" lvt-el:setAttr:on:done="aria-busy:false">Say hi</button>
         </form>
     </main>
 </body>
