@@ -105,9 +105,6 @@ func main() {
   <div class="sec-tag">One app, seven steps</div>
   <h2>Now watch that same app grow.</h2>
   <p class="lead">Everything below is the <b>same greeting app</b>, gaining one capability at a time — validation, a loading state, working without JavaScript, then real-time: your own tabs, then everyone, then the server speaking on its own. Each step is a <b>small diff</b> and the <b>real bytes on the wire</b>. There's no second model to learn — only more of the one you just saw.</p>
-  <ol class="rail">
-    <li class="done">Render</li><li>Validate</li><li>Loading</li><li>Works without JS</li><li>Your tabs</li><li>Everyone</li><li>Server speaks</li>
-  </ol>
 </div></section>
 
 <!-- STEP 2 · VALIDATE -->
