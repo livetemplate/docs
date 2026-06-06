@@ -210,7 +210,7 @@ func main() {
     <div class="step"><div class="k">4 · patch</div><div class="v">patch the browser</div></div>
   </div>
   <div class="live-card" style="margin:32px auto 0;max-width:540px">
-    <div class="live-bar"><span class="live-badge"><span class="pulse"></span> live</span><span class="live-meta">greet wall · your session</span></div>
+    <div class="live-bar"><span class="live-badge"><span class="pulse"></span> live</span><span class="live-meta">greet wall · WebSocket on</span></div>
     <div class="live-body">
 
 ```embed-lvt path="/apps/greet-wall/" upstream="http://localhost:9091" height="260px"
@@ -241,13 +241,13 @@ func (a *App) Greet(s State, ctx *lvt.Context) (State, error) {
   <h2>One more topic, and it's cross-user.</h2>
   <p class="lead">Swap the self-topic for a <b>shared</b> topic — admitted by a tiny ACL — and the same publish fans out to <b>every visitor</b>. The two cards below are <b>separate sessions — like two different people</b>. Greet in one and your line lands on the other's wall, live. Most demos show your clicks updating your screen; this is a <em>different session's</em> clicks updating yours — standard HTML, no hand-written JavaScript.</p>
   <div class="two" style="margin-top:28px">
-    <div class="live-card"><div class="live-bar"><span class="live-badge"><span class="pulse"></span> live</span><span class="live-meta">greet wall · visitor 1</span></div><div class="live-body">
+    <div class="live-card"><div class="live-bar"><span class="live-badge"><span class="pulse"></span> live</span><span class="live-meta">visitor 1 · WebSocket on</span></div><div class="live-body">
 
 ```embed-lvt path="/apps/greet-wall/" upstream="http://localhost:9091" height="260px"
 ```
 
 </div></div>
-    <div class="live-card"><div class="live-bar"><span class="live-badge"><span class="pulse"></span> live</span><span class="live-meta">greet wall · visitor 2</span></div><div class="live-body">
+    <div class="live-card"><div class="live-bar"><span class="live-badge"><span class="pulse"></span> live</span><span class="live-meta">visitor 2 · WebSocket on</span></div><div class="live-body">
 
 ```embed-lvt path="/apps/greet-wall/" upstream="http://localhost:9091" height="260px"
 ```
