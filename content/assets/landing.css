@@ -182,12 +182,16 @@ footer{background:var(--ink);color:var(--slate-3);padding:36px 0;border-top:1px 
 .tinkerdown-embed-lvt[data-embed-path*="counter"] form{display:inline-flex;gap:10px}
 .tinkerdown-embed-lvt[data-embed-path*="counter"] button{width:auto;margin:0;border-radius:10px;padding:9px 20px;font-weight:600}
 .tinkerdown-embed-lvt[data-embed-path*="counter"] button[name="increment"]{--pico-background-color:var(--sig);--pico-border-color:var(--sig);background:var(--sig);border-color:var(--sig)}
-/* greet hero app: tidy the input+button row, emerald "Say hi" */
+/* greet apps (hero + spine steps): input+button on one row, emerald "Say hi".
+   The validate/wall steps add a {{.lvt.ErrorTag}} <small> between input and
+   button; `order` keeps the input+button row intact while the error wraps to
+   its own full-width line below (it stays after the input in DOM for a11y). */
 .tinkerdown-embed-lvt[data-embed-path*="greet"] main.container{max-width:none;margin:0;padding:.25rem 0;text-align:center}
 .tinkerdown-embed-lvt[data-embed-path*="greet"] h1{font-size:26px;font-weight:800;letter-spacing:-.02em;margin:0 0 14px}
-.tinkerdown-embed-lvt[data-embed-path*="greet"] form{display:flex;gap:8px;max-width:360px;margin:0 auto}
-.tinkerdown-embed-lvt[data-embed-path*="greet"] input{margin:0;flex:1}
-.tinkerdown-embed-lvt[data-embed-path*="greet"] button[name="greet"]{--pico-background-color:var(--sig);--pico-border-color:var(--sig);background:var(--sig);border-color:var(--sig);width:auto;white-space:nowrap}
+.tinkerdown-embed-lvt[data-embed-path*="greet"] form{display:flex;flex-wrap:wrap;gap:8px;max-width:360px;margin:0 auto}
+.tinkerdown-embed-lvt[data-embed-path*="greet"] input{margin:0;flex:1 1 60%;min-width:0;order:1}
+.tinkerdown-embed-lvt[data-embed-path*="greet"] button[name="greet"]{--pico-background-color:var(--sig);--pico-border-color:var(--sig);background:var(--sig);border-color:var(--sig);width:auto;white-space:nowrap;order:2}
+.tinkerdown-embed-lvt[data-embed-path*="greet"] form small{order:3;flex-basis:100%;margin:0;text-align:left;color:#e11d48;font-weight:500}
 
 /* ── Responsive: mobile nav (hide text links, keep the CTA) ── */
 @media(max-width:760px){
