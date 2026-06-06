@@ -23,6 +23,9 @@ import (
 	"github.com/livetemplate/docs/examples/counter"
 	counterbasic "github.com/livetemplate/docs/examples/counter-basic"
 	"github.com/livetemplate/docs/examples/greet"
+	greetloading "github.com/livetemplate/docs/examples/greet-loading"
+	greetvalidate "github.com/livetemplate/docs/examples/greet-validate"
+	greetwall "github.com/livetemplate/docs/examples/greet-wall"
 	loginrecipe "github.com/livetemplate/docs/examples/login"
 	"github.com/livetemplate/docs/examples/patterns"
 	pe "github.com/livetemplate/docs/examples/progressive-enhancement"
@@ -75,9 +78,42 @@ func main() {
 		livetemplate.WithAllowedOrigins(allowedOrigins),
 	)))
 
-	// greet is the tiny "hello, name" app shown live in the homepage hero,
-	// beside its own app.tmpl / app.go source.
+	// greet is the tiny "hello, name" app shown live in the homepage hero
+	// (Step 1 of the progressive-narrative spine), beside its own app.tmpl /
+	// app.go source. WebSocket-enabled: the hero's "under the hood" animation
+	// reveals the real WS round-trip, so the app runs WS to match.
 	mux.Handle("/apps/greet/", http.StripPrefix("/apps/greet", greet.Handler(
+		livetemplate.WithAllowedOrigins(allowedOrigins),
+	)))
+
+	// The progressive-narrative spine's middle steps (2-4) each run a live
+	// app, but with WebSocket DISABLED — request/response is exactly what they
+	// teach. The client falls back to HTTP fetch (Step 4's "works without JS"
+	// degrades further to a plain form POST when JS itself is off).
+	//
+	//   Step 2 — greet-validate: server-side field validation (NewFieldError).
+	//   Step 3 — greet-loading:  HTML-declared loading button (disable-with).
+	//   Step 4 — greet-nojs:     the SAME greet handler, remounted WS-disabled,
+	//                            proving transport is a config flag, not a rewrite.
+	mux.Handle("/apps/greet-validate/", http.StripPrefix("/apps/greet-validate", greetvalidate.Handler(
+		livetemplate.WithAllowedOrigins(allowedOrigins),
+		livetemplate.WithWebSocketDisabled(),
+	)))
+	mux.Handle("/apps/greet-loading/", http.StripPrefix("/apps/greet-loading", greetloading.Handler(
+		livetemplate.WithAllowedOrigins(allowedOrigins),
+		livetemplate.WithWebSocketDisabled(),
+	)))
+	mux.Handle("/apps/greet-nojs/", http.StripPrefix("/apps/greet-nojs", greet.Handler(
+		livetemplate.WithAllowedOrigins(allowedOrigins),
+		livetemplate.WithWebSocketDisabled(),
+	)))
+
+	// greet-wall is the spine's climax (Steps 5-7) and the one shared,
+	// WebSocket-enabled real-time app on the landing: per-user tab sync
+	// (SelfTopic), a cross-user shared wall, and server-initiated push. Like
+	// seat-picker its controller is a process-wide singleton, so every visitor
+	// shares one wall — open it in two windows to watch greetings appear live.
+	mux.Handle("/apps/greet-wall/", http.StripPrefix("/apps/greet-wall", greetwall.Handler(
 		livetemplate.WithAllowedOrigins(allowedOrigins),
 	)))
 

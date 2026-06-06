@@ -329,3 +329,29 @@ html,body{overflow-x:hidden}
   .uh-up,.uh-down{display:none}
   .uh-btn::after,.uh-server::after,.uh-step.st1,.uh-step.st2{animation:none}
 }
+
+/* ── Progressive-narrative spine (greet → wall) ────────────── */
+.spine-intro{text-align:center}
+.spine-intro .lead{max-width:70ch;margin-left:auto;margin-right:auto}
+.rail{list-style:none;display:flex;flex-wrap:wrap;justify-content:center;gap:8px;padding:0;margin:28px 0 0;counter-reset:step}
+.rail li{counter-increment:step;font:600 12.5px 'JetBrains Mono';color:var(--slate-2);background:#fff;border:1px solid var(--line);border-radius:999px;padding:7px 14px 7px 11px;display:inline-flex;align-items:center;gap:7px}
+.rail li::before{content:counter(step);display:grid;place-items:center;width:18px;height:18px;border-radius:50%;background:var(--bg-3);color:var(--slate-2);font-size:11px}
+.rail li.done{color:var(--sig-d);border-color:var(--sigline);background:var(--sigsoft)}
+.rail li.done::before{background:var(--sig);color:#fff}
+
+/* a code block presented as the diff/delta from the previous step */
+.code.delta{border-color:var(--sigline);box-shadow:0 24px 50px -24px rgba(2,6,23,.55),inset 3px 0 0 var(--sig-2)}
+.code.delta .code-bar{background:linear-gradient(90deg,rgba(16,185,129,.12),var(--code-bg-2) 60%)}
+.code.delta .code-bar .file{color:#6ee7b7}
+
+/* compact "on the wire" strip — per-step real JSON frames */
+.wire{margin-top:18px;border:1px solid var(--line);border-radius:12px;background:var(--bg);padding:14px 16px;display:flex;flex-direction:column;gap:8px}
+.wlabel{font:600 10px 'JetBrains Mono';letter-spacing:.1em;text-transform:uppercase;color:var(--slate-3)}
+.wf{font:600 12px/1.5 'JetBrains Mono';padding:8px 12px;border-radius:8px;word-break:break-all}
+.wf.up{background:var(--sigsoft);color:var(--sig-d);border:1px solid var(--sigline)}
+.wf.dn{background:var(--ink);color:#cbd5e1}
+.wf.note{color:var(--slate-3);background:none;padding:0 2px;font-weight:500}
+
+/* step 4: enhancement tiers stacked beside the live embed */
+.tiers-col{grid-template-columns:1fr;margin-top:0}
+@media(max-width:860px){.spine-intro .lead{max-width:100%}}
