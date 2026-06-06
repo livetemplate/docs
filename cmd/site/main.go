@@ -22,6 +22,7 @@ import (
 
 	"github.com/livetemplate/docs/examples/counter"
 	counterbasic "github.com/livetemplate/docs/examples/counter-basic"
+	"github.com/livetemplate/docs/examples/greet"
 	loginrecipe "github.com/livetemplate/docs/examples/login"
 	"github.com/livetemplate/docs/examples/patterns"
 	pe "github.com/livetemplate/docs/examples/progressive-enhancement"
@@ -42,6 +43,7 @@ func main() {
 		"http://localhost:8084",
 		"http://localhost:8099",
 		"http://devbox:8084",
+		"http://100.123.67.113:8084", // devbox tailscale IP (preview over IP)
 	}
 
 	mux := http.NewServeMux()
@@ -70,6 +72,12 @@ func main() {
 	// single-session reactivity first and layer cross-tab sync on top via
 	// /apps/counter/ as the "next level."
 	mux.Handle("/apps/counter-basic/", http.StripPrefix("/apps/counter-basic", counterbasic.Handler(
+		livetemplate.WithAllowedOrigins(allowedOrigins),
+	)))
+
+	// greet is the tiny "hello, name" app shown live in the homepage hero,
+	// beside its own app.tmpl / app.go source.
+	mux.Handle("/apps/greet/", http.StripPrefix("/apps/greet", greet.Handler(
 		livetemplate.WithAllowedOrigins(allowedOrigins),
 	)))
 
