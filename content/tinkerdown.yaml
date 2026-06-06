@@ -243,7 +243,7 @@ styling:
   primary_color: "#5a67d8"
   font: "system-ui"
   # Bespoke emerald landing styling — injected only on layout: landing pages.
-  custom_css: "assets/landing.css?v=12"
+  custom_css: "assets/landing.css?v=13"
 
 blocks:
   auto_id: true

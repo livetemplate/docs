@@ -372,3 +372,13 @@ html,body{overflow-x:hidden}
 .pipe .arrow:nth-child(6){animation-delay:1.38s}
 .pipe .step:nth-child(7){animation-delay:1.65s}
 @media(prefers-reduced-motion:reduce){.pipe .step,.pipe .arrow{animation:none}}
+
+/* ── Step 3 loading button: a spinner that REPLACES the label in place.
+   color:transparent hides the text but keeps its box, so the button never
+   changes width (no wrap on mobile); the ::after spinner is centered over it.
+   Driven by the .is-loading class the client toggles on pending/done. */
+.tinkerdown-embed-lvt[data-embed-path*="greet-loading"] button[name="greet"]{position:relative}
+.tinkerdown-embed-lvt[data-embed-path*="greet-loading"] button[name="greet"].is-loading{color:transparent}
+.tinkerdown-embed-lvt[data-embed-path*="greet-loading"] button[name="greet"].is-loading::after{content:"";position:absolute;inset:0;margin:auto;width:16px;height:16px;border:2px solid rgba(255,255,255,.5);border-top-color:#fff;border-radius:50%;animation:greetspin .6s linear infinite}
+@keyframes greetspin{to{transform:rotate(360deg)}}
+@media(prefers-reduced-motion:reduce){.tinkerdown-embed-lvt[data-embed-path*="greet-loading"] button[name="greet"].is-loading::after{animation:none;border-top-color:rgba(255,255,255,.5)}}

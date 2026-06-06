@@ -151,7 +151,7 @@ func main() {
   <div>
     <div class="sec-tag">Step 3 · Loading state</div>
     <h2>A loading button, declared in HTML.</h2>
-    <p class="lead">Slow work shouldn't mean a client-side state machine. While the action is in flight the client toggles <code>aria-busy</code> on the button — your CSS framework renders the spinner, no JavaScript. Two attributes mark the start and the end; the server code is unchanged. Click <b>Say hi</b> and watch the spinner:</p>
+    <p class="lead">Slow work shouldn't mean a client-side state machine. While the action is in flight the client toggles a class on the button — a few lines of CSS spin an icon in its place, no JavaScript. Two attributes mark the start and the end; the server code is unchanged. Click <b>Say hi</b> and watch the spinner:</p>
     <div class="live-card" style="margin-top:24px">
       <div class="live-bar"><span class="live-badge"><span class="pulse"></span> live</span><span class="live-meta">greet-loading · live spinner</span></div>
       <div class="live-body">
@@ -165,10 +165,10 @@ func main() {
   <div>
     <div class="code delta"><div class="code-bar"><span class="dots"><i></i><i></i><i></i></span><span class="file">app.tmpl · the loading button</span></div>
 <pre><span class="tag">&lt;button</span> <span class="attr">name</span>=<span class="str">"greet"</span>
-  <span class="attr">lvt-el:setAttr:on:pending</span>=<span class="str">"aria-busy:true"</span>
-  <span class="attr">lvt-el:setAttr:on:done</span>=<span class="str">"aria-busy:false"</span><span class="tag">&gt;</span>Say hi<span class="tag">&lt;/button&gt;</span></pre></div>
+  <span class="attr">lvt-el:addClass:on:pending</span>=<span class="str">"is-loading"</span>
+  <span class="attr">lvt-el:removeClass:on:done</span>=<span class="str">"is-loading"</span><span class="tag">&gt;</span>Say hi<span class="tag">&lt;/button&gt;</span></pre></div>
     <p class="demo-cap" style="margin-top:18px"><code>lvt-*</code> attributes are the escape hatch for <b>behavior HTML itself can't express</b> — a pending state, a debounce, a keyboard shortcut. The server code for this step is <b>unchanged</b>. You reach for an attribute only here, never as boilerplate to make ordinary HTML work.</p>
-    <div class="wire"><span class="wlabel">on the wire · WebSocket</span>
+    <div class="wire"><span class="wlabel">on the wire · HTTP fetch</span>
       <span class="wf up">▲ {"action":"greet","data":{"name":"Ada"}}</span>
       <span class="wf dn">▼ {"tree":{"0":"Ada"}}</span>
     </div>
