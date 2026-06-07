@@ -41,5 +41,5 @@ publish; `PresenceChanged` refreshes only the count on peers.
 - You want explicit join/leave semantics rather than inferring presence from raw
   connection lifecycle.
 
-Reach for [Broadcasting](/recipes/ui-patterns/realtime/broadcasting) when peers
+Reach for [Pubsub](/recipes/ui-patterns/realtime/pubsub) when peers
 need to exchange messages, not just presence.

@@ -43,10 +43,10 @@ navigation:
         path: "recipes/progressive-enhancement/index.md"
       - title: "The Update Flow"
         path: "recipes/architecture-flow.md"
-      - title: "Sync & Broadcast"
-        path: "recipes/sync-and-broadcast.md"
-      - title: "Broadcasting"
-        path: "recipes/broadcasting.md"
+      - title: "Pubsub"
+        path: "recipes/pubsub.md"
+      - title: "Server push"
+        path: "recipes/server-push.md"
 
   # Recipes — short, copyable idioms.
   - title: "Recipes"
@@ -156,8 +156,8 @@ navigation:
         pages:
           - title: "Multi-User Refresh"
             path: "recipes/ui-patterns/realtime/multi-user-sync.md"
-          - title: "Broadcasting"
-            path: "recipes/ui-patterns/realtime/broadcasting.md"
+          - title: "Pubsub"
+            path: "recipes/ui-patterns/realtime/pubsub.md"
           - title: "Presence Tracking"
             path: "recipes/ui-patterns/realtime/presence.md"
           - title: "Reconnection Recovery"

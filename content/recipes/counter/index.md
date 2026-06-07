@@ -122,5 +122,5 @@ The `embed.FS` + temp-file dance at the top is a workaround for `livetemplate.Wi
 - [Reference — Authentication](/reference/authentication) — the full `Authenticator` interface, beyond the anonymous default.
 - [Reference — PubSub & Peer Fan-Out](/reference/pubsub) — multi-instance peer fan-out via Redis.
 - [Reference — Server Actions](/reference/server-actions) — the action lifecycle, including `Publish` ordering rules and gotchas.
-- [Sync & Server Push](/recipes/sync-and-broadcast) — when to use Subscribe/Publish peer fan-out vs server-initiated TriggerAction.
+- [Pubsub](/recipes/pubsub) / [Server push](/recipes/server-push) — Subscribe/Publish peer fan-out vs. server-initiated TriggerAction.
 - [Your First App](/getting-started/your-first-app) — if you arrived here cold, the from-scratch walkthrough is the better starting point.

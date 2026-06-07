@@ -37,7 +37,7 @@ Larger runnable recipes with more production shape:
 Narrative recipes for internals, tradeoffs, and operational shape:
 
 - [Counter, deeper](/recipes/counter)
-- [Broadcasting, deeper](/recipes/broadcasting)
+- [Pubsub](/recipes/pubsub) — `Subscribe`/`Publish` peer fan-out
+- [Server push](/recipes/server-push) — server-initiated `TriggerAction`
 - [How a LiveTemplate update flows](/recipes/architecture-flow)
-- [Sync, Broadcast & Multi-User Sessions](/recipes/sync-and-broadcast)
 - [How this docs site works](/recipes/how-this-site-works)
