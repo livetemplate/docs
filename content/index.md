@@ -178,11 +178,11 @@ func main() {
 <!-- STEP 4 · WORKS WITHOUT JS -->
 <section><div class="wrap">
   <div class="sec-tag">Step 4 · Works without JavaScript</div>
-  <h2>The same program. Three transports.</h2>
-  <p class="lead">This is the <b>identical greeting app</b> — but its server has WebSocket turned off. With JavaScript on, the client falls back to an HTTP fetch and patches the DOM in place. With JavaScript <em>off</em>, the very same <code>&lt;form&gt;</code> POSTs and the server renders the page. Progressive enhancement is a <b>transport flag, not a different app</b>.</p>
+  <h2>The same program. Two transports, side by side — try them.</h2>
+  <p class="lead">Both cards run the <b>identical greeting app</b> with the WebSocket turned off. <b>Left, JavaScript on:</b> the client intercepts the form, sends an HTTP fetch, and patches the headline in place — no reload. <b>Right, JavaScript disabled</b> (a sandboxed frame with scripts blocked): the very same <code>&lt;form&gt;</code> does a plain POST and the server renders the page — watch the whole card reload. Same Go, same template; progressive enhancement is a <b>transport flag, not a different app</b>. Type a name in each.</p>
   <div class="two" style="margin-top:28px">
     <div class="live-card">
-      <div class="live-bar"><span class="live-badge"><span class="pulse"></span> live</span><span class="live-meta">greet-nojs · same code, WebSocket off</span></div>
+      <div class="live-bar"><span class="live-badge"><span class="pulse"></span> live</span><span class="live-meta">JavaScript on · fetch + DOM patch</span></div>
       <div class="live-body">
 
 ```embed-lvt path="/apps/greet-nojs/" upstream="http://localhost:9091" height="200px"
@@ -190,12 +190,14 @@ func main() {
 
 </div>
     </div>
-    <div class="tiers tiers-col">
-      <div class="tier"><div class="lvl">no javascript</div><h4>Form POST</h4><p>The form submits normally; the browser shows the server-rendered response. It just works.</p></div>
-      <div class="tier"><div class="lvl">javascript</div><h4>fetch + DOM patch</h4><p>The client intercepts the form, sends HTTP, and patches the DOM in place — no full reload. <b>(this demo)</b></p></div>
-      <div class="tier"><div class="lvl">+ websocket</div><h4>Real-time push</h4><p>Actions stream over a WebSocket; the server can push any time. That's the next three steps. ↓</p></div>
+    <div class="live-card">
+      <div class="live-bar"><span class="live-badge nojs">○ no JS</span><span class="live-meta">JavaScript off · form POST → full render</span></div>
+      <div class="live-body">
+        <iframe class="nojs-frame" src="/apps/greet-nojs/" sandbox="allow-forms allow-same-origin" title="The greeting app with JavaScript disabled" loading="lazy"></iframe>
+      </div>
     </div>
   </div>
+  <p class="demo-cap" style="margin-top:18px">The third transport — <b>real-time WebSocket push</b>, where the server updates the page with no request at all — is live in the next three steps. ↓</p>
 </div></section>
 
 <!-- STEP 5 · YOUR TABS -->
@@ -287,10 +289,10 @@ func (a *App) Greet(s State, ctx *lvt.Context) (State, error) {
   <div>
     <div class="sec-tag">Step 7 · The server speaks first</div>
     <h2>No click required.</h2>
-    <p class="lead">Every update so far began with a user. But a live connection runs both ways: hold a <code>Session</code> handle and the server can push on its own. The wall above <b>greets back every half-minute or so</b> — a line from <em>the server</em>, sent with no action on anyone's part. The asymmetry is the whole point: a downstream patch with nothing going up.</p>
+    <p class="lead">Every update so far began with a user. But a live connection runs both ways: hold a <code>Session</code> handle and the server can push on its own. The card above carries a small <b>“the server said hi at …”</b> line that the server <b>refreshes on its own heartbeat</b> — sent with no action on anyone's part. It <em>replaces one value in place</em> rather than piling rows onto the wall, so the wall stays a record of real people. The asymmetry is the whole point: a downstream patch with nothing going up.</p>
     <div class="wire"><span class="wlabel">on the wire · WebSocket</span>
-      <span class="wf dn">▼ {"tree":{"3":[["a",[{"0":"the server","1":"15:04"}]]]}}</span>
-      <span class="wf note">(no ▲ — the server started it)</span>
+      <span class="wf dn">▼ {"tree":{"3":{"0":"15:04:08"}}}</span>
+      <span class="wf note">(no ▲ — the server started it; just the one changed value)</span>
     </div>
   </div>
   <div>
@@ -299,11 +301,11 @@ func (a *App) Greet(s State, ctx *lvt.Context) (State, error) {
     a.keep(ctx.GroupID(), ctx.Session())   // remember who's connected
     return s, nil
 }
-func (a *App) greetLoop() {
-    for range time.Tick(25 * time.Second) {
-        a.append(Greeting{Name: "the server"})
+func (a *App) heartbeat() {
+    for range time.Tick(30 * time.Second) {
+        a.serverAt = now()                       // replace ONE slot, in place
         for _, sess := range a.sessions {
-            sess.TriggerAction("WallRefresh", nil)   // push, unprompted
+            sess.TriggerAction("ServerRefresh", nil)   // push, unprompted
         }
     }
 }</code></pre></div>
@@ -344,14 +346,14 @@ func (a *App) greetLoop() {
 <!-- COMPARE -->
 <section><div class="wrap">
   <div class="sec-tag">How it compares</div>
-  <h2>Others add a layer. LiveTemplate keeps HTML standard.</h2>
-  <p class="lead">Other tools make HTML reactive by adding attributes (<code>hx-*</code>, <code>x-*</code>, <code>phx-*</code>) or a DSL. LiveTemplate moves reactivity to the server, where one render-and-diff pipeline already lives.</p>
+  <h2>Others annotate HTML to make it reactive. LiveTemplate moves that to the server.</h2>
+  <p class="lead">Other tools carry the behavior in the markup — <code>hx-*</code>, <code>x-*</code>, <code>phx-*</code>, or a DSL. With LiveTemplate a plain <code>&lt;button name="greet"&gt;</code> is already the action and state lives on the server. There <em>are</em> <code>lvt-*</code> attributes, but only as an escape hatch for what HTML can't express — a pending state, a debounce, a shortcut — never as boilerplate to make ordinary HTML reactive.</p>
   <table class="cmp">
     <thead><tr><th>If you’re using…</th><th>LiveTemplate gives you…</th></tr></thead>
     <tbody>
-      <tr><td>htmx</td><td class="give">Standard HTML actions <span class="badge">no hx-*</span> with server-owned state and DOM diffing.</td></tr>
+      <tr><td>htmx</td><td class="give">Standard HTML actions <span class="badge">server-owned state</span> with DOM diffing — no <code>hx-*</code> request wiring in the markup.</td></tr>
       <tr><td>templ + htmx</td><td class="give">Go’s own <code>html/template</code> instead of a new DSL, reactivity built in instead of wiring.</td></tr>
-      <tr><td>Alpine.js</td><td class="give">Reactive DOM behavior <span class="badge">no x-*</span> and no separate client-side state model.</td></tr>
+      <tr><td>Alpine.js</td><td class="give">Reactive UI <span class="badge">no client state model</span> — state lives on the server, not in <code>x-*</code> on the element.</td></tr>
       <tr><td>Phoenix LiveView</td><td class="give">Stateful server-driven UI without leaving Go — and it works over plain HTTP too.</td></tr>
       <tr><td>React SPA</td><td class="give">Reactive workflows without a client build step for common app screens.</td></tr>
     </tbody>

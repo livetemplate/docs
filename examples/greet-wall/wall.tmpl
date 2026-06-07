@@ -8,6 +8,19 @@
     <script defer src="https://cdn.jsdelivr.net/npm/@livetemplate/client@latest/dist/livetemplate-client.browser.js"></script>
 </head>
 <body>
+    <!-- Styles live in <body>: embed-lvt drops the embedded app's <head>, so
+         anything in <head> is lost once this app is mounted on the landing. -->
+    <style>
+        .from-server{display:flex;align-items:center;justify-content:center;gap:.45rem;
+            font-size:.82rem;color:#475569;margin:.2rem 0 .9rem}
+        .from-server .dot{flex:none;width:8px;height:8px;border-radius:50%;background:#10b981;
+            animation:fromServerPulse 2s ease-out infinite}
+        @keyframes fromServerPulse{
+            0%{box-shadow:0 0 0 0 rgba(16,185,129,.5)}
+            70%{box-shadow:0 0 0 7px rgba(16,185,129,0)}
+            100%{box-shadow:0 0 0 0 rgba(16,185,129,0)}}
+        @media(prefers-reduced-motion:reduce){.from-server .dot{animation:none}}
+    </style>
     <main class="container">
         <h1>Hello, {{.Name}}</h1>
         <form method="POST">
@@ -15,6 +28,9 @@
             {{.lvt.ErrorTag "name"}}
             <button name="greet">Say hi</button>
         </form>
+        <!-- Step 7: the server speaks first. A single slot the server REPLACES
+             in place on its heartbeat — never a row appended to the wall. -->
+        {{if .ServerAt}}<p class="from-server"><span class="dot"></span> the server said hi at <b>{{.ServerAt}}</b></p>{{end}}
         <ul class="wall">
             {{range .Wall}}<li><b>{{.Name}}</b> said hi <small>{{.At}}</small></li>{{end}}
         </ul>

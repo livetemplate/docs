@@ -243,7 +243,7 @@ styling:
   # Shared brand primitives (self-hosted fonts) — injected on EVERY page.
   site_css: "assets/brand.css?v=1"
   # Bespoke emerald landing styling — injected only on layout: landing pages.
-  custom_css: "assets/landing.css?v=14"
+  custom_css: "assets/landing.css?v=15"
 
 blocks:
   auto_id: true

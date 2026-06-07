@@ -10,10 +10,13 @@ package e2e
 
 import (
 	"context"
+	"os"
 	"strings"
 	"testing"
 	"time"
 
+	"github.com/chromedp/cdproto/cdp"
+	"github.com/chromedp/cdproto/emulation"
 	"github.com/chromedp/chromedp"
 )
 
@@ -111,6 +114,105 @@ func TestSpineValidation(t *testing.T) {
 // once that client is released and re-vendored into tinkerdown. A landing-side
 // e2e guard belongs here after that ships.
 
+// TestSpineNoJSFormPost is the heart of step 4's "show, don't tell": it runs a
+// real browser with JavaScript EXECUTION DISABLED, so the greet-nojs client
+// can't intercept the form. Submitting therefore does a plain HTTP POST; the
+// server replies 303 (POST-Redirect-GET) and the followed GET must still greet
+// the typed name — proving the no-JS transport genuinely round-trips (the
+// per-session name store survives it, and cmd/site rewrites the redirect back
+// under the mount so it doesn't bounce to the site root).
+func TestSpineNoJSFormPost(t *testing.T) {
+	ctx, cancel := newCtx(t)
+	defer cancel()
+
+	const name = "Nomad"
+	var headline string
+	if err := chromedp.Run(ctx,
+		emulation.SetScriptExecutionDisabled(true), // the whole point: no client JS
+		chromedp.Navigate(baseURL()+"/apps/greet-nojs/"),
+		chromedp.WaitVisible(`input[name="name"]`, chromedp.ByQuery),
+		chromedp.SendKeys(`input[name="name"]`, name, chromedp.ByQuery),
+		chromedp.Click(`button[name="greet"]`, chromedp.ByQuery), // native form submit
+		chromedp.Sleep(1500*time.Millisecond),                    // POST -> 303 -> GET render
+		chromedp.Text(`h1`, &headline, chromedp.ByQuery),
+	); err != nil {
+		t.Fatalf("no-JS run: %v", err)
+	}
+	if !strings.Contains(headline, name) {
+		t.Errorf("no-JS headline = %q, want %q after a plain form POST with JavaScript disabled", headline, name)
+	}
+}
+
+// TestSpineNoJSIframe verifies step 4's right-hand card on the LANDING — the
+// surface the reader actually uses. It confirms the card is a script-disabled
+// sandboxed frame of the real app, then proves the framed no-JS round-trip:
+// a JS-disabled greeting is recorded against the session, and the embedded
+// iframe — a separate document — renders it. The risky half is whether the
+// livetemplate-id cookie (SameSite=Lax, HttpOnly) reaches the framed request;
+// it does, because allow-same-origin keeps the same-origin frame first-party.
+// (We seed via a top-level JS-disabled submit and observe the frame because
+// chromedp's input dispatch INTO a sandboxed frame is unreliable, while frame
+// DOM reads are not; TestSpineNoJSFormPost covers the POST half top-level.)
+func TestSpineNoJSIframe(t *testing.T) {
+	ctx, cancel := newCtx(t)
+	defer cancel()
+
+	const name = "Framed"
+	// Record a greeting for this browser's session over the no-JS path.
+	if err := chromedp.Run(ctx,
+		emulation.SetScriptExecutionDisabled(true),
+		chromedp.Navigate(baseURL()+"/apps/greet-nojs/"),
+		chromedp.WaitVisible(`input[name="name"]`, chromedp.ByQuery),
+		chromedp.SendKeys(`input[name="name"]`, name, chromedp.ByQuery),
+		chromedp.Click(`button[name="greet"]`, chromedp.ByQuery),
+		chromedp.Sleep(1500*time.Millisecond), // POST -> 303 -> GET
+	); err != nil {
+		t.Fatalf("seed no-JS greeting: %v", err)
+	}
+
+	// Load the landing; the embedded iframe's GET must carry the same-origin
+	// cookie and render the recorded greeting.
+	var src, sandbox string
+	if err := chromedp.Run(ctx,
+		emulation.SetScriptExecutionDisabled(false),
+		chromedp.Navigate(baseURL()+"/"),
+		chromedp.WaitVisible(`iframe.nojs-frame`, chromedp.ByQuery),
+		chromedp.AttributeValue(`iframe.nojs-frame`, "src", &src, nil),
+		chromedp.AttributeValue(`iframe.nojs-frame`, "sandbox", &sandbox, nil),
+		chromedp.ScrollIntoView(`iframe.nojs-frame`, chromedp.ByQuery), // it's loading="lazy"
+		chromedp.Sleep(2*time.Second),                                 // frame loads + renders
+	); err != nil {
+		t.Fatalf("iframe attrs: %v", err)
+	}
+	if !strings.Contains(src, "/apps/greet-nojs/") {
+		t.Errorf("iframe src = %q, want the greet-nojs app", src)
+	}
+	if strings.Contains(sandbox, "allow-scripts") {
+		t.Errorf("iframe sandbox = %q, must NOT allow-scripts — it's the no-JS demo", sandbox)
+	}
+	if !strings.Contains(sandbox, "allow-forms") {
+		t.Errorf("iframe sandbox = %q, must allow-forms so the no-JS POST works", sandbox)
+	}
+
+	var frame []*cdp.Node
+	if err := chromedp.Run(ctx, chromedp.Nodes(`iframe.nojs-frame`, &frame,
+		chromedp.ByQuery, chromedp.Populate(-1, true))); err != nil {
+		t.Fatalf("populate iframe: %v", err)
+	}
+	if len(frame) == 0 {
+		t.Fatal("greet-nojs iframe not found")
+	}
+	var headline string
+	if err := chromedp.Run(ctx,
+		chromedp.Text(`h1`, &headline, chromedp.ByQuery, chromedp.FromNode(frame[0])),
+	); err != nil {
+		t.Fatalf("read iframe headline: %v", err)
+	}
+	if !strings.Contains(headline, name) {
+		t.Errorf("iframe headline = %q, want %q — the framed no-JS request must carry the session cookie", headline, name)
+	}
+}
+
 // TestSpineSelfTopicSync exercises step 5: two tabs of the SAME session (one
 // browser context → one cookie/group) are both open, then a greeting in tab A
 // updates tab B's headline live over the self-topic — no reload. This is the
@@ -206,6 +308,70 @@ func TestSpineCrossUserWall(t *testing.T) {
 	if !strings.Contains(otherWall, name) {
 		t.Errorf("second embed wall = %q, want %q to cross from the first embed (shared-topic broadcast)", otherWall, name)
 	}
+}
+
+// TestSpineServerPush exercises step 7, "the server speaks first", on the
+// LANDING embed — the exact surface the bug report showed. With NO user action,
+// the server's heartbeat populates an in-place ".from-server" slot inside the
+// embedded greet-wall, and crucially it does NOT append rows to the embed's
+// shared wall (the regression this change fixes; server lines used to pile up
+// and crowd out real greetings). The stack under test must run a fast heartbeat
+// (GREET_WALL_SERVER_INTERVAL); the Makefile e2e targets and the CI docker run
+// set it so this never silently idles.
+func TestSpineServerPush(t *testing.T) {
+	ctx, cancel := newCtx(t)
+	defer cancel()
+
+	embed := `.tinkerdown-embed-lvt[data-embed-path="/apps/greet-wall/"]`
+	if err := chromedp.Run(ctx,
+		chromedp.Navigate(baseURL()+"/"),
+		chromedp.WaitVisible(embed+` input[name="name"]`, chromedp.ByQuery),
+		chromedp.Sleep(1400*time.Millisecond), // WS connect
+	); err != nil {
+		t.Fatalf("connect: %v", err)
+	}
+
+	// Poll the embed's in-place slot, with no user action of any kind.
+	serverJS := `((document.querySelector('` + embed + ` .from-server'))||{}).innerText || ''`
+	deadline := time.Now().Add(serverPushTimeout())
+	var serverLine string
+	for time.Now().Before(deadline) {
+		if err := chromedp.Run(ctx, chromedp.Evaluate(serverJS, &serverLine)); err != nil {
+			t.Fatalf("read server slot: %v", err)
+		}
+		if strings.Contains(serverLine, "the server said hi") {
+			break
+		}
+		time.Sleep(500 * time.Millisecond)
+	}
+	if !strings.Contains(serverLine, "the server said hi") {
+		t.Fatalf("landing embed server slot = %q, want a server-initiated 'the server said hi at …' within %v "+
+			"(is GREET_WALL_SERVER_INTERVAL set fast on the stack under test?)", serverLine, serverPushTimeout())
+	}
+
+	// The embed's wall must stay free of server rows — that's the whole point.
+	var wallText string
+	if err := chromedp.Run(ctx, chromedp.Evaluate(
+		`((document.querySelector('`+embed+` ul.wall'))||{}).innerText || ''`, &wallText),
+	); err != nil {
+		t.Fatalf("read wall: %v", err)
+	}
+	if strings.Contains(wallText, "the server") {
+		t.Errorf("landing embed wall contains a server line:\n%s\nserver pushes must replace the in-place slot, not append to the wall", wallText)
+	}
+}
+
+// serverPushTimeout bounds how long TestSpineServerPush waits for a heartbeat,
+// derived from the same GREET_WALL_SERVER_INTERVAL the app reads so a fast
+// harness tick keeps the test quick while a default stack still passes.
+func serverPushTimeout() time.Duration {
+	interval := 30 * time.Second
+	if v := os.Getenv("GREET_WALL_SERVER_INTERVAL"); v != "" {
+		if d, err := time.ParseDuration(v); err == nil && d > 0 {
+			interval = d
+		}
+	}
+	return interval*2 + 4*time.Second
 }
 
 // newTab opens a second tab in the same browser as parent (shared cookies).
