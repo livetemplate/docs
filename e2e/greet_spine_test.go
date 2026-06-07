@@ -10,6 +10,7 @@ package e2e
 
 import (
 	"context"
+	"os"
 	"strings"
 	"testing"
 	"time"
@@ -206,6 +207,70 @@ func TestSpineCrossUserWall(t *testing.T) {
 	if !strings.Contains(otherWall, name) {
 		t.Errorf("second embed wall = %q, want %q to cross from the first embed (shared-topic broadcast)", otherWall, name)
 	}
+}
+
+// TestSpineServerPush exercises step 7, "the server speaks first": with NO user
+// action, the server's heartbeat populates an in-place ".from-server" slot —
+// and crucially it does NOT append rows to the shared wall (the regression this
+// change fixes; server lines used to pile up and crowd out real greetings). The
+// stack under test must run a fast heartbeat (GREET_WALL_SERVER_INTERVAL); the
+// Makefile e2e targets and the CI docker run set it so this never silently
+// idles.
+func TestSpineServerPush(t *testing.T) {
+	ctx, cancel := newCtx(t)
+	defer cancel()
+	url := baseURL() + "/apps/greet-wall/"
+
+	if err := chromedp.Run(ctx,
+		chromedp.Navigate(url),
+		chromedp.WaitVisible(`input[name="name"]`, chromedp.ByQuery),
+		chromedp.Sleep(1400*time.Millisecond), // WS connect
+	); err != nil {
+		t.Fatalf("connect: %v", err)
+	}
+
+	// Poll for the server's in-place slot, with no user action of any kind.
+	deadline := time.Now().Add(serverPushTimeout())
+	var serverLine string
+	for time.Now().Before(deadline) {
+		if err := chromedp.Run(ctx, chromedp.Evaluate(
+			`(document.querySelector('.from-server')||{}).innerText || ''`, &serverLine),
+		); err != nil {
+			t.Fatalf("read server slot: %v", err)
+		}
+		if strings.Contains(serverLine, "the server said hi") {
+			break
+		}
+		time.Sleep(500 * time.Millisecond)
+	}
+	if !strings.Contains(serverLine, "the server said hi") {
+		t.Fatalf("server-push slot = %q, want a server-initiated 'the server said hi at …' within %v "+
+			"(is GREET_WALL_SERVER_INTERVAL set fast on the stack under test?)", serverLine, serverPushTimeout())
+	}
+
+	// The wall itself must stay free of server rows — that's the whole point.
+	var wallText string
+	if err := chromedp.Run(ctx, chromedp.Evaluate(
+		`(document.querySelector('ul.wall')||{}).innerText || ''`, &wallText),
+	); err != nil {
+		t.Fatalf("read wall: %v", err)
+	}
+	if strings.Contains(wallText, "the server") {
+		t.Errorf("wall contains a server line:\n%s\nserver pushes must replace the in-place slot, not append to the wall", wallText)
+	}
+}
+
+// serverPushTimeout bounds how long TestSpineServerPush waits for a heartbeat,
+// derived from the same GREET_WALL_SERVER_INTERVAL the app reads so a fast
+// harness tick keeps the test quick while a default stack still passes.
+func serverPushTimeout() time.Duration {
+	interval := 30 * time.Second
+	if v := os.Getenv("GREET_WALL_SERVER_INTERVAL"); v != "" {
+		if d, err := time.ParseDuration(v); err == nil && d > 0 {
+			interval = d
+		}
+	}
+	return interval*2 + 4*time.Second
 }
 
 // newTab opens a second tab in the same browser as parent (shared cookies).

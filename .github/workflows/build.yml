@@ -57,7 +57,10 @@ jobs:
 
       - name: Start the stack
         run: |
-          docker run -d --name docs -p 8080:8080 docs-e2e
+          # GREET_WALL_SERVER_INTERVAL drives the greet-wall Step-7 heartbeat
+          # fast so TestSpineServerPush can assert the server-initiated push
+          # without waiting the 30s prod default.
+          docker run -d --name docs -p 8080:8080 -e GREET_WALL_SERVER_INTERVAL=2s docs-e2e
           # Poll until tinkerdown serves the home page (recipes binary + proxy
           # are up by then). Fail fast with logs if it never comes up.
           for i in $(seq 1 45); do

@@ -287,10 +287,10 @@ func (a *App) Greet(s State, ctx *lvt.Context) (State, error) {
   <div>
     <div class="sec-tag">Step 7 · The server speaks first</div>
     <h2>No click required.</h2>
-    <p class="lead">Every update so far began with a user. But a live connection runs both ways: hold a <code>Session</code> handle and the server can push on its own. The wall above <b>greets back every half-minute or so</b> — a line from <em>the server</em>, sent with no action on anyone's part. The asymmetry is the whole point: a downstream patch with nothing going up.</p>
+    <p class="lead">Every update so far began with a user. But a live connection runs both ways: hold a <code>Session</code> handle and the server can push on its own. The card above carries a small <b>“the server said hi at …”</b> line that the server <b>refreshes on its own heartbeat</b> — sent with no action on anyone's part. It <em>replaces one value in place</em> rather than piling rows onto the wall, so the wall stays a record of real people. The asymmetry is the whole point: a downstream patch with nothing going up.</p>
     <div class="wire"><span class="wlabel">on the wire · WebSocket</span>
-      <span class="wf dn">▼ {"tree":{"3":[["a",[{"0":"the server","1":"15:04"}]]]}}</span>
-      <span class="wf note">(no ▲ — the server started it)</span>
+      <span class="wf dn">▼ {"tree":{"4":"15:04:08"}}</span>
+      <span class="wf note">(no ▲ — the server started it; just the one changed value)</span>
     </div>
   </div>
   <div>
@@ -299,11 +299,11 @@ func (a *App) Greet(s State, ctx *lvt.Context) (State, error) {
     a.keep(ctx.GroupID(), ctx.Session())   // remember who's connected
     return s, nil
 }
-func (a *App) greetLoop() {
-    for range time.Tick(25 * time.Second) {
-        a.append(Greeting{Name: "the server"})
+func (a *App) heartbeat() {
+    for range time.Tick(30 * time.Second) {
+        a.serverAt = now()                       // replace ONE slot, in place
         for _, sess := range a.sessions {
-            sess.TriggerAction("WallRefresh", nil)   // push, unprompted
+            sess.TriggerAction("ServerRefresh", nil)   // push, unprompted
         }
     }
 }</code></pre></div>

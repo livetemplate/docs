@@ -3,6 +3,7 @@ package greetwall
 import (
 	"errors"
 	"maps"
+	"os"
 	"strings"
 	"sync"
 	"time"
@@ -21,10 +22,13 @@ type Greeting struct {
 
 // State is per-session state. Name is THIS session's greeting headline (synced
 // across the user's own tabs via SelfTopic); Wall is a snapshot of the shared,
-// cross-user list (synced to everyone via the "wall" topic).
+// cross-user list (synced to everyone via the "wall" topic); ServerAt is the
+// timestamp of the latest server-initiated heartbeat (Step 7) — a single slot
+// the server REPLACES in place, never a row it appends to the wall.
 type State struct {
-	Name string
-	Wall []Greeting
+	Name     string
+	Wall     []Greeting
+	ServerAt string
 }
 
 const (
@@ -35,11 +39,25 @@ const (
 	// flood the public wall by holding the button.
 	throttle = 400 * time.Millisecond
 
-	// serverGreetInterval is how often the server posts its own greeting
-	// (Step 7, "the server can speak first"). Bounded and gentle — slow enough
-	// that human greetings aren't drowned out on a quiet wall.
-	serverGreetInterval = 30 * time.Second
+	// defaultServerHeartbeat is how often the server posts its own heartbeat
+	// (Step 7, "the server can speak first"). The heartbeat REPLACES a single
+	// in-place slot rather than appending to the wall, so frequency no longer
+	// risks crowding out human greetings. Override via GREET_WALL_SERVER_INTERVAL
+	// (e.g. a short value so e2e can assert the push without a 30s wait).
+	defaultServerHeartbeat = 30 * time.Second
 )
+
+// serverHeartbeat resolves the heartbeat interval, honoring the
+// GREET_WALL_SERVER_INTERVAL override (any valid time.Duration > 0) so the
+// e2e harness can drive a fast tick; it falls back to defaultServerHeartbeat.
+func serverHeartbeat() time.Duration {
+	if v := os.Getenv("GREET_WALL_SERVER_INTERVAL"); v != "" {
+		if d, err := time.ParseDuration(v); err == nil && d > 0 {
+			return d
+		}
+	}
+	return defaultServerHeartbeat
+}
 
 // Controller holds the process-wide shared wall. Unlike the earlier greet
 // steps (whose state is per-session), the wall is one list shared by every
@@ -47,6 +65,7 @@ const (
 type Controller struct {
 	mu        sync.Mutex
 	wall      []Greeting                      // shared, capped, ephemeral
+	serverAt  string                          // latest server heartbeat time — replaced in place (Step 7)
 	names     map[string]string               // groupID -> latest name (SelfTopic sync target)
 	lastGreet map[string]time.Time            // groupID -> last greet time (throttle)
 	sessions  map[string]livetemplate.Session // groupID -> push handle (server push, Step 7)
@@ -77,19 +96,20 @@ func (c *Controller) Mount(s State, ctx *livetemplate.Context) (State, error) {
 		s.Name = n
 	}
 	s.Wall = c.snapshot()
+	s.ServerAt = c.serverAt // project the latest heartbeat so a fresh visitor sees it immediately
 	c.mu.Unlock()
 	return s, nil
 }
 
 // OnConnect registers this session's push handle and starts the single
-// server-greeting loop (Step 7). The handle is per session group; storing it
-// lets a background goroutine push wall updates with no user action.
+// server-heartbeat loop (Step 7). The handle is per session group; storing it
+// lets a background goroutine push the heartbeat with no user action.
 func (c *Controller) OnConnect(s State, ctx *livetemplate.Context) (State, error) {
 	if sess := ctx.Session(); sess != nil {
 		c.mu.Lock()
 		c.sessions[ctx.GroupID()] = sess
 		c.mu.Unlock()
-		c.tickOnce.Do(func() { go c.serverGreetLoop() })
+		c.tickOnce.Do(func() { go c.serverHeartbeatLoop(serverHeartbeat()) })
 	}
 	return s, nil
 }
@@ -137,7 +157,7 @@ func (c *Controller) Refresh(s State, ctx *livetemplate.Context) (State, error) 
 }
 
 // WallRefresh reloads only the shared wall. It runs on every subscriber when
-// any user greets (Step 6) and when the server posts its own greeting (Step 7).
+// any user greets (Step 6) — the wall now holds only human greetings.
 func (c *Controller) WallRefresh(s State, ctx *livetemplate.Context) (State, error) {
 	c.mu.Lock()
 	s.Wall = c.snapshot()
@@ -145,34 +165,53 @@ func (c *Controller) WallRefresh(s State, ctx *livetemplate.Context) (State, err
 	return s, nil
 }
 
-// serverGreetLoop posts a greeting from "the server" on a fixed interval and
-// pushes the new wall to every connected session — server-initiated, with no
-// user action (Step 7). Sessions reported disconnected (ErrSessionDisconnected)
-// are pruned, which self-heals the session map without an OnDisconnect hook
-// (OnDisconnect carries no group identity). Pruning is scoped to that sentinel
-// so a transient error never drops a still-connected group from server push.
-func (c *Controller) serverGreetLoop() {
+// ServerRefresh reloads only the server-heartbeat slot. It runs on every
+// connected session when the heartbeat loop pushes (Step 7) — replacing one
+// in-place value, so the server can speak without ever growing the wall.
+func (c *Controller) ServerRefresh(s State, ctx *livetemplate.Context) (State, error) {
+	c.mu.Lock()
+	s.ServerAt = c.serverAt
+	c.mu.Unlock()
+	return s, nil
+}
+
+// serverHeartbeatLoop is Step 7, "the server can speak first": on a fixed
+// interval it stamps an in-place heartbeat slot (it does NOT append to the
+// wall — that's the whole point of this redesign; a server line replaces one
+// value instead of piling up rows) and pushes ServerRefresh to every connected
+// session, server-initiated with no user action. Sessions reported disconnected
+// (ErrSessionDisconnected) are pruned, which self-heals the session map without
+// an OnDisconnect hook (OnDisconnect carries no group identity). Pruning is
+// scoped to that sentinel so a transient error never drops a still-connected
+// group from server push.
+func (c *Controller) serverHeartbeatLoop(interval time.Duration) {
 	for {
-		time.Sleep(serverGreetInterval)
-
-		c.mu.Lock()
-		if len(c.sessions) == 0 {
-			c.mu.Unlock()
-			continue // nobody watching — don't fill the wall with server lines
-		}
-		c.appendWall(Greeting{Name: "the server", At: time.Now().Format("15:04:05")})
-		pending := make(map[string]livetemplate.Session, len(c.sessions))
-		maps.Copy(pending, c.sessions)
-		c.mu.Unlock()
-
-		for group, sess := range pending {
-			if err := sess.TriggerAction("WallRefresh", nil); errors.Is(err, livetemplate.ErrSessionDisconnected) {
+		time.Sleep(interval)
+		for group, sess := range c.markServerHeartbeat(time.Now()) {
+			if err := sess.TriggerAction("ServerRefresh", nil); errors.Is(err, livetemplate.ErrSessionDisconnected) {
 				c.mu.Lock()
 				delete(c.sessions, group)
 				c.mu.Unlock()
 			}
 		}
 	}
+}
+
+// markServerHeartbeat stamps the in-place heartbeat slot and returns a snapshot
+// of the sessions to push ServerRefresh to (nil when nobody is connected). It
+// NEVER appends to the wall — that invariant is the whole redesign: a server
+// line replaces one value, so it can't crowd out human greetings no matter how
+// often it ticks. Split out from the loop so a test can drive a single tick.
+func (c *Controller) markServerHeartbeat(at time.Time) map[string]livetemplate.Session {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	c.serverAt = at.Format("15:04:05")
+	if len(c.sessions) == 0 {
+		return nil
+	}
+	pending := make(map[string]livetemplate.Session, len(c.sessions))
+	maps.Copy(pending, c.sessions)
+	return pending
 }
 
 // appendWall pushes one greeting onto the shared ring buffer, dropping the
