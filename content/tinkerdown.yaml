@@ -10,37 +10,46 @@ site:
   url: "https://livetemplate.fly.dev"
 
 navigation:
-  - title: "Start"
+  # Learn — no prior knowledge → first success.
+  - title: "Learn"
     path: "getting-started"
     collapsed: false
     pages:
+      - title: "Introduction"
+        path: "getting-started/introduction.md"
       - title: "Install"
         path: "getting-started/install.md"
       - title: "Your First App"
         path: "getting-started/your-first-app.md"
       - title: "Mental Model"
         path: "getting-started/mental-model.md"
-      - title: "Runnable Examples"
-        path: "recipes/apps/index.md"
 
-  - title: "Build"
+  # Concepts — the one model, explained, plus the how-it-works deep dives.
+  - title: "Concepts"
     path: "guides"
     collapsed: false
     pages:
-      - title: "Progressive Complexity"
-        path: "guides/progressive-complexity.md"
       - title: "Standard HTML Reactivity"
         path: "guides/standard-html-reactivity.md"
-      - title: "Controller Pattern"
+      - title: "Progressive Complexity"
+        path: "guides/progressive-complexity.md"
+      - title: "The lvt-* Decision Tree"
+        path: "recipes/progressive-complexity-tree.md"
+      - title: "Controller & State Pattern"
         path: "reference/controller-pattern.md"
       - title: "Error Handling"
         path: "reference/error-handling.md"
-      - title: "Uploads"
-        path: "reference/uploads.md"
-      - title: "Components"
-        path: "cli/components.md"
+      - title: "Transports & Progressive Enhancement"
+        path: "recipes/progressive-enhancement/index.md"
+      - title: "The Update Flow"
+        path: "recipes/architecture-flow.md"
+      - title: "Sync & Broadcast"
+        path: "recipes/sync-and-broadcast.md"
+      - title: "Broadcasting"
+        path: "recipes/broadcasting.md"
 
-  - title: "Patterns"
+  # Recipes — short, copyable idioms.
+  - title: "Recipes"
     path: "recipes"
     collapsed: false
     pages:
@@ -48,49 +57,42 @@ navigation:
         path: "recipes/index.md"
       - title: "UI Patterns"
         path: "recipes/ui-patterns/index.md"
+      - title: "UI Pattern Catalog"
+        path: "recipes/patterns-stats.md"
       - title: "Counter"
         path: "recipes/apps/counter.md"
+      - title: "Counter (Deep Dive)"
+        path: "recipes/counter/index.md"
       - title: "Progressive Enhancement"
         path: "recipes/apps/progressive-enhancement.md"
       - title: "HTTP Only"
         path: "recipes/apps/ws-disabled.md"
       - title: "Flash Messages"
         path: "recipes/apps/flash-messages.md"
+      - title: "Uploads"
+        path: "reference/uploads.md"
 
+  # Apps — full runnable examples.
   - title: "Apps"
     path: "recipes/apps"
     collapsed: false
     pages:
+      - title: "Runnable Examples"
+        path: "recipes/apps/index.md"
       - title: "Todos"
         path: "recipes/todos/index.md"
       - title: "Login"
         path: "recipes/login/index.md"
-      - title: "Shared Notepad"
-        path: "recipes/shared-notepad/index.md"
       - title: "Chat"
         path: "recipes/apps/chat.md"
       - title: "Seat Picker"
         path: "recipes/apps/seat-picker.md"
       - title: "Avatar Upload"
         path: "recipes/apps/avatar-upload.md"
+      - title: "Shared Notepad"
+        path: "recipes/shared-notepad/index.md"
 
-  - title: "Deploy"
-    path: "deploy"
-    collapsed: false
-    pages:
-      - title: "Configuration"
-        path: "reference/configuration.md"
-      - title: "Authentication"
-        path: "reference/authentication.md"
-      - title: "Session"
-        path: "reference/session.md"
-      - title: "Pub/Sub"
-        path: "reference/pubsub.md"
-      - title: "Observability"
-        path: "guides/observability.md"
-      - title: "Scaling"
-        path: "guides/scaling.md"
-
+  # Reference — low-level lookup.
   - title: "Reference"
     path: "reference"
     collapsed: false
@@ -107,63 +109,53 @@ navigation:
         path: "reference/template-support-matrix.md"
       - title: "Limitations"
         path: "reference/limitations.md"
-      - title: "Deep Dive: Counter"
-        path: "recipes/counter/index.md"
-      - title: "Deep Dive: Progressive Enhancement"
-        path: "recipes/progressive-enhancement/index.md"
-      - title: "Deep Dive: Broadcasting"
-        path: "recipes/broadcasting.md"
-      - title: "Deep Dive: Update Flow"
-        path: "recipes/architecture-flow.md"
-      - title: "Deep Dive: lvt-* Decision Tree"
-        path: "recipes/progressive-complexity-tree.md"
-      - title: "Deep Dive: Sync & Broadcast"
-        path: "recipes/sync-and-broadcast.md"
-      - title: "Deep Dive: UI Pattern Catalog"
-        path: "recipes/patterns-stats.md"
-      - title: "Deep Dive: Live Releases"
-        path: "recipes/live-releases.md"
-      - title: "Deep Dive: Docs Site"
-        path: "recipes/how-this-site-works.md"
 
-  - title: "CLI (lvt)"
-    path: "cli"
+  # Deploy & Operate — running it in production.
+  - title: "Deploy & Operate"
+    path: "deploy"
+    collapsed: false
+    pages:
+      - title: "Configuration"
+        path: "reference/configuration.md"
+      - title: "Authentication"
+        path: "reference/authentication.md"
+      - title: "Session"
+        path: "reference/session.md"
+      - title: "Pub/Sub"
+        path: "reference/pubsub.md"
+      - title: "Observability"
+        path: "guides/observability.md"
+      - title: "Scaling"
+        path: "guides/scaling.md"
+
+  # Ecosystem — CLI, client, contributing, and the meta/dogfood pages.
+  - title: "Ecosystem"
+    path: "ecosystem"
     collapsed: true
     pages:
-      - title: "Overview"
+      - title: "CLI: Overview"
         path: "cli/index.md"
-      - title: "Auth Customization"
+      - title: "CLI: Auth Customization"
         path: "cli/auth-customization.md"
-      - title: "Components"
+      - title: "CLI: Components"
         path: "cli/components.md"
-      - title: "Testing"
+      - title: "CLI: Testing"
         path: "cli/testing.md"
-
-  - title: "TypeScript Client"
-    path: "client"
-    collapsed: true
-    pages:
-      - title: "Overview"
+      - title: "TypeScript Client"
         path: "client/index.md"
-
-  - title: "Contributing"
-    path: "contributing"
-    collapsed: true
-    pages:
-      - title: "livetemplate"
+      - title: "Contributing: livetemplate"
         path: "contributing/livetemplate.md"
-      - title: "client"
+      - title: "Contributing: client"
         path: "contributing/client.md"
-      - title: "lvt (CLI)"
+      - title: "Contributing: lvt (CLI)"
         path: "contributing/cli.md"
-      - title: "examples"
+      - title: "Contributing: examples"
         path: "contributing/examples.md"
-
-  - title: "Changelog"
-    path: "changelog.md"
-    collapsed: true
-    pages:
-      - title: "All Changes"
+      - title: "Live Releases"
+        path: "recipes/live-releases.md"
+      - title: "How This Site Works"
+        path: "recipes/how-this-site-works.md"
+      - title: "Changelog"
         path: "changelog.md"
 
 sources:
@@ -240,10 +232,18 @@ server:
 
 styling:
   theme: "clean"
-  primary_color: "#5a67d8"
-  font: "system-ui"
+  # Emerald signature — matches the landing brand (gradient #047857 → #10b981).
+  # Docs stay calm: this single hue drives links + the active nav item; the
+  # vibrant gradients/dark code live only in landing.css (layout: landing).
+  primary_color: "#047857"
+  # Inter matches the landing's display font; @font-face ships in brand.css
+  # (site_css) so it loads in the docs shell too, not just on the landing.
+  # Requires tinkerdown >= v0.3.7 (styling.site_css); see Dockerfile.
+  font: "Inter"
+  # Shared brand primitives (self-hosted fonts) — injected on EVERY page.
+  site_css: "assets/brand.css?v=1"
   # Bespoke emerald landing styling — injected only on layout: landing pages.
-  custom_css: "assets/landing.css?v=13"
+  custom_css: "assets/landing.css?v=14"
 
 blocks:
   auto_id: true

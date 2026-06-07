@@ -1,0 +1,20 @@
+/* Shared brand primitives loaded on EVERY page via styling.site_css —
+   the calm docs shell and the vibrant landing alike. Keep this file to
+   foundations only (self-hosted fonts); landing-specific gradients and
+   layout live in landing.css (styling.custom_css, landing pages only).
+
+   Fonts are self-hosted under /assets/fonts so they satisfy the CSP
+   font-src 'self'. The body font-family itself is set by tinkerdown from
+   styling.font ("Inter"); these @font-face rules make that family load. */
+
+/* ── Inter (display / body) ── */
+@font-face{font-family:'Inter';font-style:normal;font-weight:400;font-display:swap;src:url('/assets/fonts/inter-400.woff2') format('woff2')}
+@font-face{font-family:'Inter';font-style:normal;font-weight:600;font-display:swap;src:url('/assets/fonts/inter-600.woff2') format('woff2')}
+@font-face{font-family:'Inter';font-style:normal;font-weight:700;font-display:swap;src:url('/assets/fonts/inter-700.woff2') format('woff2')}
+@font-face{font-family:'Inter';font-style:normal;font-weight:800;font-display:swap;src:url('/assets/fonts/inter-800.woff2') format('woff2')}
+@font-face{font-family:'Inter';font-style:normal;font-weight:900;font-display:swap;src:url('/assets/fonts/inter-900.woff2') format('woff2')}
+
+/* ── JetBrains Mono (code) ── */
+@font-face{font-family:'JetBrains Mono';font-style:normal;font-weight:400;font-display:swap;src:url('/assets/fonts/jbmono-400.woff2') format('woff2')}
+@font-face{font-family:'JetBrains Mono';font-style:normal;font-weight:500;font-display:swap;src:url('/assets/fonts/jbmono-500.woff2') format('woff2')}
+@font-face{font-family:'JetBrains Mono';font-style:normal;font-weight:600;font-display:swap;src:url('/assets/fonts/jbmono-600.woff2') format('woff2')}

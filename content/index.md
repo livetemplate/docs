@@ -6,7 +6,7 @@ layout: landing
 
 <header class="nav"><div class="wrap nav-in">
   <div class="brand"><span class="glyph">◇</span> LiveTemplate</div>
-  <nav class="nav-links"><a href="/getting-started/your-first-app">Docs</a><a href="/recipes/">Recipes</a><a href="/reference/api">Reference</a><a href="https://github.com/livetemplate/livetemplate">GitHub</a><a class="btn btn-primary" href="/getting-started/install">Get started →</a></nav>
+  <nav class="nav-links"><a href="/getting-started/introduction">Docs</a><a href="/recipes/">Recipes</a><a href="/reference/api">Reference</a><a href="https://github.com/livetemplate/livetemplate">GitHub</a><a class="btn btn-primary" href="/getting-started/install">Get started →</a></nav>
 </div></header>
 
 <!-- HERO -->
@@ -16,7 +16,7 @@ layout: landing
   <p class="sub">Build reactive, real-time web apps with <b>standard HTML and a Go controller</b> — no client framework, no build step, no JavaScript to write. Forms, buttons, and live updates just work.</p>
   <div class="cta-row">
     <a class="btn btn-primary btn-lg" href="/getting-started/install">Get started →</a>
-    <a class="btn btn-ghost btn-lg" href="/getting-started/your-first-app">Read the docs</a>
+    <a class="btn btn-ghost btn-lg" href="/getting-started/introduction">Read the docs</a>
   </div>
   <div class="hero-snip">
     <div class="live-card">
@@ -379,6 +379,6 @@ func (a *App) greetLoop() {
 
 <footer><div class="wrap foot-in">
   <div class="brand" style="color:#fff"><span class="glyph">◇</span> LiveTemplate</div>
-  <div class="foot-links"><a href="/getting-started/your-first-app">Docs</a><a href="/recipes/">Recipes</a><a href="/reference/api">Reference</a><a href="https://github.com/livetemplate/livetemplate">GitHub</a><a href="/changelog">Changelog</a><a href="https://github.com/livetemplate/livetemplate/blob/main/LICENSE">License</a></div>
+  <div class="foot-links"><a href="/getting-started/introduction">Docs</a><a href="/recipes/">Recipes</a><a href="/reference/api">Reference</a><a href="https://github.com/livetemplate/livetemplate">GitHub</a><a href="/changelog">Changelog</a><a href="https://github.com/livetemplate/livetemplate/blob/main/LICENSE">License</a></div>
   <div style="font-size:13px">© the LiveTemplate authors</div>
 </div></footer>
