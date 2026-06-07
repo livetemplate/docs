@@ -1,5 +1,5 @@
 ---
-title: "LiveTemplate — HTML app development, made easy for Go"
+title: "LiveTemplate — Reactive web apps in Go, made with just HTML"
 description: "Build reactive, real-time web apps in Go with standard HTML. No client framework, no build step."
 layout: landing
 ---
@@ -12,8 +12,8 @@ layout: landing
 <!-- HERO -->
 <section class="hero"><div class="wrap">
   <span class="eyebrow">Server-driven UI for Go · Alpha</span>
-  <h1 class="head">HTML app development, <span class="g">made easy</span> for Go.</h1>
-  <p class="sub">Build reactive, real-time web apps with <b>standard HTML and a Go controller</b> — no client framework, no build step, no JavaScript to write. Forms, buttons, and live updates just work.</p>
+  <h1 class="head">Reactive web apps in Go, <span class="g">made with just HTML.</span></h1>
+  <p class="sub">Real-time apps from <b>standard HTML and a Go controller</b> — no client framework, no build step, no JavaScript to write.</p>
   <div class="cta-row">
     <a class="btn btn-primary btn-lg" href="/getting-started/install">Get started →</a>
     <a class="btn btn-ghost btn-lg" href="/getting-started/introduction">Read the docs</a>
@@ -28,8 +28,8 @@ layout: landing
 
 </div>
     </div>
-    <p class="hero-cap" style="margin:14px 0 8px">↑ a real, running app. Type a name and hit <b>Say hi</b> — and below is <b>every line</b> that makes it. Both files, complete:</p>
-    <div class="code"><div class="code-bar"><span class="dots"><i></i><i></i><i></i></span><span class="file">app.tmpl &nbsp;— the entire template</span></div>
+    <p class="hero-cap" style="margin:14px 0 8px">↑ a real, running app. Type a name, hit <b>Say hi</b>. Below is <b>every line</b> that makes it — both files, complete:</p>
+    <div class="code"><div class="code-bar"><span class="dots"><i></i><i></i><i></i></span><span class="file">app.tmpl &nbsp;— the entire template, just standard HTML</span></div>
 <pre><span class="tag">&lt;!DOCTYPE html&gt;</span>
 <span class="tag">&lt;html&gt;&lt;head&gt;</span>
   <span class="tag">&lt;script</span> <span class="attr">defer src</span>=<span class="str">"https://cdn.jsdelivr.net/npm/@livetemplate/client"</span><span class="tag">&gt;&lt;/script&gt;</span>
@@ -57,15 +57,15 @@ func main() {
     http.ListenAndServe(":8080",
         app.Handle(&amp;App{}, lvt.AsState(&amp;State{Name: "there"})))
 }</code></pre></div>
-    <p class="hero-cap">That's it — a full reactive web app: <b>~20 lines of Go + standard HTML</b>. No client framework, no build step, no generated code.</p>
+    <p class="hero-cap">That's the whole app — ~20 lines of Go and standard HTML. No build step, no generated code.</p>
   </div>
 </div></section>
 
 <!-- UNDER THE HOOD: animated request/response over the wire -->
 <section><div class="wrap">
-  <div class="sec-tag">Step 1 · Render · no hidden code</div>
+  <div class="sec-tag">Step 1 · Render</div>
   <h2>That's the whole program — not a snippet.</h2>
-  <p class="lead">These are the <b>real frames</b> on the wire. Your action goes <b>up</b>, the server runs your method, and <b>only the changed value comes back</b> — the static HTML stays cached. No page reload, and no fetch, route, or JSON you ever wrote.</p>
+  <p class="lead">These are the <b>real frames</b> on the wire. Your action goes up, the server runs your method, and <b>only the changed value comes back</b> — no reload, no fetch or route you wrote.</p>
   <div class="uh">
     <!-- browser -->
     <div class="uh-side uh-browser">
@@ -104,7 +104,7 @@ func main() {
 <section class="alt"><div class="wrap spine-intro">
   <div class="sec-tag">One app, seven steps</div>
   <h2>Now watch that same app grow.</h2>
-  <p class="lead">Everything below is the <b>same greeting app</b>, gaining one capability at a time — validation, a loading state, working without JavaScript, then real-time: your own tabs, then everyone, then the server speaking on its own. Each step is a <b>small diff</b> and the <b>real bytes on the wire</b>. There's no second model to learn — only more of the one you just saw.</p>
+  <p class="lead">Everything below is the <b>same greeting app</b>, gaining one capability at a time — validation, loading, no-JS, then real-time. Each step is a <b>small diff</b> and the real bytes on the wire. No second model to learn — only more of the one you just saw.</p>
 </div></section>
 
 <!-- STEP 2 · VALIDATE -->
@@ -112,7 +112,7 @@ func main() {
   <div>
     <div class="sec-tag">Step 2 · Validation</div>
     <h2>Validate once, on both sides.</h2>
-    <p class="lead">Write each rule once as a <b>standard HTML attribute</b> — <code>required</code>, <code>type="email"</code>, <code>minlength</code>. The browser enforces it instantly on the client, and <code>ctx.ValidateForm()</code> re-checks the <b>same</b> rules on the server — because you never trust the client. For rules HTML can't express, return a <code>FieldError</code>; it renders inline with <code>aria-invalid</code>. Submit empty (the browser stops you) or type <b>admin</b> (the server does):</p>
+    <p class="lead">Write each rule once as a standard HTML attribute — <code>required</code>, <code>type="email"</code>. <code>ctx.ValidateForm()</code> re-checks the <b>same</b> rules server-side. For what HTML can't express, return a <code>FieldError</code>. Submit empty, or type <b>admin</b>:</p>
     <div class="live-card" style="margin-top:24px">
       <div class="live-bar"><span class="live-badge"><span class="pulse"></span> live</span><span class="live-meta">greet-validate · server-checked</span></div>
       <div class="live-body">
@@ -151,7 +151,7 @@ func main() {
   <div>
     <div class="sec-tag">Step 3 · Loading state</div>
     <h2>A loading button, declared in HTML.</h2>
-    <p class="lead">Slow work shouldn't mean a client-side state machine. While the action is in flight the client toggles a class on the button — a few lines of CSS spin an icon in its place, no JavaScript. Two attributes mark the start and the end; the server code is unchanged. Click <b>Say hi</b> and watch the spinner:</p>
+    <p class="lead">While the action is in flight, the client toggles a class on the button — a little CSS spins an icon in its place, no JavaScript. Two attributes mark the start and the end; the server code is unchanged. Click <b>Say hi</b>:</p>
     <div class="live-card" style="margin-top:24px">
       <div class="live-bar"><span class="live-badge"><span class="pulse"></span> live</span><span class="live-meta">greet-loading · live spinner</span></div>
       <div class="live-body">
@@ -167,7 +167,7 @@ func main() {
 <pre><span class="tag">&lt;button</span> <span class="attr">name</span>=<span class="str">"greet"</span>
   <span class="attr">lvt-el:addClass:on:pending</span>=<span class="str">"is-loading"</span>
   <span class="attr">lvt-el:removeClass:on:done</span>=<span class="str">"is-loading"</span><span class="tag">&gt;</span>Say hi<span class="tag">&lt;/button&gt;</span></pre></div>
-    <p class="demo-cap" style="margin-top:18px"><code>lvt-*</code> attributes are the escape hatch for <b>behavior HTML itself can't express</b> — a pending state, a debounce, a keyboard shortcut. The server code for this step is <b>unchanged</b>. You reach for an attribute only here, never as boilerplate to make ordinary HTML work.</p>
+    <p class="demo-cap" style="margin-top:18px"><code>lvt-*</code> attributes are the escape hatch for <b>behavior HTML itself can't express</b> — a pending state, a debounce, a keyboard shortcut.</p>
     <div class="wire"><span class="wlabel">on the wire · HTTP fetch</span>
       <span class="wf up">▲ {"action":"greet","data":{"name":"Ada"}}</span>
       <span class="wf dn">▼ {"tree":{"0":"Ada"}}</span>
@@ -179,7 +179,7 @@ func main() {
 <section><div class="wrap">
   <div class="sec-tag">Step 4 · Works without JavaScript</div>
   <h2>The same program. Two transports, side by side — try them.</h2>
-  <p class="lead">Both cards run the <b>identical greeting app</b> with the WebSocket turned off. <b>Left, JavaScript on:</b> the client intercepts the form, sends an HTTP fetch, and patches the headline in place — no reload. <b>Right, JavaScript disabled</b> (a sandboxed frame with scripts blocked): the very same <code>&lt;form&gt;</code> does a plain POST and the server renders the page — watch the whole card reload. Same Go, same template; progressive enhancement is a <b>transport flag, not a different app</b>. Type a name in each.</p>
+  <p class="lead">Both cards run the <b>identical app</b>, WebSocket off. <b>Left, JS on:</b> the client sends a fetch and patches the headline in place. <b>Right, JS disabled:</b> the same <code>&lt;form&gt;</code> does a plain POST and the server renders the page — watch it reload. Progressive enhancement is a <b>transport flag, not a different app</b>. Type a name in each.</p>
   <div class="two" style="margin-top:28px">
     <div class="live-card">
       <div class="live-bar"><span class="live-badge"><span class="pulse"></span> live</span><span class="live-meta">JavaScript on · fetch + DOM patch</span></div>
@@ -197,6 +197,15 @@ func main() {
       </div>
     </div>
   </div>
+  <div class="code" style="max-width:680px;margin:28px auto 0"><div class="code-bar"><span class="dots"><i></i><i></i><i></i></span><span class="file">app.tmpl · one form, either transport</span></div>
+<pre><span class="com">&lt;!-- the only line that flips the transport: --&gt;</span>
+<span class="tag">&lt;script</span> <span class="attr">defer src</span>=<span class="str">"…@livetemplate/client"</span><span class="tag">&gt;&lt;/script&gt;</span>
+
+<span class="tag">&lt;form</span> <span class="attr">method</span>=<span class="str">"POST"</span><span class="tag">&gt;</span>   <span class="com">&lt;!-- JS on → fetch + patch · JS off → native POST --&gt;</span>
+  <span class="tag">&lt;input</span> <span class="attr">name</span>=<span class="str">"name"</span><span class="tag">&gt;</span>
+  <span class="tag">&lt;button</span> <span class="attr">name</span>=<span class="str">"greet"</span><span class="tag">&gt;</span>Say hi<span class="tag">&lt;/button&gt;</span>
+<span class="tag">&lt;/form&gt;</span></pre></div>
+  <p class="demo-cap" style="margin-top:14px">Same <code>&lt;form&gt;</code> and the same <code>Greet</code> action as Step 1 — no <code>if jsEnabled</code> branch anywhere. The client enhances the submit when the <code>&lt;script&gt;</code> loads, and the browser falls back to a native POST when it doesn't.</p>
   <p class="demo-cap" style="margin-top:18px">The third transport — <b>real-time WebSocket push</b>, where the server updates the page with no request at all — is live in the next three steps. ↓</p>
 </div></section>
 
@@ -204,7 +213,7 @@ func main() {
 <section class="alt"><div class="wrap">
   <div class="sec-tag">Step 5 · Sync your own tabs</div>
   <h2>Turn on real-time. Your tabs move together.</h2>
-  <p class="lead">Now put that live connection to work. Subscribe a connection to its own topic and publish after a handler runs — <b>two calls</b> — and your greeting syncs across every tab you have open. Every reactive thing LiveTemplate does is this same four-step pipeline; a second tab just runs it too.</p>
+  <p class="lead">Subscribe a connection to its own topic and publish after a handler runs — <b>two calls</b> — and your greeting syncs across every open tab. Every reactive thing LiveTemplate does is this same four-step pipeline.</p>
   <div class="pipe" style="margin-top:26px">
     <div class="step"><div class="k">1 · state</div><div class="v">state changes</div></div><div class="arrow">→</div>
     <div class="step"><div class="k">2 · render</div><div class="v">re-render template</div></div><div class="arrow">→</div>
@@ -220,17 +229,24 @@ func main() {
 
 </div>
   </div>
-  <p class="demo-cap"><b>Open this page in a second tab</b>, greet in either one, and your headline updates in <b>both</b> — live, no reload. Your tabs share one self-topic. (The two cards in the next step are <em>separate</em> sessions, so their headlines stay independent — that's the cross-user story.)</p>
-  <div class="code delta" style="max-width:820px;margin:26px auto 0"><div class="code-bar"><span class="dots"><i></i><i></i><i></i></span><span class="file">app.go · subscribe to your own topic, publish after greeting</span></div>
+  <p class="demo-cap"><b>Open this page in a second tab</b>, greet in either, and your headline updates in <b>both</b> — live, no reload. Your tabs share one self-topic.</p>
+  <div class="code delta" style="max-width:820px;margin:26px auto 0"><div class="code-bar"><span class="dots"><i></i><i></i><i></i></span><span class="file">app.go · subscribe, publish on greet, and the Refresh it runs</span></div>
 <pre class="language-go"><code class="language-go">func (a *App) Mount(s State, ctx *lvt.Context) (State, error) {
     ctx.Subscribe(ctx.SelfTopic())                 // your tabs share a topic
+    s.Name = a.name(ctx.GroupID())                 // load your latest name
     return s, nil
 }
 func (a *App) Greet(s State, ctx *lvt.Context) (State, error) {
-    s.Name = sanitize(ctx.GetString("name"))
-    ctx.Publish(ctx.SelfTopic(), "Refresh", nil)   // nudge your other tabs
+    a.setName(ctx.GroupID(), sanitize(ctx.GetString("name")))
+    ctx.Publish(ctx.SelfTopic(), "Refresh", nil)   // run Refresh on your other tabs
+    return s, nil
+}
+// Refresh is an ordinary action — the publish above runs it on each peer tab.
+func (a *App) Refresh(s State, ctx *lvt.Context) (State, error) {
+    s.Name = a.name(ctx.GroupID())                 // re-read state, then re-render
     return s, nil
 }</code></pre></div>
+  <p class="demo-cap" style="margin-top:14px">No magic: <code>Publish(ctx.SelfTopic(), "Refresh", nil)</code> just <b>runs your <code>Refresh</code> method on your other tabs</b>. It re-reads the shared name and returns new state; the framework diffs and patches. A name lives in a tiny per-tab-group store because each tab has its own <code>State</code>.</p>
   <div class="wire" style="max-width:820px;margin:14px auto 0"><span class="wlabel">on the wire · WebSocket</span>
     <span class="wf up">▲ this tab · {"action":"greet","data":{"name":"Ada"}}</span>
     <span class="wf dn">▼ your other tab · {"tree":{"0":"Ada"}}</span>
@@ -241,7 +257,7 @@ func (a *App) Greet(s State, ctx *lvt.Context) (State, error) {
 <section><div class="wrap">
   <div class="sec-tag">Step 6 · A wall everyone shares</div>
   <h2>One more topic, and it's cross-user.</h2>
-  <p class="lead">Swap the self-topic for a <b>shared</b> topic — admitted by a tiny ACL — and the same publish fans out to <b>every visitor</b>. The two cards below are <b>separate sessions — like two different people</b>. Greet in one and your line lands on the other's wall, live. Most demos show your clicks updating your screen; this is a <em>different session's</em> clicks updating yours — standard HTML, no hand-written JavaScript.</p>
+  <p class="lead">Swap the self-topic for a <b>shared</b> topic — admitted by a tiny ACL — and the same publish fans out to <b>every visitor</b>. The two cards below are <b>separate sessions, like two different people</b>. Greet in one and your line lands on the other's wall, live.</p>
   <div class="two" style="margin-top:28px">
     <div class="live-card"><div class="live-bar"><span class="live-badge"><span class="pulse"></span> live</span><span class="live-meta">visitor 1 · WebSocket on</span></div><div class="live-body">
 
@@ -259,7 +275,7 @@ func (a *App) Greet(s State, ctx *lvt.Context) (State, error) {
   <p class="demo-cap">Two independent sessions, one shared wall — type in either card and watch the <b>list</b> appear in both. Every greeting here is real, typed by someone else reading this page.</p>
   <div class="two code-right" style="margin-top:26px">
     <div>
-      <p class="lead">The headlines stay independent (each card is its own session), but the wall is global — so a greeting crosses from one session to the other. That crossing is the whole cross-user story, and it's the same two pub/sub calls as step 5 with a different topic.</p>
+      <p class="lead">Headlines stay independent (each card is its own session), but the wall is global — so a greeting crosses from one session to the other. That's the whole cross-user story: the same two pub/sub calls as step 5, with a different topic.</p>
       <div class="wire"><span class="wlabel">on the wire · WebSocket</span>
         <span class="wf up">▲ visitor 1 · {"action":"greet","data":{"name":"Ada"}}</span>
         <span class="wf dn">▼ visitor 2 · {"tree":{"3":[["a",[{"0":"Ada","1":"15:04"}]]]}}</span>
@@ -289,7 +305,7 @@ func (a *App) Greet(s State, ctx *lvt.Context) (State, error) {
   <div>
     <div class="sec-tag">Step 7 · The server speaks first</div>
     <h2>No click required.</h2>
-    <p class="lead">Every update so far began with a user. But a live connection runs both ways: hold a <code>Session</code> handle and the server can push on its own. The card above carries a small <b>“the server said hi at …”</b> line that the server <b>refreshes on its own heartbeat</b> — sent with no action on anyone's part. It <em>replaces one value in place</em> rather than piling rows onto the wall, so the wall stays a record of real people. The asymmetry is the whole point: a downstream patch with nothing going up.</p>
+    <p class="lead">Every update so far began with a user. But a connection runs both ways: hold a <code>Session</code> handle and the server pushes on its own. A heartbeat <b>refreshes one value in place</b> — a downstream patch with nothing going up.</p>
     <div class="wire"><span class="wlabel">on the wire · WebSocket</span>
       <span class="wf dn">▼ {"tree":{"3":{"0":"15:04:08"}}}</span>
       <span class="wf note">(no ▲ — the server started it; just the one changed value)</span>
@@ -318,7 +334,7 @@ func (a *App) heartbeat() {
   <div>
     <div class="sec-tag">Only the diff goes over the wire</div>
     <h2>Send what changed, not the whole page.</h2>
-    <p class="lead">Templates split into <b>static structure (cached)</b> and <b>dynamic values</b>. When state changes, LiveTemplate diffs the new render against the last one and sends only the changed values — typically <b>85%+ less bandwidth</b> than shipping HTML. You saw it above: a greeting comes back as <code>{"tree":{"0":"Ada"}}</code>, not a page.</p>
+    <p class="lead">Templates split into <b>static structure (cached)</b> and <b>dynamic values</b>. On change, LiveTemplate sends only the changed values — typically <b>85%+ less bandwidth</b> than shipping HTML. A greeting comes back as <code>{"tree":{"0":"Ada"}}</code>, not a page.</p>
   </div>
   <div class="bars">
     <div class="bar-row"><span class="lab">full HTML</span><span class="bar full"><span></span></span><span class="val" style="color:var(--slate-2)">2.4 KB</span></div>
@@ -332,14 +348,14 @@ func (a *App) heartbeat() {
   <div class="sec-tag">And so much more</div>
   <h2>Batteries for real apps.</h2>
   <div class="grid">
-    <div class="feat"><div class="ico"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></div><h4>File uploads</h4><p>Add <code>lvt-upload</code> to a file input — chunked over the WebSocket with live progress, no extra route.</p></div>
-    <div class="feat"><div class="ico"><svg viewBox="0 0 24 24"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg></div><h4>Pub/Sub</h4><p><code>Subscribe</code>/<code>Publish</code> for multi-tab and cross-user fan-out — the engine behind steps 5–7.</p></div>
-    <div class="feat"><div class="ico"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div><h4>Sessions &amp; state</h4><p>Server-owned, per-session state. No cross-user leaks.</p></div>
-    <div class="feat"><div class="ico"><svg viewBox="0 0 24 24"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div><h4>Error handling</h4><p>Actions return <code>(State, error)</code>; field errors flow to the template, as in step 2.</p></div>
-    <div class="feat"><div class="ico"><svg viewBox="0 0 24 24"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg></div><h4>CLI (lvt)</h4><p>Scaffolds, dev server, component kits.</p></div>
-    <div class="feat"><div class="ico"><svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg></div><h4>TypeScript client</h4><p><code>@livetemplate/client</code> on npm, ~75% smaller updates.</p></div>
-    <div class="feat"><div class="ico"><svg viewBox="0 0 24 24"><line x1="6" y1="20" x2="6" y2="14"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="18" y1="20" x2="18" y2="10"/></svg></div><h4>Observability</h4><p>Structured hooks for metrics and tracing.</p></div>
-    <div class="feat"><div class="ico"><svg viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div><h4>Scaling</h4><p>Session groups, fan-out limits, deploy guidance.</p></div>
+    <a class="feat" href="/reference/uploads"><div class="ico"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></div><h4>File uploads</h4><p>Add <code>lvt-upload</code> to a file input — chunked over the WebSocket with live progress, no extra route.</p></a>
+    <a class="feat" href="/reference/pubsub"><div class="ico"><svg viewBox="0 0 24 24"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg></div><h4>Pub/Sub</h4><p><code>Subscribe</code>/<code>Publish</code> for multi-tab and cross-user fan-out — the engine behind steps 5–7.</p></a>
+    <a class="feat" href="/reference/session"><div class="ico"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div><h4>Sessions &amp; state</h4><p>Server-owned, per-session state. No cross-user leaks.</p></a>
+    <a class="feat" href="/reference/error-handling"><div class="ico"><svg viewBox="0 0 24 24"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div><h4>Error handling</h4><p>Actions return <code>(State, error)</code>; field errors flow to the template, as in step 2.</p></a>
+    <a class="feat" href="/cli/"><div class="ico"><svg viewBox="0 0 24 24"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg></div><h4>CLI (lvt)</h4><p>Scaffolds, dev server, component kits.</p></a>
+    <a class="feat" href="/client/"><div class="ico"><svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg></div><h4>TypeScript client</h4><p><code>@livetemplate/client</code> on npm, ~75% smaller updates.</p></a>
+    <a class="feat" href="/guides/observability"><div class="ico"><svg viewBox="0 0 24 24"><line x1="6" y1="20" x2="6" y2="14"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="18" y1="20" x2="18" y2="10"/></svg></div><h4>Observability</h4><p>Structured hooks for metrics and tracing.</p></a>
+    <a class="feat" href="/guides/scaling"><div class="ico"><svg viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div><h4>Scaling</h4><p>Session groups, fan-out limits, deploy guidance.</p></a>
   </div>
 </div></section>
 
@@ -347,7 +363,7 @@ func (a *App) heartbeat() {
 <section><div class="wrap">
   <div class="sec-tag">How it compares</div>
   <h2>Others annotate HTML to make it reactive. LiveTemplate moves that to the server.</h2>
-  <p class="lead">Other tools carry the behavior in the markup — <code>hx-*</code>, <code>x-*</code>, <code>phx-*</code>, or a DSL. With LiveTemplate a plain <code>&lt;button name="greet"&gt;</code> is already the action and state lives on the server. There <em>are</em> <code>lvt-*</code> attributes, but only as an escape hatch for what HTML can't express — a pending state, a debounce, a shortcut — never as boilerplate to make ordinary HTML reactive.</p>
+  <p class="lead">Other tools carry behavior in the markup — <code>hx-*</code>, <code>x-*</code>, <code>phx-*</code>, or a DSL. Here a plain <code>&lt;button name="greet"&gt;</code> is already the action, and state lives on the server. <code>lvt-*</code> attributes exist only as an escape hatch for what HTML can't express.</p>
   <table class="cmp">
     <thead><tr><th>If you’re using…</th><th>LiveTemplate gives you…</th></tr></thead>
     <tbody>
