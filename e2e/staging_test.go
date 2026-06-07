@@ -127,16 +127,18 @@ func TestEditOnGitHubLinkPresent(t *testing.T) {
 	}
 }
 
-// TestThemeTogglePersists verifies PR-A + the existing dark mode UI:
-// clicking the dark theme button persists the choice across reloads via
-// localStorage, and the html data-theme attribute updates accordingly.
+// TestThemeTogglePersists verifies the docs dark mode UI: clicking the dark
+// theme button persists the choice across reloads via localStorage, and the
+// html data-theme attribute updates accordingly. Runs against a docs page —
+// "/" is the marketing landing, which uses silent theme detection with no
+// toggle buttons.
 func TestThemeTogglePersists(t *testing.T) {
 	ctx, cancel := newCtx(t)
 	defer cancel()
 
 	var initial, afterClick, afterReload string
 	if err := chromedp.Run(ctx,
-		chromedp.Navigate(baseURL()+"/"),
+		chromedp.Navigate(baseURL()+"/getting-started/introduction"),
 		chromedp.AttributeValue("html", "data-theme", &initial, nil, chromedp.ByQuery),
 		chromedp.Click("#theme-dark", chromedp.ByID),
 		chromedp.AttributeValue("html", "data-theme", &afterClick, nil, chromedp.ByQuery),
@@ -155,16 +157,17 @@ func TestThemeTogglePersists(t *testing.T) {
 	t.Logf("initial=%q afterClick=%q afterReload=%q", initial, afterClick, afterReload)
 }
 
-// TestThemeAccentInjected verifies PR-A end-to-end: the user's
-// primary_color from tinkerdown.yaml ("#5a67d8") is injected into the
-// CSS custom property the rest of the styling reads.
+// TestThemeAccentInjected verifies end-to-end that the user's primary_color
+// from tinkerdown.yaml (emerald "#047857") is injected into the --accent CSS
+// custom property the docs styling reads. Runs against a docs page — the
+// marketing landing ("/") uses its own --sig token, not --accent.
 func TestThemeAccentInjected(t *testing.T) {
 	ctx, cancel := newCtx(t)
 	defer cancel()
 
 	var accent string
 	if err := chromedp.Run(ctx,
-		chromedp.Navigate(baseURL()+"/"),
+		chromedp.Navigate(baseURL()+"/getting-started/introduction"),
 		chromedp.Evaluate(
 			`getComputedStyle(document.documentElement).getPropertyValue('--accent').trim()`,
 			&accent,
@@ -172,9 +175,9 @@ func TestThemeAccentInjected(t *testing.T) {
 	); err != nil {
 		t.Fatalf("read --accent: %v", err)
 	}
-	want := "#5a67d8"
+	want := "#047857"
 	if !strings.EqualFold(accent, want) {
-		t.Errorf("--accent = %q, want %q (set in tinkerdown.yaml)", accent, want)
+		t.Errorf("--accent = %q, want %q (primary_color in tinkerdown.yaml)", accent, want)
 	}
 }
 

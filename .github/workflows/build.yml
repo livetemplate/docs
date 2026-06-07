@@ -33,3 +33,49 @@ jobs:
       - name: Test sync tool
         working-directory: cmd/sync
         run: go test ./... -count=1
+
+  # Browser-backed e2e against the REAL stack. Builds the same multi-stage
+  # Dockerfile prod ships (tinkerdown + recipes binary, TINKERDOWN_REF pinned),
+  # runs the container, and points the chromedp suite at it on :8080 — exactly
+  # how the suite runs against prod, just localhost. This is the gate that
+  # catches landing/IA/content changes breaking embeds, theme, or layout
+  # (validate alone can't — it never renders in a browser).
+  e2e:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.26'
+
+      # The Dockerfile encodes the full stack build (client assets → tinkerdown
+      # binary → recipes binary → entrypoint that starts both). Reuse it rather
+      # than re-deriving the build here, so CI can't drift from prod.
+      - name: Build the docs stack image
+        run: docker build -t docs-e2e .
+
+      - name: Start the stack
+        run: |
+          docker run -d --name docs -p 8080:8080 docs-e2e
+          # Poll until tinkerdown serves the home page (recipes binary + proxy
+          # are up by then). Fail fast with logs if it never comes up.
+          for i in $(seq 1 45); do
+            if curl -fsS -o /dev/null http://localhost:8080/; then
+              echo "stack is up"; exit 0
+            fi
+            sleep 2
+          done
+          echo "stack did not become ready in time"; docker logs docs; exit 1
+
+      # ubuntu-latest ships google-chrome-stable; chromedp's default allocator
+      # finds it on PATH. The suite already sets headless + --no-sandbox.
+      - name: Run e2e suite
+        working-directory: e2e
+        env:
+          E2E_BASE_URL: http://localhost:8080
+        run: go test ./... -count=1 -timeout 600s
+
+      - name: Container logs on failure
+        if: failure()
+        run: docker logs docs
