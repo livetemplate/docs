@@ -64,23 +64,23 @@ func multiUserSyncHandler() http.Handler {
 
 // <<< region:multi-user-sync
 
-// --- Pattern #27: Broadcasting ---
+// --- Pattern #27: Pubsub ---
 
-// >>> region:broadcasting-controller
-type BroadcastingController struct {
+// >>> region:pubsub-controller
+type PubSubController struct {
 	mu       sync.RWMutex
 	nextID   int
-	messages []BroadcastMessage
+	messages []PubSubMessage
 }
 
 // snapshotLocked returns a copy of c.messages. The Locked suffix signals
 // that the caller MUST hold c.mu (read or write) — without that, slices.Clone
 // reads c.messages concurrently with Send's append and races.
-func (c *BroadcastingController) snapshotLocked() []BroadcastMessage {
+func (c *PubSubController) snapshotLocked() []PubSubMessage {
 	return slices.Clone(c.messages)
 }
 
-func (c *BroadcastingController) Mount(state BroadcastingState, ctx *livetemplate.Context) (BroadcastingState, error) {
+func (c *PubSubController) Mount(state PubSubState, ctx *livetemplate.Context) (PubSubState, error) {
 	if err := ctx.Subscribe(ctx.SelfTopic()); err != nil {
 		return state, err
 	}
@@ -90,9 +90,9 @@ func (c *BroadcastingController) Mount(state BroadcastingState, ctx *livetemplat
 	return state, nil
 }
 
-// <<< region:broadcasting-controller
+// <<< region:pubsub-controller
 
-func (c *BroadcastingController) Join(state BroadcastingState, ctx *livetemplate.Context) (BroadcastingState, error) {
+func (c *PubSubController) Join(state PubSubState, ctx *livetemplate.Context) (PubSubState, error) {
 	name := strings.TrimSpace(ctx.GetString("username"))
 	if name == "" {
 		return state, nil
@@ -101,8 +101,8 @@ func (c *BroadcastingController) Join(state BroadcastingState, ctx *livetemplate
 	return state, nil
 }
 
-// >>> region:broadcasting-send
-func (c *BroadcastingController) Send(state BroadcastingState, ctx *livetemplate.Context) (BroadcastingState, error) {
+// >>> region:pubsub-send
+func (c *PubSubController) Send(state PubSubState, ctx *livetemplate.Context) (PubSubState, error) {
 	if state.Username == "" {
 		return state, nil
 	}
@@ -115,7 +115,7 @@ func (c *BroadcastingController) Send(state BroadcastingState, ctx *livetemplate
 	// No cap on c.messages: deliberately omitted to keep the demo focused
 	// on the Publish-to-SelfTopic mechanism. Production apps would
 	// ring-buffer, paginate, or persist to a store with TTL.
-	c.messages = append(c.messages, BroadcastMessage{ID: c.nextID, User: state.Username, Text: text})
+	c.messages = append(c.messages, PubSubMessage{ID: c.nextID, User: state.Username, Text: text})
 	state.Messages = c.snapshotLocked()
 	c.mu.Unlock()
 	// Publish must come after the lock release — holding the connection
@@ -128,22 +128,22 @@ func (c *BroadcastingController) Send(state BroadcastingState, ctx *livetemplate
 	return state, nil
 }
 
-// <<< region:broadcasting-send
+// <<< region:pubsub-send
 
-// >>> region:broadcasting-newmessage
-func (c *BroadcastingController) NewMessage(state BroadcastingState, ctx *livetemplate.Context) (BroadcastingState, error) {
+// >>> region:pubsub-newmessage
+func (c *PubSubController) NewMessage(state PubSubState, ctx *livetemplate.Context) (PubSubState, error) {
 	c.mu.RLock()
 	state.Messages = c.snapshotLocked()
 	c.mu.RUnlock()
 	return state, nil
 }
 
-// <<< region:broadcasting-newmessage
+// <<< region:pubsub-newmessage
 
-func broadcastingHandler() http.Handler {
-	tmpl := newLayoutTmpl("templates/layout.tmpl", "templates/realtime/broadcasting.tmpl")
-	return tmpl.Handle(&BroadcastingController{}, livetemplate.AsState(&BroadcastingState{
-		Title:    "Broadcasting",
+func pubsubHandler() http.Handler {
+	tmpl := newLayoutTmpl("templates/layout.tmpl", "templates/realtime/pubsub.tmpl")
+	return tmpl.Handle(&PubSubController{}, livetemplate.AsState(&PubSubState{
+		Title:    "Pubsub",
 		Category: "Real-Time & Multi-User",
 	}))
 }

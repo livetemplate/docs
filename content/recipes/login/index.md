@@ -70,7 +70,7 @@ Second, the actual welcome push happens in a goroutine. `OnConnect` returns imme
 
 `session.TriggerAction("serverWelcome", data)` enqueues an action on the session as if the client had dispatched it. The framework routes it to the controller's `ServerWelcome` method, runs the standard state-mutation-and-diff pipeline, and patches the dashboard — specifically the `<ins id="server-welcome-message">` block — with the new message. The client never asked for it; the server decided to update.
 
-The same pattern is how you push subscription updates, completed background-job results, or any "the server learned something new" event. For the deeper model of when to use `Publish` (peer connections in the same session group that opted in via `Subscribe`) versus `TriggerAction` (server-owned work on one session), see [Sync & Server Push](/recipes/sync-and-broadcast).
+The same pattern is how you push subscription updates, completed background-job results, or any "the server learned something new" event. For the deeper model of when to use `Publish` (peer connections in the same session group that opted in via `Subscribe`) versus `TriggerAction` (server-owned work on one session), see [Pubsub](/recipes/pubsub) and [Server push](/recipes/server-push).
 
 ## Logout: symmetric to login
 
@@ -98,4 +98,4 @@ For a header-driven alternative that does have an `Authenticator`, see the [Shar
 - [Reference — Authentication](/reference/authentication) — the full `Authenticator` interface contract.
 - [Reference — Session](/reference/session) — `session.TriggerAction`, `SessionStore`, and the session group model.
 - [Shared notepad](../shared-notepad/) — BasicAuth + per-user state + explicit peer refresh.
-- [Sync & Server Push](/recipes/sync-and-broadcast) — when to use `Publish` peer fan-out vs. `TriggerAction` server-push.
+- [Pubsub](/recipes/pubsub) / [Server push](/recipes/server-push) — when to use `Publish` peer fan-out vs. `TriggerAction` server push.

@@ -1,6 +1,6 @@
 ---
 title: "Shared notepad: BasicAuth + per-user state + explicit peer refresh"
-description: "BasicAuth turns the Authorization header into ctx.UserID() and a stable session group; a controller-owned map keys per-user state by that ID; and an opt-in ctx.Subscribe(ctx.SelfTopic()) in Mount plus ctx.Publish(ctx.SelfTopic(), \"Refresh\", nil) in Save keeps every tab of the same user in sync. The recipe sits between the [login recipe](../login/) (form-based session auth) and the [sync-and-broadcast deep dive](../sync-and-broadcast) (peer fan-out vs. server-initiated trigger)."
+description: "BasicAuth turns the Authorization header into ctx.UserID() and a stable session group; a controller-owned map keys per-user state by that ID; and an opt-in ctx.Subscribe(ctx.SelfTopic()) in Mount plus ctx.Publish(ctx.SelfTopic(), \"Refresh\", nil) in Save keeps every tab of the same user in sync. The recipe sits between the [login recipe](../login/) (form-based session auth) and the [pubsub deep dive](../pubsub) (peer fan-out, with [server push](../server-push) for the server-initiated trigger)."
 source_repo: https://github.com/livetemplate/docs
 source_path: content/recipes/shared-notepad/index.md
 ---
@@ -75,7 +75,7 @@ Three consequences worth knowing:
 - **Fan-out is fire-and-forget within a request.** The Save response goes to the originating tab immediately; peer tabs see the refresh milliseconds later as the queue drains.
 - **No `Subscribe`, no fan-out.** If `Mount` doesn't subscribe, `Publish` runs cleanly but reaches zero peer connections in the group. The Mount-side opt-in is the receiver-side contract.
 
-For the deeper model — when to use Subscribe/Publish peer fan-out versus `session.TriggerAction` for server-owned work — see [Sync & Server Push](/recipes/sync-and-broadcast).
+For the deeper model — when to use Subscribe/Publish peer fan-out versus `session.TriggerAction` for server-owned work — see [Pubsub](/recipes/pubsub) and [Server push](/recipes/server-push).
 
 ## Refresh: a regular controller action
 
@@ -113,7 +113,7 @@ None of those changes the four action methods on `NotepadController`. The shape 
 ## What next?
 
 - [Login: form-based session auth](../login/) — cookies + `OnConnect` + `session.TriggerAction` instead of header auth.
-- [Sync & Server Push](/recipes/sync-and-broadcast) — when to use Subscribe/Publish peer fan-out vs. server-initiated TriggerAction.
-- [Broadcasting, deeper](/recipes/broadcasting) — the publish pipeline in detail.
+- [Server push](/recipes/server-push) — server-initiated `TriggerAction` for server-owned work.
+- [Pubsub](/recipes/pubsub) — Subscribe/Publish peer fan-out and the publish pipeline in detail.
 - [Patterns › Preserve inputs](/recipes/ui-patterns/forms/preserve-inputs) — the `lvt-form:preserve` story by itself.
 - [Reference — Authentication](/reference/authentication) — the full `Authenticator` interface.

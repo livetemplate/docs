@@ -121,5 +121,5 @@ func (c *Controller) Save(state State, ctx *livetemplate.Context) (State, error)
 
 - [Your First App](/getting-started/your-first-app) builds the counter from scratch.
 - [Progressive Complexity](/guides/progressive-complexity) explains when to stay with plain HTML and when to add `lvt-*`.
-- [Sync & Server Push](/recipes/sync-and-broadcast) covers `Subscribe`, `Publish`, and server-initiated actions in more detail.
+- [Pubsub](/recipes/pubsub) covers `Subscribe`/`Publish` peer fan-out, and [Server push](/recipes/server-push) covers server-initiated actions, in more detail.
 - [Session Reference](/reference/session) documents state persistence and session groups.

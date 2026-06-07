@@ -25,8 +25,8 @@
 //
 //   - Inner mux registrations DROP the public recipe prefix. cmd/site
 //     StripPrefix strips "/apps/ui-patterns" so a request
-//     "/apps/ui-patterns/realtime/broadcasting" reaches this mux as
-//     "/realtime/broadcasting".
+//     "/apps/ui-patterns/realtime/pubsub" reaches this mux as
+//     "/realtime/pubsub".
 package patterns
 
 import (
@@ -221,7 +221,7 @@ func buildMux() http.Handler {
 
 	// Real-Time & Multi-User
 	mux.Handle("/realtime/multi-user-sync", multiUserSyncHandler())
-	mux.Handle("/realtime/broadcasting", broadcastingHandler())
+	mux.Handle("/realtime/pubsub", pubsubHandler())
 	mux.Handle("/realtime/presence", presenceHandler())
 	mux.Handle("/realtime/reconnection", reconnectionHandler())
 	mux.Handle("/realtime/live-preview", livePreviewHandler())

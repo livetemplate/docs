@@ -42,5 +42,5 @@ One button and one rendered counter — all the synchronization happens server-s
 - You want explicit control over *when* peers refresh, rather than auto-syncing
   every field.
 
-Reach for [Broadcasting](/recipes/ui-patterns/realtime/broadcasting) when peers
+Reach for [Pubsub](/recipes/ui-patterns/realtime/pubsub) when peers
 need to share a growing log rather than a single value.

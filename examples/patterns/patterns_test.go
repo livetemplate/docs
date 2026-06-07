@@ -3462,9 +3462,9 @@ func TestMultiUserSync(t *testing.T) {
 	runStandardSubtests(t, ctx, true, "Multi-User Sync pattern — heading, a paragraph 'Counter: 2', and an Increment button. Layout is centered with Pico styling.")
 }
 
-// --- Pattern #27: Broadcasting ---
+// --- Pattern #27: Pubsub ---
 
-func TestBroadcasting(t *testing.T) {
+func TestPubSub(t *testing.T) {
 	if testing.Short() {
 		t.Skip("Skipping E2E test in short mode")
 	}
@@ -3472,7 +3472,7 @@ func TestBroadcasting(t *testing.T) {
 	ctx, cancel, serverPort := setupTest(t)
 	defer cancel()
 
-	url := e2etest.GetChromeTestURL(serverPort) + "/apps/ui-patterns/realtime/broadcasting"
+	url := e2etest.GetChromeTestURL(serverPort) + "/apps/ui-patterns/realtime/pubsub"
 
 	// Tab 1 Joins as Alice.
 	if err := chromedp.Run(ctx,
@@ -3521,7 +3521,7 @@ func TestBroadcasting(t *testing.T) {
 		if err := chromedp.Run(peerCtx,
 			e2etest.WaitForText(`div.messages`, "hi from Alice", 3*time.Second),
 		); err != nil {
-			t.Fatalf("Peer did not receive broadcast from tab 1: %v", err)
+			t.Fatalf("Peer did not receive published message from tab 1: %v", err)
 		}
 	})
 
@@ -3541,7 +3541,7 @@ func TestBroadcasting(t *testing.T) {
 		if err := chromedp.Run(ctx,
 			e2etest.WaitForText(`div.messages`, "hi from Bob", 3*time.Second),
 		); err != nil {
-			t.Fatalf("Tab 1 did not receive broadcast from peer: %v", err)
+			t.Fatalf("Tab 1 did not receive published message from peer: %v", err)
 		}
 	})
 
@@ -3620,7 +3620,7 @@ func TestBroadcasting(t *testing.T) {
 		}
 	})
 
-	runStandardSubtests(t, ctx, true, "Broadcasting pattern — heading, 'Posting as Alice' label, message list with three entries (one from Alice, one from Bob, and a 'guard message' from Alice), and a compose form with a text input + Send button.")
+	runStandardSubtests(t, ctx, true, "Pubsub pattern — heading, 'Posting as Alice' label, message list with three entries (one from Alice, one from Bob, and a 'guard message' from Alice), and a compose form with a text input + Send button.")
 }
 
 // --- Pattern #28: Presence Tracking ---
@@ -3699,7 +3699,7 @@ func TestPresence(t *testing.T) {
 		// Targeted protocol test for Join's empty-username guard. The
 		// HTML `required` attribute is the UI guard; this test covers
 		// the server-side defense-in-depth path. Same guard-message
-		// idiom as Broadcasting: fire empty + guard, wait for the
+		// idiom as TestPubSub: fire empty + guard, wait for the
 		// guard's effect — if empty had been honored, OnlineCount
 		// would have ticked to 1 before the guard's Join fired and we'd
 		// never see exactly 1 user.

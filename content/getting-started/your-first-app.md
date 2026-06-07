@@ -145,5 +145,5 @@ You wrote a counter that:
 - [How a LiveTemplate Update Flows](/recipes/architecture-flow) — the sequence diagram of what happened between your click and the DOM patch.
 - [UI pattern recipes](/recipes/ui-patterns/) — 33 live, reactive UI idioms you can copy. Forms, lists, search, real-time, navigation, feedback.
 - [Server API reference](/reference/api) — `New`, `Handle`, `Context`, action method dispatch.
-- [Sync & Server Push](/recipes/sync-and-broadcast) — when to use `Subscribe`/`Publish` peer fan-out vs `TriggerAction()`, and how sessions are scoped.
+- [Pubsub](/recipes/pubsub) / [Server push](/recipes/server-push) — when to use `Subscribe`/`Publish` peer fan-out vs `TriggerAction()`, and how sessions are scoped.
 - [App recipes](/recipes/apps/) — runnable apps including chat, todos, file uploads, auth.

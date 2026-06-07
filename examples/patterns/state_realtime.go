@@ -1,6 +1,6 @@
 package patterns
 
-type BroadcastMessage struct {
+type PubSubMessage struct {
 	ID   int
 	User string
 	Text string
@@ -15,8 +15,8 @@ type MultiUserSyncState struct {
 
 // <<< region:multi-user-sync-state
 
-// >>> region:broadcasting-state
-type BroadcastingState struct {
+// >>> region:pubsub-state
+type PubSubState struct {
 	Title    string
 	Category string
 	// Username is intentionally NOT lvt:"persist" — persist storage is keyed
@@ -26,17 +26,17 @@ type BroadcastingState struct {
 	// as different users; per-connection state is what makes that work.
 	// Reconnect Recovery (#29) covers the persist scenario instead.
 	Username string
-	Messages []BroadcastMessage
+	Messages []PubSubMessage
 }
 
-// <<< region:broadcasting-state
+// <<< region:pubsub-state
 
 // >>> region:presence-state
 type PresenceState struct {
 	Title    string
 	Category string
 	// Username + Joined are intentionally NOT lvt:"persist" — see comment on
-	// BroadcastingState.Username. Tabs need independent presence identity.
+	// PubSubState.Username. Tabs need independent presence identity.
 	Username    string
 	Joined      bool
 	OnlineCount int

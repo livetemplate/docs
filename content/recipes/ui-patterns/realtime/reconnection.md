@@ -42,4 +42,4 @@ struct tags.
 - A user should return to exactly where they left off after a reload.
 
 For per-connection state that should *not* persist across tabs, see
-[Broadcasting](/recipes/ui-patterns/realtime/broadcasting).
+[Pubsub](/recipes/ui-patterns/realtime/pubsub).

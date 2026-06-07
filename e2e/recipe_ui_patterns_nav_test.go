@@ -126,7 +126,7 @@ func TestUIPatternsAllLeavesServed(t *testing.T) {
 		"navigation/modal-dialog", "navigation/confirm-dialog", "navigation/tabs",
 		"navigation/spa-navigation", "navigation/keyboard-shortcuts",
 		"feedback/animations", "feedback/loading-states", "feedback/highlight", "feedback/flash-messages",
-		"realtime/multi-user-sync", "realtime/broadcasting", "realtime/presence",
+		"realtime/multi-user-sync", "realtime/pubsub", "realtime/presence",
 		"realtime/reconnection", "realtime/live-preview", "realtime/server-push",
 	}
 	if len(leaves) != 33 {
