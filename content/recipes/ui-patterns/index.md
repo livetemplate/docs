@@ -9,7 +9,7 @@ A catalog of focused **UI pattern recipes** built with LiveTemplate. Each recipe
 
 Detail pages open the **live demo**, served by the docs-site recipes binary (`cmd/site`) from the [`docs/examples/patterns/`](https://github.com/livetemplate/docs/tree/main/examples/patterns) package. Tinkerdown reverse-proxies the in-process mount so you can interact with each pattern recipe without leaving this site.
 
-> The catalog below is **rendered live** from the `/recipes/ui-patterns/api/index.json` endpoint that the same package exposes, via tinkerdown's `lvt-source` REST binding. New UI pattern recipes added to the package show up here on the next deploy — no separate sync needed.
+> The catalog below is **rendered live** from the `/apps/ui-patterns/api/index.json` endpoint that the same package exposes, via tinkerdown's `lvt-source` REST binding. New UI pattern recipes added to the package show up here on the next deploy — no separate sync needed.
 
 ```lvt
 <div lvt-source="patterns" class="patterns-catalog">
@@ -41,7 +41,7 @@ This page is itself a recipe. The catalog above is **not static markdown** — i
 sources:
   patterns:
     type: rest
-    from: http://localhost:9091/recipes/ui-patterns/api/index.json
+    from: http://localhost:9091/apps/ui-patterns/api/index.json
     result_path: categories
     cache:
       ttl: 5m
@@ -51,7 +51,7 @@ On every visit, tinkerdown:
 
 1. Renders a `<div class="loading">Connecting...</div>` placeholder server-side
 2. Establishes a WebSocket to the docs server
-3. Server fetches `/recipes/ui-patterns/api/index.json` from the in-process recipes binary (cached 5 minutes), exposes the JSON as `.Data`
+3. Server fetches `/apps/ui-patterns/api/index.json` from the in-process recipes binary (cached 5 minutes), exposes the JSON as `.Data`
 4. Re-renders the inner template with the fetched data and patches it into the page
 
 The recipes binary (`cmd/site`) compiles the UI pattern catalog metadata directly from `data.go`, so any pattern added to `docs/examples/patterns/` shows up in this catalog on the next deploy — no separate sync needed.

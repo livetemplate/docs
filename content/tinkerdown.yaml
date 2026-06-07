@@ -55,8 +55,6 @@ navigation:
     pages:
       - title: "Recipes Overview"
         path: "recipes/index.md"
-      - title: "UI Patterns"
-        path: "recipes/ui-patterns/index.md"
       - title: "UI Pattern Catalog"
         path: "recipes/patterns-stats.md"
       - title: "Counter"
@@ -71,6 +69,31 @@ navigation:
         path: "recipes/apps/flash-messages.md"
       - title: "Uploads"
         path: "reference/uploads.md"
+
+  # UI Patterns — one page per pattern (live embed + code + when-to-use).
+  # tinkerdown only serves pages registered in nav, so every pattern page is
+  # listed here. Collapsed by default to stay compact; the Overview page is the
+  # intro/hub. Pages are ordered by category. More categories land in follow-ups.
+  - title: "UI Patterns"
+    path: "recipes/ui-patterns"
+    collapsed: true
+    pages:
+      - title: "Overview"
+        path: "recipes/ui-patterns/index.md"
+      - title: "Forms · Click to Edit"
+        path: "recipes/ui-patterns/forms/click-to-edit.md"
+      - title: "Forms · Edit Row"
+        path: "recipes/ui-patterns/forms/edit-row.md"
+      - title: "Forms · Inline Validation"
+        path: "recipes/ui-patterns/forms/inline-validation.md"
+      - title: "Forms · Bulk Update"
+        path: "recipes/ui-patterns/forms/bulk-update.md"
+      - title: "Forms · Reset User Input"
+        path: "recipes/ui-patterns/forms/reset-input.md"
+      - title: "Forms · File Upload"
+        path: "recipes/ui-patterns/forms/file-upload.md"
+      - title: "Forms · Preserving File Inputs"
+        path: "recipes/ui-patterns/forms/preserve-inputs.md"
 
   # Apps — full runnable examples.
   - title: "Apps"
@@ -160,13 +183,13 @@ navigation:
 
 sources:
   # UI pattern recipe catalog index: served by the docs-site recipes binary
-  # (cmd/site) at the in-process patterns mount. /recipes/ui-patterns/index.md
-  # binds to this via <div lvt-source="patterns">. tinkerdown's REST
-  # source fetcher runs server-side at render/WS-connect time, so the
-  # localhost upstream is reachable.
+  # (cmd/site) at the in-process patterns mount (now /apps/ui-patterns/).
+  # /recipes/ui-patterns/index.md binds to this via <div lvt-source="patterns">.
+  # tinkerdown's REST source fetcher runs server-side at render/WS-connect time,
+  # so the localhost upstream is reachable.
   patterns:
     type: rest
-    from: http://localhost:9091/recipes/ui-patterns/api/index.json
+    from: http://localhost:9091/apps/ui-patterns/api/index.json
     result_path: categories
     cache:
       ttl: 5m
@@ -180,39 +203,14 @@ sources:
       ttl: 1h
 
 routes:
-  # UI pattern recipe category subtrees proxy to the docs-site recipes
-  # binary (cmd/site) at the in-process /recipes/ui-patterns/ mount,
-  # NOT resolved as markdown. Tinkerdown forwards
-  # /recipes/ui-patterns/<cat>/<slug> verbatim to the upstream.
-  - pattern: "/recipes/ui-patterns/api/"
-    type: "proxy"
-    upstream: "http://localhost:9091"
-  - pattern: "/recipes/ui-patterns/forms/"
-    type: "proxy"
-    upstream: "http://localhost:9091"
-  - pattern: "/recipes/ui-patterns/lists/"
-    type: "proxy"
-    upstream: "http://localhost:9091"
-  - pattern: "/recipes/ui-patterns/loading/"
-    type: "proxy"
-    upstream: "http://localhost:9091"
-  - pattern: "/recipes/ui-patterns/feedback/"
-    type: "proxy"
-    upstream: "http://localhost:9091"
-  - pattern: "/recipes/ui-patterns/navigation/"
-    type: "proxy"
-    upstream: "http://localhost:9091"
-  - pattern: "/recipes/ui-patterns/realtime/"
-    type: "proxy"
-    upstream: "http://localhost:9091"
-  - pattern: "/recipes/ui-patterns/search/"
-    type: "proxy"
-    upstream: "http://localhost:9091"
-  # Recipe apps under /apps/<slug>/ (counter, todos, future folds) are
-  # served by cmd/site too. Direct navigation via in-page links (e.g.
-  # the Todos recipe's "Launch the live demo" link) bypasses embed-lvt
-  # and hits tinkerdown's public port; this route proxies them through.
-  # WebSocket upgrade flows for /apps/<slug>/live also use this route.
+  # Recipe apps under /apps/<slug>/ (counter, todos, the UI pattern live
+  # apps at /apps/ui-patterns/<cat>/<slug>, future folds) are served by the
+  # docs-site recipes binary (cmd/site), NOT resolved as markdown. Direct
+  # navigation via in-page links and embed-lvt's server-side prefetch both
+  # hit this route; WebSocket upgrade flows for /apps/<slug>/live use it too.
+  # The UI pattern docs pages live at /recipes/ui-patterns/<cat>/<slug> and
+  # ARE markdown, so they must NOT be proxied — that's why the live apps moved
+  # under /apps/ (no per-category /recipes/ui-patterns/ proxy routes).
   - pattern: "/apps/"
     type: "proxy"
     upstream: "http://localhost:9091"

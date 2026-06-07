@@ -45,7 +45,7 @@ The catalog this site exposes is itself driven by the same `lvt-source="patterns
     {{else}}
     <p data-test="meta-summary">
         Right now: <strong>{{len .Data}}</strong> pattern categories, served from
-        the docs-site recipes binary's <code>/recipes/ui-patterns/api/index.json</code>
+        the docs-site recipes binary's <code>/apps/ui-patterns/api/index.json</code>
         endpoint, cached 5 minutes at the docs-site edge.
     </p>
     {{end}}

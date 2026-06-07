@@ -185,7 +185,7 @@ func TestThemeAccentInjected(t *testing.T) {
 // /recipes/ui-patterns/ catalog is a tinkerdown <div lvt-source="patterns"> block
 // that renders a "Connecting..." placeholder server-side, then hydrates
 // over WebSocket from the in-process recipes binary's
-// /recipes/ui-patterns/api/index.json endpoint.
+// /apps/ui-patterns/api/index.json endpoint.
 //
 // We must NOT inspect the curl body — it would only show the loading
 // shell. Instead, wait for a [data-test="pattern-row"] element (only
@@ -503,17 +503,18 @@ func TestRecipe7_MetaPageHasMermaidAndLiveCount(t *testing.T) {
 }
 
 // TestPatternProxiedAndInteractive verifies the routing pipeline:
-// /recipes/ui-patterns/forms/click-to-edit on the docs site reverse-proxies to
+// /apps/ui-patterns/forms/click-to-edit on the docs site reverse-proxies to
 // the in-process recipes binary's patterns mount, the click-to-edit
-// page renders, and we can see its expected DOM (an Edit button and
-// a name field).
+// live app renders, and we can see its expected DOM (an Edit button and
+// a name field). The docs page that embeds this app is covered separately
+// by TestUIPatternDocPageRenders.
 func TestPatternProxiedAndInteractive(t *testing.T) {
 	ctx, cancel := newCtx(t)
 	defer cancel()
 
 	var html string
 	if err := chromedp.Run(ctx,
-		chromedp.Navigate(baseURL()+"/recipes/ui-patterns/forms/click-to-edit"),
+		chromedp.Navigate(baseURL()+"/apps/ui-patterns/forms/click-to-edit"),
 		chromedp.OuterHTML("body", &html, chromedp.ByQuery),
 	); err != nil {
 		t.Fatalf("navigate: %v", err)

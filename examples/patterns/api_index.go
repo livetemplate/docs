@@ -18,10 +18,23 @@ type apiCategory struct {
 type apiPattern struct {
 	Slug        string `json:"slug"`        // last URL segment, e.g. "click-to-edit"
 	Name        string `json:"name"`        // human title
-	Path        string `json:"path"`        // public path, e.g. "/recipes/ui-patterns/forms/click-to-edit"
+	Path        string `json:"path"`        // catalog link: doc page if the category has one, else the live app
 	Description string `json:"description"` // one-line problem statement
 	Status      string `json:"status"`      // "stable" | "soon"
 	Category    string `json:"category"`    // human category name (denormalized for client convenience)
+}
+
+// docBase is where the per-pattern markdown doc pages live
+// (docBase/<cat>/<slug>), distinct from the live-app basePath
+// (/apps/ui-patterns/<cat>/<slug>) the doc pages embed.
+const docBase = "/recipes/ui-patterns"
+
+// docPageCategories names the categories that have dedicated doc pages. The
+// catalog links those patterns to their doc page; categories not yet migrated
+// link straight to the live app, so the hub never points at a missing page.
+// Append a category here in the same change that adds its doc pages.
+var docPageCategories = map[string]bool{
+	"Forms & Editing": true, // content/recipes/ui-patterns/forms/*.md
 }
 
 // apiIndexHandler exposes the pattern catalog as JSON for the
@@ -70,6 +83,10 @@ func apiIndexHandler(basePath string) http.Handler {
 				Name:     c.Name,
 				Patterns: make([]apiPattern, 0, len(c.Patterns)),
 			}
+			linkBase := basePath // live app, until this category has doc pages
+			if docPageCategories[c.Name] {
+				linkBase = docBase // the per-pattern doc page
+			}
 			for _, p := range c.Patterns {
 				status := "stable"
 				if !p.Implemented {
@@ -78,7 +95,7 @@ func apiIndexHandler(basePath string) http.Handler {
 				ac.Patterns = append(ac.Patterns, apiPattern{
 					Slug:        patternSlugFromPath(p.Path),
 					Name:        p.Name,
-					Path:        basePath + p.RelPath(),
+					Path:        linkBase + p.RelPath(),
 					Description: p.Description,
 					Status:      status,
 					Category:    c.Name,

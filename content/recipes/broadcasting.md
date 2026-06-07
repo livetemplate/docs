@@ -11,7 +11,7 @@ source_path: content/recipes/broadcasting.md
 
 Broadcasting goes further within the same scope. Counter shared one integer; this pattern shares a multi-author message log. Same Subscribe/Publish primitives, two design choices that change everything — which fields are per-connection vs persisted, and where the source of truth lives.
 
-```embed-lvt path="/recipes/ui-patterns/realtime/broadcasting" upstream="http://localhost:9091" height="380px"
+```embed-lvt path="/apps/ui-patterns/realtime/broadcasting" upstream="http://localhost:9091" height="380px"
 ```
 
 Open the page in a second tab. Join with a different name. Send a message from either side. Both update. Both tabs are in the same session group (same cookie), so each tab's `SelfTopic()` resolves to the same string, and a Publish from either reaches both — but each tab keeps its own `Username` because identity is per-connection, not persisted.
@@ -66,5 +66,5 @@ Multi-replica: swap in-process fan-out for Redis Pub/Sub via [`WithPubSubBroadca
 
 ## What's next
 
-The reconnection-recovery pattern (live demo at [/recipes/ui-patterns/realtime/reconnection](/recipes/ui-patterns/realtime/reconnection)) is the persist-state companion. Same Subscribe/Publish shape, but the demo state survives a WebSocket drop because the fields are `lvt:"persist"`-tagged. A future recipe will go deep on it; for now the live widget plus its source in the same `_app/` is the reference.
+The reconnection-recovery pattern (live demo at [/apps/ui-patterns/realtime/reconnection](/apps/ui-patterns/realtime/reconnection)) is the persist-state companion. Same Subscribe/Publish shape, but the demo state survives a WebSocket drop because the fields are `lvt:"persist"`-tagged. A future recipe will go deep on it; for now the live widget plus its source in the same `_app/` is the reference.
 

@@ -17,13 +17,15 @@ import (
 	"github.com/chromedp/chromedp"
 )
 
-// wantSections is the locked seven-group IA, in sidebar order.
+// wantSections is the locked IA, in sidebar order. "UI Patterns" is a
+// dedicated section (collapsed by default) for the per-pattern recipe pages,
+// which must be nav-registered to be served.
 var wantSections = []string{
-	"Learn", "Concepts", "Recipes", "Apps",
+	"Learn", "Concepts", "Recipes", "UI Patterns", "Apps",
 	"Reference", "Deploy & Operate", "Ecosystem",
 }
 
-// TestDocsIASidebarSections asserts every docs page shows exactly the seven
+// TestDocsIASidebarSections asserts every docs page shows exactly the
 // IA sections in the sidebar, in order.
 func TestDocsIASidebarSections(t *testing.T) {
 	ctx, cancel := newCtx(t)
@@ -90,6 +92,7 @@ func TestDocsIASectionPages(t *testing.T) {
 		"Learn":            "/getting-started/introduction",
 		"Concepts":         "/guides/standard-html-reactivity",
 		"Recipes":          "/recipes/",
+		"UI Patterns":      "/recipes/ui-patterns/forms/click-to-edit",
 		"Apps":             "/recipes/todos/",
 		"Reference":        "/reference/api",
 		"Deploy & Operate": "/reference/configuration",

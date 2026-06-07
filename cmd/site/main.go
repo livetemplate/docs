@@ -128,19 +128,18 @@ func main() {
 		livetemplate.WithAllowedOrigins(allowedOrigins),
 	)))
 
-	// UI patterns are mounted at their recipe URL space because the
-	// catalog and detail pages are first-class recipes. Tinkerdown's proxy
-	// routes for /recipes/ui-patterns/forms/, /recipes/ui-patterns/lists/,
-	// etc. forward here. Templates render absolute hrefs as
-	// {{basePath}}/realtime/broadcasting →
-	// /recipes/ui-patterns/realtime/broadcasting.
+	// UI pattern live apps are mounted under /apps/ (like every other embedded
+	// recipe app), so the docs URL space /recipes/ui-patterns/<cat>/<slug> is
+	// free for the per-pattern markdown pages. The existing /apps/ proxy route
+	// forwards here; no per-category proxy routes are needed. The per-pattern
+	// docs pages embed these via embed-lvt path="/apps/ui-patterns/<cat>/<slug>".
 	//
 	// Production options: AnonymousAuthenticator (default — per-browser
 	// session group), explicit origin allowlist for the docs deploy
 	// targets. The handler package's Handler signature accepts opts so
 	// the e2e test-server (docs/e2e/patterns/main.go) can supply
 	// WithPermissiveOriginCheck for random-port test setups.
-	mux.Handle("/recipes/ui-patterns/", http.StripPrefix("/recipes/ui-patterns", patterns.Handler("/recipes/ui-patterns",
+	mux.Handle("/apps/ui-patterns/", http.StripPrefix("/apps/ui-patterns", patterns.Handler("/apps/ui-patterns",
 		livetemplate.WithAuthenticator(&livetemplate.AnonymousAuthenticator{}),
 		livetemplate.WithAllowedOrigins(allowedOrigins),
 	)))

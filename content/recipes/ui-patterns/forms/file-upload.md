@@ -1,0 +1,39 @@
+---
+title: "File Upload"
+description: "Standard multipart upload and chunked upload with live progress."
+source_repo: "https://github.com/livetemplate/docs"
+source_path: "examples/patterns/templates/forms/file-upload.tmpl"
+---
+
+# File Upload
+
+Two tiers from the same handler. **Tier 1** is a plain `multipart/form-data` form —
+it just works, no JavaScript. **Tier 2** adds `lvt-upload` to stream the file in
+chunks over the WebSocket and render a live `<progress>` bar as it arrives.
+
+```embed-lvt path="/apps/ui-patterns/forms/file-upload" upstream="http://localhost:9091" height="380px"
+```
+
+## Template
+
+`{{range .lvt.Uploads "chunked-doc"}}` exposes per-file progress for the chunked input.
+
+```html include="/examples/patterns/templates/forms/file-upload.tmpl"
+```
+
+## Handler & state
+
+`WithUpload` declares each named upload (size caps, and a small `ChunkSize` so the
+demo's progress is visible); `Upload` flashes the completed file's name.
+
+```go include="/examples/patterns/handlers_forms.go" lines="166-204"
+```
+
+```go include="/examples/patterns/state_forms.go" lines="45-48"
+```
+
+## When to use
+
+- Any file input — start with Tier 1, add `lvt-upload` only when you want progress or
+  large-file chunking.
+- See [Uploads](/reference/uploads) for the full upload reference.

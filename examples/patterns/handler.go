@@ -2,7 +2,7 @@
 // 33 reactive UI pattern handlers exposed as a single Go package
 // consumable by docs/cmd/site. There is no main() here: production
 // runs via the docs single-binary container, mounted by cmd/site at
-// /recipes/ui-patterns/ with StripPrefix.
+// /apps/ui-patterns/ with StripPrefix.
 //
 // Architecture notes:
 //
@@ -24,8 +24,8 @@
 //     before parse, which we don't get with livetemplate.New.
 //
 //   - Inner mux registrations DROP the public recipe prefix. cmd/site
-//     StripPrefix strips "/recipes/ui-patterns" so a request
-//     "/recipes/ui-patterns/realtime/broadcasting" reaches this mux as
+//     StripPrefix strips "/apps/ui-patterns" so a request
+//     "/apps/ui-patterns/realtime/broadcasting" reaches this mux as
 //     "/realtime/broadcasting".
 package patterns
 
@@ -70,7 +70,7 @@ var (
 // plus /api/index.json + the dev-mode static asset routes
 // (/livetemplate-client.js, /livetemplate.css). Mount it with
 // http.StripPrefix; the basePath argument is the prefix the docs
-// container exposes externally (e.g. "/recipes/ui-patterns").
+// container exposes externally (e.g. "/apps/ui-patterns").
 //
 // basePath has no trailing slash. Templates were authored with the
 // literal token "{{basePath}}" which extractTemplates rewrites to the
