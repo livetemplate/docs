@@ -17,6 +17,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strings"
 
 	"github.com/livetemplate/livetemplate"
 
@@ -24,6 +25,7 @@ import (
 	counterbasic "github.com/livetemplate/docs/examples/counter-basic"
 	"github.com/livetemplate/docs/examples/greet"
 	greetloading "github.com/livetemplate/docs/examples/greet-loading"
+	greetnojs "github.com/livetemplate/docs/examples/greet-nojs"
 	greetvalidate "github.com/livetemplate/docs/examples/greet-validate"
 	greetwall "github.com/livetemplate/docs/examples/greet-wall"
 	loginrecipe "github.com/livetemplate/docs/examples/login"
@@ -99,7 +101,12 @@ func main() {
 		livetemplate.WithAllowedOrigins(allowedOrigins),
 		livetemplate.WithWebSocketDisabled(),
 	)))
-	mux.Handle("/apps/greet-nojs/", http.StripPrefix("/apps/greet-nojs", greet.Handler(
+	// greet-nojs is Step 4 ("works without JavaScript"): mounted WS-disabled and
+	// shown live in a script-disabled iframe so the reader can watch the plain
+	// HTTP form-POST round-trip. mountStripped also rewrites the POST-Redirect-
+	// GET Location (the handler emits "/") back under this prefix, so the no-JS
+	// submit lands on the greet page instead of bouncing to the site root.
+	mux.Handle("/apps/greet-nojs/", mountStripped("/apps/greet-nojs", greetnojs.Handler(
 		livetemplate.WithAllowedOrigins(allowedOrigins),
 		livetemplate.WithWebSocketDisabled(),
 	)))
@@ -197,4 +204,37 @@ func getenv(key, fallback string) string {
 		return v
 	}
 	return fallback
+}
+
+// mountStripped is http.StripPrefix plus redirect-Location rewriting. A recipe
+// mounted under a prefix sees its root as "/", so the POST-Redirect-GET path
+// (the no-JS form-submit transport) emits a root-absolute Location like "/" —
+// which, unstripped, points at the site root rather than back under the mount.
+// This re-adds the prefix to such Locations so a no-JS submit returns to the
+// recipe. Locations already under the prefix, or absolute URLs, pass through.
+func mountStripped(prefix string, h http.Handler) http.Handler {
+	stripped := http.StripPrefix(prefix, h)
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		stripped.ServeHTTP(&locationPrefixer{ResponseWriter: w, prefix: prefix}, r)
+	})
+}
+
+// locationPrefixer rewrites a root-absolute redirect Location to sit under
+// prefix, just before the status line is written.
+type locationPrefixer struct {
+	http.ResponseWriter
+	prefix  string
+	written bool
+}
+
+func (lp *locationPrefixer) WriteHeader(code int) {
+	if !lp.written {
+		lp.written = true
+		if loc := lp.Header().Get("Location"); strings.HasPrefix(loc, "/") &&
+			!strings.HasPrefix(loc, "//") && // protocol-relative URL, leave it
+			!strings.HasPrefix(loc, lp.prefix+"/") && loc != lp.prefix {
+			lp.Header().Set("Location", lp.prefix+loc)
+		}
+	}
+	lp.ResponseWriter.WriteHeader(code)
 }

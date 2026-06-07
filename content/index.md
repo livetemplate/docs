@@ -178,11 +178,11 @@ func main() {
 <!-- STEP 4 · WORKS WITHOUT JS -->
 <section><div class="wrap">
   <div class="sec-tag">Step 4 · Works without JavaScript</div>
-  <h2>The same program. Three transports.</h2>
-  <p class="lead">This is the <b>identical greeting app</b> — but its server has WebSocket turned off. With JavaScript on, the client falls back to an HTTP fetch and patches the DOM in place. With JavaScript <em>off</em>, the very same <code>&lt;form&gt;</code> POSTs and the server renders the page. Progressive enhancement is a <b>transport flag, not a different app</b>.</p>
+  <h2>The same program. Two transports, side by side — try them.</h2>
+  <p class="lead">Both cards run the <b>identical greeting app</b> with the WebSocket turned off. <b>Left, JavaScript on:</b> the client intercepts the form, sends an HTTP fetch, and patches the headline in place — no reload. <b>Right, JavaScript disabled</b> (a sandboxed frame with scripts blocked): the very same <code>&lt;form&gt;</code> does a plain POST and the server renders the page — watch the whole card reload. Same Go, same template; progressive enhancement is a <b>transport flag, not a different app</b>. Type a name in each.</p>
   <div class="two" style="margin-top:28px">
     <div class="live-card">
-      <div class="live-bar"><span class="live-badge"><span class="pulse"></span> live</span><span class="live-meta">greet-nojs · same code, WebSocket off</span></div>
+      <div class="live-bar"><span class="live-badge"><span class="pulse"></span> live</span><span class="live-meta">JavaScript on · fetch + DOM patch</span></div>
       <div class="live-body">
 
 ```embed-lvt path="/apps/greet-nojs/" upstream="http://localhost:9091" height="200px"
@@ -190,12 +190,14 @@ func main() {
 
 </div>
     </div>
-    <div class="tiers tiers-col">
-      <div class="tier"><div class="lvl">no javascript</div><h4>Form POST</h4><p>The form submits normally; the browser shows the server-rendered response. It just works.</p></div>
-      <div class="tier"><div class="lvl">javascript</div><h4>fetch + DOM patch</h4><p>The client intercepts the form, sends HTTP, and patches the DOM in place — no full reload. <b>(this demo)</b></p></div>
-      <div class="tier"><div class="lvl">+ websocket</div><h4>Real-time push</h4><p>Actions stream over a WebSocket; the server can push any time. That's the next three steps. ↓</p></div>
+    <div class="live-card">
+      <div class="live-bar"><span class="live-badge nojs">○ no JS</span><span class="live-meta">JavaScript off · form POST → full render</span></div>
+      <div class="live-body">
+        <iframe class="nojs-frame" src="/apps/greet-nojs/" sandbox="allow-forms allow-same-origin" title="The greeting app with JavaScript disabled" loading="lazy"></iframe>
+      </div>
     </div>
   </div>
+  <p class="demo-cap" style="margin-top:18px">The third transport — <b>real-time WebSocket push</b>, where the server updates the page with no request at all — is live in the next three steps. ↓</p>
 </div></section>
 
 <!-- STEP 5 · YOUR TABS -->

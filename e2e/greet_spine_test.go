@@ -15,6 +15,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/chromedp/cdproto/emulation"
 	"github.com/chromedp/chromedp"
 )
 
@@ -111,6 +112,63 @@ func TestSpineValidation(t *testing.T) {
 // since the fix lives in @livetemplate/client and reaches the landing only
 // once that client is released and re-vendored into tinkerdown. A landing-side
 // e2e guard belongs here after that ships.
+
+// TestSpineNoJSFormPost is the heart of step 4's "show, don't tell": it runs a
+// real browser with JavaScript EXECUTION DISABLED, so the greet-nojs client
+// can't intercept the form. Submitting therefore does a plain HTTP POST; the
+// server replies 303 (POST-Redirect-GET) and the followed GET must still greet
+// the typed name — proving the no-JS transport genuinely round-trips (the
+// per-session name store survives it, and cmd/site rewrites the redirect back
+// under the mount so it doesn't bounce to the site root).
+func TestSpineNoJSFormPost(t *testing.T) {
+	ctx, cancel := newCtx(t)
+	defer cancel()
+
+	const name = "Nomad"
+	var headline string
+	if err := chromedp.Run(ctx,
+		emulation.SetScriptExecutionDisabled(true), // the whole point: no client JS
+		chromedp.Navigate(baseURL()+"/apps/greet-nojs/"),
+		chromedp.WaitVisible(`input[name="name"]`, chromedp.ByQuery),
+		chromedp.SendKeys(`input[name="name"]`, name, chromedp.ByQuery),
+		chromedp.Click(`button[name="greet"]`, chromedp.ByQuery), // native form submit
+		chromedp.Sleep(1500*time.Millisecond),                    // POST -> 303 -> GET render
+		chromedp.Text(`h1`, &headline, chromedp.ByQuery),
+	); err != nil {
+		t.Fatalf("no-JS run: %v", err)
+	}
+	if !strings.Contains(headline, name) {
+		t.Errorf("no-JS headline = %q, want %q after a plain form POST with JavaScript disabled", headline, name)
+	}
+}
+
+// TestSpineNoJSIframe verifies step 4's right-hand card is a script-disabled
+// sandboxed frame of the real app — so the no-JS path it shows can't silently
+// turn into the JS path. (The round-trip itself is proven by
+// TestSpineNoJSFormPost.)
+func TestSpineNoJSIframe(t *testing.T) {
+	ctx, cancel := newCtx(t)
+	defer cancel()
+
+	var src, sandbox string
+	if err := chromedp.Run(ctx,
+		chromedp.Navigate(baseURL()+"/"),
+		chromedp.WaitVisible(`iframe.nojs-frame`, chromedp.ByQuery),
+		chromedp.AttributeValue(`iframe.nojs-frame`, "src", &src, nil),
+		chromedp.AttributeValue(`iframe.nojs-frame`, "sandbox", &sandbox, nil),
+	); err != nil {
+		t.Fatalf("iframe run: %v", err)
+	}
+	if !strings.Contains(src, "/apps/greet-nojs/") {
+		t.Errorf("iframe src = %q, want the greet-nojs app", src)
+	}
+	if strings.Contains(sandbox, "allow-scripts") {
+		t.Errorf("iframe sandbox = %q, must NOT allow-scripts — it's the no-JS demo", sandbox)
+	}
+	if !strings.Contains(sandbox, "allow-forms") {
+		t.Errorf("iframe sandbox = %q, must allow-forms so the no-JS POST works", sandbox)
+	}
+}
 
 // TestSpineSelfTopicSync exercises step 5: two tabs of the SAME session (one
 // browser context → one cookie/group) are both open, then a greeting in tab A

@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Hello (no JavaScript)</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@livetemplate/client@latest/livetemplate.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/@livetemplate/client@latest/dist/livetemplate-client.browser.js"></script>
+    <!-- Emerald styling so the JS-off <iframe> on the landing matches the
+         JS-on embed beside it (the landing themes its embed via CSS it can't
+         reach across an iframe boundary, so the brand styling lives here). -->
+    <style>
+        body{font-family:system-ui,-apple-system,sans-serif}
+        main.container{max-width:none;margin:0;padding:.25rem 0;text-align:center}
+        h1{font-size:26px;font-weight:800;letter-spacing:-.02em;margin:0 0 14px}
+        form{display:flex;flex-wrap:wrap;gap:8px;max-width:360px;margin:0 auto}
+        input{margin:0;flex:1 1 60%;min-width:0}
+        button[name="greet"]{--pico-background-color:#047857;--pico-border-color:#047857;
+            background:#047857;border-color:#047857;width:auto;white-space:nowrap}
+    </style>
+</head>
+<body>
+    <main class="container">
+        <h1>Hello, {{.Name}}</h1>
+        <form method="POST">
+            <input name="name" placeholder="Your name">
+            <button name="greet">Say hi</button>
+        </form>
+    </main>
+</body>
+</html>
