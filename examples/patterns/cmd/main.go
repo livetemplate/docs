@@ -1,14 +1,14 @@
 // Command patterns starts the UI patterns recipe as a standalone HTTP
 // server. Production deployments mount this handler via cmd/site at
-// /recipes/ui-patterns/; this entry point exists so the recipe can be
+// /apps/ui-patterns/; this entry point exists so the recipe can be
 // exercised in isolation (local dev, browser e2e tests).
 //
 // The recipe handler is mounted twice in the test/dev server:
 //
 //   - "/" — for tests that navigate to bare root for the catalog index
 //     (TestIndexPage et al.)
-//   - "/recipes/ui-patterns/" — for tests that hardcode individual
-//     pattern URLs like "/recipes/ui-patterns/forms/click-to-edit"
+//   - "/apps/ui-patterns/" — for tests that hardcode individual
+//     pattern URLs like "/apps/ui-patterns/forms/click-to-edit"
 //
 // patterns.Handler is idempotent across calls with the same basePath
 // (handlerOnce inside the package returns the cached instance), so
@@ -61,9 +61,9 @@ func main() {
 		}))
 	}
 
-	h := patterns.Handler("/recipes/ui-patterns", opts...)
+	h := patterns.Handler("/apps/ui-patterns", opts...)
 	mux := http.NewServeMux()
-	mux.Handle("/recipes/ui-patterns/", http.StripPrefix("/recipes/ui-patterns", h))
+	mux.Handle("/apps/ui-patterns/", http.StripPrefix("/apps/ui-patterns", h))
 	mux.Handle("/", h)
 
 	log.Printf("patterns listening on :%s", port)

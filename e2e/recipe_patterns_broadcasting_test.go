@@ -8,7 +8,7 @@
 //   - the embed mount div is present with the correct upstream path
 //   - tinkerdown server-side inlines the widget (broadcasting markup
 //     appears inside the mount), proving cmd/site returned 200 for
-//     /recipes/ui-patterns/realtime/broadcasting
+//     /apps/ui-patterns/realtime/broadcasting
 //   - no CSP violations or unexpected console errors
 //
 // Cross-tab broadcast is NOT verified here — that lives in the patterns
@@ -67,8 +67,8 @@ func TestRecipePatternsBroadcastingRenders(t *testing.T) {
 	if !hasMount {
 		t.Fatalf("no .tinkerdown-embed-lvt mount on page")
 	}
-	if mountPath != "/recipes/ui-patterns/realtime/broadcasting" {
-		t.Errorf("mount path = %q, want /recipes/ui-patterns/realtime/broadcasting", mountPath)
+	if mountPath != "/apps/ui-patterns/realtime/broadcasting" {
+		t.Errorf("mount path = %q, want /apps/ui-patterns/realtime/broadcasting", mountPath)
 	}
 	if !hasBroadcastH {
 		t.Fatalf("broadcasting widget did not inline (no <h3>Broadcasting</h3> inside mount); console errors: %v", consoleErrs())
