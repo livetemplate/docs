@@ -344,14 +344,14 @@ func (a *App) heartbeat() {
 <!-- COMPARE -->
 <section><div class="wrap">
   <div class="sec-tag">How it compares</div>
-  <h2>Others add a layer. LiveTemplate keeps HTML standard.</h2>
-  <p class="lead">Other tools make HTML reactive by adding attributes (<code>hx-*</code>, <code>x-*</code>, <code>phx-*</code>) or a DSL. LiveTemplate moves reactivity to the server, where one render-and-diff pipeline already lives.</p>
+  <h2>Others annotate HTML to make it reactive. LiveTemplate moves that to the server.</h2>
+  <p class="lead">Other tools carry the behavior in the markup — <code>hx-*</code>, <code>x-*</code>, <code>phx-*</code>, or a DSL. With LiveTemplate a plain <code>&lt;button name="greet"&gt;</code> is already the action and state lives on the server. There <em>are</em> <code>lvt-*</code> attributes, but only as an escape hatch for what HTML can't express — a pending state, a debounce, a shortcut — never as boilerplate to make ordinary HTML reactive.</p>
   <table class="cmp">
     <thead><tr><th>If you’re using…</th><th>LiveTemplate gives you…</th></tr></thead>
     <tbody>
-      <tr><td>htmx</td><td class="give">Standard HTML actions <span class="badge">no hx-*</span> with server-owned state and DOM diffing.</td></tr>
+      <tr><td>htmx</td><td class="give">Standard HTML actions <span class="badge">server-owned state</span> with DOM diffing — no <code>hx-*</code> request wiring in the markup.</td></tr>
       <tr><td>templ + htmx</td><td class="give">Go’s own <code>html/template</code> instead of a new DSL, reactivity built in instead of wiring.</td></tr>
-      <tr><td>Alpine.js</td><td class="give">Reactive DOM behavior <span class="badge">no x-*</span> and no separate client-side state model.</td></tr>
+      <tr><td>Alpine.js</td><td class="give">Reactive UI <span class="badge">no client state model</span> — state lives on the server, not in <code>x-*</code> on the element.</td></tr>
       <tr><td>Phoenix LiveView</td><td class="give">Stateful server-driven UI without leaving Go — and it works over plain HTTP too.</td></tr>
       <tr><td>React SPA</td><td class="give">Reactive workflows without a client build step for common app screens.</td></tr>
     </tbody>
