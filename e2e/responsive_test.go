@@ -35,9 +35,11 @@ type responsiveCase struct {
 // cover the bug surface exposed by past regressions: long inline code
 // (/cli/), wide tables (/reference/template-support-matrix), pre blocks
 // with negative-margin bleed (most pages), prerendered SVG diagrams
-// (/recipes/architecture-flow), and a thin landing page (/).
+// (/recipes/architecture-flow), the Learn entry page (/getting-started/
+// introduction), and a thin landing page (/).
 var representativePages = []string{
 	"/",
+	"/getting-started/introduction",
 	"/cli/",
 	"/reference/template-support-matrix",
 	"/recipes/architecture-flow",
@@ -119,15 +121,6 @@ func TestResponsiveLayoutAcrossViewports(t *testing.T) {
 				}
 			})
 		}
-	}
-}
-
-// inViewportContext applies viewport emulation BEFORE Navigate, which
-// is the only way to get tinkerdown's media-query CSS to evaluate
-// against the right width on first paint.
-func inViewportContext(width, height int64, mobile bool) chromedp.Tasks {
-	return chromedp.Tasks{
-		emulation.SetDeviceMetricsOverride(width, height, 1.0, mobile),
 	}
 }
 
