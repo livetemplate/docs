@@ -232,7 +232,11 @@ server:
 
 styling:
   theme: "clean"
-  primary_color: "#5a67d8"
+  # Emerald signature — matches the landing brand. Drives docs links + the
+  # active nav item. Docs stay calm: gradients/dark code live only in
+  # landing.css (custom_css, layout: landing). (Inter font match is deferred —
+  # it needs the tinkerdown styling.site_css feature; see branch docs-inter-later.)
+  primary_color: "#047857"
   font: "system-ui"
   # Bespoke emerald landing styling — injected only on layout: landing pages.
   custom_css: "assets/landing.css?v=13"
