@@ -229,7 +229,7 @@ func buildMux() http.Handler {
 
 	// JSON catalog index — same shape as upstream examples/patterns
 	// served (kept for forward-compat consumers; unused in B1).
-	mux.Handle("/api/index.json", apiIndexHandler(pkgBasePath))
+	mux.Handle("/api/index.json", apiIndexHandler())
 
 	// Dev-mode client + CSS, served from the inner mount so templates
 	// render {{basePath}}/livetemplate-client.js. lvt/testing fetches

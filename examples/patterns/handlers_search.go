@@ -8,6 +8,7 @@ import (
 
 // --- Pattern #12: Active Search ---
 
+// >>> region:active-search
 type ActiveSearchController struct{}
 
 func (c *ActiveSearchController) Mount(state ActiveSearchState, ctx *livetemplate.Context) (ActiveSearchState, error) {
@@ -32,8 +33,11 @@ func activeSearchHandler() http.Handler {
 	}))
 }
 
+// <<< region:active-search
+
 // --- Pattern #13: URL-Preserved Filters ---
 
+// >>> region:url-filters
 type URLFiltersController struct{}
 
 // validStatuses / validSorts allow Mount to reject unknown query param values
@@ -72,3 +76,5 @@ func urlFiltersHandler() http.Handler {
 		Sort:     "name",
 	}))
 }
+
+// <<< region:url-filters

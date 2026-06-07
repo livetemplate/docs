@@ -9,6 +9,7 @@ import (
 
 // --- Pattern #1: Click To Edit ---
 
+// >>> region:click-to-edit
 type ClickToEditController struct{}
 
 func (c *ClickToEditController) Edit(state ClickToEditState, ctx *livetemplate.Context) (ClickToEditState, error) {
@@ -40,8 +41,11 @@ func clickToEditHandler() http.Handler {
 	}))
 }
 
+// <<< region:click-to-edit
+
 // --- Pattern #2: Edit Row ---
 
+// >>> region:edit-row
 type EditRowController struct{}
 
 func (c *EditRowController) Edit(state EditRowState, ctx *livetemplate.Context) (EditRowState, error) {
@@ -78,8 +82,11 @@ func editRowHandler() http.Handler {
 	}))
 }
 
+// <<< region:edit-row
+
 // --- Pattern #3: Inline Validation ---
 
+// >>> region:inline-validation
 type InlineValidationController struct{}
 
 func (c *InlineValidationController) Change(state InlineValidationState, ctx *livetemplate.Context) (InlineValidationState, error) {
@@ -109,8 +116,11 @@ func inlineValidationHandler() http.Handler {
 	}))
 }
 
+// <<< region:inline-validation
+
 // --- Pattern #4: Bulk Update ---
 
+// >>> region:bulk-update
 type BulkUpdateController struct{}
 
 func (c *BulkUpdateController) BulkUpdate(state BulkUpdateState, ctx *livetemplate.Context) (BulkUpdateState, error) {
@@ -141,8 +151,11 @@ func bulkUpdateHandler() http.Handler {
 	}))
 }
 
+// <<< region:bulk-update
+
 // --- Pattern #5: Reset User Input ---
 
+// >>> region:reset-input
 type ResetInputController struct{}
 
 func (c *ResetInputController) Submit(state ResetInputState, ctx *livetemplate.Context) (ResetInputState, error) {
@@ -161,8 +174,11 @@ func resetInputHandler() http.Handler {
 	}))
 }
 
+// <<< region:reset-input
+
 // --- Pattern #6: File Upload ---
 
+// >>> region:file-upload
 type FileUploadController struct{}
 
 func (c *FileUploadController) Upload(state FileUploadState, ctx *livetemplate.Context) (FileUploadState, error) {
@@ -203,8 +219,11 @@ func fileUploadHandler() http.Handler {
 	}))
 }
 
+// <<< region:file-upload
+
 // --- Pattern #7: Preserving File Inputs ---
 
+// >>> region:preserve-inputs
 type PreserveInputsController struct{}
 
 func (c *PreserveInputsController) Submit(state PreserveInputsState, ctx *livetemplate.Context) (PreserveInputsState, error) {
@@ -235,3 +254,5 @@ func preserveInputsHandler() http.Handler {
 		Category: "Forms & Editing",
 	}))
 }
+
+// <<< region:preserve-inputs

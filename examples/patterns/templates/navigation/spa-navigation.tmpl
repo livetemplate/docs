@@ -3,6 +3,7 @@
     <h3>SPA Navigation</h3>
     <p><small>Every <code>&lt;a&gt;</code> link inside the LiveTemplate wrapper is auto-intercepted. Same-pathname links use the in-band WebSocket <code>__navigate__</code> action; cross-pathname links fetch and reconnect transparently. External targets opt out with <code>lvt-nav:no-intercept</code>.</small></p>
 
+    {{/* >>> region:spa-navigation */}}
     <section>
         <h4>Same-pathname (in-band <code>__navigate__</code>)</h4>
         <p>Click these to update <code>?step=</code> without an HTTP round-trip. The page does not reload &mdash; only this section re-renders.</p>
@@ -15,6 +16,7 @@
         </nav>
         <p><strong>Step {{.Step}} of 3</strong>.</p>
     </section>
+    {{/* <<< region:spa-navigation */}}
 
     <section>
         <h4>Cross-pathname (WebSocket reconnect)</h4>

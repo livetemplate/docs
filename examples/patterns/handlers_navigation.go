@@ -17,6 +17,7 @@ var validateNav = validator.New()
 
 // --- Pattern #17: Modal Dialog ---
 
+// >>> region:modal-dialog
 // On invalid submit, field errors must render inside the still-open dialog.
 type ModalDialogController struct{}
 
@@ -47,8 +48,11 @@ func modalDialogHandler() http.Handler {
 	}))
 }
 
+// <<< region:modal-dialog
+
 // --- Pattern #18: Confirm Dialog ---
 
+// >>> region:confirm-dialog
 // The Delete action reads the item id from the submit button's value attribute
 // (the canonical Tier-1 row-action shape), not a hidden input.
 type ConfirmDialogController struct{}
@@ -82,8 +86,11 @@ func confirmDialogHandler() http.Handler {
 	}))
 }
 
+// <<< region:confirm-dialog
+
 // --- Pattern #19: Tabs (HATEOAS) ---
 
+// >>> region:tabs
 // Mount-only: tab links use the in-band __navigate__ action, which re-runs
 // Mount with ctx.Action()=="" so the same guard covers initial GET.
 type TabsController struct{}
@@ -120,8 +127,11 @@ func tabsHandler() http.Handler {
 	}))
 }
 
+// <<< region:tabs
+
 // --- Pattern #20: SPA Navigation ---
 
+// >>> region:spa-navigation
 type SPANavController struct{}
 
 const spaNavMaxStep = 3
@@ -149,8 +159,11 @@ func spaNavigationHandler() http.Handler {
 	}))
 }
 
+// <<< region:spa-navigation
+
 // --- Pattern #21: Keyboard Shortcuts ---
 
+// >>> region:keyboard-shortcuts
 // Tier-2: lvt-on:window:keydown drives the panel; "/" opens, "Escape" closes
 // (bound only while the panel is rendered).
 type ShortcutsController struct{}
@@ -190,3 +203,5 @@ func keyboardShortcutsHandler() http.Handler {
 		Category: "Dialogs, Tabs & Navigation",
 	}))
 }
+
+// <<< region:keyboard-shortcuts

@@ -26,10 +26,10 @@ chunks over the WebSocket and render a live `<progress>` bar as it arrives.
 `WithUpload` declares each named upload (size caps, and a small `ChunkSize` so the
 demo's progress is visible); `Upload` flashes the completed file's name.
 
-```go include="/examples/patterns/handlers_forms.go" lines="166-204"
+```go include="/examples/patterns/handlers_forms.go" region="file-upload"
 ```
 
-```go include="/examples/patterns/state_forms.go" lines="45-48"
+```go include="/examples/patterns/state_forms.go" region="file-upload-state"
 ```
 
 ## When to use

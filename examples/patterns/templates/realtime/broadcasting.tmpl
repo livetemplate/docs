@@ -1,5 +1,6 @@
 {{define "content"}}
 <article>
+    {{/* >>> region:broadcasting */}}
     <h3>Broadcasting</h3>
     <p><small>Mount calls <code>ctx.Subscribe(ctx.SelfTopic())</code> to opt this connection in to peer fan-out; Send then calls <code>ctx.Publish(ctx.SelfTopic(), "NewMessage", nil)</code> to fan the named action out to every other connection that subscribed. Peers receive it as a regular action invocation; their handler reads the shared message log under a mutex and refreshes local state. The publish is queued during the action and executes after it returns successfully.</small></p>
 
@@ -28,6 +29,7 @@
         </fieldset>
     </form>
     {{end}}
+    {{/* <<< region:broadcasting */}}
 
     <p><small><strong>Try:</strong> Open this page in a second tab and Join with a different name. Sending in either tab publishes to both subscribed peers. The shared log lives on the controller; each tab's <code>Username</code> is per-connection (not persisted) so two tabs in the same browser stay independent — see <a href="{{basePath}}/realtime/reconnection">Reconnection Recovery</a> for the persist case.</small></p>
     <p><small><strong>Limitation:</strong> The shared message log is in-memory and uncapped — production apps would ring-buffer, paginate, or persist to a TTL store. Kept simple here to focus on the Subscribe/Publish mechanism itself.</small></p>

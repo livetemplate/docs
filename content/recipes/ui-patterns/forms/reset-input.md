@@ -26,10 +26,10 @@ A plain form plus a list of submitted messages. No reset attribute, no client JS
 `Submit` appends the message; because the input isn't bound to retained state, the
 re-render starts it empty.
 
-```go include="/examples/patterns/handlers_forms.go" lines="146-162"
+```go include="/examples/patterns/handlers_forms.go" region="reset-input"
 ```
 
-```go include="/examples/patterns/state_forms.go" lines="38-42"
+```go include="/examples/patterns/state_forms.go" region="reset-input-state"
 ```
 
 ## When to use

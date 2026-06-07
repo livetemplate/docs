@@ -26,16 +26,10 @@ type apiPattern struct {
 
 // docBase is where the per-pattern markdown doc pages live
 // (docBase/<cat>/<slug>), distinct from the live-app basePath
-// (/apps/ui-patterns/<cat>/<slug>) the doc pages embed.
+// (/apps/ui-patterns/<cat>/<slug>) the doc pages embed. Every pattern has a
+// doc page (content/recipes/ui-patterns/<cat>/*.md), so the catalog always
+// links here; the live apps are reached only via each doc page's embed.
 const docBase = "/recipes/ui-patterns"
-
-// docPageCategories names the categories that have dedicated doc pages. The
-// catalog links those patterns to their doc page; categories not yet migrated
-// link straight to the live app, so the hub never points at a missing page.
-// Append a category here in the same change that adds its doc pages.
-var docPageCategories = map[string]bool{
-	"Forms & Editing": true, // content/recipes/ui-patterns/forms/*.md
-}
 
 // apiIndexHandler exposes the pattern catalog as JSON for the
 // LiveTemplate docs site (and any other consumer that wants to embed
@@ -50,7 +44,7 @@ var docPageCategories = map[string]bool{
 //
 // Versioned for forward-compat: bump `version` when the schema changes
 // in a way that breaks existing consumers.
-func apiIndexHandler(basePath string) http.Handler {
+func apiIndexHandler() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// CORS preflight first: a browser fetch from the docs site will
 		// OPTIONS-preflight on any cross-origin request that the spec
@@ -83,10 +77,6 @@ func apiIndexHandler(basePath string) http.Handler {
 				Name:     c.Name,
 				Patterns: make([]apiPattern, 0, len(c.Patterns)),
 			}
-			linkBase := basePath // live app, until this category has doc pages
-			if docPageCategories[c.Name] {
-				linkBase = docBase // the per-pattern doc page
-			}
 			for _, p := range c.Patterns {
 				status := "stable"
 				if !p.Implemented {
@@ -95,7 +85,7 @@ func apiIndexHandler(basePath string) http.Handler {
 				ac.Patterns = append(ac.Patterns, apiPattern{
 					Slug:        patternSlugFromPath(p.Path),
 					Name:        p.Name,
-					Path:        linkBase + p.RelPath(),
+					Path:        docBase + p.RelPath(),
 					Description: p.Description,
 					Status:      status,
 					Category:    c.Name,

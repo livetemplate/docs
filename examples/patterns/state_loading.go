@@ -1,5 +1,6 @@
 package patterns
 
+// >>> region:lazy-loading-state
 // LazyLoadState holds the state for the Lazy Loading pattern (#14).
 type LazyLoadState struct {
 	Title    string
@@ -8,6 +9,9 @@ type LazyLoadState struct {
 	Data     string
 }
 
+// <<< region:lazy-loading-state
+
+// >>> region:progress-bar-state
 // ProgressBarState holds the state for the Progress Bar pattern (#15).
 //
 // Progress and Done are persisted so a completed run's outcome
@@ -27,6 +31,9 @@ type ProgressBarState struct {
 	Done     bool `lvt:"persist"`
 }
 
+// <<< region:progress-bar-state
+
+// >>> region:async-operations-state
 // AsyncOpsState holds the state for the Async Operations pattern (#16).
 // Status is a simple state machine: "" (idle), "loading", "success", "error".
 type AsyncOpsState struct {
@@ -36,3 +43,5 @@ type AsyncOpsState struct {
 	Result   string
 	Error    string
 }
+
+// <<< region:async-operations-state

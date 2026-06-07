@@ -28,10 +28,10 @@ re-checks the same rules and renders `aria-invalid` + the error message inline.
 `Change` updates the touched field and runs `ValidateForm` (errors surface via the
 template tags); `Submit` rejects until validation passes.
 
-```go include="/examples/patterns/handlers_forms.go" lines="83-110"
+```go include="/examples/patterns/handlers_forms.go" region="inline-validation"
 ```
 
-```go include="/examples/patterns/state_forms.go" lines="22-28"
+```go include="/examples/patterns/state_forms.go" region="inline-validation-state"
 ```
 
 ## When to use

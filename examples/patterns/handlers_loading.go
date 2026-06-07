@@ -10,6 +10,7 @@ import (
 
 // --- Pattern #14: Lazy Loading ---
 
+// >>> region:lazy-loading
 // LazyLoadController spawns a goroutine on OnConnect that pushes the lazily-
 // loaded payload via session.TriggerAction after a simulated delay. If the
 // client reconnects after the payload has already arrived, OnConnect is a
@@ -122,8 +123,11 @@ func lazyLoadingHandler() http.Handler {
 	}))
 }
 
+// <<< region:lazy-loading
+
 // --- Pattern #15: Progress Bar ---
 
+// >>> region:progress-bar
 // ProgressBarController drives a bounded goroutine that ticks progress from
 // 10% to 100% in 10% increments every 500ms. session.TriggerAction is
 // retried for ~5 seconds per tick when the session group has zero
@@ -238,8 +242,11 @@ func progressBarHandler() http.Handler {
 	}))
 }
 
+// <<< region:progress-bar
+
 // --- Pattern #16: Async Operations ---
 
+// >>> region:async-operations
 // AsyncOpsController implements a loading/success/error state machine. The
 // Fetch action transitions to "loading" synchronously, then a goroutine waits
 // and pushes a "fetchResult" action with either a success payload or an error
@@ -340,3 +347,5 @@ func asyncOperationsHandler() http.Handler {
 		Category: "Loading & Progress",
 	}))
 }
+
+// <<< region:async-operations
