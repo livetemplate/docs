@@ -28,10 +28,10 @@ action it triggers.
 
 Three tiny actions toggle `Editing`; `Save` also reads the submitted fields.
 
-```go include="/examples/patterns/handlers_forms.go" lines="12-41"
+```go include="/examples/patterns/handlers_forms.go" region="click-to-edit"
 ```
 
-```go include="/examples/patterns/state_forms.go" lines="4-11"
+```go include="/examples/patterns/state_forms.go" region="click-to-edit-state"
 ```
 
 ## When to use

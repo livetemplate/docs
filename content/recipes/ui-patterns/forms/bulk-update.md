@@ -26,10 +26,10 @@ The checkbox `name` encodes the row ID, so one form submits every row's state at
 `BulkUpdate` reads each `active-<id>` with `ctx.GetBool`, applies it, and flashes a
 count (or "No changes").
 
-```go include="/examples/patterns/handlers_forms.go" lines="114-142"
+```go include="/examples/patterns/handlers_forms.go" region="bulk-update"
 ```
 
-```go include="/examples/patterns/state_forms.go" lines="31-35"
+```go include="/examples/patterns/state_forms.go" region="bulk-update-state"
 ```
 
 ## When to use

@@ -69,7 +69,6 @@ Everything else — proxy routing, theme tokens, mermaid bundling, `lvt-source` 
 
 ## Reading list
 
-- [Anatomy of the UI Pattern Recipes](/recipes/patterns-stats) — same `patterns` source, different view
 - [How a LiveTemplate Update Flows](/recipes/architecture-flow) — what happens between a click and a DOM patch
 - [Live Framework Releases](/recipes/live-releases) — proves a 2nd REST source works
 - [The UI pattern recipes catalog itself](/recipes/ui-patterns/) — recipe 1, doubled as the catalog page

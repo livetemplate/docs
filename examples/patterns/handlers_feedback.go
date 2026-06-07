@@ -11,6 +11,7 @@ import (
 
 // --- Pattern #22: Animations ---
 
+// >>> region:animations
 type AnimationsController struct{}
 
 var validAnimateModes = map[string]bool{"fade": true, "slide": true, "scale": true}
@@ -37,8 +38,11 @@ func animationsHandler() http.Handler {
 	}))
 }
 
+// <<< region:animations
+
 // --- Pattern #23: Loading States ---
 
+// >>> region:loading-states
 type LoadingStatesController struct{}
 
 const slowSaveDelay = 2 * time.Second
@@ -58,8 +62,11 @@ func loadingStatesHandler() http.Handler {
 	}))
 }
 
+// <<< region:loading-states
+
 // --- Pattern #24: Highlight on Change ---
 
+// >>> region:highlight
 type HighlightController struct{}
 
 func (c *HighlightController) Increment(state HighlightState, ctx *livetemplate.Context) (HighlightState, error) {
@@ -75,11 +82,9 @@ func highlightHandler() http.Handler {
 	}))
 }
 
+// <<< region:highlight
+
 // --- Pattern #25: Flash Messages ---
-
-type FlashMessagesController struct{}
-
-const flashSuccessExpiry = 5 * time.Second
 
 // nudgeFlashExpiry triggers a re-render at FlashExpiry's deadline.
 // FlashExpiry is render-driven (no background timer), so without a nudge
@@ -98,6 +103,16 @@ func nudgeFlashExpiry(ctx *livetemplate.Context, expiry time.Duration) {
 		_ = session.TriggerAction("refresh", nil)
 	}()
 }
+
+// flashSuccessExpiry is the flash auto-dismiss window shared by every pattern
+// that flashes a success toast (flash-messages here, plus file-upload,
+// preserve-inputs, progress-bar, async-operations). Kept outside the
+// flash-messages region — like nudgeFlashExpiry above — so the snippet doesn't
+// imply it belongs to a single pattern.
+const flashSuccessExpiry = 5 * time.Second
+
+// >>> region:flash-messages
+type FlashMessagesController struct{}
 
 func (c *FlashMessagesController) Save(state FlashMessagesState, ctx *livetemplate.Context) (FlashMessagesState, error) {
 	name := strings.TrimSpace(ctx.GetString("name"))
@@ -136,3 +151,5 @@ func flashMessagesHandler() http.Handler {
 		Category: "Visual Feedback",
 	}))
 }
+
+// <<< region:flash-messages

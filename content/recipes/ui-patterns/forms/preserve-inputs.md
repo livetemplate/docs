@@ -27,10 +27,10 @@ One attribute — `lvt-form:preserve` on the form — keeps the inputs across re
 `Submit` validates and flashes; on a validation error the form re-renders but the
 client-preserved file stays selected.
 
-```go include="/examples/patterns/handlers_forms.go" lines="208-237"
+```go include="/examples/patterns/handlers_forms.go" region="preserve-inputs"
 ```
 
-```go include="/examples/patterns/state_forms.go" lines="51-56"
+```go include="/examples/patterns/state_forms.go" region="preserve-inputs-state"
 ```
 
 ## When to use

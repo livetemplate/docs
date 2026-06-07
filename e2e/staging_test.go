@@ -273,7 +273,6 @@ func TestSidebarWalk(t *testing.T) {
 		"/recipes/architecture-flow",
 		"/recipes/progressive-complexity-tree",
 		"/recipes/sync-and-broadcast",
-		"/recipes/patterns-stats",
 		"/recipes/live-releases",
 		"/recipes/how-this-site-works",
 		"/contributing/livetemplate",
@@ -375,41 +374,6 @@ func TestRecipe2_ArchitectureFlowDiagramRenders(t *testing.T) {
 	}
 	if presentBtnCount == 0 {
 		t.Errorf("no .presentation-btn in chrome; presentation-mode feature regressed?")
-	}
-}
-
-// TestRecipe3_StatsViewSharesPatternsSource verifies Phase 5 recipe 3:
-// the stats page binds to the SAME patterns source as the catalog and
-// hydrates a different view (table with category rows) from it. This
-// proves the "one source, many views" pattern is wired — the source
-// is reachable from a second page without redeclaration.
-//
-// If this passes but TestRecipe1 fails, something is wrong with the
-// catalog template specifically. If both fail, the source itself is
-// likely broken (network, sources config, CORS).
-func TestRecipe3_StatsViewSharesPatternsSource(t *testing.T) {
-	ctx, cancel := newCtx(t)
-	defer cancel()
-
-	var rowCount int
-	var summary string
-	if err := chromedp.Run(ctx,
-		chromedp.Navigate(baseURL()+"/recipes/patterns-stats"),
-		chromedp.WaitVisible(`[data-test="cat-row"]`, chromedp.ByQuery),
-		chromedp.Text(`[data-test="stats-summary"]`, &summary, chromedp.ByQuery),
-		chromedp.Evaluate(
-			`document.querySelectorAll('[data-test="cat-row"]').length`,
-			&rowCount,
-		),
-	); err != nil {
-		t.Fatalf("hydrate: %v", err)
-	}
-
-	if rowCount < 5 {
-		t.Errorf("stats page hydrated with %d category rows; want >= 5", rowCount)
-	}
-	if !strings.Contains(summary, "categories") {
-		t.Errorf("stats summary did not render expected text: %q", summary)
 	}
 }
 

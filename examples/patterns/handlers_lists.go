@@ -20,6 +20,7 @@ const listPageSize = 10
 
 // --- Pattern #8: Delete Row ---
 
+// >>> region:delete-row
 // DeleteRowController holds a shared in-memory "database" protected by a
 // mutex. Mount copies the DB snapshot into per-session state on every
 // connect, so deletions persist across reloads and cross-handler navigation
@@ -81,8 +82,11 @@ func deleteRowHandler() http.Handler {
 	}))
 }
 
+// <<< region:delete-row
+
 // --- Pattern #9: Click To Load ---
 
+// >>> region:click-to-load
 type ClickToLoadController struct{}
 
 func (c *ClickToLoadController) LoadMore(state ClickToLoadState, ctx *livetemplate.Context) (ClickToLoadState, error) {
@@ -104,8 +108,11 @@ func clickToLoadHandler() http.Handler {
 	}))
 }
 
+// <<< region:click-to-load
+
 // --- Pattern #11: Value Select (Cascading Selects) ---
 
+// >>> region:value-select
 type ValueSelectController struct{}
 
 func (c *ValueSelectController) Mount(state ValueSelectState, ctx *livetemplate.Context) (ValueSelectState, error) {
@@ -140,8 +147,11 @@ func valueSelectHandler() http.Handler {
 	}))
 }
 
+// <<< region:value-select
+
 // --- Pattern #10: Infinite Scroll ---
 
+// >>> region:infinite-scroll
 type InfiniteScrollController struct{}
 
 // LoadMore is dispatched by the client-side IntersectionObserver when
@@ -168,8 +178,11 @@ func infiniteScrollHandler() http.Handler {
 	}))
 }
 
+// <<< region:infinite-scroll
+
 // --- Sortable List ---
 
+// >>> region:sortable
 // SortableController holds the list ordering process-wide so it persists across reloads (live multi-tab sync would need Publish to SelfTopic()).
 type SortableController struct {
 	mu    sync.Mutex
@@ -248,8 +261,11 @@ func sortableHandler() http.Handler {
 	}))
 }
 
+// <<< region:sortable
+
 // --- Large Table (10k-row streaming-range demo) ---
 
+// >>> region:large-table
 const (
 	largeTableSortByName   = "name"
 	largeTableSortByEmail  = "email"
@@ -425,3 +441,5 @@ func largeTableHandler() http.Handler {
 		Category: "Lists & Data",
 	}))
 }
+
+// <<< region:large-table

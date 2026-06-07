@@ -5,9 +5,9 @@ description: "A catalog of focused LiveTemplate UI recipes for forms, lists, loa
 
 # UI Pattern Recipes
 
-A catalog of focused **UI pattern recipes** built with LiveTemplate. Each recipe is a self-contained handler demonstrating a single idiom — forms, lists, navigation, real-time, and more.
+A catalog of focused **UI pattern recipes** built with LiveTemplate. Each recipe is a self-contained handler demonstrating a single idiom — forms, lists, navigation, real-time, and more. Browse them by category below, or jump straight to a pattern from the **UI Patterns** section in the sidebar.
 
-Detail pages open the **live demo**, served by the docs-site recipes binary (`cmd/site`) from the [`docs/examples/patterns/`](https://github.com/livetemplate/docs/tree/main/examples/patterns) package. Tinkerdown reverse-proxies the in-process mount so you can interact with each pattern recipe without leaving this site.
+Every catalog entry links to that pattern's **recipe page**: a short description, the **live demo** embedded inline, and the template + handler + state source. The demos are served by the docs-site recipes binary (`cmd/site`) from the [`docs/examples/patterns/`](https://github.com/livetemplate/docs/tree/main/examples/patterns) package and embedded into each page, so you can read and interact with a pattern without leaving this site.
 
 > The catalog below is **rendered live** from the `/apps/ui-patterns/api/index.json` endpoint that the same package exposes, via tinkerdown's `lvt-source` REST binding. New UI pattern recipes added to the package show up here on the next deploy — no separate sync needed.
 

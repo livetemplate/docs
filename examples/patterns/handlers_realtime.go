@@ -12,6 +12,7 @@ import (
 
 // --- Pattern #26: Multi-User Refresh ---
 
+// >>> region:multi-user-sync
 type MultiUserSyncController struct {
 	mu      sync.RWMutex
 	counter int
@@ -60,6 +61,8 @@ func multiUserSyncHandler() http.Handler {
 		Category: "Real-Time & Multi-User",
 	}))
 }
+
+// <<< region:multi-user-sync
 
 // --- Pattern #27: Broadcasting ---
 
@@ -147,6 +150,7 @@ func broadcastingHandler() http.Handler {
 
 // --- Pattern #28: Presence Tracking ---
 
+// >>> region:presence
 type PresenceController struct {
 	mu          sync.RWMutex
 	onlineUsers map[string]bool
@@ -223,8 +227,11 @@ func presenceHandler() http.Handler {
 	}))
 }
 
+// <<< region:presence
+
 // --- Pattern #29: Reconnection Recovery ---
 
+// >>> region:reconnection
 type ReconnectionController struct{}
 
 func (c *ReconnectionController) Increment(state ReconnectionState, ctx *livetemplate.Context) (ReconnectionState, error) {
@@ -249,8 +256,11 @@ func reconnectionHandler() http.Handler {
 	}))
 }
 
+// <<< region:reconnection
+
 // --- Pattern #30: Live Preview ---
 
+// >>> region:live-preview
 type LivePreviewController struct{}
 
 // Change is auto-bound by the framework when the controller exposes it.
@@ -283,8 +293,11 @@ func livePreviewHandler() http.Handler {
 	}))
 }
 
+// <<< region:live-preview
+
 // --- Pattern #31: Server Push ---
 
+// >>> region:server-push
 type ServerPushController struct{}
 
 const serverPushTickInterval = 1 * time.Second
@@ -356,3 +369,5 @@ func serverPushHandler() http.Handler {
 		Category: "Real-Time & Multi-User",
 	}))
 }
+
+// <<< region:server-push

@@ -27,10 +27,10 @@ which record to act on.
 `Edit` records which row is open (`value` = row ID); `Save` writes the fields back to
 that contact and clears `EditingID`.
 
-```go include="/examples/patterns/handlers_forms.go" lines="45-79"
+```go include="/examples/patterns/handlers_forms.go" region="edit-row"
 ```
 
-```go include="/examples/patterns/state_forms.go" lines="14-19"
+```go include="/examples/patterns/state_forms.go" region="edit-row-state"
 ```
 
 ## When to use

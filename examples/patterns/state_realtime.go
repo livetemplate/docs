@@ -6,11 +6,14 @@ type BroadcastMessage struct {
 	Text string
 }
 
+// >>> region:multi-user-sync-state
 type MultiUserSyncState struct {
 	Title    string
 	Category string
 	Counter  int
 }
+
+// <<< region:multi-user-sync-state
 
 // >>> region:broadcasting-state
 type BroadcastingState struct {
@@ -28,6 +31,7 @@ type BroadcastingState struct {
 
 // <<< region:broadcasting-state
 
+// >>> region:presence-state
 type PresenceState struct {
 	Title    string
 	Category string
@@ -38,6 +42,9 @@ type PresenceState struct {
 	OnlineCount int
 }
 
+// <<< region:presence-state
+
+// >>> region:reconnection-state
 type ReconnectionState struct {
 	Title    string
 	Category string
@@ -45,6 +52,9 @@ type ReconnectionState struct {
 	Notes    string `lvt:"persist"`
 }
 
+// <<< region:reconnection-state
+
+// >>> region:live-preview-state
 type LivePreviewState struct {
 	Title    string
 	Category string
@@ -56,6 +66,9 @@ type LivePreviewState struct {
 	Preview string
 }
 
+// <<< region:live-preview-state
+
+// >>> region:server-push-state
 type ServerPushState struct {
 	Title    string
 	Category string
@@ -66,3 +79,5 @@ type ServerPushState struct {
 	// the template) keeps the template in sync if the constant changes.
 	Total int
 }
+
+// <<< region:server-push-state
