@@ -289,7 +289,7 @@ func (a *App) Greet(s State, ctx *lvt.Context) (State, error) {
     <h2>No click required.</h2>
     <p class="lead">Every update so far began with a user. But a live connection runs both ways: hold a <code>Session</code> handle and the server can push on its own. The card above carries a small <b>“the server said hi at …”</b> line that the server <b>refreshes on its own heartbeat</b> — sent with no action on anyone's part. It <em>replaces one value in place</em> rather than piling rows onto the wall, so the wall stays a record of real people. The asymmetry is the whole point: a downstream patch with nothing going up.</p>
     <div class="wire"><span class="wlabel">on the wire · WebSocket</span>
-      <span class="wf dn">▼ {"tree":{"4":"15:04:08"}}</span>
+      <span class="wf dn">▼ {"tree":{"3":{"0":"15:04:08"}}}</span>
       <span class="wf note">(no ▲ — the server started it; just the one changed value)</span>
     </div>
   </div>
