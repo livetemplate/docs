@@ -232,14 +232,18 @@ server:
 
 styling:
   theme: "clean"
-  # Emerald signature — matches the landing brand. Drives docs links + the
-  # active nav item. Docs stay calm: gradients/dark code live only in
-  # landing.css (custom_css, layout: landing). (Inter font match is deferred —
-  # it needs the tinkerdown styling.site_css feature; see branch docs-inter-later.)
+  # Emerald signature — matches the landing brand (gradient #047857 → #10b981).
+  # Docs stay calm: this single hue drives links + the active nav item; the
+  # vibrant gradients/dark code live only in landing.css (layout: landing).
   primary_color: "#047857"
-  font: "system-ui"
+  # Inter matches the landing's display font; @font-face ships in brand.css
+  # (site_css) so it loads in the docs shell too, not just on the landing.
+  # Requires tinkerdown >= v0.3.7 (styling.site_css); see Dockerfile.
+  font: "Inter"
+  # Shared brand primitives (self-hosted fonts) — injected on EVERY page.
+  site_css: "assets/brand.css?v=1"
   # Bespoke emerald landing styling — injected only on layout: landing pages.
-  custom_css: "assets/landing.css?v=13"
+  custom_css: "assets/landing.css?v=14"
 
 blocks:
   auto_id: true

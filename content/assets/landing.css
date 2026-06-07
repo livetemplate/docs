@@ -1,12 +1,5 @@
-/* ── Self-hosted fonts (CSP font-src 'self') ── */
-@font-face{font-family:'Inter';font-style:normal;font-weight:400;font-display:swap;src:url('/assets/fonts/inter-400.woff2') format('woff2')}
-@font-face{font-family:'Inter';font-style:normal;font-weight:600;font-display:swap;src:url('/assets/fonts/inter-600.woff2') format('woff2')}
-@font-face{font-family:'Inter';font-style:normal;font-weight:700;font-display:swap;src:url('/assets/fonts/inter-700.woff2') format('woff2')}
-@font-face{font-family:'Inter';font-style:normal;font-weight:800;font-display:swap;src:url('/assets/fonts/inter-800.woff2') format('woff2')}
-@font-face{font-family:'Inter';font-style:normal;font-weight:900;font-display:swap;src:url('/assets/fonts/inter-900.woff2') format('woff2')}
-@font-face{font-family:'JetBrains Mono';font-style:normal;font-weight:400;font-display:swap;src:url('/assets/fonts/jbmono-400.woff2') format('woff2')}
-@font-face{font-family:'JetBrains Mono';font-style:normal;font-weight:500;font-display:swap;src:url('/assets/fonts/jbmono-500.woff2') format('woff2')}
-@font-face{font-family:'JetBrains Mono';font-style:normal;font-weight:600;font-display:swap;src:url('/assets/fonts/jbmono-600.woff2') format('woff2')}
+/* Self-hosted @font-face for Inter + JetBrains Mono now lives in brand.css
+   (styling.site_css), loaded site-wide so the docs shell gets them too. */
 
 :root{
   /* ── Emerald: ONE signature hue + neutrals ── */
