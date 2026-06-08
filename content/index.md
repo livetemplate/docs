@@ -192,12 +192,25 @@ func (a *App) FinishGreet(s State, ctx *lvt.Context) (State, error) {
     return s, nil
 }</code></pre></div>
     <p class="demo-cap" style="margin-top:18px">This version keeps loading entirely in <b>server state</b>, but it needs a second action to clear the spinner. It is a good fit when loading is part of the app's actual state machine.</p>
+    <div class="wire"><span class="wlabel">on the wire · server-state version</span>
+      <span class="wf up">▲ {"action":"greet","data":{"name":"Ada"}}</span>
+      <span class="wf dn">▼ {"tree":{"1":"Saving..."}}</span>
+      <span class="wf dn">▼ {"action":"FinishGreet","data":{"name":"Ada"}} → {"tree":{"0":"Ada","1":"Say hi"}}</span>
+    </div>
     <div class="code delta"><div class="code-bar"><span class="dots"><i></i><i></i><i></i></span><span class="file">app.tmpl · button-level pending with two <code>lvt-*</code> attributes</span></div>
 <pre><span class="tag">&lt;button</span> <span class="attr">name</span>=<span class="str">"greet"</span>
   <span class="attr">lvt-el:addClass:on:pending</span>=<span class="str">"is-loading"</span>
   <span class="attr">lvt-el:removeClass:on:done</span>=<span class="str">"is-loading"</span><span class="tag">&gt;</span>Say hi<span class="tag">&lt;/button&gt;</span></pre></div>
-    <p class="demo-cap" style="margin-top:18px">This version keeps the <b>Go code unchanged</b>. Use it when the pending UI is just button chrome rather than meaningful server state.</p>
-    <div class="wire"><span class="wlabel">on the wire · HTTP fetch</span>
+    <div class="code delta"><div class="code-bar"><span class="dots"><i></i><i></i><i></i></span><span class="file">app.go · no loading state machine needed</span></div>
+<pre class="language-go"><code class="language-go">func (a *App) Greet(s State, ctx *lvt.Context) (State, error) {
+    time.Sleep(700 * time.Millisecond)
+    if name := strings.TrimSpace(ctx.GetString("name")); name != "" {
+        s.Name = name
+    }
+    return s, nil
+}</code></pre></div>
+    <p class="demo-cap" style="margin-top:18px">This version keeps the <b>Go code simpler</b> by leaving pending UI out of server state. Use it when the loading indicator is just button chrome rather than meaningful application state.</p>
+    <div class="wire"><span class="wlabel">on the wire · attribute version</span>
       <span class="wf up">▲ {"action":"greet","data":{"name":"Ada"}}</span>
       <span class="wf dn">▼ {"tree":{"0":"Ada"}}</span>
     </div>
@@ -213,13 +226,13 @@ func (a *App) FinishGreet(s State, ctx *lvt.Context) (State, error) {
     <div class="live-card">
       <div class="live-bar"><span class="live-badge"><span class="pulse"></span> live</span><span class="live-meta">JavaScript on · fetch + DOM patch</span></div>
       <div class="live-body">
-        <iframe class="nojs-frame" src="/apps/greet-nojs/" sandbox="allow-forms allow-same-origin allow-scripts" title="The greeting app with JavaScript enabled" loading="lazy"></iframe>
+        <iframe class="nojs-frame" src="/apps/greet-nojs/" sandbox="allow-forms allow-same-origin allow-scripts" title="The greeting app with JavaScript enabled"></iframe>
 </div>
     </div>
     <div class="live-card">
       <div class="live-bar"><span class="live-badge nojs">○ no JS</span><span class="live-meta">JavaScript off · form POST → full render</span></div>
       <div class="live-body">
-        <iframe class="nojs-frame" src="/apps/greet-nojs/" sandbox="allow-forms allow-same-origin" title="The greeting app with JavaScript disabled" loading="lazy"></iframe>
+        <iframe class="nojs-frame" src="/apps/greet-nojs/" sandbox="allow-forms allow-same-origin" title="The greeting app with JavaScript disabled"></iframe>
       </div>
     </div>
   </div>

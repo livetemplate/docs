@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
     <meta charset="UTF-8">
     <title>Hello (no JavaScript)</title>
@@ -10,13 +10,35 @@
          JS-on embed beside it (the landing themes its embed via CSS it can't
          reach across an iframe boundary, so the brand styling lives here). -->
     <style>
-        body{font-family:system-ui,-apple-system,sans-serif}
-        main.container{max-width:none;margin:0;padding:.25rem 0;text-align:center}
-        h1{font-size:26px;font-weight:800;letter-spacing:-.02em;margin:0 0 14px}
-        form{display:flex;flex-wrap:wrap;gap:8px;max-width:360px;margin:0 auto}
-        input{margin:0;flex:1 1 60%;min-width:0}
+        :root{
+            color-scheme:light;
+            --pico-background-color:#fff;
+            --pico-color:#0f172a;
+            --pico-muted-color:#475569;
+            --pico-form-element-background-color:#fff;
+            --pico-form-element-border-color:#cbd5e1;
+            --pico-form-element-color:#0f172a;
+            --pico-primary:#047857;
+            --pico-primary-background:#047857;
+            --pico-primary-border:#047857;
+            --pico-primary-hover:#065f46;
+            --pico-primary-hover-background:#065f46;
+            --pico-primary-hover-border:#065f46;
+        }
+        *,*::before,*::after{box-sizing:border-box}
+        html,body{margin:0;background:#fff !important;color:#0f172a !important}
+        body{font-family:system-ui,-apple-system,sans-serif;background:#fff !important;color:#0f172a !important}
+        main.container{max-width:none;margin:0;padding:.25rem 0;text-align:center;background:#fff}
+        h1{font-size:26px;font-weight:800;letter-spacing:-.02em;margin:0 0 14px;color:#0f172a !important}
+        form{display:flex;flex-wrap:wrap;align-items:stretch;gap:8px;max-width:360px;margin:0 auto}
+        input,button[name="greet"]{font:600 16px/1.25 system-ui,-apple-system,sans-serif}
+        input{margin:0;flex:1 1 60%;min-width:0;height:44px;min-height:44px;padding:0 .875rem;line-height:42px;
+            background:#fff !important;color:#0f172a !important;border:1px solid #cbd5e1 !important;
+            border-radius:8px;box-shadow:none;appearance:none}
         button[name="greet"]{--pico-background-color:#047857;--pico-border-color:#047857;
-            background:#047857;border-color:#047857;width:auto;white-space:nowrap}
+            background:#047857 !important;border:1px solid #047857 !important;color:#fff !important;
+            width:auto;white-space:nowrap;height:46px;min-height:46px;padding:0 1rem;border-radius:8px;
+            display:inline-flex;align-items:center;justify-content:center;line-height:44px;appearance:none}
     </style>
 </head>
 <body>
