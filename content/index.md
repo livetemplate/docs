@@ -1,6 +1,6 @@
 ---
-title: "LiveTemplate — Build web apps in Go with standard HTML templates"
-description: "Use html/template, forms, and Go handlers. Standard HTML takes you surprisingly far, even for rich interactive app screens."
+title: "LiveTemplate — Build interactive web apps in Go with standard HTML templates"
+description: "Use html/template and Go handlers to build rich app screens without writing JavaScript for the common cases."
 layout: landing
 ---
 
@@ -11,9 +11,9 @@ layout: landing
 
 <!-- HERO -->
 <section class="hero"><div class="wrap">
-  <span class="eyebrow">A simpler way to build rich Go web apps · Alpha</span>
-  <h1 class="head">Build web apps in Go with <span class="g">standard HTML templates.</span></h1>
-  <p class="sub">Use <b><code>html/template</code>, forms, and Go handlers</b>. Standard HTML takes you surprisingly far, even for rich interactive app screens.</p>
+  <span class="eyebrow">A simpler way to build interactive Go web apps · Alpha</span>
+  <h1 class="head">Build interactive web apps in Go with <span class="g">standard HTML templates.</span></h1>
+  <p class="sub">Use <b><code>html/template</code> and Go handlers</b> to build rich app screens without writing JavaScript for the common cases.</p>
   <div class="cta-row">
     <a class="btn btn-primary btn-lg" href="/getting-started/install">Get started →</a>
     <a class="btn btn-ghost btn-lg" href="/getting-started/introduction">Read the docs</a>
