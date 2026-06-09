@@ -25,6 +25,7 @@ import (
 	counterbasic "github.com/livetemplate/docs/examples/counter-basic"
 	"github.com/livetemplate/docs/examples/greet"
 	greetloading "github.com/livetemplate/docs/examples/greet-loading"
+	greetloadingserver "github.com/livetemplate/docs/examples/greet-loading-server"
 	greetnojs "github.com/livetemplate/docs/examples/greet-nojs"
 	greetvalidate "github.com/livetemplate/docs/examples/greet-validate"
 	greetwall "github.com/livetemplate/docs/examples/greet-wall"
@@ -47,8 +48,19 @@ func main() {
 		"http://localhost:8080",
 		"http://localhost:8084",
 		"http://localhost:8099",
+		"http://localhost:9091",
+		"http://localhost:9191",
+		"http://127.0.0.1:8080",
+		"http://127.0.0.1:8084",
+		"http://127.0.0.1:8099",
+		"http://127.0.0.1:9091",
+		"http://127.0.0.1:9191",
 		"http://devbox:8084",
+		"http://devbox:9091",
+		"http://devbox:9191",
 		"http://100.123.67.113:8084", // devbox tailscale IP (preview over IP)
+		"http://100.123.67.113:9091",
+		"http://100.123.67.113:9191",
 	}
 
 	mux := http.NewServeMux()
@@ -117,6 +129,12 @@ func main() {
 	mux.Handle("/apps/greet-loading/", http.StripPrefix("/apps/greet-loading", greetloading.Handler(
 		livetemplate.WithAllowedOrigins(allowedOrigins),
 		livetemplate.WithWebSocketDisabled(),
+	)))
+	// Step 3 also shows the server-owned loading variant. This one keeps
+	// Loading in server state and clears it with a follow-up server push, so it
+	// keeps WebSocket enabled.
+	mux.Handle("/apps/greet-loading-server/", http.StripPrefix("/apps/greet-loading-server", greetloadingserver.Handler(
+		livetemplate.WithAllowedOrigins(allowedOrigins),
 	)))
 
 	// greet-wall is the spine's climax (Steps 5-7) and the one shared,

@@ -91,6 +91,10 @@ h2{font-size:clamp(28px,4vw,42px);line-height:1.1;letter-spacing:-.03em;font-wei
 .counter-btns button{font:600 16px 'Inter';padding:10px 22px;border-radius:10px;border:1px solid var(--line);cursor:pointer;background:#fff;color:var(--ink)}
 .counter-btns button.plus{background:var(--sig);color:#fff;border-color:transparent}
 .demo-cap{text-align:center;color:var(--slate-2);font-size:14px;margin-top:14px}.demo-cap b{color:var(--slate)}
+.loading-cols{align-items:start}
+.loading-col{display:flex;flex-direction:column;gap:16px}
+.loading-col .code+.code{margin-top:0}
+.loading-cap{text-align:left}
 
 /* form demo */
 .form-demo{display:flex;flex-direction:column;gap:12px;max-width:340px;margin:0 auto;text-align:left}
@@ -188,6 +192,7 @@ footer{background:var(--ink);color:var(--slate-3);padding:36px 0;border-top:1px 
 .tinkerdown-embed-lvt[data-embed-path*="greet"] form{display:flex;flex-wrap:wrap;gap:8px;max-width:360px;margin:0 auto}
 .tinkerdown-embed-lvt[data-embed-path*="greet"] input{margin:0;flex:1 1 60%;min-width:0;order:1}
 .tinkerdown-embed-lvt[data-embed-path*="greet"] button[name="greet"]{--pico-background-color:var(--sig);--pico-border-color:var(--sig);background:var(--sig);border-color:var(--sig);width:auto;white-space:nowrap;order:2}
+.tinkerdown-embed-lvt[data-embed-path*="greet"] button.greet-btn{--pico-background-color:var(--sig);--pico-border-color:var(--sig);background:var(--sig);border-color:var(--sig);color:#fff;width:auto;white-space:nowrap;order:2}
 .tinkerdown-embed-lvt[data-embed-path*="greet"] form small{order:3;flex-basis:100%;margin:0;text-align:left;color:#e11d48;font-weight:500}
 
 /* ── Responsive: mobile nav (hide text links, keep the CTA) ── */

@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Hello</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@livetemplate/client@latest/livetemplate.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/@livetemplate/client@latest/dist/livetemplate-client.browser.js"></script>
+    <style>
+        main.container{max-width:none;margin:0;padding:.25rem 0;text-align:center}
+        h1{font-size:26px;font-weight:800;letter-spacing:-.02em;margin:0 0 14px}
+        form{display:flex;flex-wrap:wrap;gap:8px;max-width:360px;margin:0 auto}
+        input{margin:0;flex:1 1 60%;min-width:0;order:1}
+        button.greet-btn{
+            --pico-background-color:#047857;
+            --pico-border-color:#047857;
+            background:#047857;
+            border-color:#047857;
+            color:#fff;
+            width:auto;
+            white-space:nowrap;
+            order:2;
+        }
+    </style>
+</head>
+<body>
+    <main class="container">
+        <h1>Hello, {{.Name}}</h1>
+        <form method="POST">
+            <input name="name" placeholder="Your name" required>
+            <button class="greet-btn" {{if .Loading}}type="button" aria-busy="true" disabled{{else}}name="greet"{{end}}>Say hi</button>
+        </form>
+    </main>
+</body>
+</html>
