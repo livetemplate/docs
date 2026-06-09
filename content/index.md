@@ -102,7 +102,7 @@ func main() {
 
 <!-- SPINE INTRO -->
 <section class="alt"><div class="wrap spine-intro">
-  <div class="sec-tag">One app, seven steps</div>
+  <div class="sec-tag">One app, six steps</div>
   <h2>Start with a normal Go app. Then add the parts real apps need.</h2>
   <p class="lead">Everything below is the <b>same greeting app</b>. We add plain POST fallback, validation, pending state, then WebSocket updates. Each step is a <b>small diff</b>. You keep one Go codebase and one place for application logic.</p>
 </div></section>

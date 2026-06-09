@@ -1,7 +1,6 @@
 // Verifies the homepage's progressive-narrative spine — one greet app shown
-// across seven steps. Step embeds 1-4 run WebSocket-disabled (HTTP fetch);
-// the greet-wall embed (steps 5-7) runs over WebSocket with per-tab sync,
-// a shared cross-user wall, and server-initiated push.
+// across six steps. The spine mixes plain HTTP, JS-enhanced form submits, and
+// live-session WebSocket updates as the same app grows richer behavior.
 //
 // Run locally against the live preview:
 //
@@ -21,7 +20,7 @@ import (
 )
 
 // spineEmbeds are the embed-lvt mounts the spine relies on, in scroll order.
-// Step 4 uses real iframes instead, so greet-nojs is asserted separately.
+// Step 2 uses real iframes instead, so greet-nojs is asserted separately.
 var spineEmbeds = []string{
 	"/apps/greet/",
 	"/apps/greet-validate/",
@@ -65,7 +64,7 @@ func TestSpineEmbedsMount(t *testing.T) {
 		}
 	}
 
-	// Step 4 no longer uses embed-lvt: both cards render the real greet-nojs
+	// Step 2 uses real iframes: both cards render the real greet-nojs
 	// app in iframes, one script-enabled and one script-disabled.
 	var nojsFrames int
 	var nojsScriptless bool
@@ -86,10 +85,10 @@ func TestSpineEmbedsMount(t *testing.T) {
 		}
 	}
 	if nojsFrames < 2 {
-		t.Errorf("step 4 greet-nojs iframes = %d, want both JS-on and JS-off cards present", nojsFrames)
+		t.Errorf("step 2 greet-nojs iframes = %d, want both JS-on and JS-off cards present", nojsFrames)
 	}
 	if !nojsScriptless {
-		t.Errorf("step 4 greet-nojs iframes missing a script-disabled sandboxed variant")
+		t.Errorf("step 2 greet-nojs iframes missing a script-disabled sandboxed variant")
 	}
 
 	for _, e := range consoleErrs() {
@@ -141,7 +140,7 @@ func TestSpineValidation(t *testing.T) {
 // once that client is released and re-vendored into tinkerdown. A landing-side
 // e2e guard belongs here after that ships.
 
-// TestSpineLoadingServerEmbed exercises Step 3's server-owned loading demo on
+// TestSpineLoadingServerEmbed exercises Step 4's server-owned loading demo on
 // the landing page itself. It must leave the pending state, clear aria-busy
 // and disabled, and render the final greeting after the follow-up action.
 func TestSpineLoadingServerEmbed(t *testing.T) {
@@ -168,7 +167,7 @@ func TestSpineLoadingServerEmbed(t *testing.T) {
 		chromedp.Evaluate(`document.querySelector(`+"`"+sel+` button`+"`"+`)?.getAttribute('disabled') || ''`, &disabled),
 		chromedp.Evaluate(`document.querySelector(`+"`"+sel+` button`+"`"+`)?.getAttribute('aria-busy') || ''`, &busy),
 	); err != nil {
-		t.Fatalf("step 3 server loading run: %v", err)
+		t.Fatalf("step 4 server loading run: %v", err)
 	}
 	if !strings.Contains(headline, name) {
 		t.Errorf("headline = %q, want %q after the server-owned loading demo finishes", headline, name)
