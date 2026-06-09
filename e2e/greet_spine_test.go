@@ -26,6 +26,7 @@ var spineEmbeds = []string{
 	"/apps/greet/",
 	"/apps/greet-validate/",
 	"/apps/greet-loading/",
+	"/apps/greet-loading-server/",
 	"/apps/greet-wall/",
 }
 
@@ -139,6 +140,49 @@ func TestSpineValidation(t *testing.T) {
 // since the fix lives in @livetemplate/client and reaches the landing only
 // once that client is released and re-vendored into tinkerdown. A landing-side
 // e2e guard belongs here after that ships.
+
+// TestSpineLoadingServerEmbed exercises Step 3's server-owned loading demo on
+// the landing page itself. It must leave the pending state, clear aria-busy
+// and disabled, and render the final greeting after the follow-up action.
+func TestSpineLoadingServerEmbed(t *testing.T) {
+	ctx, cancel := newCtx(t)
+	defer cancel()
+
+	const (
+		path = `/apps/greet-loading-server/`
+		name = "Ada"
+	)
+	sel := `.tinkerdown-embed-lvt[data-embed-path="` + path + `"]`
+
+	var headline, button, disabled, busy string
+	if err := chromedp.Run(ctx,
+		chromedp.Navigate(baseURL()+"/"),
+		chromedp.WaitVisible(sel, chromedp.ByQuery),
+		chromedp.ScrollIntoView(sel, chromedp.ByQuery),
+		chromedp.Sleep(1500*time.Millisecond),
+		chromedp.SendKeys(sel+` input[name="name"]`, name, chromedp.ByQuery),
+		chromedp.Click(sel+` button`, chromedp.ByQuery),
+		chromedp.Sleep(3*time.Second),
+		chromedp.Text(sel+` h1`, &headline, chromedp.ByQuery),
+		chromedp.Text(sel+` button`, &button, chromedp.ByQuery),
+		chromedp.Evaluate(`document.querySelector(`+"`"+sel+` button`+"`"+`)?.getAttribute('disabled') || ''`, &disabled),
+		chromedp.Evaluate(`document.querySelector(`+"`"+sel+` button`+"`"+`)?.getAttribute('aria-busy') || ''`, &busy),
+	); err != nil {
+		t.Fatalf("step 3 server loading run: %v", err)
+	}
+	if !strings.Contains(headline, name) {
+		t.Errorf("headline = %q, want %q after the server-owned loading demo finishes", headline, name)
+	}
+	if disabled != "" {
+		t.Errorf("disabled = %q, want cleared after follow-up action completes", disabled)
+	}
+	if busy != "" {
+		t.Errorf("aria-busy = %q, want cleared after follow-up action completes", busy)
+	}
+	if button != "Say hi" {
+		t.Errorf("button = %q, want \"Say hi\" after loading clears", button)
+	}
+}
 
 // TestSpineNoJSFormPost is the heart of step 4's "show, don't tell": it runs a
 // real browser with JavaScript EXECUTION DISABLED, so the greet-nojs client

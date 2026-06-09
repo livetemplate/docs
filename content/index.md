@@ -104,13 +104,47 @@ func main() {
 <section class="alt"><div class="wrap spine-intro">
   <div class="sec-tag">One app, seven steps</div>
   <h2>Start with a normal Go app. Then add the parts real apps need.</h2>
-  <p class="lead">Everything below is the <b>same greeting app</b>. We add validation, pending state, plain POST fallback, then WebSocket updates. Each step is a <b>small diff</b>. You keep one Go codebase and one place for application logic.</p>
+  <p class="lead">Everything below is the <b>same greeting app</b>. We add plain POST fallback, validation, pending state, then WebSocket updates. Each step is a <b>small diff</b>. You keep one Go codebase and one place for application logic.</p>
 </div></section>
 
-<!-- STEP 2 · VALIDATE -->
+<!-- STEP 2 · WORKS WITHOUT JS -->
 <section><div class="wrap two code-right">
   <div>
-    <div class="sec-tag">Step 2 · Validation</div>
+    <div class="sec-tag">Step 2 · Works without JavaScript</div>
+    <h2>The same app. With and without JavaScript.</h2>
+    <p class="lead">Both cards run the <b>identical app</b>, with WebSocket off. <b>Left, JS on:</b> the browser enhances the form submit and patches the headline in place. <b>Right, JS disabled:</b> the same <code>&lt;form&gt;</code> does a plain POST and the server renders the page. JavaScript changes the <b>browser behavior</b>, not the app you have to build. Type a name in each.</p>
+    <div class="two" style="margin-top:28px">
+      <div class="live-card">
+        <div class="live-bar"><span class="live-badge"><span class="pulse"></span> live</span><span class="live-meta">JavaScript on · fetch + DOM patch</span></div>
+        <div class="live-body">
+        <iframe class="nojs-frame" src="/apps/greet-nojs/" sandbox="allow-forms allow-same-origin allow-scripts" title="The greeting app with JavaScript enabled"></iframe>
+</div>
+      </div>
+      <div class="live-card">
+        <div class="live-bar"><span class="live-badge nojs">○ no JS</span><span class="live-meta">JavaScript off · form POST → full render</span></div>
+        <div class="live-body">
+          <iframe class="nojs-frame" src="/apps/greet-nojs/" sandbox="allow-forms allow-same-origin" title="The greeting app with JavaScript disabled"></iframe>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div>
+    <div class="code" style="max-width:680px;margin:0 auto"><div class="code-bar"><span class="dots"><i></i><i></i><i></i></span><span class="file">app.tmpl · one form, either transport</span></div>
+<pre><span class="com">&lt;!-- the only line that flips the transport: --&gt;</span>
+<span class="tag">&lt;script</span> <span class="attr">defer src</span>=<span class="str">"…@livetemplate/client"</span><span class="tag">&gt;&lt;/script&gt;</span>
+
+<span class="tag">&lt;form</span> <span class="attr">method</span>=<span class="str">"POST"</span><span class="tag">&gt;</span>   <span class="com">&lt;!-- JS on → fetch + patch · JS off → native POST --&gt;</span>
+  <span class="tag">&lt;input</span> <span class="attr">name</span>=<span class="str">"name"</span><span class="tag">&gt;</span>
+  <span class="tag">&lt;button</span> <span class="attr">name</span>=<span class="str">"greet"</span><span class="tag">&gt;</span>Say hi<span class="tag">&lt;/button&gt;</span>
+<span class="tag">&lt;/form&gt;</span></pre></div>
+    <p class="demo-cap loading-cap" style="margin-top:14px">Same <code>&lt;form&gt;</code> and the same <code>Greet</code> handler as Step 1 — no <code>if jsEnabled</code> branch anywhere. When the <code>&lt;script&gt;</code> loads, the client enhances the submit; when it doesn't, the browser falls back to a native POST.</p>
+  </div>
+</div></section>
+
+<!-- STEP 3 · VALIDATE -->
+<section><div class="wrap two code-right">
+  <div>
+    <div class="sec-tag">Step 3 · Validation</div>
     <h2>Write the rule in HTML. Enforce it again on the server.</h2>
     <p class="lead">Use standard HTML attributes like <code>required</code> and <code>type="email"</code>. <code>ctx.ValidateForm()</code> re-runs the <b>same</b> rules server-side, then you can add Go-only checks for business rules. Submit empty, or type <b>admin</b>:</p>
     <div class="live-card" style="margin-top:24px">
@@ -146,30 +180,25 @@ func main() {
   </div>
 </div></section>
 
-<!-- STEP 3 · LOADING -->
-<section class="alt"><div class="wrap two code-right">
-  <div>
-    <div class="sec-tag">Step 3 · Loading state</div>
-    <h2>Two ways to show pending state.</h2>
-    <p class="lead">You can model loading in <b>server state</b> with ordinary template conditionals, or use a small <b>button-level escape hatch</b> when the server code should stay unchanged. The live demo below shows the smaller attribute version. Click <b>Say hi</b>:</p>
-    <div class="live-card" style="margin-top:24px">
-      <div class="live-bar"><span class="live-badge"><span class="pulse"></span> live</span><span class="live-meta">greet-loading · live spinner</span></div>
-      <div class="live-body">
+<!-- STEP 4 · LOADING -->
+<section class="alt"><div class="wrap">
+  <div class="sec-tag">Step 4 · Loading state</div>
+  <h2>Two ways to show pending state, in HTTP and WebSocket mode.</h2>
+  <p class="lead">LiveTemplate works in both <b>plain HTTP</b> and <b>live-session WebSocket</b> mode. You can model loading in <b>server state</b> with ordinary template conditionals, or use a small <b>button-level escape hatch</b> when the server code should stay unchanged. The server-state version below needs a <b>live session connection</b> for its follow-up push; the attribute version works as a single request/response.</p>
+  <div class="two loading-cols" style="margin-top:28px">
+    <div class="loading-col">
+      <div class="live-card">
+        <div class="live-bar"><span class="live-badge"><span class="pulse"></span> live</span><span class="live-meta">greet loading server owned</span></div>
+        <div class="live-body">
 
-```embed-lvt path="/apps/greet-loading/" upstream="http://localhost:9091" height="200px"
+```embed-lvt path="/apps/greet-loading-server/" upstream="http://localhost:9091" height="200px"
 ```
 
 </div>
-    </div>
-  </div>
-  <div>
-    <div class="code delta"><div class="code-bar"><span class="dots"><i></i><i></i><i></i></span><span class="file">app.tmpl · server-owned loading, only template variables</span></div>
-<pre>{{<span class="kw">if</span> <span class="fn">.Loading</span>}}
-  <span class="tag">&lt;button</span> <span class="attr">type</span>=<span class="str">"button"</span> <span class="attr">aria-busy</span>=<span class="str">"true"</span> <span class="attr">disabled</span><span class="tag">&gt;</span>Saving…<span class="tag">&lt;/button&gt;</span>
-{{<span class="kw">else</span>}}
-  <span class="tag">&lt;button</span> <span class="attr">name</span>=<span class="str">"greet"</span><span class="tag">&gt;</span>Say hi<span class="tag">&lt;/button&gt;</span>
-{{<span class="kw">end</span>}}</pre></div>
-    <div class="code delta"><div class="code-bar"><span class="dots"><i></i><i></i><i></i></span><span class="file">app.go · set Loading, then finish via server push</span></div>
+      </div>
+      <div class="code delta"><div class="code-bar"><span class="dots"><i></i><i></i><i></i></span><span class="file">app.tmpl · server-owned loading, only template variables</span></div>
+<pre><span class="tag">&lt;button</span> <span class="attr">class</span>=<span class="str">"greet-btn"</span> {{<span class="kw">if</span> <span class="fn">.Loading</span>}}<span class="attr">type</span>=<span class="str">"button"</span> <span class="attr">aria-busy</span>=<span class="str">"true"</span> <span class="attr">disabled</span>{{<span class="kw">else</span>}}<span class="attr">name</span>=<span class="str">"greet"</span>{{<span class="kw">end</span>}}<span class="tag">&gt;</span>Say hi<span class="tag">&lt;/button&gt;</span></pre></div>
+      <div class="code delta"><div class="code-bar"><span class="dots"><i></i><i></i><i></i></span><span class="file">app.go · set Loading, then finish via server push</span></div>
 <pre class="language-go"><code class="language-go">func (a *App) Greet(s State, ctx *lvt.Context) (State, error) {
     if s.Loading {
         return s, nil
@@ -182,7 +211,7 @@ func main() {
     s.Loading = true
     go func() {
         time.Sleep(700 * time.Millisecond)
-        _ = session.TriggerAction("FinishGreet", map[string]any{"name": name})
+        _ = session.TriggerAction("finishGreet", map[string]any{"name": name})
     }()
     return s, nil
 }
@@ -191,17 +220,28 @@ func (a *App) FinishGreet(s State, ctx *lvt.Context) (State, error) {
     s.Loading = false
     return s, nil
 }</code></pre></div>
-    <p class="demo-cap" style="margin-top:18px">This version keeps loading entirely in <b>server state</b>, but it needs a second action to clear the spinner. It is a good fit when loading is part of the app's actual state machine.</p>
-    <div class="wire"><span class="wlabel">on the wire · server-state version</span>
-      <span class="wf up">▲ {"action":"greet","data":{"name":"Ada"}}</span>
-      <span class="wf dn">▼ {"tree":{"1":"Saving..."}}</span>
-      <span class="wf dn">▼ {"action":"FinishGreet","data":{"name":"Ada"}} → {"tree":{"0":"Ada","1":"Say hi"}}</span>
+      <p class="demo-cap loading-cap" style="margin-top:18px">This version keeps loading entirely in <b>server state</b>, but it needs a second action over the live session to clear the spinner. It is a good fit when loading is part of the app's actual state machine.</p>
+      <div class="wire"><span class="wlabel">on the wire · server-state version</span>
+        <span class="wf up">▲ {"action":"greet","data":{"name":"Ada"}}</span>
+        <span class="wf dn">▼ {"tree":{"1":{"aria-busy":"true","disabled":true,"type":"button"}}}</span>
+        <span class="wf dn">▼ {"action":"finishGreet","data":{"name":"Ada"}} → {"tree":{"0":"Ada","1":{"name":"greet"}}}</span>
+      </div>
     </div>
-    <div class="code delta"><div class="code-bar"><span class="dots"><i></i><i></i><i></i></span><span class="file">app.tmpl · button-level pending with two <code>lvt-*</code> attributes</span></div>
+    <div class="loading-col">
+      <div class="live-card">
+        <div class="live-bar"><span class="live-badge"><span class="pulse"></span> live</span><span class="live-meta">greet loading attribute</span></div>
+        <div class="live-body">
+
+```embed-lvt path="/apps/greet-loading/" upstream="http://localhost:9091" height="200px"
+```
+
+</div>
+      </div>
+      <div class="code delta"><div class="code-bar"><span class="dots"><i></i><i></i><i></i></span><span class="file">app.tmpl · button-level pending with two <code>lvt-*</code> attributes</span></div>
 <pre><span class="tag">&lt;button</span> <span class="attr">name</span>=<span class="str">"greet"</span>
   <span class="attr">lvt-el:addClass:on:pending</span>=<span class="str">"is-loading"</span>
   <span class="attr">lvt-el:removeClass:on:done</span>=<span class="str">"is-loading"</span><span class="tag">&gt;</span>Say hi<span class="tag">&lt;/button&gt;</span></pre></div>
-    <div class="code delta"><div class="code-bar"><span class="dots"><i></i><i></i><i></i></span><span class="file">app.go · no loading state machine needed</span></div>
+      <div class="code delta"><div class="code-bar"><span class="dots"><i></i><i></i><i></i></span><span class="file">app.go · no loading state machine needed</span></div>
 <pre class="language-go"><code class="language-go">func (a *App) Greet(s State, ctx *lvt.Context) (State, error) {
     time.Sleep(700 * time.Millisecond)
     if name := strings.TrimSpace(ctx.GetString("name")); name != "" {
@@ -209,50 +249,20 @@ func (a *App) FinishGreet(s State, ctx *lvt.Context) (State, error) {
     }
     return s, nil
 }</code></pre></div>
-    <p class="demo-cap" style="margin-top:18px">This version keeps the <b>Go code simpler</b> by leaving pending UI out of server state. Use it when the loading indicator is just button chrome rather than meaningful application state.</p>
-    <div class="wire"><span class="wlabel">on the wire · attribute version</span>
-      <span class="wf up">▲ {"action":"greet","data":{"name":"Ada"}}</span>
-      <span class="wf dn">▼ {"tree":{"0":"Ada"}}</span>
-    </div>
-  </div>
-</div></section>
-
-<!-- STEP 4 · WORKS WITHOUT JS -->
-<section><div class="wrap">
-  <div class="sec-tag">Step 4 · Works without JavaScript</div>
-  <h2>The same app. Two transports, side by side.</h2>
-  <p class="lead">Both cards run the <b>identical app</b>, with WebSocket off. <b>Left, JS on:</b> the client sends a fetch and patches the headline in place. <b>Right, JS disabled:</b> the same <code>&lt;form&gt;</code> does a plain POST and the server renders the page. JavaScript changes the <b>transport</b>, not the app you have to build. Type a name in each.</p>
-  <div class="two" style="margin-top:28px">
-    <div class="live-card">
-      <div class="live-bar"><span class="live-badge"><span class="pulse"></span> live</span><span class="live-meta">JavaScript on · fetch + DOM patch</span></div>
-      <div class="live-body">
-        <iframe class="nojs-frame" src="/apps/greet-nojs/" sandbox="allow-forms allow-same-origin allow-scripts" title="The greeting app with JavaScript enabled"></iframe>
-</div>
-    </div>
-    <div class="live-card">
-      <div class="live-bar"><span class="live-badge nojs">○ no JS</span><span class="live-meta">JavaScript off · form POST → full render</span></div>
-      <div class="live-body">
-        <iframe class="nojs-frame" src="/apps/greet-nojs/" sandbox="allow-forms allow-same-origin" title="The greeting app with JavaScript disabled"></iframe>
+      <p class="demo-cap loading-cap" style="margin-top:18px">This version keeps the <b>Go code simpler</b> by leaving pending UI out of server state. It works as a single request/response, so use it when the loading indicator is just button chrome rather than meaningful application state.</p>
+      <div class="wire"><span class="wlabel">on the wire · attribute version</span>
+        <span class="wf up">▲ {"action":"greet","data":{"name":"Ada"}}</span>
+        <span class="wf dn">▼ {"tree":{"0":"Ada"}}</span>
       </div>
     </div>
   </div>
-  <div class="code" style="max-width:680px;margin:28px auto 0"><div class="code-bar"><span class="dots"><i></i><i></i><i></i></span><span class="file">app.tmpl · one form, either transport</span></div>
-<pre><span class="com">&lt;!-- the only line that flips the transport: --&gt;</span>
-<span class="tag">&lt;script</span> <span class="attr">defer src</span>=<span class="str">"…@livetemplate/client"</span><span class="tag">&gt;&lt;/script&gt;</span>
-
-<span class="tag">&lt;form</span> <span class="attr">method</span>=<span class="str">"POST"</span><span class="tag">&gt;</span>   <span class="com">&lt;!-- JS on → fetch + patch · JS off → native POST --&gt;</span>
-  <span class="tag">&lt;input</span> <span class="attr">name</span>=<span class="str">"name"</span><span class="tag">&gt;</span>
-  <span class="tag">&lt;button</span> <span class="attr">name</span>=<span class="str">"greet"</span><span class="tag">&gt;</span>Say hi<span class="tag">&lt;/button&gt;</span>
-<span class="tag">&lt;/form&gt;</span></pre></div>
-  <p class="demo-cap" style="margin-top:14px">Same <code>&lt;form&gt;</code> and the same <code>Greet</code> handler as Step 1 — no <code>if jsEnabled</code> branch anywhere. When the <code>&lt;script&gt;</code> loads, the client enhances the submit; when it doesn't, the browser falls back to a native POST.</p>
-  <p class="demo-cap" style="margin-top:18px">Next, the same app upgrades again: WebSocket updates for tab sync, shared views, and server push. ↓</p>
 </div></section>
 
 <!-- STEP 5 · YOUR TABS -->
 <section class="alt"><div class="wrap">
   <div class="sec-tag">Step 5 · Sync your own tabs</div>
   <h2>Add WebSocket updates. Keep your tabs in sync.</h2>
-  <p class="lead">Subscribe this browser session to its own topic and publish after a handler runs — <b>two calls</b> — and your greeting syncs across every open tab. The handler stays the same; only the audience for the update changes.</p>
+  <p class="lead">Subscribe this browser session to its own topic and publish after a handler runs — <b>two calls</b> — and your greeting syncs across every open tab. The same live session also lets the <b>server push first</b> when it has something new to say.</p>
   <div class="pipe" style="margin-top:26px">
     <div class="step"><div class="k">1 · state</div><div class="v">state changes</div></div><div class="arrow">→</div>
     <div class="step"><div class="k">2 · render</div><div class="v">re-render template</div></div><div class="arrow">→</div>
@@ -268,7 +278,7 @@ func (a *App) FinishGreet(s State, ctx *lvt.Context) (State, error) {
 
 </div>
   </div>
-  <p class="demo-cap"><b>Open this page in a second tab</b>, greet in either, and your headline updates in <b>both</b> — live, no reload. This is the kind of step from "single-page form" to "real workflow" that usually pushes teams toward a separate frontend.</p>
+  <p class="demo-cap"><b>Open this page in a second tab</b>, greet in either, and your headline updates in <b>both</b> — live, no reload. The same connection also allows <b>server-initiated refreshes</b> in this app, without waiting for a user click. This is the kind of step from "single-page form" to "real workflow" that usually pushes teams toward a separate frontend.</p>
   <div class="code delta" style="max-width:820px;margin:26px auto 0"><div class="code-bar"><span class="dots"><i></i><i></i><i></i></span><span class="file">app.go · subscribe, publish on greet, and the Refresh it runs</span></div>
 <pre class="language-go"><code class="language-go">func (a *App) Mount(s State, ctx *lvt.Context) (State, error) {
     ctx.Subscribe(ctx.SelfTopic())                 // your tabs share a topic
@@ -289,6 +299,23 @@ func (a *App) Refresh(s State, ctx *lvt.Context) (State, error) {
   <div class="wire" style="max-width:820px;margin:14px auto 0"><span class="wlabel">on the wire · WebSocket</span>
     <span class="wf up">▲ this tab · {"action":"greet","data":{"name":"Ada"}}</span>
     <span class="wf dn">▼ your other tab · {"tree":{"0":"Ada"}}</span>
+  </div>
+  <div class="code delta" style="max-width:820px;margin:18px auto 0"><div class="code-bar"><span class="dots"><i></i><i></i><i></i></span><span class="file">app.go · the same session can be pushed by the server</span></div>
+<pre class="language-go"><code class="language-go">func (a *App) OnConnect(s State, ctx *lvt.Context) (State, error) {
+    a.keep(ctx.GroupID(), ctx.Session())   // remember who's connected
+    return s, nil
+}
+func (a *App) heartbeat() {
+    for range time.Tick(30 * time.Second) {
+        a.serverAt = now()                      // replace one slot in place
+        for _, sess := range a.sessions {
+            sess.TriggerAction("ServerRefresh", nil)
+        }
+    }
+}</code></pre></div>
+  <div class="wire" style="max-width:820px;margin:14px auto 0"><span class="wlabel">on the wire · server push</span>
+    <span class="wf dn">▼ {"tree":{"3":{"0":"15:04:08"}}}</span>
+    <span class="wf note">(no ▲ — the server started it; just the changed value goes down)</span>
   </div>
 </div></section>
 
@@ -339,35 +366,6 @@ func (a *App) Greet(s State, ctx *lvt.Context) (State, error) {
   </div>
 </div></section>
 
-<!-- STEP 7 · SERVER SPEAKS -->
-<section class="alt"><div class="wrap two code-right">
-  <div>
-    <div class="sec-tag">Step 7 · The server speaks first</div>
-    <h2>The server can update the page first.</h2>
-    <p class="lead">Every update so far began with a user. But the connection runs both ways: hold a <code>Session</code> handle and the server can push on its own. A heartbeat <b>refreshes one value in place</b> — a downstream patch with nothing going up.</p>
-    <div class="wire"><span class="wlabel">on the wire · WebSocket</span>
-      <span class="wf dn">▼ {"tree":{"3":{"0":"15:04:08"}}}</span>
-      <span class="wf note">(no ▲ — the server started it; just the one changed value)</span>
-    </div>
-  </div>
-  <div>
-    <div class="code delta"><div class="code-bar"><span class="dots"><i></i><i></i><i></i></span><span class="file">app.go · a handle, and a heartbeat</span></div>
-<pre class="language-go"><code class="language-go">func (a *App) OnConnect(s State, ctx *lvt.Context) (State, error) {
-    a.keep(ctx.GroupID(), ctx.Session())   // remember who's connected
-    return s, nil
-}
-func (a *App) heartbeat() {
-    for range time.Tick(30 * time.Second) {
-        a.serverAt = now()                       // replace ONE slot, in place
-        for _, sess := range a.sessions {
-            sess.TriggerAction("ServerRefresh", nil)   // push, unprompted
-        }
-    }
-}</code></pre></div>
-    <p class="demo-cap">That's the full arc: one small Go app gained validation, pending state, plain POST fallback, tab sync, cross-user fan-out, and server push — without splitting into backend plus SPA.</p>
-  </div>
-</div></section>
-
 <!-- DIFF -->
 <section><div class="wrap two">
   <div>
@@ -380,6 +378,12 @@ func (a *App) heartbeat() {
     <div class="bar-row"><span class="lab">lvt diff</span><span class="bar diff"><span></span></span><span class="val" style="color:var(--sig-d)">340 B</span></div>
     <div style="font:500 13px 'JetBrains Mono';color:var(--slate);margin-top:8px">↓ 86% smaller per update</div>
   </div>
+</div></section>
+
+<section><div class="wrap">
+  <div class="sec-tag">UI Patterns</div>
+  <h2>Want deeper demos?</h2>
+  <p class="lead">The <a href="/recipes/ui-patterns/">UI patterns catalog</a> breaks these ideas out into focused examples: loading states, inline validation, SPA-style navigation, sortable tables, pubsub, presence, server push, and more.</p>
 </div></section>
 
 <!-- FEATURES -->
