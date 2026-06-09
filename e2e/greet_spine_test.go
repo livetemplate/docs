@@ -20,13 +20,12 @@ import (
 	"github.com/chromedp/chromedp"
 )
 
-// spineEmbeds are the live demo mounts the spine relies on, in scroll order.
-// greet-wall backs steps 5-7; the rest are one step each.
+// spineEmbeds are the embed-lvt mounts the spine relies on, in scroll order.
+// Step 4 uses real iframes instead, so greet-nojs is asserted separately.
 var spineEmbeds = []string{
 	"/apps/greet/",
 	"/apps/greet-validate/",
 	"/apps/greet-loading/",
-	"/apps/greet-nojs/",
 	"/apps/greet-wall/",
 }
 
@@ -63,6 +62,33 @@ func TestSpineEmbedsMount(t *testing.T) {
 		} else if !inlined {
 			t.Errorf("embed %s present but did not inline (no <h1>); console: %v", path, consoleErrs())
 		}
+	}
+
+	// Step 4 no longer uses embed-lvt: both cards render the real greet-nojs
+	// app in iframes, one script-enabled and one script-disabled.
+	var nojsFrames int
+	var nojsScriptless bool
+	const nojsJS = `(() => {
+		const frames = [...document.querySelectorAll('iframe.nojs-frame[src="/apps/greet-nojs/"]')];
+		return [frames.length, frames.some(f => !(f.getAttribute('sandbox') || '').includes('allow-scripts'))];
+	})()`
+	var nojsRes []any
+	if err := chromedp.Run(ctx, chromedp.Evaluate(nojsJS, &nojsRes)); err != nil {
+		t.Fatalf("eval greet-nojs iframes: %v", err)
+	}
+	if len(nojsRes) == 2 {
+		if v, ok := nojsRes[0].(float64); ok {
+			nojsFrames = int(v)
+		}
+		if v, ok := nojsRes[1].(bool); ok {
+			nojsScriptless = v
+		}
+	}
+	if nojsFrames < 2 {
+		t.Errorf("step 4 greet-nojs iframes = %d, want both JS-on and JS-off cards present", nojsFrames)
+	}
+	if !nojsScriptless {
+		t.Errorf("step 4 greet-nojs iframes missing a script-disabled sandboxed variant")
 	}
 
 	for _, e := range consoleErrs() {
@@ -176,10 +202,10 @@ func TestSpineNoJSIframe(t *testing.T) {
 	if err := chromedp.Run(ctx,
 		emulation.SetScriptExecutionDisabled(false),
 		chromedp.Navigate(baseURL()+"/"),
-		chromedp.WaitVisible(`iframe.nojs-frame`, chromedp.ByQuery),
-		chromedp.AttributeValue(`iframe.nojs-frame`, "src", &src, nil),
-		chromedp.AttributeValue(`iframe.nojs-frame`, "sandbox", &sandbox, nil),
-		chromedp.ScrollIntoView(`iframe.nojs-frame`, chromedp.ByQuery), // it's loading="lazy"
+		chromedp.WaitVisible(`iframe.nojs-frame[sandbox="allow-forms allow-same-origin"]`, chromedp.ByQuery),
+		chromedp.AttributeValue(`iframe.nojs-frame[sandbox="allow-forms allow-same-origin"]`, "src", &src, nil),
+		chromedp.AttributeValue(`iframe.nojs-frame[sandbox="allow-forms allow-same-origin"]`, "sandbox", &sandbox, nil),
+		chromedp.ScrollIntoView(`iframe.nojs-frame[sandbox="allow-forms allow-same-origin"]`, chromedp.ByQuery),
 		chromedp.Sleep(2*time.Second),                                 // frame loads + renders
 	); err != nil {
 		t.Fatalf("iframe attrs: %v", err)
@@ -195,7 +221,7 @@ func TestSpineNoJSIframe(t *testing.T) {
 	}
 
 	var frame []*cdp.Node
-	if err := chromedp.Run(ctx, chromedp.Nodes(`iframe.nojs-frame`, &frame,
+	if err := chromedp.Run(ctx, chromedp.Nodes(`iframe.nojs-frame[sandbox="allow-forms allow-same-origin"]`, &frame,
 		chromedp.ByQuery, chromedp.Populate(-1, true))); err != nil {
 		t.Fatalf("populate iframe: %v", err)
 	}
