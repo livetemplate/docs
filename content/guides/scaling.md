@@ -1,10 +1,9 @@
 ---
 title: "LiveTemplate Scaling Guide"
-description: "How to scale LiveTemplate apps from one process to Redis-backed multi-instance production deployments."
 source_repo: "https://github.com/livetemplate/livetemplate"
 source_path: "docs/guides/SCALING.md"
-source_ref: "v0.11.1"
-source_commit: "37dae7f35e960ff7647a0f1eb51d89bcc62d173a"
+source_ref: "v0.12.0"
+source_commit: "6e9ead8f8e03f16170c2e41d407e24a646c96c22"
 ---
 
 # LiveTemplate Scaling Guide
@@ -12,17 +11,6 @@ source_commit: "37dae7f35e960ff7647a0f1eb51d89bcc62d173a"
 **Target Audience:** DevOps engineers, SREs, and developers deploying LiveTemplate applications at scale.
 
 **Last Updated:** 2025-11-01
-
-## At a glance
-
-| Situation | Default choice | See |
-|---|---|---|
-| Prototype or small internal tool | Single instance with memory session store | [Tier 1: Single Host](#tier-1-single-host-hobby) |
-| Small production app | Add Redis for persistence and safer restarts | [Tier 2: Small Production](#tier-2-small-production-startup) |
-| Multiple app instances | Redis session store plus pub/sub | [Migration Guide: Memory to Redis Session Store](#migration-guide-memory-to-redis-session-store) |
-| Kubernetes or orchestrated deploy | Use tier checklists before scaling up | [Scaling Checklist](#scaling-checklist) |
-| Capacity planning | Estimate WebSocket memory and Redis memory separately | [Capacity Planning](#capacity-planning) |
-| Production rollout | Monitor connection counts, publish latency, and error rates | [Monitoring and Alerting](#monitoring-and-alerting) |
 
 ---
 

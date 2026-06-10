@@ -2,8 +2,8 @@
 title: "Ephemeral Components Guide"
 source_repo: "https://github.com/livetemplate/livetemplate"
 source_path: "docs/guides/ephemeral-components.md"
-source_ref: "v0.11.1"
-source_commit: "37dae7f35e960ff7647a0f1eb51d89bcc62d173a"
+source_ref: "v0.12.0"
+source_commit: "6e9ead8f8e03f16170c2e41d407e24a646c96c22"
 ---
 
 # Ephemeral Components Guide

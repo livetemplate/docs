@@ -2,8 +2,8 @@
 title: "Contributing to LiveTemplate Core Library"
 source_repo: "https://github.com/livetemplate/livetemplate"
 source_path: "CONTRIBUTING.md"
-source_ref: "v0.11.1"
-source_commit: "37dae7f35e960ff7647a0f1eb51d89bcc62d173a"
+source_ref: "v0.12.0"
+source_commit: "6e9ead8f8e03f16170c2e41d407e24a646c96c22"
 ---
 
 # Contributing to LiveTemplate Core Library
@@ -17,7 +17,7 @@ LiveTemplate is distributed across multiple repositories. Please use the appropr
 - **[Core Library](https://github.com/livetemplate/livetemplate)** (this repo) - Go server-side library
 - **[Client Library](https://github.com/livetemplate/client)** - TypeScript client for browsers → [Client CONTRIBUTING.md](/contributing/client)
 - **[CLI Tool (lvt)](https://github.com/livetemplate/lvt)** - Code generator and dev server → [LVT CONTRIBUTING.md](/contributing/cli)
-- **[Examples](https://github.com/livetemplate/examples)** - Example applications → [Examples CONTRIBUTING.md](/contributing/examples)
+- **[Examples](https://github.com/livetemplate/examples)** - Example applications → [Examples CONTRIBUTING.md](https://github.com/livetemplate/examples/blob/main/CONTRIBUTING.md)
 
 ---
 
