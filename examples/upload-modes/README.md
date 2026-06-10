@@ -45,9 +45,11 @@ LVT_LOCAL_CLIENT=/path/to/livetemplate-client.browser.js PORT=8087 go run main.g
 ## Browser test
 
 ```bash
-LVT_LOCAL_CLIENT=/path/to/livetemplate-client.browser.js \
+LVT_UPLOAD_MODES_E2E=1 LVT_LOCAL_CLIENT=/path/to/livetemplate-client.browser.js \
   go test ./examples/upload-modes/ -run E2E -v
 ```
 
-Drives all four modes with chromedp and asserts the Proxied upload stages **zero**
-files on local disk.
+Drives all four modes with a locally-installed Chromium and asserts the Proxied
+upload stages **zero** files on local disk. Gated on `LVT_UPLOAD_MODES_E2E` so it
+skips in the cross-repo CI (which uses a Docker-chrome remote allocator);
+integrating it into that harness is tracked in livetemplate/docs#67.
