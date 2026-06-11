@@ -1,10 +1,9 @@
 ---
 title: "Session Reference"
-description: "Reference for LiveTemplate session groups, state persistence, session stores, connection management, and WebSocket configuration."
 source_repo: "https://github.com/livetemplate/livetemplate"
 source_path: "docs/references/session.md"
-source_ref: "v0.11.1"
-source_commit: "37dae7f35e960ff7647a0f1eb51d89bcc62d173a"
+source_ref: "v0.13.0"
+source_commit: "4c5f1c71b2de9abf1abf76d0ddcafd1ec31201dd"
 ---
 
 # Session Reference
@@ -12,17 +11,6 @@ source_commit: "37dae7f35e960ff7647a0f1eb51d89bcc62d173a"
 Session infrastructure in LiveTemplate handles state storage, connection management, and WebSocket configuration. This guide covers state safety guarantees, session stores, connection management, and performance tuning for production deployments.
 
 For pushing updates from server-side code, see [Server Actions Reference](server-actions.md).
-
-## At a glance
-
-| Need | Use | See |
-|---|---|---|
-| Isolate user state | Authenticator session groups | [Key Concepts](#key-concepts) |
-| Persist filters, page number, or similar UI state | `lvt:"persist"` on selected state fields | [State Persistence](#state-persistence) |
-| Reload database-backed data on each request | Populate ephemeral fields in `Mount()` | [State Persistence](#state-persistence) |
-| Sync same-user tabs after a mutation | `ctx.Subscribe(ctx.SelfTopic())` + `ctx.Publish(...)` | [Explicit Peer Refresh](#explicit-peer-refresh) |
-| Scale sessions beyond one process | Redis-backed session store and pub/sub | [Session Store Interface](#session-store-interface) |
-| Limit connection pressure | WebSocket and connection configuration | [Connection Management](#connection-management) |
 
 ## Overview
 
