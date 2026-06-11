@@ -29,8 +29,13 @@
 
   <div class="mode">
     <h2>Proxied</h2>
-    <p>Bytes stream through the server to storage with zero local-disk staging.</p>
-    <input type="file" lvt-upload="proxied" accept="image/*" />
+    <p>Bytes stream through the server to storage with zero local-disk staging. The
+       record id below rides along in the same multipart POST, ahead of the file
+       part, so <code>OnUpload</code> reads it mid-stream and routes the bytes per record.</p>
+    <form>
+      <label>Record id <input type="text" name="record_id" id="proxied-record-id" placeholder="e.g. invoice-7" /></label>
+      <input type="file" lvt-upload="proxied" accept="image/*" />
+    </form>
     {{if .ProxiedRef}}<div class="result" id="proxied-result">stored: {{.ProxiedRef}}</div>
     <img class="thumb" src="{{.ProxiedRef}}" alt="proxied upload" />{{end}}
   </div>

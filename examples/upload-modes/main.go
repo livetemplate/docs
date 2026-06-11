@@ -41,12 +41,19 @@ type UploadModesController struct {
 
 // OnUpload implements livetemplate.UploadStreamer for the Proxied field: it
 // streams the in-flight bytes straight to storage without local-disk staging by
-// the framework, then records the resulting reference.
+// the framework, then records the resulting reference. The record id arrives as
+// a form field ordered before the file part, so it is readable here mid-stream —
+// letting the handler route each upload to its record's folder.
 func (c *UploadModesController) OnUpload(part *livetemplate.UploadPart, ctx *livetemplate.Context) error {
-	if err := os.MkdirAll(proxiedDir, 0o755); err != nil {
+	recordID := filepath.Base(ctx.GetString("record_id"))
+	if recordID == "" || recordID == "." {
+		recordID = "unfiled"
+	}
+	dir := filepath.Join(proxiedDir, recordID)
+	if err := os.MkdirAll(dir, 0o755); err != nil {
 		return err
 	}
-	dst := filepath.Join(proxiedDir, filepath.Base(part.Filename))
+	dst := filepath.Join(dir, filepath.Base(part.Filename))
 	f, err := os.Create(dst)
 	if err != nil {
 		return err
@@ -55,7 +62,7 @@ func (c *UploadModesController) OnUpload(part *livetemplate.UploadPart, ctx *liv
 	if _, err := io.Copy(f, part); err != nil {
 		return err
 	}
-	part.SetResult("/files/proxied/" + filepath.Base(part.Filename))
+	part.SetResult("/files/proxied/" + recordID + "/" + filepath.Base(part.Filename))
 	return nil
 }
 
@@ -125,9 +132,9 @@ func newApp(ctrl *UploadModesController) http.Handler {
 			MaxFileSize: 10 << 20,
 		}),
 		livetemplate.WithUpload("preview", livetemplate.UploadConfig{
-			Mode:   livetemplate.UploadModePreview,
+			Mode:       livetemplate.UploadModePreview,
 			AutoUpload: true,
-			Accept: []string{"image/*"},
+			Accept:     []string{"image/*"},
 		}),
 	))
 

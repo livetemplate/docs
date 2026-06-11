@@ -79,14 +79,19 @@ func TestUploadModes_E2E(t *testing.T) {
 	if err := chromedp.Run(ctx,
 		chromedp.Navigate(srv.URL),
 		chromedp.WaitVisible(`input[lvt-upload="proxied"]`, chromedp.ByQuery),
+		// Set the record id before selecting the file: the client serializes it
+		// into the multipart POST ahead of the file part, and OnUpload reads it.
+		chromedp.SetValue(`#proxied-record-id`, "invoice-42", chromedp.ByQuery),
 		chromedp.SetUploadFiles(`input[lvt-upload="proxied"]`, []string{img}, chromedp.ByQuery),
 		chromedp.WaitVisible(`#proxied-result`, chromedp.ByQuery),
 		chromedp.Text(`#proxied-result`, &proxiedText, chromedp.ByQuery),
 	); err != nil {
 		t.Fatalf("proxied flow: %v", err)
 	}
-	if !strings.Contains(proxiedText, "/files/proxied/testdata.png") {
-		t.Errorf("proxied result = %q, want it to contain the stored ref", proxiedText)
+	// The record id reached OnUpload, so the bytes are routed under its folder —
+	// proof the form field rode the streaming POST and was readable mid-stream.
+	if !strings.Contains(proxiedText, "/files/proxied/invoice-42/testdata.png") {
+		t.Errorf("proxied result = %q, want the ref routed under record id invoice-42", proxiedText)
 	}
 
 	// Zero-disk: the Proxied upload staged nothing under .uploads (the dir may
@@ -95,8 +100,8 @@ func TestUploadModes_E2E(t *testing.T) {
 	if n := countFiles(t, ".uploads"); n != 0 {
 		t.Errorf("zero-disk violated: %d staged files under .uploads", n)
 	}
-	if _, err := os.Stat("storage/proxied/testdata.png"); err != nil {
-		t.Errorf("proxied bytes not written to storage: %v", err)
+	if _, err := os.Stat("storage/proxied/invoice-42/testdata.png"); err != nil {
+		t.Errorf("proxied bytes not written under the record id: %v", err)
 	}
 
 	// Preview: selecting the file shows a local object URL and uploads nothing.
@@ -194,17 +199,19 @@ func TestUploadModes_ProxiedWSDisabled_E2E(t *testing.T) {
 		}),
 		chromedp.Navigate(srv.URL),
 		chromedp.WaitVisible(`input[lvt-upload="proxied"]`, chromedp.ByQuery),
+		// The form field rides the multipart POST on the HTTP-fallback path too.
+		chromedp.SetValue(`#proxied-record-id`, "offline-9", chromedp.ByQuery),
 		chromedp.SetUploadFiles(`input[lvt-upload="proxied"]`, []string{img}, chromedp.ByQuery),
 		chromedp.WaitVisible(`#proxied-result`, chromedp.ByQuery),
 		chromedp.Text(`#proxied-result`, &proxiedText, chromedp.ByQuery),
 	); err != nil {
 		t.Fatalf("proxied flow (WS disabled): %v", err)
 	}
-	if !strings.Contains(proxiedText, "/files/proxied/testdata.png") {
-		t.Errorf("proxied result = %q, want the stored ref", proxiedText)
+	if !strings.Contains(proxiedText, "/files/proxied/offline-9/testdata.png") {
+		t.Errorf("proxied result = %q, want the ref routed under record id offline-9", proxiedText)
 	}
-	if _, err := os.Stat("storage/proxied/testdata.png"); err != nil {
-		t.Errorf("proxied bytes not written: %v", err)
+	if _, err := os.Stat("storage/proxied/offline-9/testdata.png"); err != nil {
+		t.Errorf("proxied bytes not written under the record id: %v", err)
 	}
 	if n := countFiles(t, ".uploads"); n != 0 {
 		t.Errorf("zero-disk violated: %d staged files under .uploads", n)
