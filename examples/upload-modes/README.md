@@ -29,6 +29,23 @@ livetemplate.WithUpload("preview", livetemplate.UploadConfig{Mode: livetemplate.
 - **Preview** uses the `{{.lvt.UploadPreview "preview"}}` helper; the client fills
   it from a local `URL.createObjectURL` and never uploads the bytes.
 
+## Works with the WebSocket disabled
+
+All four modes complete over plain HTTP when the socket is unavailable
+(`WithWebSocketDisabled()`, a proxy that blocks WS, or a transient drop):
+
+- **Volume** falls back to a single multipart POST that the server stages to
+  `Dir` (retained), instead of WebSocket chunks
+  ([#449](https://github.com/livetemplate/livetemplate/issues/449)).
+- **Direct** presigns over HTTP, the browser PUTs to storage, then the client
+  re-sends the entry metadata over an HTTP completion handshake so the
+  `upload_<field>_complete` action still runs
+  ([#448](https://github.com/livetemplate/livetemplate/issues/448)).
+- **Proxied** and **Preview** are single self-contained requests, so they were
+  already WS-independent.
+
+The `*WSDisabled_E2E` tests stub a dead `window.WebSocket` to prove each path.
+
 ## Run
 
 ```bash
