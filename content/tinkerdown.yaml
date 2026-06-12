@@ -188,6 +188,8 @@ navigation:
         path: "recipes/apps/seat-picker.md"
       - title: "Avatar Upload"
         path: "recipes/apps/avatar-upload.md"
+      - title: "Upload Modes"
+        path: "recipes/apps/upload-modes.md"
       - title: "Shared Notepad"
         path: "recipes/shared-notepad/index.md"
 

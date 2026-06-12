@@ -35,7 +35,8 @@ All examples follow the [progressive complexity](https://github.com/livetemplate
 | `seat-picker/` | 1 | **Cross-user** real-time seat booking (different users, shared topic) | None |
 | `todos/` | 1+2 | Full CRUD with SQLite, auth, modal + toast components | `lvt-on:change`, `lvt-fx:animate`, `lvt-fx:highlight`, `lvt-el:setAttr` |
 | `flash-messages/` | 1 | Flash notification patterns | None |
-| `avatar-upload/` | 1+2 | File upload with progress | `lvt-upload` |
+| `avatar-upload/` | 1+2 | File upload with progress (Volume mode) | `lvt-upload` |
+| `upload-modes/` | 1+2 | Four upload modes (Volume/Direct/Proxied/Preview), one input | `lvt-upload` |
 | `progressive-enhancement/` | 1 | Works with/without JS | None |
 | `ws-disabled/` | 1 | HTTP-only mode | None |
 | `live-preview/` | 1 | Change() live updates | None |
