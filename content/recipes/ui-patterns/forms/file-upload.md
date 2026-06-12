@@ -24,7 +24,9 @@ chunks over the WebSocket and render a live `<progress>` bar as it arrives.
 ## Handler & state
 
 `WithUpload` declares each named upload (size caps, and a small `ChunkSize` so the
-demo's progress is visible); `Upload` flashes the completed file's name.
+demo's progress is visible); `Upload` flashes the completed file's name. With no
+`Mode` set, both fields use the default **Volume** mode — bytes stage on the
+server and you read them from `entry.TempPath`.
 
 ```go include="/examples/patterns/handlers_forms.go" region="file-upload"
 ```
@@ -36,4 +38,7 @@ demo's progress is visible); `Upload` flashes the completed file's name.
 
 - Any file input — start with Tier 1, add `lvt-upload` only when you want progress or
   large-file chunking.
+- This recipe stages bytes on the server (Volume mode). To send bytes straight to
+  cloud storage, stream them through with zero local disk, or keep them on the
+  device, see the [Upload Modes recipe](/recipes/apps/upload-modes).
 - See [Uploads](/reference/uploads) for the full upload reference.

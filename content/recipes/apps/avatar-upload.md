@@ -1,174 +1,147 @@
 ---
 title: "Avatar Upload"
-description: "A runnable LiveTemplate avatar upload app demonstrating file upload flow, previews, progress, and validation."
-source_repo: "https://github.com/livetemplate/examples"
-source_path: "avatar-upload/README.md"
-source_commit: "b976439626d58845129a7c3aba567d6429662a0a"
+description: "A profile form that uploads an avatar with live progress, validation, and an instant preview — using the default Volume upload mode."
+source_repo: "https://github.com/livetemplate/docs"
+source_path: "content/recipes/apps/avatar-upload.md"
 ---
 
-# Avatar Upload App Recipe
+# Avatar Upload — a profile form with a file field
 
-A simple example demonstrating LiveTemplate's file upload feature with avatar upload functionality.
+A profile form with one extra field: an avatar. The file streams to the
+server over the WebSocket with a live `<progress>` bar, is validated against
+a type and size whitelist, and — once the form is saved — is moved to a
+permanent location and shown back instantly. No page reload, no custom
+JavaScript. The full source is
+[`examples/avatar-upload/`](https://github.com/livetemplate/docs/tree/main/examples/avatar-upload).
 
-## Features
+## Which upload mode is this?
 
-- 📸 **Image Upload**: Upload JPEG, PNG, or GIF avatars
-- 📊 **Real-time Progress**: WebSocket chunked upload with live progress tracking
-- ✅ **Validation**: Automatic file type and size validation (5MB limit)
-- 🎨 **Beautiful UI**: Gradient design with smooth animations
-- 🔄 **Live Updates**: Profile updates instantly without page reload
+This recipe uses the **Volume** mode — LiveTemplate's default. The browser
+sends the bytes to the server, which stages them on local disk; the app then
+owns the file's lifecycle (here: move it into `uploads/`). It is the right
+default when you want the server to see and keep the bytes.
 
-## What This App Recipe Demonstrates
+Volume is one of [four upload modes](/reference/uploads#upload-modes); the
+mode is chosen purely by server config on an otherwise identical
+`<input lvt-upload>`. To stream bytes straight to remote storage with zero
+local disk, or to let the browser upload directly to S3/GCS, see the
+[Upload Modes recipe](/recipes/apps/upload-modes) and the
+[Upload reference](/reference/uploads).
 
-### Upload Configuration
+## Configure the upload field
+
+`WithUpload` declares the named upload and its validation. With no `Mode`
+set, the field is Volume (the default); with no `Dir`, bytes stage to a temp
+directory and the app moves them where it wants on completion:
+
 ```go
-func (s *ProfileStore) AllowUploads() map[string]livetemplate.UploadConfig {
-    return map[string]livetemplate.UploadConfig{
-        "avatar": {
-            Accept:      []string{"image/jpeg", "image/png", "image/gif"},
-            MaxFileSize: 5 * 1024 * 1024, // 5MB
-            MaxEntries:  1,                // Single file
-            AutoUpload:  false,            // Manual upload on form submit
-            ChunkSize:   256 * 1024,       // 256KB chunks
-        },
+lt := livetemplate.Must(livetemplate.New("avatar-upload",
+    livetemplate.WithParseFiles("avatar-upload.tmpl"),
+    livetemplate.WithUpload("avatar", livetemplate.UploadConfig{
+        Accept:      []string{"image/jpeg", "image/png", "image/gif"},
+        MaxFileSize: 5 * 1024 * 1024, // 5MB
+        MaxEntries:  1,                // single file
+    }),
+))
+
+handler := lt.Handle(&ProfileController{}, livetemplate.AsState(&ProfileState{
+    Name:  "John Doe",
+    Email: "john@example.com",
+}))
+```
+
+> Set `Dir: "uploads"` (with `Mode: livetemplate.UploadModeVolume`) to have
+> LiveTemplate **retain** the staged file in a directory you own, instead of
+> the stage-then-move pattern below. See the
+> [Volume mode reference](/reference/uploads#volume--staged-to-the-servers-disk).
+
+## Handle the submission
+
+The avatar rides along in the same `multipart/form-data` POST as the text
+fields, so one action reads both. Text fields come from `ctx.GetString`;
+completed files come from `ctx.GetCompletedUploads`. Each entry carries the
+server-side staging path in `entry.TempPath` — move it to permanent storage
+and record the URL in state:
+
+```go
+func (c *ProfileController) UpdateProfile(state ProfileState, ctx *livetemplate.Context) (ProfileState, error) {
+    state.Name = ctx.GetString("name")
+    state.Email = ctx.GetString("email")
+
+    for _, entry := range ctx.GetCompletedUploads("avatar") {
+        ext := filepath.Ext(entry.ClientName)
+        dst := filepath.Join("uploads", fmt.Sprintf("avatar-%s%s", entry.ID, ext))
+        if err := os.Rename(entry.TempPath, dst); err != nil {
+            return state, fmt.Errorf("failed to save avatar: %w", err)
+        }
+        state.AvatarURL = "/" + dst
     }
+
+    ctx.SetFlash("success", "Profile updated")
+    return state, nil
 }
 ```
 
-### Upload Processing
-```go
-func (s *ProfileStore) ConsumeUpload(ctx context.Context, name string, entries []*livetemplate.UploadEntry) error {
-    for _, entry := range entries {
-        // Move from temp to permanent location
-        permanentPath := filepath.Join("uploads", fmt.Sprintf("avatar-%s%s", entry.ID, ext))
-        os.Rename(entry.TempPath, permanentPath)
+## Template
 
-        // Update store with new avatar
-        s.AvatarPath = permanentPath
-        s.AvatarURL = "/" + permanentPath
-    }
-    return nil
-}
-```
+The file input is a plain `<input type="file">` plus one attribute,
+`lvt-upload="avatar"`. The `{{range .lvt.Uploads "avatar"}}` block renders
+per-file progress as it streams; `.lvt.HasUploadError` / `.lvt.UploadError`
+surface validation failures:
 
-### Template Helpers
 ```html
-<input type="file" lvt-upload="avatar" accept="image/jpeg,image/png,image/gif">
+<form method="POST" name="updateProfile" enctype="multipart/form-data" lvt-form:preserve>
+    <input type="text" name="name" value="{{.Name}}" required>
+    <input type="email" name="email" value="{{.Email}}" required>
 
-<!-- Show upload progress -->
-{{range .lvt.Uploads "avatar"}}
-    <div class="upload-entry">
-        <span>{{.ClientName}} - {{.Progress}}%</span>
+    <input type="file" name="avatar" lvt-upload="avatar"
+           accept="image/jpeg,image/png,image/gif">
+
+    {{range .lvt.Uploads "avatar"}}
+        <small><strong>{{.ClientName}}</strong> — {{.Progress}}%</small>
         <progress value="{{.Progress}}" max="100"></progress>
-        {{if .Error}}<span class="error">{{.Error}}</span>{{end}}
-    </div>
-{{end}}
+        {{if .Error}}<del>{{.Error}}</del>{{else if .Done}}<ins>Upload complete!</ins>{{end}}
+    {{end}}
+
+    {{if .lvt.HasUploadError "avatar"}}<del>{{.lvt.UploadError "avatar"}}</del>{{end}}
+
+    <button type="submit">Save Profile</button>
+</form>
+
+{{if .AvatarURL}}<img src="{{.AvatarURL}}" alt="Avatar">{{end}}
 ```
 
-## Running the App Recipe
+`lvt-form:preserve` keeps the chosen file and typed text across the live
+re-render so a validation error doesn't wipe the form.
 
-### 1. Install Dependencies
+## Validation
+
+`UploadConfig` enforces the whitelist before your handler runs — a file
+that fails is marked invalid, surfaced via `.lvt.UploadError`, and never
+appears in `GetCompletedUploads`:
+
+- **Wrong type** (e.g. a `.txt` or `.pdf`) — rejected by `Accept`.
+- **Too large** (over 5MB) — rejected by `MaxFileSize`.
+- **Too many files** — only the first is accepted (`MaxEntries: 1`).
+
+MIME types can be spoofed, so for security-critical uploads also validate the
+file's actual content in your handler — see
+[Content validation](/reference/uploads#content-validation).
+
+## Run it
 
 ```bash
-cd /Users/adnaan/code/livetemplate/examples/avatar-upload
-go mod download
+cd examples/avatar-upload
+GOWORK=off go run main.go
 ```
 
-### 2. Run the Server
+Open <http://localhost:8080>, choose an image, and click **Save Profile** to
+watch the progress bar fill and the avatar appear. The
+[end-to-end test](https://github.com/livetemplate/docs/blob/main/examples/avatar-upload/avatar-upload_test.go)
+drives exactly that flow in a real browser.
 
-```bash
-go run main.go
-```
+## See also
 
-The server will start at http://localhost:8080
-
-### 3. Try It Out
-
-1. Open http://localhost:8080 in your browser
-2. Click "Choose File" and select an image (JPEG, PNG, or GIF)
-3. Click "Save Profile"
-4. Watch the real-time progress bar as your file uploads
-5. See your avatar appear instantly when upload completes!
-
-## Upload Strategies
-
-This app recipe uses **WebSocket Chunked Upload**:
-- ✅ Real-time progress tracking
-- ✅ Handles large files efficiently (256KB chunks)
-- ✅ Non-blocking uploads
-- ✅ Works with LiveTemplate's reactive updates
-
-## File Structure
-
-```
-avatar-upload/
-├── main.go              # Server code with ProfileStore
-├── avatar-upload.tmpl   # HTML template with upload UI
-├── go.mod              # Dependencies (uses local livetemplate)
-├── README.md           # This file
-└── uploads/            # Created at runtime for uploaded avatars
-```
-
-## Testing Different Scenarios
-
-### Valid Upload
-- Upload a JPEG, PNG, or GIF under 5MB
-- ✅ Should show progress and complete successfully
-
-### File Too Large
-- Upload an image over 5MB
-- ❌ Should show validation error
-
-### Invalid File Type
-- Upload a non-image file (e.g., .txt, .pdf)
-- ❌ Should show "file type not accepted" error
-
-### Multiple Files
-- Try selecting multiple images
-- ℹ️ Only the first will be accepted (MaxEntries: 1)
-
-## Code Quality
-
-This app recipe demonstrates:
-- ✅ Clean separation of concerns (Store pattern)
-- ✅ Proper error handling
-- ✅ File validation and security
-- ✅ Temp file cleanup
-- ✅ LiveTemplate best practices
-
-## Next Steps
-
-Want to extend this example?
-
-1. **Add S3 Upload**: Replace local storage with S3 presigner
-2. **Multiple Avatars**: Change `MaxEntries` to allow multiple images
-3. **Image Cropping**: Add client-side cropping before upload
-4. **Drag & Drop**: Add drag-and-drop file selection
-5. **Auto-Upload**: Set `AutoUpload: true` for instant uploads
-
-## Learn More
-
-- [Upload Documentation](../../livetemplate/.worktrees/feature-uploads/docs/uploads.md)
-- [LiveTemplate Documentation](https://github.com/livetemplate/livetemplate)
-- [Other app recipes](./)
-
-## Troubleshooting
-
-**Upload not working?**
-- Check browser console for errors
-- Ensure WebSocket connection is established (look for green indicator)
-- Verify file meets validation criteria (type, size)
-
-**Progress not updating?**
-- Make sure you're using WebSocket (not HTTP fallback)
-- Check that ChunkSize is set appropriately
-- Verify client library is loaded
-
-**Files not saving?**
-- Check that `uploads/` directory exists (created automatically)
-- Verify file permissions on the uploads directory
-- Check server logs for errors
-
----
-
-Built with ❤️ using [LiveTemplate v0.3.0](https://github.com/livetemplate/livetemplate)
+- [Upload Modes recipe](/recipes/apps/upload-modes) — all four modes, one `lvt-upload`.
+- [File Upload pattern](/recipes/ui-patterns/forms/file-upload) — the minimal two-tier form.
+- [Upload reference](/reference/uploads) — full config, helpers, and the mode matrix.
