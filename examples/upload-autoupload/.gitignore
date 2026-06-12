@@ -1,0 +1,3 @@
+# Runtime upload staging dirs created when the app/e2e runs
+.uploads/
+uploads/
