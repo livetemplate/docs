@@ -106,6 +106,17 @@ The client fills the placeholder from a local `URL.createObjectURL` and never
 uploads the bytes. The server records a metadata-only entry
 (`entry.Preview == true`, no `TempPath` / `ExternalRef`).
 
+## Works with the WebSocket disabled
+
+Every mode completes over plain HTTP when the socket is down. **Volume** falls
+back to a single multipart POST that the server stages to `Dir`
+([#449](https://github.com/livetemplate/livetemplate/issues/449)); **Direct**
+presigns over HTTP, the browser PUTs, then the client re-sends the entry metadata
+over an HTTP completion handshake so `upload_<field>_complete` still runs
+([#448](https://github.com/livetemplate/livetemplate/issues/448)). **Proxied**
+and **Preview** are single requests and were already WS-independent. No app code
+changes — the same controller works on either transport.
+
 ## Run it
 
 ```bash
