@@ -2,8 +2,8 @@
 title: "Upload Reference"
 source_repo: "https://github.com/livetemplate/livetemplate"
 source_path: "docs/references/uploads.md"
-source_ref: "v0.13.0"
-source_commit: "4c5f1c71b2de9abf1abf76d0ddcafd1ec31201dd"
+source_ref: "v0.14.0"
+source_commit: "e3d0ceb62fa9bc7bc163ab92561e21754cf2a902"
 ---
 
 # Upload Reference
@@ -471,6 +471,11 @@ ChunkSize: 512 * 1024, // 512KB chunks
 - Verify `lvt-upload` attribute matches the field name in `WithUpload()`
 - Check browser console for JavaScript errors
 - Ensure the template includes `lvt-upload="fieldName"` on the file input
+- **SSR'd input + `AutoUpload` not firing on first select?** Upgrade to
+  `@livetemplate/client` >= v0.13.1. Before that fix, a server-rendered
+  `lvt-upload` input whose first WebSocket render added no new nodes was left
+  without a change listener (see
+  [#453](https://github.com/livetemplate/livetemplate/issues/453))
 
 ### Progress Not Updating
 
