@@ -57,7 +57,8 @@ func main() {
     http.ListenAndServe(":8080",
         app.Handle(&amp;App{}, lvt.AsState(&amp;State{Name: "there"})))
 }</code></pre></div>
-    <p class="hero-cap">That's the whole app — ~20 lines of Go and standard HTML. No separate frontend, no build step, no generated code.</p>
+    <p class="hero-cap">That's the whole app — ~20 lines of Go and standard HTML. No SPA framework, no REST API, no build step.</p>
+    <p class="hero-cap">It reads like a classic server-rendered form, but it <b>behaves like a modern app</b>: the page updates live, with no full reload and no JavaScript you had to write. From here, everything you'd reach for a frontend framework to do — form validation, loading states, progressive enhancement, real-time sync across tabs, multiplayer/collaborative views, file uploads — is a <b>small diff on this exact code</b>. The rest of this page builds them, one step at a time.</p>
   </div>
 </div></section>
 
