@@ -2,8 +2,8 @@
 title: "@livetemplate/client"
 source_repo: "https://github.com/livetemplate/client"
 source_path: "README.md"
-source_ref: "v0.14.0"
-source_commit: "84a4b3b88afdab2328531b5beca560df60f44002"
+source_ref: "v0.14.2"
+source_commit: "a12816be8e1a4623ef5af7e259b8c5ab5e0470fa"
 ---
 
 # @livetemplate/client
