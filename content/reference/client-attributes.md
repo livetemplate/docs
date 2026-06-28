@@ -1009,6 +1009,9 @@ Complete reference of all `lvt-*` and `data-*` template attributes.
 | `lvt-key` | Filter keyboard events by key | `lvt-key="Enter"` |
 | `lvt-mod:debounce` | Debounce delay in milliseconds | `lvt-mod:debounce="300"` |
 | `lvt-mod:throttle` | Throttle interval in milliseconds | `lvt-mod:throttle="100"` |
+| `lvt-mod:skip-when-typing` | Suppress a keyboard binding while focus is in a text field | `<div lvt-on:window:keydown="nextFile" lvt-key="j" lvt-mod:skip-when-typing>` |
+
+**`lvt-mod:skip-when-typing`** lets a global keyboard shortcut coexist with text entry. When the attribute is present, the binding does **not** fire if `document.activeElement` is (or is inside) an editable element — a text-like `<input>`, `<textarea>`, `<select>`, or `[contenteditable]`. Button/checkbox/radio inputs are not treated as editable, so shortcuts still fire when one is focused. Bindings **without** the attribute (e.g. `Escape`-to-cancel) keep firing while typing, so a cancel key still works inside a focused composer. Only applies to `keydown`/`keyup` bindings.
 
 ### Form Attributes (`lvt-form:`, `lvt-nav:`)
 
