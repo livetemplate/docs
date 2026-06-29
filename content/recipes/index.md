@@ -39,5 +39,6 @@ Narrative recipes for internals, tradeoffs, and operational shape:
 - [Counter, deeper](/recipes/counter)
 - [Pubsub](/recipes/pubsub) — `Subscribe`/`Publish` peer fan-out
 - [Server push](/recipes/server-push) — server-initiated `TriggerAction`
+- [Skip validation with `formnovalidate`](/recipes/formnovalidate) — a "Save draft" button that bypasses validation on every tier
 - [How a LiveTemplate update flows](/recipes/architecture-flow)
 - [How this docs site works](/recipes/how-this-site-works)
