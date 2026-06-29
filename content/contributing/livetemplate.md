@@ -2,8 +2,8 @@
 title: "Contributing to LiveTemplate Core Library"
 source_repo: "https://github.com/livetemplate/livetemplate"
 source_path: "CONTRIBUTING.md"
-source_ref: "v0.13.0"
-source_commit: "4c5f1c71b2de9abf1abf76d0ddcafd1ec31201dd"
+source_ref: "v0.15.0"
+source_commit: "7a9b692568c98566bbf14cba77448cc6ab83cc56"
 ---
 
 # Contributing to LiveTemplate Core Library
@@ -213,7 +213,7 @@ livetemplate/
 │   ├── parse/           # Phase 1: Template parsing (AST evaluation)
 │   ├── build/           # Phase 2: Tree types, fingerprinting, wrapper injection
 │   ├── diff/            # Phase 3: Tree comparison and update generation
-│   ├── render/          # Phase 4: HTML rendering and minification
+│   ├── render/          # Phase 4: HTML rendering
 │   ├── send/            # Phase 5: Message parsing and serialization
 │   ├── session/         # WebSocket connection registry
 │   ├── observe/         # Metrics and Prometheus export

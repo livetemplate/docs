@@ -2,8 +2,8 @@
 title: "Progressive Complexity Reference"
 source_repo: "https://github.com/livetemplate/livetemplate"
 source_path: "docs/references/progressive-complexity-reference.md"
-source_ref: "v0.13.0"
-source_commit: "4c5f1c71b2de9abf1abf76d0ddcafd1ec31201dd"
+source_ref: "v0.15.0"
+source_commit: "7a9b692568c98566bbf14cba77448cc6ab83cc56"
 ---
 
 # Progressive Complexity Reference
@@ -59,7 +59,7 @@ HTML validation attributes are extracted by `ctx.ValidateForm()`:
 | `min="N"` | Numeric minimum |
 | `max="N"` | Numeric maximum |
 | `pattern="regex"` | Must match regex |
-| `formnovalidate` on button | Skips validation for that action |
+| `formnovalidate` on a named submit button | `ctx.ValidateForm()` skips validation when that button is the submitter (all tiers; no-JS needs an empty-value button) |
 
 ## Dialog Routing
 
