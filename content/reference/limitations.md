@@ -2,8 +2,8 @@
 title: "Current Limitations"
 source_repo: "https://github.com/livetemplate/livetemplate"
 source_path: "docs/references/current-limitations.md"
-source_ref: "v0.13.0"
-source_commit: "4c5f1c71b2de9abf1abf76d0ddcafd1ec31201dd"
+source_ref: "v0.15.0"
+source_commit: "7a9b692568c98566bbf14cba77448cc6ab83cc56"
 ---
 
 # Current Limitations
@@ -89,8 +89,8 @@ Use `ctx.IsHTTP()` to check which transport is active in an action method.
 
 | Limitation | Detail | Workaround |
 |-----------|--------|-----------|
-| Form schema not auto-wired from statics | `ExtractFormSchema()` exists but must be called manually via `ctx.WithFormSchema()` | Use `ctx.BindAndValidate()` with struct tags for production validation |
-| `formnovalidate` not respected server-side | `ctx.ValidateForm()` validates all fields regardless of the submitting button's `formnovalidate` attribute | Skip validation manually in the action method for draft/save-without-validation flows |
+| `ctx.ValidateForm()` merges all forms in a template into one schema | `ExtractFormSchema` builds a single schema for the whole template, so multiple distinct forms share one rule set | Use `ctx.BindAndValidate()` with struct tags for per-form rules |
+| `formnovalidate` skip needs an empty-value button on the no-JS tier | The no-JS submitter is identified by its empty-value form field, so a `formnovalidate` button carrying a `value` isn't recognized as the submitter without JavaScript (JS tiers send an explicit submitter and are unaffected) | Omit `value` on no-JS draft buttons, or skip validation explicitly in the action |
 
 ---
 
