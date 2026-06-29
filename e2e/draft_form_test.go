@@ -22,6 +22,7 @@ import (
 	"log/slog"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"strings"
 	"sync"
 	"testing"
@@ -34,8 +35,9 @@ import (
 	draftform "github.com/livetemplate/docs/examples/draft-form"
 )
 
-// chromiumPath is the chromium binary available in this environment; there is
-// no google-chrome, so the default exec allocator's lookup would fail.
+// chromiumPath is the chromium binary on the local dev box (no google-chrome
+// there). It's used only when present; CI relies on the default allocator
+// finding google-chrome-stable on PATH instead.
 const chromiumPath = "/run/current-system/sw/bin/chromium"
 
 // clientJSURL is the CDN bundle the draft.tmpl loads. The test needs it to
@@ -69,12 +71,17 @@ func (s *syncBuf) String() string {
 func newDraftCtx(t *testing.T) (context.Context, context.CancelFunc) {
 	t.Helper()
 	allocOpts := append(chromedp.DefaultExecAllocatorOptions[:],
-		chromedp.ExecPath(chromiumPath),
 		chromedp.Flag("headless", true),
 		chromedp.Flag("disable-gpu", true),
 		chromedp.Flag("no-sandbox", true),
 		chromedp.WSURLReadTimeout(45*time.Second),
 	)
+	// Pin chromium only when it exists at this path (local dev env). In CI
+	// (ubuntu-latest) chromedp's default allocator finds google-chrome-stable on
+	// PATH, so forcing a nonexistent ExecPath would break the run.
+	if _, err := os.Stat(chromiumPath); err == nil {
+		allocOpts = append(allocOpts, chromedp.ExecPath(chromiumPath))
+	}
 	allocCtx, allocCancel := chromedp.NewExecAllocator(context.Background(), allocOpts...)
 	ctx, cancel := chromedp.NewContext(allocCtx)
 	timeoutCtx, timeoutCancel := context.WithTimeout(ctx, 45*time.Second)
