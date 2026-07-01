@@ -23,6 +23,7 @@ import (
 
 	"github.com/livetemplate/docs/examples/counter"
 	counterbasic "github.com/livetemplate/docs/examples/counter-basic"
+	draftform "github.com/livetemplate/docs/examples/draft-form"
 	"github.com/livetemplate/docs/examples/greet"
 	greetloading "github.com/livetemplate/docs/examples/greet-loading"
 	greetloadingserver "github.com/livetemplate/docs/examples/greet-loading-server"
@@ -119,6 +120,21 @@ func main() {
 	// GET Location (the handler emits "/") back under this prefix, so the no-JS
 	// submit lands on the greet page instead of bouncing to the site root.
 	mux.Handle("/apps/greet-nojs/", mountStripped("/apps/greet-nojs", greetnojs.Handler(
+		livetemplate.WithAllowedOrigins(allowedOrigins),
+		livetemplate.WithWebSocketDisabled(),
+	)))
+
+	// draft-form demonstrates server-side formnovalidate: "Publish" validates
+	// the required title; "Save draft" carries formnovalidate so the SAME
+	// ctx.ValidateForm() call is skipped. The default mount keeps WebSocket on;
+	// the /no-js/ mount is WS-disabled (mountStripped rewrites the PRG Location
+	// back under the prefix) so the reader can watch the skip hold over a plain
+	// HTTP form POST — the tier where the kebab-case save-draft button name also
+	// routes to SaveDraft verbatim.
+	mux.Handle("/apps/draft-form/", http.StripPrefix("/apps/draft-form", draftform.Handler(
+		livetemplate.WithAllowedOrigins(allowedOrigins),
+	)))
+	mux.Handle("/apps/draft-form/no-js/", mountStripped("/apps/draft-form/no-js", draftform.Handler(
 		livetemplate.WithAllowedOrigins(allowedOrigins),
 		livetemplate.WithWebSocketDisabled(),
 	)))

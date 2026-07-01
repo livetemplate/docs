@@ -7,7 +7,7 @@ require (
 	github.com/chromedp/chromedp v0.14.2
 	github.com/go-playground/validator/v10 v10.30.2
 	github.com/gorilla/websocket v1.5.3
-	github.com/livetemplate/livetemplate v0.14.0
+	github.com/livetemplate/livetemplate v0.15.0
 	github.com/livetemplate/lvt v0.1.6
 	github.com/livetemplate/lvt/components v0.1.2
 	gopkg.in/yaml.v3 v3.0.1
@@ -36,8 +36,6 @@ require (
 	github.com/ncruces/go-strftime v1.0.0 // indirect
 	github.com/redis/go-redis/v9 v9.17.2 // indirect
 	github.com/remyoudompheng/bigfft v0.0.0-20230129092748-24d4a6f8daec // indirect
-	github.com/tdewolff/minify/v2 v2.24.8 // indirect
-	github.com/tdewolff/parse/v2 v2.8.5 // indirect
 	golang.org/x/crypto v0.49.0 // indirect
 	golang.org/x/exp v0.0.0-20251219203646-944ab1f22d93 // indirect
 	golang.org/x/net v0.51.0 // indirect
