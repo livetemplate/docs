@@ -2,8 +2,8 @@
 title: "Controller+State Pattern Reference"
 source_repo: "https://github.com/livetemplate/livetemplate"
 source_path: "docs/references/controller-pattern.md"
-source_ref: "v0.13.0"
-source_commit: "4c5f1c71b2de9abf1abf76d0ddcafd1ec31201dd"
+source_ref: "v0.16.0"
+source_commit: "f4f9147c7066382d821c022caa48683d0886ad9a"
 ---
 
 # Controller+State Pattern Reference
