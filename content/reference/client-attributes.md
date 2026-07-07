@@ -2,8 +2,8 @@
 title: "Client Attributes Reference"
 source_repo: "https://github.com/livetemplate/livetemplate"
 source_path: "docs/references/client-attributes.md"
-source_ref: "v0.13.0"
-source_commit: "4c5f1c71b2de9abf1abf76d0ddcafd1ec31201dd"
+source_ref: "v0.16.0"
+source_commit: "f4f9147c7066382d821c022caa48683d0886ad9a"
 ---
 
 # Client Attributes Reference
@@ -819,7 +819,16 @@ User-toggled `checked` state on `<input type="checkbox">` and `<input type="radi
 <label><input type="checkbox" name="select" value="item-1"> Item 1</label>
 ```
 
-**Radio group caveat:** Browser mutual exclusion fires synchronously during the morphdom pass. If you need to force-reset a radio group from the server, add `data-lvt-force-update` to *all* radios in the group, not just the one being checked.
+**Exception — `lvt-on:click` controls are server-authoritative.** A checkbox or radio with an `lvt-on:click` handler routes its own toggle to the server, which echoes back the authoritative `checked` state in its re-render. There is no pending local-only selection to protect, so the server's rendered value wins automatically — without needing `data-lvt-force-update`. This is what makes a server-driven toggle (e.g. a todo checkbox) reflect correctly.
+
+```html
+<!-- Server owns the checked state; clicking routes the toggle to the server -->
+<input type="checkbox" {{if .Done}}checked{{end}} lvt-on:click="Toggle" data-id="{{.ID}}">
+```
+
+If instead you want the user's selection to win for a checkbox that *also* sends a click to the server (e.g. a click handler that only logs a side effect), use `lvt-on:change` — only `lvt-on:click` opts into server authority.
+
+**Radio group caveat:** Browser mutual exclusion fires synchronously during the morphdom pass. If you need to force-reset a radio group from the server, make the server send the authoritative state (via `lvt-on:click` or `data-lvt-force-update`) on *all* radios in the group, not just the one being checked.
 
 ### Dialog Open State
 
@@ -873,7 +882,7 @@ All automatic preservation behaviors can be overridden by adding `data-lvt-force
 
 | Preserved State | Mechanism | Override |
 |-----------|-------------|---------|
-| Checkbox/radio `checked` | Property copied to virtual DOM | `data-lvt-force-update` on the input |
+| Checkbox/radio `checked` | Property copied to virtual DOM | `data-lvt-force-update` on the input, or an `lvt-on:click` handler (auto server-authoritative) |
 | Dialog `open` | morphdom update skipped while dialog is open | `data-lvt-force-update` on the dialog |
 | Datalist dropdown | Entire morphdom pass deferred while datalist input focused | `data-lvt-force-update` on the connected `<input>` (overrides deferral for the entire pass) |
 | Focused input elements | morphdom update skipped | `data-lvt-force-update` on the input |
@@ -1009,9 +1018,6 @@ Complete reference of all `lvt-*` and `data-*` template attributes.
 | `lvt-key` | Filter keyboard events by key | `lvt-key="Enter"` |
 | `lvt-mod:debounce` | Debounce delay in milliseconds | `lvt-mod:debounce="300"` |
 | `lvt-mod:throttle` | Throttle interval in milliseconds | `lvt-mod:throttle="100"` |
-| `lvt-mod:skip-when-typing` | Suppress a keyboard binding while focus is in a text field | `<div lvt-on:window:keydown="nextFile" lvt-key="j" lvt-mod:skip-when-typing>` |
-
-**`lvt-mod:skip-when-typing`** lets a global keyboard shortcut coexist with text entry. When the attribute is present, the binding does **not** fire if `document.activeElement` is (or is inside) an editable element — a text-like `<input>`, `<textarea>`, `<select>`, or `[contenteditable]`. Button/checkbox/radio inputs are not treated as editable, so shortcuts still fire when one is focused. Bindings **without** the attribute (e.g. `Escape`-to-cancel) keep firing while typing, so a cancel key still works inside a focused composer. Only applies to `keydown`/`keyup` bindings.
 
 ### Form Attributes (`lvt-form:`, `lvt-nav:`)
 

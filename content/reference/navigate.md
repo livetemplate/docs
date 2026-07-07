@@ -2,8 +2,8 @@
 title: "Navigate Action Reference"
 source_repo: "https://github.com/livetemplate/livetemplate"
 source_path: "docs/references/navigate.md"
-source_ref: "v0.13.0"
-source_commit: "4c5f1c71b2de9abf1abf76d0ddcafd1ec31201dd"
+source_ref: "v0.16.0"
+source_commit: "f4f9147c7066382d821c022caa48683d0886ad9a"
 ---
 
 # Navigate Action Reference
@@ -122,6 +122,27 @@ The load-bearing test is `TestNavigateActionReMountsWithNewQueryData` in `naviga
 4. Confirms the next render flips `Selected` to `"beta"` and bumps `MountCount` to `2` — proving Mount re-ran without any reconnect.
 
 Browser-level chromedp tests live in the lvt repo at `e2e/livetemplate_core_test.go` per the [test strategy](../../CLAUDE.md). Both layers must stay green.
+
+---
+
+## Related: the `__ping__` reserved action (liveness heartbeat)
+
+`__ping__` is the other reserved WebSocket-only action. A client sends
+`{action: "__ping__"}` and the server replies with exactly `{"pong":true}` —
+a bare liveness reply, **not** an `UpdateResponse` (no `tree`, no `meta`). The
+reply is short-circuited in the event loop *after* the message rate limiter but
+*before* the action/render pipeline, so a ping neither runs Mount/dispatch nor
+perturbs connection state, and a flood of pings is throttled like any other
+message.
+
+It exists because browsers cannot send WebSocket ping *control frames* from JS,
+so a client that wants to detect a dead — or **zombie** (still reports `OPEN`
+while its TCP is gone, firing no `close` event, a documented mobile behaviour) —
+socket needs an app-level round-trip: it pings on a timer and treats a missing
+pong as a dead socket, then reconnects. The server half is just the echo;
+non-heartbeat clients that never send `__ping__` see no behavior change. The
+client half lives in the separate [`client`](https://github.com/livetemplate/client)
+repo (`data-lvt-heartbeat-ms`).
 
 ---
 
