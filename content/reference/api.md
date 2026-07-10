@@ -2,8 +2,8 @@
 title: "Go Library API Reference"
 source_repo: "https://github.com/livetemplate/livetemplate"
 source_path: "docs/references/api-reference.md"
-source_ref: "v0.16.0"
-source_commit: "f4f9147c7066382d821c022caa48683d0886ad9a"
+source_ref: "v0.17.0"
+source_commit: "20648eb134863ff13a45b258faa0eedd1626d63f"
 ---
 
 # Go Library API Reference
@@ -437,6 +437,7 @@ Options passed to `New()`:
 | `WithCookieMaxAge` | `(maxAge time.Duration)` | Session cookie max age |
 | `WithUpgrader` | `(upgrader *websocket.Upgrader)` | Custom WebSocket upgrader |
 | `WithParseFiles` | `(files ...string)` | Explicit template files |
+| `WithParseFS` | `(fsys fs.FS, patterns ...string)` | Templates from an `fs.FS` (e.g. `embed.FS`); precedence over `WithParseFiles` |
 | `WithTemplateBaseDir` | `(dir string)` | Template discovery base dir |
 | `WithIgnoreTemplateDirs` | `(dirs ...string)` | Skip directories during discovery |
 | `WithUpload` | `(name string, config UploadConfig)` | Configure upload field |

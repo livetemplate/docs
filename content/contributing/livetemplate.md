@@ -2,8 +2,8 @@
 title: "Contributing to LiveTemplate Core Library"
 source_repo: "https://github.com/livetemplate/livetemplate"
 source_path: "CONTRIBUTING.md"
-source_ref: "v0.16.0"
-source_commit: "f4f9147c7066382d821c022caa48683d0886ad9a"
+source_ref: "v0.17.0"
+source_commit: "20648eb134863ff13a45b258faa0eedd1626d63f"
 ---
 
 # Contributing to LiveTemplate Core Library
