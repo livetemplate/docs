@@ -24,18 +24,18 @@ func (c *TodoController) Mount(state TodoState, ctx *livetemplate.Context) (Todo
 	}
 	state.Username = ctx.UserID()
 	state = initComponents(state)
-	return c.loadTodos(context.Background(), state, ctx.UserID())
+	return c.loadTodos(ctx, state, ctx.UserID())
 }
 
 func (c *TodoController) OnConnect(state TodoState, ctx *livetemplate.Context) (TodoState, error) {
 	state.Username = ctx.UserID()
 	state = initComponents(state)
-	return c.loadTodos(context.Background(), state, ctx.UserID())
+	return c.loadTodos(ctx, state, ctx.UserID())
 }
 
 func (c *TodoController) RefreshTodos(state TodoState, ctx *livetemplate.Context) (TodoState, error) {
 	state = initComponents(state)
-	return c.loadTodos(context.Background(), state, ctx.UserID())
+	return c.loadTodos(ctx, state, ctx.UserID())
 }
 
 func (c *TodoController) Add(state TodoState, ctx *livetemplate.Context) (TodoState, error) {
@@ -46,9 +46,8 @@ func (c *TodoController) Add(state TodoState, ctx *livetemplate.Context) (TodoSt
 
 	now := time.Now()
 	id := fmt.Sprintf("todo-%d", now.UnixNano())
-	dbCtx := context.Background()
 
-	_, err := c.Queries.CreateTodo(dbCtx, db.CreateTodoParams{
+	_, err := c.Queries.CreateTodo(ctx, db.CreateTodoParams{
 		ID:        id,
 		UserID:    ctx.UserID(),
 		Text:      input.Text,
@@ -61,7 +60,7 @@ func (c *TodoController) Add(state TodoState, ctx *livetemplate.Context) (TodoSt
 
 	state.Toasts.AddSuccess("Added", fmt.Sprintf("%q added", input.Text))
 	state.LastUpdated = formatTime()
-	state, err = c.loadTodos(dbCtx, state, ctx.UserID())
+	state, err = c.loadTodos(ctx, state, ctx.UserID())
 	if err != nil {
 		return state, err
 	}
@@ -77,9 +76,7 @@ func (c *TodoController) Toggle(state TodoState, ctx *livetemplate.Context) (Tod
 		return state, err
 	}
 
-	dbCtx := context.Background()
-
-	todo, err := c.Queries.GetTodoByID(dbCtx, db.GetTodoByIDParams{
+	todo, err := c.Queries.GetTodoByID(ctx, db.GetTodoByIDParams{
 		ID:     input.ID,
 		UserID: ctx.UserID(),
 	})
@@ -87,7 +84,7 @@ func (c *TodoController) Toggle(state TodoState, ctx *livetemplate.Context) (Tod
 		return state, fmt.Errorf("failed to get todo: %w", err)
 	}
 
-	err = c.Queries.UpdateTodoCompleted(dbCtx, db.UpdateTodoCompletedParams{
+	err = c.Queries.UpdateTodoCompleted(ctx, db.UpdateTodoCompletedParams{
 		Completed: !todo.Completed,
 		ID:        input.ID,
 		UserID:    ctx.UserID(),
@@ -102,7 +99,7 @@ func (c *TodoController) Toggle(state TodoState, ctx *livetemplate.Context) (Tod
 		state.Toasts.AddInfo("Reopened", "Todo marked as incomplete")
 	}
 	state.LastUpdated = formatTime()
-	state, err = c.loadTodos(dbCtx, state, ctx.UserID())
+	state, err = c.loadTodos(ctx, state, ctx.UserID())
 	if err != nil {
 		return state, err
 	}
@@ -126,8 +123,7 @@ func (c *TodoController) ConfirmDeleteConfirm(state TodoState, ctx *livetemplate
 		return state, nil
 	}
 
-	dbCtx := context.Background()
-	err := c.Queries.DeleteTodo(dbCtx, db.DeleteTodoParams{
+	err := c.Queries.DeleteTodo(ctx, db.DeleteTodoParams{
 		ID:     state.DeleteID,
 		UserID: ctx.UserID(),
 	})
@@ -139,7 +135,7 @@ func (c *TodoController) ConfirmDeleteConfirm(state TodoState, ctx *livetemplate
 	state.DeleteConfirm.Hide()
 	state.DeleteID = ""
 	state.LastUpdated = formatTime()
-	state, err = c.loadTodos(dbCtx, state, ctx.UserID())
+	state, err = c.loadTodos(ctx, state, ctx.UserID())
 	if err != nil {
 		return state, err
 	}
@@ -161,12 +157,12 @@ func (c *TodoController) Change(state TodoState, ctx *livetemplate.Context) (Tod
 		state.SearchQuery = ctx.GetString("query")
 		state.CurrentPage = 1
 		state.LastUpdated = formatTime()
-		return c.loadTodos(context.Background(), state, ctx.UserID())
+		return c.loadTodos(ctx, state, ctx.UserID())
 	}
 	if ctx.Has("sort_by") {
 		state.SortBy = ctx.GetString("sort_by")
 		state.LastUpdated = formatTime()
-		return c.loadTodos(context.Background(), state, ctx.UserID())
+		return c.loadTodos(ctx, state, ctx.UserID())
 	}
 	return state, nil
 }
@@ -179,7 +175,7 @@ func (c *TodoController) Search(state TodoState, ctx *livetemplate.Context) (Tod
 
 	state.SearchQuery = input.Query
 	state.LastUpdated = formatTime()
-	return c.loadTodos(context.Background(), state, ctx.UserID())
+	return c.loadTodos(ctx, state, ctx.UserID())
 }
 
 func (c *TodoController) Sort(state TodoState, ctx *livetemplate.Context) (TodoState, error) {
@@ -190,7 +186,7 @@ func (c *TodoController) Sort(state TodoState, ctx *livetemplate.Context) (TodoS
 
 	state.SortBy = input.SortBy
 	state.LastUpdated = formatTime()
-	return c.loadTodos(context.Background(), state, ctx.UserID())
+	return c.loadTodos(ctx, state, ctx.UserID())
 }
 
 func (c *TodoController) NextPage(state TodoState, ctx *livetemplate.Context) (TodoState, error) {
@@ -198,7 +194,7 @@ func (c *TodoController) NextPage(state TodoState, ctx *livetemplate.Context) (T
 		state.CurrentPage++
 	}
 	state.LastUpdated = formatTime()
-	return c.loadTodos(context.Background(), state, ctx.UserID())
+	return c.loadTodos(ctx, state, ctx.UserID())
 }
 
 func (c *TodoController) PrevPage(state TodoState, ctx *livetemplate.Context) (TodoState, error) {
@@ -206,7 +202,7 @@ func (c *TodoController) PrevPage(state TodoState, ctx *livetemplate.Context) (T
 		state.CurrentPage--
 	}
 	state.LastUpdated = formatTime()
-	return c.loadTodos(context.Background(), state, ctx.UserID())
+	return c.loadTodos(ctx, state, ctx.UserID())
 }
 
 func (c *TodoController) GotoPage(state TodoState, ctx *livetemplate.Context) (TodoState, error) {
@@ -219,20 +215,18 @@ func (c *TodoController) GotoPage(state TodoState, ctx *livetemplate.Context) (T
 		state.CurrentPage = input.Page
 	}
 	state.LastUpdated = formatTime()
-	return c.loadTodos(context.Background(), state, ctx.UserID())
+	return c.loadTodos(ctx, state, ctx.UserID())
 }
 
 func (c *TodoController) ClearCompleted(state TodoState, ctx *livetemplate.Context) (TodoState, error) {
-	dbCtx := context.Background()
-
-	err := c.Queries.DeleteCompletedTodos(dbCtx, ctx.UserID())
+	err := c.Queries.DeleteCompletedTodos(ctx, ctx.UserID())
 	if err != nil {
 		return state, fmt.Errorf("failed to delete completed todos: %w", err)
 	}
 
 	state.Toasts.AddSuccess("Cleared", fmt.Sprintf("%d completed todo(s) removed", state.CompletedCount))
 	state.LastUpdated = formatTime()
-	state, err = c.loadTodos(dbCtx, state, ctx.UserID())
+	state, err = c.loadTodos(ctx, state, ctx.UserID())
 	if err != nil {
 		return state, err
 	}
