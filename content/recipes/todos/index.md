@@ -57,7 +57,7 @@ Look at the state struct:
 
 And the re-init function:
 
-```go include="/examples/todos/controller.go" lines="245-266"
+```go include="/examples/todos/controller.go" lines="239-260"
 ```
 
 The pattern: **persistable plain data with `lvt:"persist"`; non-serializable runtime objects re-built in `Mount` / `OnConnect` / `Sync`.** A toast queue that was serialized would be a re-render hazard (the same notifications would repaint after every reconnect); explicit re-init at lifecycle entry points is the right shape.
@@ -66,14 +66,14 @@ The pattern: **persistable plain data with `lvt:"persist"`; non-serializable run
 
 The delete-with-confirm flow is two action handlers and the modal component handles the open/close state for you:
 
-```go include="/examples/todos/controller.go" lines="96-131"
+```go include="/examples/todos/controller.go" lines="93-127"
 ```
 
 `ConfirmDelete` is fired when the user clicks Delete on a row — the modal is opened, no DB work yet. `ConfirmDeleteConfirm` runs only if the user clicks the destructive button inside the modal — by then `state.DeleteID` is whatever the original click captured. `CancelDeleteConfirm` clears the modal without touching the DB. The component never round-trips to the server for its own UI state changes; it's just `state.DeleteConfirm.Show()` / `.Hide()`.
 
 Toasts are even simpler — fire-and-forget from any action:
 
-```go include="/examples/todos/controller.go" lines="36-60" highlight="57"
+```go include="/examples/todos/controller.go" lines="36-59" highlight="56"
 ```
 
 The `state.Toasts.AddSuccess(...)` call queues a notification; the rendered template walks `state.Toasts` and emits the toast container. The toast disappears client-side on its own dismiss timer; you don't write any of that.
