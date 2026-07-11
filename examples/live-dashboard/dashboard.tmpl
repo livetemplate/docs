@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="light dark">
+    <title>Live Ops Dashboard</title>
+    <link rel="stylesheet" href="/livetemplate.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Live Ops Dashboard</h1>
+        <p class="lede">
+            Every metric below is pushed by a <strong>single background
+            goroutine</strong> to <strong>every connected browser</strong> —
+            no per-tab timer, no <code>Session</code>-handle registry. Open this
+            page in a second tab and watch both update in lockstep.
+        </p>
+
+        <dl class="metrics">
+            <dt>Pushes received</dt>
+            <dd id="ticks">{{.Ticks}}</dd>
+
+            <dt>Simulated active jobs</dt>
+            <dd id="jobs">{{.Jobs}}</dd>
+
+            <dt>Last server push</dt>
+            <dd id="updated">{{.UpdatedAt}}</dd>
+        </dl>
+
+        <p class="hint">
+            The server runs one <code>time.Ticker</code>. On each tick it updates
+            shared state and calls <code>handler.Publish("dashboard", "Refresh",
+            nil)</code>; the framework re-renders every subscriber.
+        </p>
+    </div>
+
+    <script src="/livetemplate-client.js"></script>
+</body>
+</html>
