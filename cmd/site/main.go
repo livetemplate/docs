@@ -30,6 +30,7 @@ import (
 	greetnojs "github.com/livetemplate/docs/examples/greet-nojs"
 	greetvalidate "github.com/livetemplate/docs/examples/greet-validate"
 	greetwall "github.com/livetemplate/docs/examples/greet-wall"
+	livedashboard "github.com/livetemplate/docs/examples/live-dashboard"
 	loginrecipe "github.com/livetemplate/docs/examples/login"
 	"github.com/livetemplate/docs/examples/patterns"
 	pe "github.com/livetemplate/docs/examples/progressive-enhancement"
@@ -90,6 +91,15 @@ func main() {
 	// single-session reactivity first and layer cross-tab sync on top via
 	// /apps/counter/ as the "next level."
 	mux.Handle("/apps/counter-basic/", http.StripPrefix("/apps/counter-basic", counterbasic.Handler(
+		livetemplate.WithAllowedOrigins(allowedOrigins),
+	)))
+
+	// live-dashboard is the out-of-band fan-out recipe: one process-wide
+	// background goroutine calls handler.Publish("dashboard", "Refresh", nil)
+	// and every connected browser re-renders — no per-tab timer, no Session
+	// registry. Anonymous auth + a single shared developer topic (authorized by
+	// WithTopicACL), so the inline docs embed works without an auth prompt.
+	mux.Handle("/apps/live-dashboard/", http.StripPrefix("/apps/live-dashboard", livedashboard.Handler(
 		livetemplate.WithAllowedOrigins(allowedOrigins),
 	)))
 
