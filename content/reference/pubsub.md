@@ -2,8 +2,8 @@
 title: "PubSub Reference"
 source_repo: "https://github.com/livetemplate/livetemplate"
 source_path: "docs/references/pubsub.md"
-source_ref: "v0.16.0"
-source_commit: "f4f9147c7066382d821c022caa48683d0886ad9a"
+source_ref: "v0.18.0"
+source_commit: "c96981964c226221cf2a34848e4350a494c08e8c"
 ---
 
 # PubSub Reference

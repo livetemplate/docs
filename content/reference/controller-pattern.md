@@ -2,8 +2,8 @@
 title: "Controller+State Pattern Reference"
 source_repo: "https://github.com/livetemplate/livetemplate"
 source_path: "docs/references/controller-pattern.md"
-source_ref: "v0.16.0"
-source_commit: "f4f9147c7066382d821c022caa48683d0886ad9a"
+source_ref: "v0.18.0"
+source_commit: "c96981964c226221cf2a34848e4350a494c08e8c"
 ---
 
 # Controller+State Pattern Reference
@@ -213,9 +213,58 @@ func (c *TodoController) OnDisconnect() {
 - Cancel background jobs
 - Unsubscribe from data feeds
 
+## State methods in templates
+
+Exported zero-arg methods on your State type are callable from templates just like
+fields — `{{.ActiveCount}}` resolves to `ActiveCount()`'s return value. Methods
+returning `(T, error)` are omitted (with a warning) when the error is non-nil.
+
+Because LiveTemplate converts State to a map before rendering, these methods are
+*precomputed* — but only for methods your templates actually reference. A method that
+appears nowhere in any template is never called, so an expensive or side-effecting
+helper you keep on State but don't render costs nothing.
+
+Two caveats:
+
+- **Conditional references still run.** The scoping is by name, not by reachability:
+  `{{if .Show}}{{.Expensive}}{{end}}` still calls `Expensive()` on every render even
+  when `.Show` is false, because the name appears in the template text. Keep genuinely
+  expensive work in an action method, not a render-time State method.
+- **Prefer methods without side effects.** Precompute timing is an implementation
+  detail; a State method should compute a view of the state, not mutate anything or
+  perform I/O.
+
 ## Context API
 
 For the complete Context API (data extraction, HTTP operations, struct binding), see [API Reference — Context](api-reference.md#context).
+
+### Request context
+
+`*livetemplate.Context` **embeds `context.Context`** — it carries the request/connection
+context (cancellation, deadline, request-scoped values). So `ctx` *is* a `context.Context`:
+pass it directly to any context-aware call (database queries, outbound HTTP, tracing) instead
+of `context.Background()`.
+
+```go
+func (c *TodoController) Add(state TodoState, ctx *livetemplate.Context) (TodoState, error) {
+    // ✅ ctx is a context.Context — propagates cancellation when the request/connection ends
+    if err := c.DB.InsertTodo(ctx, todo); err != nil {
+        return state, err
+    }
+    return state, nil
+}
+```
+
+Reaching for `context.Background()` inside an action instead silently discards that
+cancellation and any deadline or trace attached to the request:
+
+```go
+// ❌ throws away request-scoped cancellation, deadline, and tracing
+if err := c.DB.InsertTodo(context.Background(), todo); err != nil { ... }
+```
+
+Use `context.Background()` only for work that must deliberately **outlive** the request (e.g.
+a fire-and-forget goroutine you start from the action) — not for the action's own calls.
 
 ## Error Handling
 
@@ -266,7 +315,8 @@ type TodoController struct {
 }
 
 func (c *TodoController) Mount(state TodoState, ctx *livetemplate.Context) (TodoState, error) {
-    items, err := c.DB.GetTodos()
+    // Pass ctx (a context.Context) so the query is cancelled if the request ends.
+    items, err := c.DB.GetTodos(ctx)
     if err != nil {
         return state, fmt.Errorf("failed to load todos: %w", err)
     }
@@ -285,7 +335,7 @@ func (c *TodoController) Add(state TodoState, ctx *livetemplate.Context) (TodoSt
         Title: title,
     }
 
-    if err := c.DB.InsertTodo(todo); err != nil {
+    if err := c.DB.InsertTodo(ctx, todo); err != nil {
         return state, fmt.Errorf("database error")
     }
 
