@@ -84,6 +84,11 @@ func startServer(t *testing.T, clientJS, clientCSS string) (int, func()) {
 		t.Fatalf("free port: %v", err)
 	}
 
+	// Point the framework client funcs at our same-origin routes below, so the
+	// browser loads the locally-built bundle instead of the pinned CDN one.
+	t.Setenv("LVT_CLIENT_JS_URL", "/livetemplate-client.js")
+	t.Setenv("LVT_CLIENT_CSS_URL", "/livetemplate.css")
+
 	mux := http.NewServeMux()
 	mux.Handle("/", redactedform.LiveHandler(
 		livetemplate.WithDevMode(true),

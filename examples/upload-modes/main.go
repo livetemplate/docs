@@ -15,7 +15,6 @@ import (
 	"path/filepath"
 
 	"github.com/livetemplate/livetemplate"
-	lvttest "github.com/livetemplate/lvt/testing"
 )
 
 const (
@@ -138,6 +137,17 @@ func newApp(ctrl *UploadModesController) http.Handler {
 		}),
 	))
 
+	// When LVT_LOCAL_CLIENT points at a locally-built client bundle (for
+	// developing against unreleased client changes), repoint the framework's
+	// lvtClientScriptURL func at a same-origin route serving it; otherwise the
+	// template renders the pinned CDN bundle. Funcs merge by name, so this wins.
+	localClient := os.Getenv("LVT_LOCAL_CLIENT")
+	if localClient != "" {
+		tmpl.Funcs(map[string]any{
+			"lvtClientScriptURL": func() string { return "/livetemplate-client.js" },
+		})
+	}
+
 	handler := tmpl.Handle(ctrl, livetemplate.AsState(&UploadModesState{}))
 
 	mux := http.NewServeMux()
@@ -170,17 +180,15 @@ func newApp(ctrl *UploadModesController) http.Handler {
 	mux.Handle("/files/direct/", http.StripPrefix("/files/direct/", http.FileServer(http.Dir(sinkDir))))
 	mux.Handle("/files/proxied/", http.StripPrefix("/files/proxied/", http.FileServer(http.Dir(proxiedDir))))
 
-	// Client library: prefer a locally-built bundle (LVT_LOCAL_CLIENT) for
-	// development against unreleased client changes; otherwise the pinned CDN.
-	mux.HandleFunc("/livetemplate-client.js", func(w http.ResponseWriter, r *http.Request) {
-		if local := os.Getenv("LVT_LOCAL_CLIENT"); local != "" {
+	// Client library: only served locally when developing against an unreleased
+	// bundle (LVT_LOCAL_CLIENT, wired to the func override above). Production
+	// renders the pinned CDN URL via the client-asset template funcs.
+	if localClient != "" {
+		mux.HandleFunc("/livetemplate-client.js", func(w http.ResponseWriter, r *http.Request) {
 			w.Header().Set("Content-Type", "application/javascript")
-			http.ServeFile(w, r, local)
-			return
-		}
-		lvttest.ServeClientLibrary(w, r)
-	})
-	mux.HandleFunc("/livetemplate.css", lvttest.ServeCSS)
+			http.ServeFile(w, r, localClient)
+		})
+	}
 
 	mux.Handle("/", handler)
 	return mux

@@ -14,7 +14,6 @@ import (
 	"os"
 
 	"github.com/livetemplate/livetemplate"
-	lvttest "github.com/livetemplate/lvt/testing"
 )
 
 // UploadController is a singleton holding dependencies (none needed here).
@@ -24,23 +23,6 @@ type UploadController struct{}
 // itself doesn't already track via .lvt.Uploads, keeping the render
 // hydrate-idempotent.
 type UploadState struct{}
-
-// serveClientJS serves the LiveTemplate browser client. For the #453 regression
-// the browser MUST load a locally built bundle (the published @latest predates
-// the fix), so when LVT_LOCAL_CLIENT_JS points at a built dist we serve that
-// file directly with no caching. Serving it ourselves — rather than via
-// LVT_CLIENT_CDN_URL — sidesteps lvttest's filename-keyed disk cache, which can
-// otherwise return a stale CDN copy. Without the env var we fall back to the
-// CDN-backed helper so the example still runs standalone.
-func serveClientJS(w http.ResponseWriter, r *http.Request) {
-	if path := os.Getenv("LVT_LOCAL_CLIENT_JS"); path != "" {
-		w.Header().Set("Content-Type", "application/javascript")
-		w.Header().Set("Cache-Control", "no-store")
-		http.ServeFile(w, r, path)
-		return
-	}
-	lvttest.ServeClientLibrary(w, r)
-}
 
 func main() {
 	port := os.Getenv("PORT")
@@ -59,11 +41,26 @@ func main() {
 		}),
 	))
 
+	// The template renders {{lvtClientScriptURL}} — the pinned CDN bundle — by
+	// default. For the #453 regression the browser MUST instead load a locally
+	// built bundle (published @latest predates the fix): when LVT_LOCAL_CLIENT_JS
+	// points at a built dist, serve it same-origin with no caching and repoint
+	// the framework's lvtClientScriptURL func at it (funcs merge by name, so this
+	// override wins over the pinned default).
+	if bundle := os.Getenv("LVT_LOCAL_CLIENT_JS"); bundle != "" {
+		lt.Funcs(map[string]any{
+			"lvtClientScriptURL": func() string { return "/livetemplate-client.js" },
+		})
+		http.HandleFunc("/livetemplate-client.js", func(w http.ResponseWriter, r *http.Request) {
+			w.Header().Set("Content-Type", "application/javascript")
+			w.Header().Set("Cache-Control", "no-store")
+			http.ServeFile(w, r, bundle)
+		})
+	}
+
 	controller := &UploadController{}
 	handler := lt.Handle(controller, livetemplate.AsState(&UploadState{}))
 
-	http.HandleFunc("/livetemplate-client.js", serveClientJS)
-	http.HandleFunc("/livetemplate.css", lvttest.ServeCSS)
 	http.Handle("/", handler)
 
 	addr := ":" + port

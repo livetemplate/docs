@@ -204,8 +204,8 @@ func TestPE_TierA_BrowserE2E(t *testing.T) {
 		if !strings.Contains(html, `name="add"`) {
 			t.Error("Expected button with name='add' in form")
 		}
-		if !strings.Contains(html, "livetemplate-client.js") {
-			t.Error("Script tag for livetemplate-client.js not found")
+		if !strings.Contains(html, "livetemplate-client.browser.js") {
+			t.Error("Script tag for the livetemplate client bundle not found")
 		}
 		t.Log("✅ Initial page load verified")
 	})

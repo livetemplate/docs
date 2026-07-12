@@ -23,6 +23,7 @@ package redactedform
 
 import (
 	"embed"
+	"html/template"
 	"log"
 	"net/http"
 	"os"
@@ -30,7 +31,6 @@ import (
 	"sync"
 
 	"github.com/livetemplate/livetemplate"
-	e2etest "github.com/livetemplate/lvt/testing"
 )
 
 //go:embed redacted-form.html
@@ -101,26 +101,44 @@ func (c *FormController) Save(state FormState, ctx *livetemplate.Context) (FormS
 
 // LiveHandler returns just the livetemplate "/" handler for the recipe (no
 // client-asset routes). AnonymousAuthenticator gives each browser its own
-// session so the demo is safe to expose publicly. The e2e suite mounts this
-// directly so it can serve the locally-built client bundle instead of the CDN
-// one — the only way to exercise unreleased client changes end-to-end.
+// session so the demo is safe to expose publicly. In production the template
+// renders {{lvtClientScriptURL}} / {{lvtClientStyleURL}} (the pinned CDN
+// bundle). The e2e suite serves a locally-built client bundle same-origin and
+// sets LVT_CLIENT_JS_URL / LVT_CLIENT_CSS_URL so those funcs point at it
+// instead — the only way to exercise unreleased client changes end-to-end.
 func LiveHandler(opts ...livetemplate.Option) http.Handler {
 	baseOpts := []livetemplate.Option{
 		livetemplate.WithParseFiles(extractTemplate()),
 		livetemplate.WithAuthenticator(&livetemplate.AnonymousAuthenticator{}),
 	}
 	tmpl := livetemplate.Must(livetemplate.New("redacted-form", append(baseOpts, opts...)...))
+	overrideClientURLsFromEnv(tmpl)
 	return tmpl.Handle(&FormController{}, livetemplate.AsState(&FormState{}))
 }
 
-// Handler returns the redacted-form app as an http.Handler ready to mount,
-// including the client JS + CSS routes (served from CDN via the shared test
-// helpers, matching the other docs recipes). Callers supply environment-
-// specific options.
+// overrideClientURLsFromEnv repoints the framework's lvtClientScriptURL /
+// lvtClientStyleURL funcs at LVT_CLIENT_JS_URL / LVT_CLIENT_CSS_URL when either
+// is set. This dogfoods livetemplate's own Funcs override (funcs merge by name,
+// so a user func wins over the framework default) to let the e2e suite serve a
+// locally-built client bundle from a same-origin route. Production leaves the
+// funcs at their pinned CDN defaults.
+func overrideClientURLsFromEnv(tmpl *livetemplate.Template) {
+	js, css := os.Getenv("LVT_CLIENT_JS_URL"), os.Getenv("LVT_CLIENT_CSS_URL")
+	if js == "" && css == "" {
+		return
+	}
+	tmpl.Funcs(template.FuncMap{
+		"lvtClientScriptURL": func() string { return js },
+		"lvtClientStyleURL":  func() string { return css },
+	})
+}
+
+// Handler returns the redacted-form app as an http.Handler ready to mount.
+// The template references the client bundle via the framework funcs, so no
+// client-asset routes are served here. Callers supply environment-specific
+// options.
 func Handler(opts ...livetemplate.Option) http.Handler {
 	mux := http.NewServeMux()
 	mux.Handle("/", LiveHandler(opts...))
-	mux.HandleFunc("/livetemplate-client.js", e2etest.ServeClientLibrary)
-	mux.HandleFunc("/livetemplate.css", e2etest.ServeCSS)
 	return mux
 }

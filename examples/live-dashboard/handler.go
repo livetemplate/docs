@@ -31,7 +31,6 @@ import (
 	"time"
 
 	"github.com/livetemplate/livetemplate"
-	e2etest "github.com/livetemplate/lvt/testing"
 )
 
 //go:embed dashboard.tmpl
@@ -67,8 +66,6 @@ func Handler(opts ...livetemplate.Option) http.Handler {
 
 	mux := http.NewServeMux()
 	mux.Handle("/", live)
-	mux.HandleFunc("/livetemplate-client.js", e2etest.ServeClientLibrary)
-	mux.HandleFunc("/livetemplate.css", e2etest.ServeCSS)
 	return mux
 }
 

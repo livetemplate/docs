@@ -6,13 +6,8 @@
     <meta name="color-scheme" content="light dark">
     <title>{{if .Title}}{{.Title}} — {{end}}LiveTemplate UI Pattern Recipes</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
-    {{if .lvt.DevMode}}
-    <link rel="stylesheet" href="{{basePath}}/livetemplate.css">
-    <script defer src="{{basePath}}/livetemplate-client.js"></script>
-    {{else}}
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@livetemplate/client@latest/livetemplate.css">
-    <script defer src="https://cdn.jsdelivr.net/npm/@livetemplate/client@latest/dist/livetemplate-client.browser.js"></script>
-    {{end}}
+    <link rel="stylesheet" href="{{lvtClientStyleURL}}">
+    <script defer src="{{lvtClientScriptURL}}"></script>
 </head>
 <body>
     <main class="container">

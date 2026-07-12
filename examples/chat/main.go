@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/livetemplate/livetemplate"
-	e2etest "github.com/livetemplate/lvt/testing"
 )
 
 // ChatController is a singleton holding shared data (messages, users).
@@ -197,8 +196,6 @@ func main() {
 	tmpl := livetemplate.Must(livetemplate.New("chat", envConfig.ToOptions()...))
 
 	http.Handle("/", tmpl.Handle(controller, livetemplate.AsState(initialState)))
-	http.HandleFunc("/livetemplate-client.js", e2etest.ServeClientLibrary)
-	http.HandleFunc("/livetemplate.css", e2etest.ServeCSS)
 
 	port := os.Getenv("PORT")
 	if port == "" {

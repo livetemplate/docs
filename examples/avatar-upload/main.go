@@ -9,7 +9,6 @@ import (
 	"path/filepath"
 
 	"github.com/livetemplate/livetemplate"
-	lvttest "github.com/livetemplate/lvt/testing"
 )
 
 //go:embed *.tmpl
@@ -124,7 +123,7 @@ func main() {
 		livetemplate.WithUpload("avatar", livetemplate.UploadConfig{
 			Accept:      []string{"image/jpeg", "image/png", "image/gif"},
 			MaxFileSize: 5 * 1024 * 1024, // 5MB
-			MaxEntries:  1,                // Single file
+			MaxEntries:  1,               // Single file
 		}),
 	))
 
@@ -142,10 +141,6 @@ func main() {
 
 	// Serve static files (for uploaded avatars)
 	http.Handle("/uploads/", http.StripPrefix("/uploads/", http.FileServer(http.Dir("uploads"))))
-
-	// Serve client library
-	http.HandleFunc("/livetemplate-client.js", lvttest.ServeClientLibrary)
-	http.HandleFunc("/livetemplate.css", lvttest.ServeCSS)
 
 	// Mount the LiveTemplate handler
 	http.Handle("/", handler)

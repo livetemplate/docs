@@ -13,11 +13,37 @@ LiveTemplate is a Go framework. The minimum to get a reactive page running is on
 go get github.com/livetemplate/livetemplate
 ```
 
-That's it for the server side. The TypeScript client (loaded from CDN by default) wires up the browser side automatically — you'll add a single `<script>` tag in your template; no npm step needed for getting started.
+That's it for the server side. The TypeScript client wires up the browser side automatically — you add two tags to your template's `<head>`/`<body>`; no npm step needed for getting started.
 
-## Client CDN versioning
+## Loading the browser client
 
-Docs examples may use `@latest` when they are demonstrating the current client quickly. For production apps, prefer a version range that matches your LiveTemplate core release policy, or pin an exact client version when you need reproducible archived behavior. The important part is to keep the server library and browser client on compatible major/minor versions.
+Add these to your template. The `lvtClientScriptURL` / `lvtClientStyleURL` functions are provided by the framework on every template:
+
+```html
+<link rel="stylesheet" href="{{lvtClientStyleURL}}">
+<script defer src="{{lvtClientScriptURL}}"></script>
+```
+
+They render the CDN URL for the client bundle **this server release is wire-compatible with** — pinned, not `@latest`. This matters: there is no runtime handshake between server and client, so an unpinned client can ship a wire-protocol change to browsers still talking to an older server. The pinned version moves only when you upgrade the framework (`go get -u github.com/livetemplate/livetemplate`), keeping the two in lockstep. Every example in these docs uses this pattern.
+
+The URLs are also exported as constants — `livetemplate.ClientVersion`, `livetemplate.ClientScriptURL`, `livetemplate.ClientStyleURL` — if you need them outside a template.
+
+### Self-hosting (offline, air-gapped, or CSP-strict)
+
+If your deployment can't reach a public CDN — or a Content-Security-Policy forbids third-party script origins — vendor the bundle at the pinned version and serve it from your own origin:
+
+```bash
+npm install @livetemplate/client@<version>   # match livetemplate.ClientVersion
+```
+
+Serve the vendored files same-origin, then either write your own tags pointing at them or repoint the framework functions with a `Funcs` override (they merge by name, so yours wins) — no need to edit every template:
+
+```go
+tmpl.Funcs(template.FuncMap{
+    "lvtClientScriptURL": func() string { return "/assets/livetemplate-client.browser.js" },
+    "lvtClientStyleURL":  func() string { return "/assets/livetemplate.css" },
+})
+```
 
 ## Optional: install the `lvt` CLI
 
