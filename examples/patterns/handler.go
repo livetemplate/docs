@@ -42,7 +42,6 @@ import (
 	"sync"
 
 	"github.com/livetemplate/livetemplate"
-	e2etest "github.com/livetemplate/lvt/testing"
 )
 
 // stripPatternsPrefix turns "/patterns/forms/click-to-edit" into
@@ -67,8 +66,7 @@ var (
 )
 
 // Handler returns an http.Handler that serves all 33 pattern routes
-// plus /api/index.json + the dev-mode static asset routes
-// (/livetemplate-client.js, /livetemplate.css). Mount it with
+// plus /api/index.json. Mount it with
 // http.StripPrefix; the basePath argument is the prefix the docs
 // container exposes externally (e.g. "/apps/ui-patterns").
 //
@@ -230,12 +228,6 @@ func buildMux() http.Handler {
 	// JSON catalog index — same shape as upstream examples/patterns
 	// served (kept for forward-compat consumers; unused in B1).
 	mux.Handle("/api/index.json", apiIndexHandler())
-
-	// Dev-mode client + CSS, served from the inner mount so templates
-	// render {{basePath}}/livetemplate-client.js. lvt/testing fetches
-	// these from CDN once and caches in-memory.
-	mux.HandleFunc("/livetemplate-client.js", e2etest.ServeClientLibrary)
-	mux.HandleFunc("/livetemplate.css", e2etest.ServeCSS)
 
 	return mux
 }

@@ -36,7 +36,6 @@ import (
 	"github.com/livetemplate/lvt/components/base"
 	"github.com/livetemplate/lvt/components/modal"
 	"github.com/livetemplate/lvt/components/toast"
-	e2etest "github.com/livetemplate/lvt/testing"
 )
 
 //go:embed todos.tmpl
@@ -130,8 +129,6 @@ func Handler(opts ...livetemplate.Option) http.Handler {
 
 		mux := http.NewServeMux()
 		mux.Handle("/", tmpl.Handle(controller, livetemplate.AsState(initialState)))
-		mux.HandleFunc("/livetemplate-client.js", e2etest.ServeClientLibrary)
-		mux.HandleFunc("/livetemplate.css", e2etest.ServeCSS)
 		rootHandler = mux
 	})
 	return rootHandler

@@ -40,7 +40,6 @@ import (
 
 	"github.com/go-playground/validator/v10"
 	"github.com/livetemplate/livetemplate"
-	e2etest "github.com/livetemplate/lvt/testing"
 )
 
 //go:embed progressive-enhancement.tmpl
@@ -87,7 +86,5 @@ func Handler(opts ...livetemplate.Option) http.Handler {
 
 	mux := http.NewServeMux()
 	mux.Handle("/", tmpl.Handle(controller, livetemplate.AsState(initialState)))
-	mux.HandleFunc("/livetemplate-client.js", e2etest.ServeClientLibrary)
-	mux.HandleFunc("/livetemplate.css", e2etest.ServeCSS)
 	return mux
 }

@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>LiveTemplate — Upload Modes</title>
-  <link rel="stylesheet" href="/livetemplate.css" />
+  <link rel="stylesheet" href="{{lvtClientStyleURL}}" />
   <style>
     body { font-family: system-ui, sans-serif; max-width: 760px; margin: 2rem auto; padding: 0 1rem; }
     .mode { border: 1px solid #ddd; border-radius: 8px; padding: 1rem 1.25rem; margin: 1rem 0; }
@@ -54,6 +54,6 @@
     {{.lvt.UploadPreview "preview"}}
   </div>
 
-  <script src="/livetemplate-client.js"></script>
+  <script src="{{lvtClientScriptURL}}"></script>
 </body>
 </html>

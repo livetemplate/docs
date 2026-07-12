@@ -163,8 +163,8 @@ func TestTodosE2E(t *testing.T) {
 		}
 
 		// Check if script tag is present
-		if !strings.Contains(initialHTML, "livetemplate-client.js") {
-			t.Errorf("Script tag for livetemplate-client.js not found in initial HTML. HTML length: %d", len(initialHTML))
+		if !strings.Contains(initialHTML, "livetemplate-client.browser.js") {
+			t.Errorf("Script tag for the livetemplate client bundle not found in initial HTML. HTML length: %d", len(initialHTML))
 			// Log last 500 chars to see where HTML ends
 			if len(initialHTML) > 500 {
 				t.Logf("Last 500 chars of HTML: %s", initialHTML[len(initialHTML)-500:])

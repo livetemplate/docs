@@ -12,7 +12,6 @@ import (
 
 	"github.com/go-playground/validator/v10"
 	"github.com/livetemplate/livetemplate"
-	e2etest "github.com/livetemplate/lvt/testing"
 )
 
 var validate = validator.New()
@@ -104,8 +103,6 @@ func main() {
 
 	mux := http.NewServeMux()
 	mux.Handle("/", liveHandler)
-	mux.HandleFunc("/livetemplate-client.js", e2etest.ServeClientLibrary)
-	mux.HandleFunc("/livetemplate.css", e2etest.ServeCSS)
 
 	port := os.Getenv("PORT")
 	if port == "" {

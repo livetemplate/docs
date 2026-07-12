@@ -240,6 +240,57 @@ This client library follows the LiveTemplate core library's major.minor version.
 
 Patch versions are independent and can be incremented for client-specific fixes.
 
+### Let the server pick the version (recommended)
+
+There is **no runtime handshake** between server and client, so loading an
+unpinned `@latest` bundle is unsafe: a client-only release can ship a wire-format
+change to browsers still talking to an older server. To avoid hand-maintaining the
+version, LiveTemplate seeds two template functions into every template that render
+the CDN URL for the client bundle this server release is wire-compatible with:
+
+```html
+<link rel="stylesheet" href="{{lvtClientStyleURL}}">
+<script defer src="{{lvtClientScriptURL}}"></script>
+```
+
+The version moves only when you upgrade the server dependency
+(`go get -u github.com/livetemplate/livetemplate`), keeping client and server in
+lockstep. The functions resolve the exported `livetemplate.ClientVersion` /
+`livetemplate.ClientScriptURL` / `livetemplate.ClientStyleURL` constants, so the
+pinned version is single-sourced in Go. Every recipe in these docs uses this
+pattern.
+
+### Self-hosting (offline, air-gapped, or CSP-strict)
+
+If your deployment cannot reach a public CDN — an offline network, or a
+Content-Security-Policy that forbids third-party script origins — vendor the
+bundle at the pinned version and serve it from your own origin instead:
+
+```bash
+npm install @livetemplate/client@<ClientVersion>   # match livetemplate.ClientVersion
+# or copy dist/livetemplate-client.browser.js + livetemplate.css into your assets
+```
+
+```go
+mux.Handle("/assets/", http.StripPrefix("/assets/", http.FileServer(http.Dir("assets"))))
+```
+
+```html
+<link rel="stylesheet" href="/assets/livetemplate.css">
+<script defer src="/assets/livetemplate-client.browser.js"></script>
+```
+
+Because the template functions merge into the template FuncMap by name, you can
+also keep `{{lvtClientScriptURL}}` in your templates and repoint it at your
+same-origin path with a `Funcs` override rather than editing every template:
+
+```go
+tmpl.Funcs(template.FuncMap{
+    "lvtClientScriptURL": func() string { return "/assets/livetemplate-client.browser.js" },
+    "lvtClientStyleURL":  func() string { return "/assets/livetemplate.css" },
+})
+```
+
 ## Contributing
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for development guidelines.

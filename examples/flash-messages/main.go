@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"github.com/livetemplate/livetemplate"
-	e2etest "github.com/livetemplate/lvt/testing"
 )
 
 // FlashController demonstrates flash messages for page-level notifications.
@@ -141,10 +140,6 @@ func main() {
 		w.Header().Set("Content-Type", "application/json")
 		w.Write([]byte(`{"status":"ok","timestamp":"` + time.Now().Format(time.RFC3339) + `"}`))
 	})
-
-	// Serve client library (development only - use CDN in production)
-	http.HandleFunc("/livetemplate-client.js", e2etest.ServeClientLibrary)
-	http.HandleFunc("/livetemplate.css", e2etest.ServeCSS)
 
 	port := os.Getenv("PORT")
 	if port == "" {
