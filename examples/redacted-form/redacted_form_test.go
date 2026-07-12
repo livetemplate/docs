@@ -91,8 +91,7 @@ func startServer(t *testing.T, clientJS, clientCSS string) (int, func()) {
 
 	mux := http.NewServeMux()
 	mux.Handle("/", redactedform.LiveHandler(
-		livetemplate.WithDevMode(true),
-		livetemplate.WithPermissiveOriginCheck(),
+		livetemplate.WithDevMode(true), // also relaxes the WS origin check
 	))
 	mux.HandleFunc("/livetemplate-client.js", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/javascript")

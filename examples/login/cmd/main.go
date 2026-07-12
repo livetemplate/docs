@@ -52,10 +52,9 @@ func main() {
 
 	var opts []livetemplate.Option
 	if *dev || os.Getenv("LVT_DEV_MODE") == "true" {
-		opts = append(opts,
-			livetemplate.WithDevMode(true),
-			livetemplate.WithPermissiveOriginCheck(),
-		)
+		// Dev mode also relaxes the WebSocket origin check (allows all
+		// origins), so localhost on any port works during development.
+		opts = append(opts, livetemplate.WithDevMode(true))
 	} else {
 		opts = append(opts, livetemplate.WithAllowedOrigins([]string{
 			"https://livetemplate.fly.dev",

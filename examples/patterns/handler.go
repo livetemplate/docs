@@ -81,7 +81,7 @@ var (
 // Pass extra livetemplate.Options as opts — these are appended to
 // every internal template construction. Production callers (cmd/site)
 // supply WithAuthenticator + WithAllowedOrigins; test-server callers
-// (docs/e2e/patterns/main.go) supply WithPermissiveOriginCheck so
+// run in dev mode (WithDevMode(true)), which relaxes the origin check so
 // random per-test ports work over the WS upgrade.
 //
 // Why options aren't hardcoded here: production wants strict origin

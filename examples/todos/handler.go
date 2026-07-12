@@ -78,8 +78,8 @@ func extractTemplate() string {
 // hrefs that must resolve to the live mount prefix).
 //
 // Production callers (cmd/site) supply WithAllowedOrigins; test-server
-// callers supply WithPermissiveOriginCheck + WithDevMode for random-port
-// setups.
+// callers run in dev mode (WithDevMode(true)), which relaxes the origin
+// check for random-port setups.
 //
 // Calling Handler more than once returns the same first-call handler
 // (handlerOnce); the package-level state (DB, template) is one-shot
