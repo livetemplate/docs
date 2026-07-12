@@ -71,8 +71,8 @@ func extractTemplate() string {
 // Handler returns the progressive-enhancement app as an http.Handler
 // ready to mount. Production callers (cmd/site) supply
 // WithAllowedOrigins (and optionally WithWebSocketDisabled for the
-// Tier B mount). Test-server callers supply WithDevMode +
-// WithPermissiveOriginCheck for random-port setups.
+// Tier B mount). Test-server callers run in dev mode (WithDevMode(true)),
+// which relaxes the origin check for random-port setups.
 func Handler(opts ...livetemplate.Option) http.Handler {
 	controller := &TodoController{validate: validator.New()}
 	initialState := &TodoState{}

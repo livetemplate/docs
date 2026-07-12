@@ -44,8 +44,7 @@ func TestMain(m *testing.M) {
 // carries the metrics markup — no Chrome required, so it runs in -short.
 func TestLiveDashboard_SmokeHTTP(t *testing.T) {
 	handler := livedashboard.Handler(
-		livetemplate.WithDevMode(true),
-		livetemplate.WithPermissiveOriginCheck(),
+		livetemplate.WithDevMode(true), // also relaxes the WS origin check
 	)
 	srv := httptest.NewServer(handler)
 	defer srv.Close()

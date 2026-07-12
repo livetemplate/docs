@@ -181,8 +181,8 @@ func main() {
 	// Production options: AnonymousAuthenticator (default — per-browser
 	// session group), explicit origin allowlist for the docs deploy
 	// targets. The handler package's Handler signature accepts opts so
-	// the e2e test-server (docs/e2e/patterns/main.go) can supply
-	// WithPermissiveOriginCheck for random-port test setups.
+	// the e2e test-server can run in dev mode (WithDevMode(true)), which
+	// relaxes the origin check for random-port test setups.
 	mux.Handle("/apps/ui-patterns/", http.StripPrefix("/apps/ui-patterns", patterns.Handler("/apps/ui-patterns",
 		livetemplate.WithAuthenticator(&livetemplate.AnonymousAuthenticator{}),
 		livetemplate.WithAllowedOrigins(allowedOrigins),

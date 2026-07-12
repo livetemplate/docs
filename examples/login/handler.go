@@ -77,8 +77,8 @@ func extractTemplate() string {
 // sees the request URL.
 //
 // Production callers (cmd/site) supply WithAllowedOrigins; test-server
-// callers (docs/e2e/login) supply WithDevMode + WithPermissiveOriginCheck
-// for random-port test setups.
+// callers run in dev mode (WithDevMode(true)), which relaxes the origin
+// check so random test ports work.
 func Handler(mountPath string, opts ...livetemplate.Option) http.Handler {
 	if mountPath == "" {
 		mountPath = "/"
