@@ -2,8 +2,8 @@
 title: "Server Actions Reference"
 source_repo: "https://github.com/livetemplate/livetemplate"
 source_path: "docs/references/server-actions.md"
-source_ref: "v0.16.0"
-source_commit: "f4f9147c7066382d821c022caa48683d0886ad9a"
+source_ref: "v0.18.1"
+source_commit: "f6f22cc3190ec0bf15f9d8bbec14f34b35409f77"
 ---
 
 # Server Actions Reference
@@ -12,14 +12,16 @@ Server actions let you push updates from server-side code to connected clients. 
 
 ## Overview
 
-LiveTemplate supports two types of updates:
+LiveTemplate supports three types of updates:
 
 | Type | Trigger | Scope | Use Case |
 |------|---------|-------|----------|
 | **Client Action** | User interaction (click, submit) | Same session group | Form submissions, button clicks |
 | **Server Action** | Server-side code | Same session group | Timers, webhooks, background jobs |
+| **Topic Fan-out** | Server-side code | Many sessions across groups | Refreshing every viewer of a shared dashboard |
 
-Server actions use the `Session` interface to trigger updates:
+Server actions use the `Session` interface to trigger updates for **one session
+group**:
 
 ```go
 // From any goroutine - timer, webhook handler, background job
@@ -27,6 +29,11 @@ session.TriggerAction("notification", map[string]interface{}{
     "message": "Your export is ready!",
 })
 ```
+
+To reach **many sessions at once** from a background goroutine — every tab of a
+user, or every viewer of a shared dashboard — without stashing a registry of
+`Session` handles, use out-of-band topic fan-out instead. See
+[Fanning out to many sessions](#fanning-out-to-many-sessions-without-a-handle-registry).
 
 ## Session Interface
 
@@ -325,9 +332,17 @@ func (c *ExportController) ExportFailed(state ExportState, ctx *livetemplate.Con
 }
 ```
 
-### Real-time Notifications
+### Real-time Notifications (legacy `sync.Map` pattern)
 
-Push notifications from any part of your application:
+Push notifications from any part of your application.
+
+> **Prefer topic fan-out for this.** The hand-rolled `sync.Map` of `Session`
+> handles below predates the topic API and is kept only for the case where you
+> genuinely need a specific per-session handle (e.g. to cancel a per-session
+> goroutine). To notify a user's connections by ID, subscribe to the user's
+> topic in `Mount` and call `handler.Publish(livetemplate.UserTopic(userID), …)`
+> — no registry, no `OnConnect`/`OnDisconnect` bookkeeping, no pruning of dead
+> handles. See [Fanning out to many sessions](#fanning-out-to-many-sessions-without-a-handle-registry).
 
 ```go
 // Global session registry (thread-safe)
@@ -353,6 +368,84 @@ func NotifyUser(userID string, message string) {
     }
 }
 ```
+
+### Fanning out to many sessions (without a handle registry)
+
+`Session.TriggerAction` targets **one** session group, so refreshing many
+connections at once tempts you to keep a registry of `Session` handles and
+iterate it (the pattern above) — which then needs `OnConnect`/`OnDisconnect`
+bookkeeping and dead-handle pruning. You don't need any of that. Two primitives
+compose into a registry-free fan-out:
+
+1. **Join in `Mount`** with `ctx.Subscribe(topic)`. Because it runs in `Mount`,
+   the subscription is re-established automatically on reconnect.
+2. **Fan out from anywhere** with the `LiveHandler.Publish(topic, action, data)`
+   returned by `Handle()` — out-of-band (no `Context`), safe from any goroutine.
+   Every subscriber re-runs `action` against its own state, exactly like
+   `TriggerAction`, and re-renders.
+
+The `action` you publish is a normal controller method — typically a `Refresh`
+that reloads shared data into state:
+
+```go
+func (c *DashboardController) Refresh(s State, ctx *livetemplate.Context) (State, error) {
+    s.Stats = c.store.Snapshot() // re-read the shared source
+    return s, nil
+}
+```
+
+**Per-user (all of one user's tabs) — no configuration:**
+
+```go
+func (c *DashboardController) Mount(s State, ctx *livetemplate.Context) (State, error) {
+    // ctx.SelfTopic() is the ACL-exempt self-identity topic. For an
+    // authenticated user it is livetemplate.UserTopic(ctx.UserID()).
+    if err := ctx.Subscribe(ctx.SelfTopic()); err != nil {
+        return s, err
+    }
+    s.Stats = c.store.Snapshot()
+    return s, nil
+}
+
+// Background goroutine — refresh every tab of one user:
+handler.Publish(livetemplate.UserTopic("alice"), "Refresh", nil)
+```
+
+**Shared across all viewers (a developer topic) — requires an ACL.** Developer
+topics are **deny-all by default**: a connection may only subscribe if you
+configure [`WithTopicACL`](pubsub.md#topic-subscribe--publish-api) (or
+`WithOpenTopics` in trusted single-tenant tools). This is deliberate — a
+developer topic is cross-user, so its ACL is the only boundary.
+
+```go
+tmpl := livetemplate.New("dash",
+    livetemplate.WithTopicACL(func(topic, userID string, r *http.Request) (bool, error) {
+        return topic == "dashboard", nil // authorize the shared topic
+    }),
+)
+
+func (c *DashboardController) Mount(s State, ctx *livetemplate.Context) (State, error) {
+    if err := ctx.Subscribe("dashboard"); err != nil {
+        return s, err // surfaces an lvt:error envelope to the client if denied
+    }
+    s.Stats = c.store.Snapshot()
+    return s, nil
+}
+
+// Background goroutine — refresh every viewer, in every group:
+handler.Publish("dashboard", "Refresh", nil)
+```
+
+**Notes:**
+
+- The out-of-band dispatch response is a pure state update: the client receives
+  the re-rendered tree with no `meta.action` echo (unlike a client-initiated
+  action).
+- `Publish` is scoped to one `LiveHandler`'s subscribers. If a shared group
+  spans two separate handlers (e.g. a `/home` and a `/board` page backed by
+  different controllers), publish on each handler.
+- For horizontally scaled (multi-instance) deployments, configure
+  [`WithPubSubBroadcaster`](pubsub.md#setup) so topic fan-out crosses instances.
 
 ## Thread Safety
 
@@ -410,7 +503,11 @@ func (c *Controller) triggerFromBackground() {
 - Simpler mental model - "push to myself"
 - No accidental cross-user data leaks
 - No authorization checks needed in controller code
-- For admin broadcasts, use database + polling or dedicated admin endpoints
+
+For cross-user broadcasts (admin announcements, a shared dashboard), use a
+developer topic with [`WithTopicACL`](#fanning-out-to-many-sessions-without-a-handle-registry)
+— the ACL is the explicit authorization boundary `TriggerAction` deliberately
+lacks.
 
 ## Multi-Tab/Multi-Device Behavior
 
@@ -623,4 +720,5 @@ In multi-instance deployments, `TriggerAction()` automatically publishes to Redi
 - [Controller+State Pattern](controller-pattern.md) - Core architecture pattern
 - [Session Reference](session.md) - Session stores and connection management
 - [Authentication Reference](authentication.md) - User identification and custom authenticators
+- [PubSub Reference](pubsub.md#topic-subscribe--publish-api) - Topic grammar, ACL, and out-of-band `handler.Publish`
 - [Scaling Guide](../guides/SCALING.md) - Horizontal scaling with Redis

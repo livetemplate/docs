@@ -2,8 +2,8 @@
 title: "Upload Reference"
 source_repo: "https://github.com/livetemplate/livetemplate"
 source_path: "docs/references/uploads.md"
-source_ref: "v0.16.0"
-source_commit: "f4f9147c7066382d821c022caa48683d0886ad9a"
+source_ref: "v0.18.1"
+source_commit: "f6f22cc3190ec0bf15f9d8bbec14f34b35409f77"
 ---
 
 # Upload Reference
