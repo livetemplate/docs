@@ -2,8 +2,8 @@
 title: "LiveTemplate Go Template Support Matrix"
 source_repo: "https://github.com/livetemplate/livetemplate"
 source_path: "docs/references/template-support-matrix.md"
-source_ref: "v0.16.0"
-source_commit: "f4f9147c7066382d821c022caa48683d0886ad9a"
+source_ref: "v0.19.0"
+source_commit: "62f903a3b235b047bd3a612fb7da90daa1ccad04"
 ---
 
 # LiveTemplate Go Template Support Matrix
@@ -181,7 +181,7 @@ Stripping uses the HTML tokenizer (not a regex), so it is context-aware:
 |---------|--------|-------|
 | `{{define}}` / `{{template}}` | ✅ | Automatically flattened via `FlattenTemplate()` in `internal/parse/flatten.go` |
 | `{{block}}` | ✅ | Resolved during flattening; equivalent to `{{define}}` + `{{template}}` |
-| Circular template references | ❌ | Not supported, would cause infinite loop |
+| Recursive / circular template references | ❌ | Rejected at parse time with a clear `ParseError` naming the cycle (e.g. `treeNode -> treeNode`). Because `{{template}}` calls are inlined during flattening, a self-referential template cannot be inlined; runtime invocation of recursive templates is a planned feature (see `docs/proposals/recursive-templates-proposal.md`). |
 | Undefined template invocation | ❌ | Returns error from Go template engine |
 
 Template composition is fully supported through automatic AST flattening. `FlattenTemplate()` walks the parsed template tree, identifies the entry point, and inlines all `{{template}}` invocations into a single flat template before tree generation.
@@ -192,7 +192,8 @@ Template composition is fully supported through automatic AST flattening. `Flatt
 |---------|--------|-------|
 | Built-in Go functions | ✅ | All standard functions supported |
 | User-defined functions | ⚠️ | Must be registered with Go template engine |
-| Method calls on data | ✅ | Works if methods are public |
+| Zero-arg method calls on data | ✅ | Public methods; precomputed from State (`{{.Count}}`) |
+| Arg-accepting method calls | ⚠️ | Only on a struct **field**, not top-level State — `{{.Views.Class .ID}}`, not `{{.Class .ID}}` (see [Controller Pattern — view helpers](controller-pattern.md#methods-that-take-arguments-view-helpers)) |
 
 ## Performance Considerations
 
