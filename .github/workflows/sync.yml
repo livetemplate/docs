@@ -36,43 +36,88 @@ jobs:
         with:
           go-version: "1.26"
 
+      # repository_dispatch client_payload is attacker-controllable by anyone
+      # who can dispatch to this repo, so it never reaches a run: block via
+      # ${{ }} interpolation — that would be shell injection into a job holding
+      # contents: write, pull-requests: write and DOCS_BOT_TOKEN. Values arrive
+      # as environment variables and are quoted at every use.
       - name: Determine source_repo + ref
         id: inputs
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          DISPATCH_REPO: ${{ github.event.client_payload.source_repo }}
+          DISPATCH_REF: ${{ github.event.client_payload.ref }}
+          INPUT_REPO: ${{ github.event.inputs.source_repo }}
+          INPUT_REF: ${{ github.event.inputs.ref }}
         run: |
-          if [ "${{ github.event_name }}" = "repository_dispatch" ]; then
-            echo "source_repo=${{ github.event.client_payload.source_repo }}" >> "$GITHUB_OUTPUT"
-            echo "ref=${{ github.event.client_payload.ref }}" >> "$GITHUB_OUTPUT"
+          set -euo pipefail
+          if [ "$EVENT_NAME" = "repository_dispatch" ]; then
+            source_repo="$DISPATCH_REPO"
+            ref="$DISPATCH_REF"
           else
-            echo "source_repo=${{ github.event.inputs.source_repo }}" >> "$GITHUB_OUTPUT"
-            echo "ref=${{ github.event.inputs.ref }}" >> "$GITHUB_OUTPUT"
+            source_repo="$INPUT_REPO"
+            ref="$INPUT_REF"
           fi
+
+          # workflow_dispatch restricts source_repo to a choice list;
+          # repository_dispatch has no such gate. Without this allowlist a
+          # dispatch could aim the sync at an arbitrary repo and open a PR
+          # pulling that repo's markdown into this site.
+          case "$source_repo" in
+            https://github.com/livetemplate/livetemplate|\
+            https://github.com/livetemplate/client|\
+            https://github.com/livetemplate/lvt) ;;
+            *)
+              echo "::error::refusing to sync from unrecognised source_repo: $source_repo"
+              exit 1
+              ;;
+          esac
+
+          # Refs become branch names and shell arguments; keep them to the
+          # characters a tag or branch actually needs.
+          if ! printf '%s' "$ref" | grep -Eq '^[A-Za-z0-9._/-]+$'; then
+            echo "::error::refusing to sync from unsafe ref: $ref"
+            exit 1
+          fi
+
+          echo "source_repo=$source_repo" >> "$GITHUB_OUTPUT"
+          echo "ref=$ref" >> "$GITHUB_OUTPUT"
 
       - name: Compute slug for branch / PR title
         id: slug
+        env:
+          SOURCE_REPO: ${{ steps.inputs.outputs.source_repo }}
         run: |
-          slug=$(echo "${{ steps.inputs.outputs.source_repo }}" | sed 's|.*/||')
-          echo "slug=$slug" >> "$GITHUB_OUTPUT"
+          set -euo pipefail
+          echo "slug=${SOURCE_REPO##*/}" >> "$GITHUB_OUTPUT"
 
       - name: Build sync tool
         working-directory: cmd/sync
         run: go build -o /usr/local/bin/sync .
 
       - name: Run sync
+        env:
+          SOURCE_REPO: ${{ steps.inputs.outputs.source_repo }}
+          SOURCE_REF: ${{ steps.inputs.outputs.ref }}
         run: |
+          set -euo pipefail
           sync \
-            --source-repo="${{ steps.inputs.outputs.source_repo }}" \
-            --ref="${{ steps.inputs.outputs.ref }}" \
+            --source-repo="$SOURCE_REPO" \
+            --ref="$SOURCE_REF" \
             --site-root="${GITHUB_WORKSPACE}" \
           | tee /tmp/sync-output.log
 
       - name: Check for changes
         id: changes
+        env:
+          SOURCE_REPO: ${{ steps.inputs.outputs.source_repo }}
+          SOURCE_REF: ${{ steps.inputs.outputs.ref }}
         run: |
           if [ -n "$(git status --porcelain content/)" ]; then
             echo "has_changes=true" >> "$GITHUB_OUTPUT"
           else
             echo "has_changes=false" >> "$GITHUB_OUTPUT"
-            echo "::notice::no content changes from ${{ steps.inputs.outputs.source_repo }}@${{ steps.inputs.outputs.ref }}"
+            echo "::notice::no content changes from $SOURCE_REPO@$SOURCE_REF"
           fi
 
       - name: Open sync PR
@@ -87,7 +132,19 @@ jobs:
           # until the PAT is set up. See CONTRIBUTING.md → Sync workflow.
           token: ${{ secrets.DOCS_BOT_TOKEN || secrets.GITHUB_TOKEN }}
           commit-message: "Sync from ${{ steps.slug.outputs.slug }}@${{ steps.inputs.outputs.ref }}"
-          branch: sync/${{ steps.slug.outputs.slug }}-${{ steps.inputs.outputs.ref }}
+          # One rolling branch per source repo — deliberately NOT suffixed with
+          # the ref. create-pull-request is idempotent per branch: when the
+          # branch already has an open PR it updates that PR in place instead of
+          # opening another. Suffixing with the ref made every source release
+          # mint a fresh branch, so unmerged syncs accumulated (nine were open
+          # at once in July 2026, leaving the site on v0.16.0 reference docs
+          # while core shipped v0.19.0).
+          #
+          # Safe because the page sets are disjoint: no site_url in
+          # source-of-truth.yaml is claimed by two source repos, so
+          # sync/livetemplate, sync/lvt and sync/client never touch the same
+          # file and cannot conflict with each other.
+          branch: sync/${{ steps.slug.outputs.slug }}
           title: "Sync from ${{ steps.slug.outputs.slug }}@${{ steps.inputs.outputs.ref }}"
           body: |
             Automated sync from `${{ steps.inputs.outputs.source_repo }}` at ref `${{ steps.inputs.outputs.ref }}`.
