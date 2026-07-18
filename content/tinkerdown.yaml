@@ -186,6 +186,8 @@ navigation:
         path: "recipes/apps/chat.md"
       - title: "Seat Picker"
         path: "recipes/apps/seat-picker.md"
+      - title: "File Tree"
+        path: "recipes/apps/file-tree.md"
       - title: "Avatar Upload"
         path: "recipes/apps/avatar-upload.md"
       - title: "Upload Modes"
