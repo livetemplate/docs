@@ -2,8 +2,8 @@
 title: "LiveTemplate Configuration Guide"
 source_repo: "https://github.com/livetemplate/livetemplate"
 source_path: "docs/references/CONFIGURATION.md"
-source_ref: "v0.16.0"
-source_commit: "f4f9147c7066382d821c022caa48683d0886ad9a"
+source_ref: "v0.19.1"
+source_commit: "fe690899b1400a0c3886206038c0b958b40554be"
 ---
 
 # LiveTemplate Configuration Guide
@@ -140,9 +140,9 @@ Enable development mode.
 - **Accepted values**: `true`, `false`, `1`, `0`, `yes`, `no`, `on`, `off` (case-insensitive)
 
 **Features when enabled**:
-- Uses local client library instead of CDN
+- Allows **all** WebSocket origins — disables the same-origin/CSRF check, so `WithPermissiveOriginCheck()` is redundant in dev (**never enable in production**)
 - More verbose logging
-- Less strict origin checking
+- Exposes `{{.lvt.DevMode}}` to templates
 
 **Use case**: Local development and debugging.
 
@@ -180,6 +180,18 @@ Base directory for template auto-discovery.
 - **Example**: `LVT_TEMPLATE_BASE_DIR=./templates`
 
 **Use case**: Override automatic template directory detection. Useful in containerized deployments where `runtime.Caller` may resolve to an unexpected path.
+
+#### `LVT_MAX_TEMPLATE_DEPTH`
+
+Maximum nesting depth for recursive `{{template}}` invocations while building the reactive tree.
+
+- **Type**: Integer
+- **Default**: `128`
+- **Example**: `LVT_MAX_TEMPLATE_DEPTH=256`
+- **Validation**: Must be a positive integer; an invalid value is a hard startup error
+- **Option**: `WithMaxTemplateDepth(n)`
+
+**Use case**: Recursive templates (file trees, comment threads, nested navigation) render self-referential data. This cap stops a *cycle in the data* — a node whose children contain itself — from overflowing the stack, surfacing an error instead. Raise it only when your data is legitimately deeper than the default; the cap is a safety net, not a tuning knob. See [Template Support Matrix — Recursion depth](template-support-matrix.md#recursion-depth) for the first-render versus update behavior.
 
 ### Graceful Shutdown
 
@@ -345,7 +357,7 @@ tmpl := livetemplate.New("app",
 | `WithPubSubBroadcaster(broadcaster)` | Redis pub/sub for distributed deployments |
 | `WithComponentTemplates(sets...)` | Register component template sets |
 | `WithIgnoreTemplateDirs(dirs...)` | Skip directories during template discovery |
-| `WithPermissiveOriginCheck()` | Bypass origin check (dev only) |
+| `WithPermissiveOriginCheck()` | Bypass origin check without dev mode (`WithDevMode` already relaxes origins) |
 | `WithProgressiveEnhancement(enabled)` | Non-JS form submission support (default: true) |
 | `WithCookieMaxAge(duration)` | Session cookie max age (default: 365 days) |
 
