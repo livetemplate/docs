@@ -2,8 +2,8 @@
 title: "LiveTemplate Components Library"
 source_repo: "https://github.com/livetemplate/lvt"
 source_path: "components/README.md"
-source_ref: "v0.1.8"
-source_commit: "dc7d1a4ddc7fd3d3ac9f3a1c51c9ea74c4f5ccf3"
+source_ref: "v0.2.0"
+source_commit: "2a88feb18e38e6e1b76b12952a1dc68cce094c63"
 ---
 
 # LiveTemplate Components Library
