@@ -24,6 +24,7 @@ import (
 	"github.com/livetemplate/docs/examples/counter"
 	counterbasic "github.com/livetemplate/docs/examples/counter-basic"
 	draftform "github.com/livetemplate/docs/examples/draft-form"
+	filetree "github.com/livetemplate/docs/examples/file-tree"
 	"github.com/livetemplate/docs/examples/greet"
 	greetloading "github.com/livetemplate/docs/examples/greet-loading"
 	greetloadingserver "github.com/livetemplate/docs/examples/greet-loading-server"
@@ -91,6 +92,16 @@ func main() {
 	// single-session reactivity first and layer cross-tab sync on top via
 	// /apps/counter/ as the "next level."
 	mux.Handle("/apps/counter-basic/", http.StripPrefix("/apps/counter-basic", counterbasic.Handler(
+		livetemplate.WithAllowedOrigins(allowedOrigins),
+	)))
+
+	// file-tree is the recursive-template recipe: a directory tree whose
+	// template invokes itself for each child. This is the shape {{template}}
+	// inlining cannot express — livetemplate leaves the self-referential call
+	// un-inlined and evaluates it at build time (v0.19.0+). Starring a file
+	// several levels down scopes the update to that leaf rather than re-sending
+	// the branch, which is what makes deep trees practical over the wire.
+	mux.Handle("/apps/file-tree/", http.StripPrefix("/apps/file-tree", filetree.Handler(
 		livetemplate.WithAllowedOrigins(allowedOrigins),
 	)))
 

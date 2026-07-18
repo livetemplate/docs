@@ -33,6 +33,7 @@ All examples follow the [progressive complexity](https://github.com/livetemplate
 | `counter/` | 1 | Counter with logging + graceful shutdown | None |
 | `chat/` | 1+2 | Real-time multi-user chat | `lvt-fx:scroll` |
 | `seat-picker/` | 1 | **Cross-user** real-time seat booking (different users, shared topic) | None |
+| `file-tree/` | 1 | **Recursive template** — a directory tree whose template invokes itself; deep edits scope to one leaf | None |
 | `todos/` | 1+2 | Full CRUD with SQLite, auth, modal + toast components | `lvt-on:change`, `lvt-fx:animate`, `lvt-fx:highlight`, `lvt-el:setAttr` |
 | `flash-messages/` | 1 | Flash notification patterns | None |
 | `avatar-upload/` | 1+2 | File upload with progress (Volume mode) | `lvt-upload` |

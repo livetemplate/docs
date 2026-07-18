@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>File Tree</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
+    <link rel="stylesheet" href="{{lvtClientStyleURL}}">
+    <script defer src="{{lvtClientScriptURL}}"></script>
+    <style>
+        .tree, .tree ul { list-style: none; margin: 0; padding-left: 1.25rem; }
+        .tree > li { padding-left: 0; }
+        .tree button { padding: 0 .35rem; margin: 0; border: none; background: none; }
+        .tree .file { display: inline-flex; gap: .35rem; align-items: center; }
+    </style>
+</head>
+<body>
+    <main class="container">
+        <h1>File tree</h1>
+        <p>A directory contains directories, so the template that renders one
+        invokes <em>itself</em> for each child. Expand a folder or star a file
+        and only that node's markup is sent over the wire.</p>
+
+        <ul class="tree">
+            {{template "node" .Root}}
+        </ul>
+    </main>
+</body>
+</html>
+
+{{define "node"}}
+<li data-key="{{.Path}}">
+    {{if .IsDir}}
+        <form method="POST" style="display:inline">
+            <button name="toggle" value="{{.Path}}">{{if .Expanded}}▾{{else}}▸{{end}} {{.Name}}/</button>
+        </form>
+        {{if .Expanded}}
+            <ul>
+                {{range .Children}}{{template "node" .}}{{end}}
+            </ul>
+        {{end}}
+    {{else}}
+        <span class="file">
+            <form method="POST" style="display:inline">
+                <button name="star" value="{{.Path}}">{{if .Starred}}★{{else}}☆{{end}}</button>
+            </form>
+            {{.Name}}
+        </span>
+    {{end}}
+</li>
+{{end}}
