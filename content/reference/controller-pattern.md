@@ -2,8 +2,8 @@
 title: "Controller+State Pattern Reference"
 source_repo: "https://github.com/livetemplate/livetemplate"
 source_path: "docs/references/controller-pattern.md"
-source_ref: "v0.16.0"
-source_commit: "f4f9147c7066382d821c022caa48683d0886ad9a"
+source_ref: "v0.19.1"
+source_commit: "fe690899b1400a0c3886206038c0b958b40554be"
 ---
 
 # Controller+State Pattern Reference
@@ -213,9 +213,99 @@ func (c *TodoController) OnDisconnect() {
 - Cancel background jobs
 - Unsubscribe from data feeds
 
+## State methods in templates
+
+Exported zero-arg methods on your State type are callable from templates just like
+fields — `{{.ActiveCount}}` resolves to `ActiveCount()`'s return value. Methods
+returning `(T, error)` are omitted (with a warning) when the error is non-nil.
+
+Because LiveTemplate converts State to a map before rendering, these methods are
+*precomputed* — but only for methods your templates actually reference. A method that
+appears nowhere in any template is never called, so an expensive or side-effecting
+helper you keep on State but don't render costs nothing.
+
+Two caveats:
+
+- **Conditional references still run.** The scoping is by name, not by reachability:
+  `{{if .Show}}{{.Expensive}}{{end}}` still calls `Expensive()` on every render even
+  when `.Show` is false, because the name appears in the template text. Keep genuinely
+  expensive work in an action method, not a render-time State method.
+- **Prefer methods without side effects.** Precompute timing is an implementation
+  detail; a State method should compute a view of the state, not mutate anything or
+  perform I/O.
+
+### Methods that take arguments (view helpers)
+
+Sometimes you want a method that takes a key and returns a per-item view — e.g. a
+CSS class for a given row, or a formatted label for a given id. **Put it on a struct
+field, not on the top-level State**, and call it through that field:
+
+```go
+type RowViews struct{ selected map[string]bool }
+
+func (v RowViews) Class(id string) string {
+    if v.selected[id] {
+        return "row selected"
+    }
+    return "row"
+}
+
+type BoardState struct {
+    Rows  []Row
+    Views RowViews // a "view helper" sub-struct
+}
+```
+
+```html
+{{range .Rows}}
+  <div class="{{$.Views.Class .ID}}">{{.Label}}</div>
+{{end}}
+```
+
+This works in both the initial HTTP render and WebSocket updates, and replaces the
+common workaround of precomputing a `map[string]string` in an action and looking it
+up by key in the template. It is the same shape as the framework's built-in
+`{{.lvt.AriaInvalid "field"}}`.
+
+**Why the field matters — top-level arg-methods are not supported.** LiveTemplate
+converts State to a map before rendering (to inject the `{{.lvt}}` namespace), and
+Go's `html/template` cannot call an argument-accepting method once its receiver is a
+map key — `{{.Class .ID}}` directly on State fails with *"Class is not a method but
+has arguments"*. A struct **field** is stored in the map as a struct value, so both
+renderers call its methods natively. Zero-arg State methods are unaffected (they are
+precomputed, as above); only *argument-accepting* methods need the field.
+
 ## Context API
 
 For the complete Context API (data extraction, HTTP operations, struct binding), see [API Reference — Context](api-reference.md#context).
+
+### Request context
+
+`*livetemplate.Context` **embeds `context.Context`** — it carries the request/connection
+context (cancellation, deadline, request-scoped values). So `ctx` *is* a `context.Context`:
+pass it directly to any context-aware call (database queries, outbound HTTP, tracing) instead
+of `context.Background()`.
+
+```go
+func (c *TodoController) Add(state TodoState, ctx *livetemplate.Context) (TodoState, error) {
+    // ✅ ctx is a context.Context — propagates cancellation when the request/connection ends
+    if err := c.DB.InsertTodo(ctx, todo); err != nil {
+        return state, err
+    }
+    return state, nil
+}
+```
+
+Reaching for `context.Background()` inside an action instead silently discards that
+cancellation and any deadline or trace attached to the request:
+
+```go
+// ❌ throws away request-scoped cancellation, deadline, and tracing
+if err := c.DB.InsertTodo(context.Background(), todo); err != nil { ... }
+```
+
+Use `context.Background()` only for work that must deliberately **outlive** the request (e.g.
+a fire-and-forget goroutine you start from the action) — not for the action's own calls.
 
 ## Error Handling
 
@@ -266,7 +356,8 @@ type TodoController struct {
 }
 
 func (c *TodoController) Mount(state TodoState, ctx *livetemplate.Context) (TodoState, error) {
-    items, err := c.DB.GetTodos()
+    // Pass ctx (a context.Context) so the query is cancelled if the request ends.
+    items, err := c.DB.GetTodos(ctx)
     if err != nil {
         return state, fmt.Errorf("failed to load todos: %w", err)
     }
@@ -285,7 +376,7 @@ func (c *TodoController) Add(state TodoState, ctx *livetemplate.Context) (TodoSt
         Title: title,
     }
 
-    if err := c.DB.InsertTodo(todo); err != nil {
+    if err := c.DB.InsertTodo(ctx, todo); err != nil {
         return state, fmt.Errorf("database error")
     }
 
@@ -390,6 +481,22 @@ func (c *ChatController) RefreshMessages(state ChatState, ctx *livetemplate.Cont
 }
 ```
 
+**The published action reloads data only — it is not a re-Mount.** Notice `RefreshMessages` re-reads the messages and nothing else. Reach for the tempting shortcut and it bites you:
+
+```go
+// ❌ Don't do this. A fan-out tick is neither a page load nor a connect.
+func (c *ChatController) RefreshMessages(state ChatState, ctx *livetemplate.Context) (ChatState, error) {
+    return c.Mount(state, ctx)
+}
+```
+
+`Mount` does **connect-time** work on top of loading: it `Subscribe`s to topics and runs any `IsInitialMount()`/`IsReconnect()`/`IsNewConnect()`-guarded setup (analytics, background goroutines, presence). A fan-out dispatch is an *action* — its connect-kind is `ConnectKindAction`, so all three of those helpers return `false`. Delegating the action to `Mount` therefore means any connect-kind-guarded setup **silently never runs**, and the unguarded `Subscribe` re-runs on every single broadcast — a cheap no-op for `ctx.SelfTopic()` (ACL-exempt and idempotent, as here), but a real per-tick ACL re-check for a developer topic like `Subscribe("room/" + id)`. Keep the two jobs separate:
+
+- **`Mount`** — subscribe + load. Runs on HTTP GET/POST, WS connect, WS reconnect.
+- **The published action** (`RefreshMessages`) — load only. Runs on every fan-out tick.
+
+The shortcut *appears* to work when `Mount` is a pure data-load with no `Subscribe` or guarded setup (its fields just get re-set to the same values) — which is exactly why it's a trap: it breaks silently the day `Mount` grows a connect-time concern. So split them unconditionally, even while `Mount` is still a plain load; don't wait for the break. The runnable [`live-dashboard`](https://github.com/livetemplate/docs/tree/main/examples/live-dashboard) example follows the split from the start: `Mount` subscribes then snapshots; its `Refresh` action snapshots only.
+
 **Ordering.** `Publish` queues onto a per-action drain. Call it **after** every `ctx.With*()` shallow-copy mutation; publishes queued before a `With*()` are stranded on the pre-copy Context and won't propagate.
 
 **Cap.** A single action can enqueue at most `MaxPublishesPerAction` (declared in `topic_context.go`) `Publish` calls before subsequent calls become hard errors.
@@ -446,6 +553,25 @@ handler := tmpl.Handle(controller, livetemplate.AsState(initialState))
 // Mount to HTTP server
 http.Handle("/", handler)
 ```
+
+### Serving static assets alongside the app
+
+The handler returned by `Handle` is mounted at `/`, where Go's `ServeMux` treats it as a **catch-all**: every request that doesn't match a more specific pattern falls through to it (including the WebSocket upgrade). To serve static files — images, CSS, downloads — next to your app, register them under a **more specific prefix** on the same mux. Longest-prefix-match routes those requests to the file server and everything else to the app:
+
+```go
+handler := tmpl.Handle(controller, livetemplate.AsState(initialState))
+
+// Files under /assets/… are served from ./assets. http.Dir already rejects
+// "../" traversal, so http.FileServer needs no extra guard.
+http.Handle("/assets/", http.StripPrefix("/assets/", http.FileServer(http.Dir("assets"))))
+
+// The app owns everything else.
+http.Handle("/", handler)
+```
+
+The prefix just has to be distinct from your app's own routes — `ServeMux` does the rest. This composition is plain `net/http`; the framework adds nothing here on purpose.
+
+**When a prefix isn't enough.** If your app renders content that references assets at **arbitrary top-level paths** — e.g. user-authored HTML with `<img src="diagram.png">` resolving to `/diagram.png` — those paths can collide with app routes, and `ServeMux` can't disambiguate them by prefix. That case needs a fall-through wrapper: *serve the file if it exists under a safe root, otherwise defer to the app handler.* Keep it a small wrapper in your own `main` rather than reaching for a framework primitive — the security-relevant policy (which extensions to serve, embedded vs. disk, symlink resolution) is app-specific, and `http.Dir` / `http.FileServer` already supply the traversal-safe file access it builds on.
 
 ## Upload Access
 

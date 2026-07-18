@@ -2,8 +2,8 @@
 title: "Go Library API Reference"
 source_repo: "https://github.com/livetemplate/livetemplate"
 source_path: "docs/references/api-reference.md"
-source_ref: "v0.16.0"
-source_commit: "f4f9147c7066382d821c022caa48683d0886ad9a"
+source_ref: "v0.19.1"
+source_commit: "fe690899b1400a0c3886206038c0b958b40554be"
 ---
 
 # Go Library API Reference
@@ -111,7 +111,9 @@ handler := tmpl.Handle(&TodoController{DB: db}, livetemplate.AsState(&TodoState{
 
 | Option | Description |
 |--------|-------------|
-| `WithStore(store SessionStore)` | Override the session store for this handler |
+| `WithEphemeralSweepTTL(ttl time.Duration)` | How long an idle ephemeral HTTP cache entry survives before eviction (default 30m; no effect in persistent mode) |
+
+> The session store is set at construction via `WithSessionStore` (a `New` option), not per-handler.
 
 ---
 
@@ -423,11 +425,11 @@ Options passed to `New()`:
 
 | Option | Signature | Description |
 |--------|-----------|-------------|
-| `WithDevMode` | `(enabled bool)` | Enable development mode |
+| `WithDevMode` | `(enabled bool)` | Enable dev mode: allows all WS origins, verbose logging, `{{.lvt.DevMode}}` |
 | `WithSessionStore` | `(store SessionStore)` | Set session store |
 | `WithAuthenticator` | `(auth Authenticator)` | Set authenticator |
 | `WithAllowedOrigins` | `(origins []string)` | Allowed WebSocket origins |
-| `WithPermissiveOriginCheck` | `()` | Bypass origin check (dev only) |
+| `WithPermissiveOriginCheck` | `()` | Bypass origin check without dev mode (`WithDevMode` already relaxes origins) |
 | `WithMaxConnections` | `(max int64)` | Max WebSocket connections |
 | `WithMaxConnectionsPerGroup` | `(max int64)` | Max connections per group |
 | `WithWebSocketDisabled` | `()` | HTTP-only mode |
@@ -437,6 +439,7 @@ Options passed to `New()`:
 | `WithCookieMaxAge` | `(maxAge time.Duration)` | Session cookie max age |
 | `WithUpgrader` | `(upgrader *websocket.Upgrader)` | Custom WebSocket upgrader |
 | `WithParseFiles` | `(files ...string)` | Explicit template files |
+| `WithParseFS` | `(fsys fs.FS, patterns ...string)` | Templates from an `fs.FS` (e.g. `embed.FS`); precedence over `WithParseFiles` |
 | `WithTemplateBaseDir` | `(dir string)` | Template discovery base dir |
 | `WithIgnoreTemplateDirs` | `(dirs ...string)` | Skip directories during discovery |
 | `WithUpload` | `(name string, config UploadConfig)` | Configure upload field |
