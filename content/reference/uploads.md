@@ -67,11 +67,44 @@ func (c *Controller) OnUpload(part *livetemplate.UploadPart, ctx *livetemplate.C
 ```
 
 Inside `OnUpload`, `ctx` carries the request identity (`ctx.UserID()`,
-`ctx.GroupID()`) **and** the form fields parsed *before* this file part, read via
-`ctx.GetString(...)`. Because parts stream in body order, a field is visible only
-if its input precedes the file input — so order any field you need mid-stream
-(e.g. the record id to route the bytes to the right destination) ahead of the
-file input. Fields after the file part reach only the follow-on action.
+`ctx.GroupID()`) **and** the form fields the upload was told to carry, read via
+`ctx.GetString(...)`.
+
+#### Sending form fields with an upload
+
+A Proxied upload auto-fires the moment a file is selected — there is no submit
+for the user to review — so nothing from the enclosing form travels unless you
+mark it with `lvt-upload-with`:
+
+```html
+<form>
+  <input type="hidden" name="id" value="{{.Record.ID}}" lvt-upload-with />
+  <input type="hidden" name="csrf" value="{{.CSRFToken}}" />
+  <input type="file" lvt-upload="scan" />
+</form>
+```
+
+Here `id` reaches `OnUpload` and `csrf` does not. Mark only what the handler
+needs: unmarked fields — session tokens, co-located credentials, anything else
+that happens to share the form — never reach the upload endpoint. Forgetting to
+mark a field you *do* need surfaces as a missing value in `OnUpload`, which is
+why the default is off.
+
+Three rules apply on top of the marking:
+
+- **Order matters.** Parts stream in body order, so a marked field is readable
+  mid-stream only if its input precedes the file input. Fields after the file
+  part reach only the follow-on action.
+- **Marking is by name, and form-scoped.** A marked field travels with every
+  upload fired from its form, and marking any one member of a radio or checkbox
+  group opts in the whole group. Which values actually send is still the
+  browser's usual successful-control behaviour — an unchecked box sends nothing.
+- **The file wins a name collision.** If a marked field shares the upload
+  field's name, the file part replaces it.
+
+When one selection carries several files, each is POSTed as its own request and
+the marked fields ride along with every one, so each reaches `OnUpload`
+self-describing.
 
 The reader enforces `MaxFileSize` mid-stream, returning `ErrUploadTooLarge` (a
 distinct sentinel, not `io.EOF`) so a truncated stream aborts instead of
