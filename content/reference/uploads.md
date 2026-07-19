@@ -106,6 +106,22 @@ When one selection carries several files, each is POSTed as its own request and
 the marked fields ride along with every one, so each reaches `OnUpload`
 self-describing.
 
+#### Marked fields are multipart-only
+
+Marked fields travel on the **multipart** upload path. A Proxied upload always
+uses it, so an `OnUpload` handler always receives them.
+
+Volume and Direct uploads go over the WebSocket in chunks while the socket is up,
+and that transport carries no form fields — so a marked field will not reach the
+`upload_<name>_complete` action handler on those modes. (They do arrive if the
+socket is down, since the client falls back to a multipart POST.) The client logs
+a console warning when it sends a chunked upload from a form that marks fields, so
+this shows up as a diagnosable message rather than a silently empty value.
+
+If a Volume or Direct handler needs context, read it from the state your controller
+already holds rather than from the upload's form. Tracked as
+[livetemplate#508](https://github.com/livetemplate/livetemplate/issues/508).
+
 The reader enforces `MaxFileSize` mid-stream, returning `ErrUploadTooLarge` (a
 distinct sentinel, not `io.EOF`) so a truncated stream aborts instead of
 committing a partial object. Because nothing stages to disk, a pure-Proxied app
