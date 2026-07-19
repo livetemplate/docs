@@ -30,10 +30,11 @@
   <div class="mode">
     <h2>Proxied</h2>
     <p>Bytes stream through the server to storage with zero local-disk staging. The
-       record id below rides along in the same multipart POST, ahead of the file
-       part, so <code>OnUpload</code> reads it mid-stream and routes the bytes per record.</p>
+       record id below is marked <code>lvt-upload-with</code>, so it rides along in the
+       same multipart POST, ahead of the file part — <code>OnUpload</code> reads it
+       mid-stream and routes the bytes per record. Unmarked fields stay put.</p>
     <form>
-      <label>Record id <input type="text" name="record_id" id="proxied-record-id" placeholder="e.g. invoice-7" /></label>
+      <label>Record id <input type="text" name="record_id" id="proxied-record-id" placeholder="e.g. invoice-7" lvt-upload-with /></label>
       <input type="file" lvt-upload="proxied" accept="image/*" />
     </form>
     {{if .ProxiedRef}}<div class="result" id="proxied-result">stored: {{.ProxiedRef}}</div>
