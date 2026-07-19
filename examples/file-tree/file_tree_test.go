@@ -358,7 +358,12 @@ func TestFileTreeE2E(t *testing.T) {
 	var starred, siblingSurvived bool
 	if err := chromedp.Run(ctx,
 		chromedp.Click(`button[name="star"][value="`+deepFile+`"]`, chromedp.ByQuery),
-		chromedp.WaitVisible(`li[data-key="`+deepFile+`"] button[name="star"]`, chromedp.ByQuery),
+		// Wait for the star itself to change, not for the button to exist. The
+		// button is already on screen before the click — only its text changes —
+		// so a WaitVisible here is satisfied instantly and the assertion below
+		// races the WebSocket round trip. Every other wait in this test targets
+		// an element the update creates, which is why only this step flaked.
+		e2etest.WaitFor(`document.querySelector('li[data-key="`+deepFile+`"] button[name="star"]').textContent.includes('★')`, 10*time.Second),
 		chromedp.Evaluate(`document.querySelector('li[data-key="`+deepFile+`"] button[name="star"]').textContent.includes('★')`, &starred),
 		chromedp.Evaluate(`document.querySelector('li[data-key="/internal/store/sql/migrate.go"]').__lvtMark === 'sibling'`, &siblingSurvived),
 	); err != nil {
