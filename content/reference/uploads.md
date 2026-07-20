@@ -2,8 +2,8 @@
 title: "Upload Reference"
 source_repo: "https://github.com/livetemplate/livetemplate"
 source_path: "docs/references/uploads.md"
-source_ref: "v0.19.1"
-source_commit: "fe690899b1400a0c3886206038c0b958b40554be"
+source_ref: "v0.20.1"
+source_commit: "830946938ebc52e735fcd1adacd4e57a0f4e38a4"
 ---
 
 # Upload Reference
@@ -56,7 +56,8 @@ controller implements `UploadStreamer`:
 
 ```go
 func (c *Controller) OnUpload(part *livetemplate.UploadPart, ctx *livetemplate.Context) error {
-    // "id" must be ordered before the file input in the form (see below).
+    // "id" must be marked lvt-upload-with and ordered before the file input
+    // in the form (see below).
     ref, err := myBackend.Put(ctx, ctx.GetString("id"), part.Filename, part)
     if err != nil {
         return err
@@ -130,7 +131,9 @@ when it falls back to multipart, so a handler can see them intermittently
 depending on socket state — don't depend on that. Direct never delivers them at
 all. For either, read the context from the state your controller already holds
 rather than from the upload's form. Tracked as
-[livetemplate#508](https://github.com/livetemplate/livetemplate/issues/508).
+[#508](https://github.com/livetemplate/livetemplate/issues/508).
+
+Requires `@livetemplate/client` v0.20.0 or newer.
 
 The reader enforces `MaxFileSize` mid-stream, returning `ErrUploadTooLarge` (a
 distinct sentinel, not `io.EOF`) so a truncated stream aborts instead of
