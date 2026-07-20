@@ -106,6 +106,32 @@ When one selection carries several files, each is POSTed as its own request and
 the marked fields ride along with every one, so each reaches `OnUpload`
 self-describing.
 
+#### Marked fields are multipart-only
+
+Marked fields travel on the **multipart** upload path, and only there. Which mode
+you use decides whether that path is taken:
+
+| Mode | Transport | Marked fields arrive? |
+| --- | --- | --- |
+| **Proxied** | always multipart | **Yes**, always — `OnUpload` included |
+| **Volume** | chunked over the WebSocket; multipart when the socket is down | Only on the multipart fallback |
+| **Direct** | presigned PUT to storage, then a metadata-only completion | **No**, on any path |
+
+The chunked WebSocket transport sends bytes and entry ids, and Direct completes
+with a metadata-only message — neither carries form fields, so the server builds
+the `upload_<name>_complete` action's context from an empty map.
+
+The client logs a console warning when an upload leaves by one of those
+transports from a form that marks fields, so this surfaces as a diagnosable
+message rather than a silently empty value.
+
+Note the asymmetry between the two: a Volume upload *does* deliver marked fields
+when it falls back to multipart, so a handler can see them intermittently
+depending on socket state — don't depend on that. Direct never delivers them at
+all. For either, read the context from the state your controller already holds
+rather than from the upload's form. Tracked as
+[livetemplate#508](https://github.com/livetemplate/livetemplate/issues/508).
+
 The reader enforces `MaxFileSize` mid-stream, returning `ErrUploadTooLarge` (a
 distinct sentinel, not `io.EOF`) so a truncated stream aborts instead of
 committing a partial object. Because nothing stages to disk, a pure-Proxied app
