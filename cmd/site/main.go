@@ -26,6 +26,7 @@ import (
 	draftform "github.com/livetemplate/docs/examples/draft-form"
 	filetree "github.com/livetemplate/docs/examples/file-tree"
 	"github.com/livetemplate/docs/examples/greet"
+	greetasync "github.com/livetemplate/docs/examples/greet-async"
 	greetloading "github.com/livetemplate/docs/examples/greet-loading"
 	greetloadingserver "github.com/livetemplate/docs/examples/greet-loading-server"
 	greetnojs "github.com/livetemplate/docs/examples/greet-nojs"
@@ -171,6 +172,13 @@ func main() {
 	// Loading in server state and clears it with a follow-up server push, so it
 	// keeps WebSocket enabled.
 	mux.Handle("/apps/greet-loading-server/", http.StripPrefix("/apps/greet-loading-server", greetloadingserver.Handler(
+		livetemplate.WithAllowedOrigins(allowedOrigins),
+	)))
+	// greet-async is the Async+Pending variant: same server-owned loading
+	// behavior as greet-loading-server but collapsed to one method via
+	// livetemplate.Async and {{.lvt.Pending}}. WebSocket-enabled (Async
+	// dispatches the completion via DispatchChan on the event loop).
+	mux.Handle("/apps/greet-async/", http.StripPrefix("/apps/greet-async", greetasync.Handler(
 		livetemplate.WithAllowedOrigins(allowedOrigins),
 	)))
 
