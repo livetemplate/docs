@@ -2,8 +2,8 @@
 title: "Client Attributes Reference"
 source_repo: "https://github.com/livetemplate/livetemplate"
 source_path: "docs/references/client-attributes.md"
-source_ref: "v0.20.1"
-source_commit: "830946938ebc52e735fcd1adacd4e57a0f4e38a4"
+source_ref: "v0.22.0"
+source_commit: "22a4853506a682583b511e470bdd1e6193f4d5fe"
 ---
 
 # Client Attributes Reference
@@ -402,6 +402,8 @@ These execute client-side with no server round-trip.
     Save
 </button>
 ```
+
+> For choosing between client-owned pending (`lvt-el:*:on:pending`) and server-owned loading (`{{if .Loading}}`), see [Loading States](../guides/progressive-complexity.md#7-loading-states) in the Progressive Complexity Guide.
 
 **Form Reset on Success:**
 
