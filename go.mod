@@ -7,7 +7,7 @@ require (
 	github.com/chromedp/chromedp v0.14.2
 	github.com/go-playground/validator/v10 v10.30.2
 	github.com/gorilla/websocket v1.5.3
-	github.com/livetemplate/livetemplate v0.19.0
+	github.com/livetemplate/livetemplate v0.22.0
 	github.com/livetemplate/lvt v0.2.0
 	github.com/livetemplate/lvt/components v0.1.8
 	gopkg.in/yaml.v3 v3.0.1
