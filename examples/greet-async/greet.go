@@ -21,7 +21,7 @@ func (c *Controller) Greet(s State, ctx *livetemplate.Context) (State, error) {
 			time.Sleep(700 * time.Millisecond)
 			return name, nil
 		},
-		func(s State, name string, err error) (State, error) {
+		func(s State, name string, _ error) (State, error) {
 			s.Name = name
 			return s, nil
 		},

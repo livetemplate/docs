@@ -66,18 +66,6 @@ func recordWSFrames(ctx context.Context) *wsRecorder {
 	return r
 }
 
-func (r *wsRecorder) received() []wsFrame {
-	r.mu.Lock()
-	defer r.mu.Unlock()
-	var out []wsFrame
-	for _, f := range r.frames {
-		if f.Direction == "received" {
-			out = append(out, f)
-		}
-	}
-	return out
-}
-
 func (r *wsRecorder) receivedWithTree() []wsFrame {
 	r.mu.Lock()
 	defer r.mu.Unlock()
@@ -92,31 +80,12 @@ func (r *wsRecorder) receivedWithTree() []wsFrame {
 	return out
 }
 
-func (r *wsRecorder) receivedSince(n int) []wsFrame {
-	all := r.received()
-	if n >= len(all) {
-		return nil
-	}
-	return all[n:]
-}
-
 func (r *wsRecorder) receivedWithTreeSince(n int) []wsFrame {
 	all := r.receivedWithTree()
 	if n >= len(all) {
 		return nil
 	}
 	return all[n:]
-}
-
-func (r *wsRecorder) waitForReceivedCount(want int, timeout time.Duration) error {
-	deadline := time.Now().Add(timeout)
-	for time.Now().Before(deadline) {
-		if len(r.received()) >= want {
-			return nil
-		}
-		time.Sleep(50 * time.Millisecond)
-	}
-	return fmt.Errorf("timeout: got %d received frames, want >= %d", len(r.received()), want)
 }
 
 func (r *wsRecorder) waitForReceivedWithTreeCount(want int, timeout time.Duration) error {
