@@ -86,10 +86,48 @@ func (c *Controller) OnUpload(part *livetemplate.UploadPart, ctx *livetemplate.C
 }
 ```
 
-Because multipart parts stream in body order, a form field is readable
-mid-stream via `ctx.GetString` **only if its input precedes the file input** —
-which is how the example routes each upload to its record's folder. The result
-recorded with `part.SetResult` is later read back from `entry.ExternalRef`.
+Two conditions have to hold for `record_id` to reach that handler, and the
+markup carries both:
+
+```html
+<form>
+    <input type="text" name="record_id" lvt-upload-with />
+    <input type="file" lvt-upload="proxied" accept="image/*" />
+</form>
+```
+
+1. **The field is marked `lvt-upload-with`.** Since `@livetemplate/client`
+   v0.19.1 nothing from the enclosing form travels with an upload unless it is
+   marked. The old behaviour serialized every co-located field — CSRF tokens,
+   hidden secrets — to the upload endpoint, and a Proxied upload auto-fires on
+   file selection, so there was no submit-time moment for the user to notice.
+   The denylist failed open; the opt-in fails closed. An unmarked field now
+   shows up as a missing value in the handler rather than as a silent leak.
+2. **It precedes the file input.** Multipart parts stream in body order, so a
+   field is only readable mid-stream via `ctx.GetString` if its input comes
+   first — which is how the example routes each upload to its record's folder.
+
+The result recorded with `part.SetResult` is later read back from
+`entry.ExternalRef`.
+
+### Marked fields are multipart-only
+
+`lvt-upload-with` fields ride the **multipart** request, so whether they arrive
+depends on the transport the mode uses:
+
+| Mode | Transport | Marked fields arrive? |
+|---|---|---|
+| **Proxied** | Always multipart | **Yes**, always |
+| **Volume** | Chunked over WebSocket; multipart when the socket is down | Only on the multipart fallback |
+| **Direct** | Presigned PUT, then a metadata-only completion | **No**, on any path |
+
+The chunked transport sends bytes and entry ids, and Direct completes with a
+metadata-only message, so in both cases the server builds the completion
+action's context from an empty map. Since client v0.20.0 the client warns in
+the console when it finds marked fields it cannot deliver, naming the fields
+and the remedy — Volume delivers them on its multipart fallback, while Direct
+never does, so for Direct the record id belongs in controller state instead.
+Requires `@livetemplate/client` v0.20.0 or newer.
 
 ## Preview — the file never leaves the device
 

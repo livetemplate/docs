@@ -1,17 +1,17 @@
 ---
 title: "Avatar Upload"
-description: "A profile form that uploads an avatar with live progress, validation, and an instant preview — using the default Volume upload mode."
+description: "A profile form that uploads an avatar with validation and an instant preview — a plain file input riding the ordinary form submit, using the default Volume upload mode."
 source_repo: "https://github.com/livetemplate/docs"
 source_path: "content/recipes/apps/avatar-upload.md"
 ---
 
 # Avatar Upload — a profile form with a file field
 
-A profile form with one extra field: an avatar. The file streams to the
-server over the WebSocket with a live `<progress>` bar, is validated against
-a type and size whitelist, and — once the form is saved — is moved to a
-permanent location and shown back instantly. No page reload, no custom
-JavaScript. The full source is
+A profile form with one extra field: an avatar. The file rides the ordinary
+form submit, is validated against a type and size whitelist, and — once the
+form is saved — is moved to a permanent location and shown back instantly.
+No page reload, no custom JavaScript, and **no upload attribute at all**.
+The full source is
 [`examples/avatar-upload/`](https://github.com/livetemplate/docs/tree/main/examples/avatar-upload).
 
 ## Which upload mode is this?
@@ -22,9 +22,9 @@ owns the file's lifecycle (here: move it into `uploads/`). It is the right
 default when you want the server to see and keep the bytes.
 
 Volume is one of [four upload modes](/reference/uploads#upload-modes); the
-mode is chosen purely by server config on an otherwise identical
-`<input lvt-upload>`. To stream bytes straight to remote storage with zero
-local disk, or to let the browser upload directly to S3/GCS, see the
+mode is chosen purely by server config, leaving the markup unchanged. To
+stream bytes straight to remote storage with zero local disk, or to let the
+browser upload directly to S3/GCS, see the
 [Upload Modes recipe](/recipes/apps/upload-modes) and the
 [Upload reference](/reference/uploads).
 
@@ -84,17 +84,20 @@ func (c *ProfileController) UpdateProfile(state ProfileState, ctx *livetemplate.
 
 ## Template
 
-The file input is a plain `<input type="file">` plus one attribute,
-`lvt-upload="avatar"`. The `{{range .lvt.Uploads "avatar"}}` block renders
-per-file progress as it streams; `.lvt.HasUploadError` / `.lvt.UploadError`
-surface validation failures:
+The file input is a **plain `<input type="file">` with no upload attribute** —
+its `name="avatar"` is what pairs it with the `WithUpload("avatar", …)`
+registration on the server. The file travels inside the form's ordinary
+`multipart/form-data` submit, so this is Tier 1: standard HTML, no `lvt-*`
+needed. The `{{range .lvt.Uploads "avatar"}}` block renders the resulting
+upload entries, and `.lvt.HasUploadError` / `.lvt.UploadError` surface
+validation failures:
 
 ```html
 <form method="POST" name="updateProfile" enctype="multipart/form-data" lvt-form:preserve>
     <input type="text" name="name" value="{{.Name}}" required>
     <input type="email" name="email" value="{{.Email}}" required>
 
-    <input type="file" name="avatar" lvt-upload="avatar"
+    <input type="file" name="avatar"
            accept="image/jpeg,image/png,image/gif">
 
     {{range .lvt.Uploads "avatar"}}
@@ -113,6 +116,14 @@ surface validation failures:
 
 `lvt-form:preserve` keeps the chosen file and typed text across the live
 re-render so a validation error doesn't wipe the form.
+
+> **Want a live progress bar?** On this Tier 1 path the whole file arrives in
+> one multipart POST, so the entry is already complete by the time it renders —
+> the `<progress>` element reports the finished upload rather than animating
+> toward it. For byte-by-byte progress the input needs `lvt-upload="avatar"`,
+> which switches it to the chunked WebSocket transport; see
+> [`upload-autoupload`](https://github.com/livetemplate/docs/tree/main/examples/upload-autoupload)
+> and the [Upload Modes recipe](/recipes/apps/upload-modes).
 
 ## Validation
 

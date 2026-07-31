@@ -23,7 +23,13 @@ livetemplate.WithUpload("preview", livetemplate.UploadConfig{Mode: livetemplate.
 
 - **Proxied** streams the in-flight bytes straight to the controller's
   `OnUpload(part *livetemplate.UploadPart, ctx)` — zero local-disk staging — and
-  records the result with `part.SetResult(ref)`.
+  records the result with `part.SetResult(ref)`. The record id it reads via
+  `ctx.GetString("record_id")` reaches it because that input is marked
+  `lvt-upload-with` **and** ordered before the file input: since client v0.19.1
+  nothing from the enclosing form travels with an upload unless it is marked,
+  and multipart parts are only readable mid-stream in body order. Marked fields
+  ride the multipart request only — Volume delivers them just on its multipart
+  fallback, and Direct never does.
 - **Direct** is self-contained here: the presigner points at this server's own
   `/sink` route so no external cloud is needed.
 - **Preview** uses the `{{.lvt.UploadPreview "preview"}}` helper; the client fills
