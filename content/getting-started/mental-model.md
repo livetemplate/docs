@@ -26,6 +26,7 @@ A user clicking a button runs it. A second tab reacting to that click runs it. A
 | What happened | When the action runs | Who gets the patch |
 |---|---|---|
 | This user clicked | Immediately, on their connection | This connection |
+| This user started slow work | Twice — once now, once when `livetemplate.Async` work completes | This connection |
 | Another tab should follow | After the action, via `ctx.Publish` | Same user's other tabs (or any subscribed connections) |
 | Another user should follow | After the action, via `ctx.Publish` to a shared topic | Everyone subscribed to that topic |
 | The server decided | Whenever the server calls `session.TriggerAction` | The target connection(s) |
@@ -94,7 +95,9 @@ Use plain HTML first:
 - Use normal inputs for form data.
 - Use links for navigation when a full page navigation is correct.
 
-Reach for `lvt-*` attributes when HTML cannot express the interaction cleanly: debounced input, explicit loading states, client-side DOM effects, click-away behavior, or SPA-style navigation that should keep the current LiveTemplate session.
+Reach for `lvt-*` attributes when HTML cannot express the interaction cleanly: debounced input, instant client-side pending feedback, client-side DOM effects, click-away behavior, or SPA-style navigation that should keep the current LiveTemplate session.
+
+Server-owned loading is deliberately *not* on that list. `livetemplate.Async` runs slow work off the event loop and `{{.lvt.Pending}}` renders the spinner, both through ordinary template conditionals — no attributes involved.
 
 ## When to use pub/sub
 

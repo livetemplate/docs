@@ -25,7 +25,7 @@ var spineEmbeds = []string{
 	"/apps/greet/",
 	"/apps/greet-validate/",
 	"/apps/greet-loading/",
-	"/apps/greet-loading-server/",
+	"/apps/greet-async/",
 	"/apps/greet-wall/",
 }
 
@@ -140,15 +140,18 @@ func TestSpineValidation(t *testing.T) {
 // once that client is released and re-vendored into tinkerdown. A landing-side
 // e2e guard belongs here after that ships.
 
-// TestSpineLoadingServerEmbed exercises Step 4's server-owned loading demo on
-// the landing page itself. It must leave the pending state, clear aria-busy
-// and disabled, and render the final greeting after the follow-up action.
-func TestSpineLoadingServerEmbed(t *testing.T) {
+// TestSpineAsyncEmbed exercises Step 4's server-owned loading demo on the
+// landing page itself. Since the Async/Pending swap the panel mounts
+// greet-async, so the pending state comes from {{.lvt.Pending}} and clears on
+// the completion render Async schedules — there is no second action involved.
+// It must leave the pending state, clear aria-busy and disabled, and render the
+// final greeting.
+func TestSpineAsyncEmbed(t *testing.T) {
 	ctx, cancel := newCtx(t)
 	defer cancel()
 
 	const (
-		path = `/apps/greet-loading-server/`
+		path = `/apps/greet-async/`
 		name = "Ada"
 	)
 	sel := `.tinkerdown-embed-lvt[data-embed-path="` + path + `"]`
@@ -167,16 +170,16 @@ func TestSpineLoadingServerEmbed(t *testing.T) {
 		chromedp.Evaluate(`document.querySelector(`+"`"+sel+` button`+"`"+`)?.getAttribute('disabled') || ''`, &disabled),
 		chromedp.Evaluate(`document.querySelector(`+"`"+sel+` button`+"`"+`)?.getAttribute('aria-busy') || ''`, &busy),
 	); err != nil {
-		t.Fatalf("step 4 server loading run: %v", err)
+		t.Fatalf("step 4 async loading run: %v", err)
 	}
 	if !strings.Contains(headline, name) {
 		t.Errorf("headline = %q, want %q after the server-owned loading demo finishes", headline, name)
 	}
 	if disabled != "" {
-		t.Errorf("disabled = %q, want cleared after follow-up action completes", disabled)
+		t.Errorf("disabled = %q, want cleared after the Async completion render", disabled)
 	}
 	if busy != "" {
-		t.Errorf("aria-busy = %q, want cleared after follow-up action completes", busy)
+		t.Errorf("aria-busy = %q, want cleared after the Async completion render", busy)
 	}
 	if button != "Say hi" {
 		t.Errorf("button = %q, want \"Say hi\" after loading clears", button)

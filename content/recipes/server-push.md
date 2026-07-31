@@ -17,6 +17,19 @@ ticks.
 session's live connections, exactly as if the client had invoked it — the same
 diff-and-patch pipeline, just enqueued from the server side.
 
+> **Slow work started by a click does not belong here.** If a user action kicks off
+> the work and its result goes back to the same connection, use
+> [`livetemplate.Async`](/reference/api#async) instead: it runs the work off the
+> event loop, re-enters the loop to apply the result, and cancels itself if the
+> connection drops — one method, no goroutine and no second action to name. Server
+> push is for work the client did not ask for.
+>
+> Everything on this page remains the right tool when the work **starts** outside an
+> action handler (`Mount`, `OnConnect`, a webhook, a timer), **reports progress
+> repeatedly** rather than completing once, or must reach **connections other than
+> the one that started it**. `Async` covers none of those — it is action-handler-only,
+> one-shot, and scoped to the originating connection.
+
 ## Triggering an action from server-owned work
 
 Grab the session with `ctx.Session()` while you're still on a connection, then
