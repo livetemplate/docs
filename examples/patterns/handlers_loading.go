@@ -263,6 +263,12 @@ func progressBarHandler() http.Handler {
 // is gone. Adding OnConnect to "recover" loading state would actively make
 // this worse by trying to restore Status="loading" against a goroutine that
 // the framework has already torn down.
+// Why this is NOT written with livetemplate.Async: Async's apply closure
+// receives only (state, result, err) — no *Context — so it cannot call
+// SetFlash. FetchResult below raises a flash on both branches, which is half
+// of what this pattern demonstrates, so the completion step has to be a real
+// action. Async is the right tool when the second render only changes state;
+// see examples/greet-async.
 type AsyncOpsController struct{}
 
 const asyncFetchDelay = 2 * time.Second

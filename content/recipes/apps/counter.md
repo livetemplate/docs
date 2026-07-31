@@ -152,8 +152,8 @@ func main() {
 <button name="decrement">-1</button>
 <button name="reset">Reset</button>
 
-<!-- Auto-initializing client library -->
-<script src="livetemplate-client.js"></script>
+<!-- Auto-initializing client library, pinned to this server release -->
+<script defer src="{{lvtClientScriptURL}}"></script>
 ```
 
 That's it! No JavaScript code needed. The client library auto-initializes and handles:
@@ -272,7 +272,7 @@ The template follows the same pattern as `testdata/e2e/counter/input.tmpl`:
 - **Port**: Defaults to `:8080`, can be overridden with `PORT` environment variable
 - **Endpoint**: `/live` handles both WebSocket upgrades and HTTP POST requests
 - **Template Path**: Reads from `examples/counter/counter.tmpl`
-- **Client Library**: Serves `client/dist/livetemplate-client.browser.js` via `internal/testing.ServeClientLibrary()` (development only - use CDN in production)
+- **Client Library**: `{{lvtClientScriptURL}}` renders the pinned CDN URL for the client this server release is wire-compatible with. To serve a local build instead, override the function with `tmpl.Funcs` — see [Install](/getting-started/install#self-hosting-offline-air-gapped-or-csp-strict)
 - **Building Client**: Run `cd client && npm run build` to regenerate the browser bundle
 - **State Isolation**: Each WebSocket connection gets its own cloned state
 - **Session Management**: HTTP connections use cookie-based sessions for state persistence

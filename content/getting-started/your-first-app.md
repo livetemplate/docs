@@ -94,8 +94,8 @@ Click and the count changes — no full-page reload, just a DOM patch streamed o
 Remove these two lines from the template:
 
 ```html
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@livetemplate/client@latest/livetemplate.css">
-<script defer src="https://cdn.jsdelivr.net/npm/@livetemplate/client@latest/dist/livetemplate-client.browser.js"></script>
+<link rel="stylesheet" href="{{lvtClientStyleURL}}">
+<script defer src="{{lvtClientScriptURL}}"></script>
 ```
 
 …and the counter still works. Each click does a full form POST and page reload (you'll see a brief flash). The framework re-renders. The browser navigates. **No JavaScript needed.**

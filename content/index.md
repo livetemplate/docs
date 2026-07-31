@@ -32,7 +32,7 @@ layout: landing
     <div class="code"><div class="code-bar"><span class="dots"><i></i><i></i><i></i></span><span class="file">app.tmpl &nbsp;— the entire template, just standard HTML</span></div>
 <pre><span class="tag">&lt;!DOCTYPE html&gt;</span>
 <span class="tag">&lt;html&gt;&lt;head&gt;</span>
-  <span class="tag">&lt;script</span> <span class="attr">defer src</span>=<span class="str">"https://cdn.jsdelivr.net/npm/@livetemplate/client"</span><span class="tag">&gt;&lt;/script&gt;</span>
+  <span class="tag">&lt;script</span> <span class="attr">defer src</span>=<span class="str">"{{lvtClientScriptURL}}"</span><span class="tag">&gt;&lt;/script&gt;</span>
 <span class="tag">&lt;/head&gt;&lt;body&gt;</span>
   <span class="tag">&lt;h1&gt;</span>Hello, {{<span class="fn">.Name</span>}}<span class="tag">&lt;/h1&gt;</span>
   <span class="tag">&lt;form</span> <span class="attr">method</span>=<span class="str">"POST"</span><span class="tag">&gt;</span>
@@ -132,7 +132,7 @@ func main() {
   <div>
     <div class="code" style="max-width:680px;margin:0 auto"><div class="code-bar"><span class="dots"><i></i><i></i><i></i></span><span class="file">app.tmpl · one form, either transport</span></div>
 <pre><span class="com">&lt;!-- the only line that flips the transport: --&gt;</span>
-<span class="tag">&lt;script</span> <span class="attr">defer src</span>=<span class="str">"…@livetemplate/client"</span><span class="tag">&gt;&lt;/script&gt;</span>
+<span class="tag">&lt;script</span> <span class="attr">defer src</span>=<span class="str">"{{lvtClientScriptURL}}"</span><span class="tag">&gt;&lt;/script&gt;</span>
 
 <span class="tag">&lt;form</span> <span class="attr">method</span>=<span class="str">"POST"</span><span class="tag">&gt;</span>   <span class="com">&lt;!-- JS on → fetch + patch · JS off → native POST --&gt;</span>
   <span class="tag">&lt;input</span> <span class="attr">name</span>=<span class="str">"name"</span><span class="tag">&gt;</span>

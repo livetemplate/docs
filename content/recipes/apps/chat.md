@@ -198,11 +198,8 @@ func main() {
         Messages: []Message{},
     }
 
-    tmpl := livetemplate.New("chat", livetemplate.WithDevMode(true))
-    http.Handle("/", tmpl.Handle(state))
-
-    // Serve client library for development
-    http.HandleFunc("/livetemplate-client.js", serveClientLibrary)
+    tmpl := livetemplate.Must(livetemplate.New("chat", livetemplate.WithDevMode(true)))
+    http.Handle("/", tmpl.Handle(controller, livetemplate.AsState(state)))
 
     port := os.Getenv("PORT")
     if port == "" {
@@ -427,12 +424,15 @@ type Room struct {
 
 ## Production Considerations
 
-### 1. Use CDN for Client Library
+### 1. Load the Client Library from the CDN
 
-In `chat.tmpl`:
+In `chat.tmpl` — the framework function renders the pinned CDN URL for the
+client this server release is wire-compatible with, so the two stay in
+lockstep:
 
 ```html
-<script src="https://unpkg.com/@livetemplate/client@latest/dist/livetemplate-client.browser.js"></script>
+<link rel="stylesheet" href="{{lvtClientStyleURL}}">
+<script defer src="{{lvtClientScriptURL}}"></script>
 ```
 
 ### 2. Add Rate Limiting

@@ -86,6 +86,10 @@ After an action changes state, LiveTemplate renders the template on the server a
 
 That means templates remain the source of truth. The browser client is there to preserve focus, submit actions, apply patches, and handle optional client attributes; it is not a second application.
 
+Give repeated items a stable `data-key` and the diff can patch a row in place instead of removing and re-inserting it — see [Delete Row](/recipes/ui-patterns/lists/delete-row) for the shape.
+
+This holds for nested structures too. A `{{define}}` block may invoke **itself**, so file trees, comment threads, and nested navigation render as ordinary templates and stay inside the reactive tree — editing one leaf five levels down sends a patch addressing that leaf, not its whole branch. Depth is capped at 128 by default (`WithMaxTemplateDepth`, or `LVT_MAX_TEMPLATE_DEPTH`) so self-referential *data* surfaces an error instead of overflowing the stack. The [File Tree recipe](/recipes/apps/file-tree) is a worked example.
+
 ## When to use lvt-* attributes
 
 Use plain HTML first:
