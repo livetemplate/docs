@@ -270,6 +270,12 @@ navigation:
         path: "recipes/how-this-site-works.md"
       - title: "Changelog"
         path: "changelog.md"
+      - title: "Changelog: Core Library"
+        path: "changelog/livetemplate.md"
+      - title: "Changelog: Browser Client"
+        path: "changelog/client.md"
+      - title: "Changelog: CLI"
+        path: "changelog/cli.md"
 
 sources:
   # UI pattern recipe catalog index: served by the docs-site recipes binary

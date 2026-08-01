@@ -27,16 +27,21 @@ Focused interaction recipes for forms, lists, loading, feedback, navigation, rea
 
 Larger runnable recipes with more production shape:
 
-- [Todos](/recipes/todos) — persistence, auth, components, and multi-step workflows.
+- [Todos](/recipes/todos/) — persistence, auth, components, and multi-step workflows.
+- [Login](/recipes/login/) — form-based session auth with cookies and an `OnConnect` hook.
 - [Chat](/recipes/apps/chat) — realtime multi-user messaging.
-- [Avatar upload](/recipes/apps/avatar-upload) — file upload flow.
+- [Seat picker](/recipes/apps/seat-picker) — cross-user realtime over a shared topic, all standard HTML.
+- [Shared notepad](/recipes/shared-notepad/) — per-user state with explicit peer refresh.
+- [File tree](/recipes/apps/file-tree) — a self-invoking recursive template; deep edits patch one leaf.
+- [Avatar upload](/recipes/apps/avatar-upload) — file upload on the ordinary form submit.
+- [Upload modes](/recipes/apps/upload-modes) — one input, four destinations, chosen by server config.
 - [Flash messages](/recipes/apps/flash-messages) — page-level notifications.
 
 ## Deep Dives
 
 Narrative recipes for internals, tradeoffs, and operational shape:
 
-- [Counter, deeper](/recipes/counter)
+- [Counter, deeper](/recipes/counter/)
 - [Pubsub](/recipes/pubsub) — `Subscribe`/`Publish` peer fan-out
 - [Server push](/recipes/server-push) — server-initiated `TriggerAction`
 - [Skip validation with `formnovalidate`](/recipes/formnovalidate) — a "Save draft" button that bypasses validation on every tier

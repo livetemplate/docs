@@ -110,6 +110,22 @@ pages:
   # source-of-truth is this repo. The runnable apps themselves live at
   # docs/examples/<slug>/ and are mounted by cmd/site.
 
+  # ---- Changelogs ----
+  # One page per repo. The old single /changelog page concatenated all of
+  # them by hand and had no entry here, so it never auto-synced and froze at
+  # livetemplate v0.8.23 while the library shipped v0.22.0. sync maps one
+  # source file to one page, so the fix is to split rather than concatenate;
+  # /changelog is now an index linking to these three.
+  - site_url: /changelog/livetemplate
+    source_repo: https://github.com/livetemplate/livetemplate
+    source_path: CHANGELOG.md
+  - site_url: /changelog/client
+    source_repo: https://github.com/livetemplate/client
+    source_path: CHANGELOG.md
+  - site_url: /changelog/cli
+    source_repo: https://github.com/livetemplate/lvt
+    source_path: CHANGELOG.md
+
   # ---- Contributing ----
   - site_url: /contributing/livetemplate
     source_repo: https://github.com/livetemplate/livetemplate

@@ -47,7 +47,7 @@ the button's `value`, read on the server with `ctx.GetString("value")`. No
 
 ## Why it's more than the chat recipe
 
-The [chat](/recipes/apps/chat) and [todos](/recipes/todos) recipes are
+The [chat](/recipes/apps/chat) and [todos](/recipes/todos/) recipes are
 real-time too, but they sync **one user's own tabs** via `ctx.SelfTopic()`.
 Seat-picker broadcasts **across different users** on a developer-defined
 topic, `event/main`, admitted past the deny-all default:

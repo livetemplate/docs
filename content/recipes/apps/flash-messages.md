@@ -1,9 +1,8 @@
 ---
 title: "Flash Messages"
 description: "A runnable app demonstrating LiveTemplate flash message lifecycle, display helpers, and form feedback patterns."
-source_repo: "https://github.com/livetemplate/examples"
-source_path: "flash-messages/README.md"
-source_commit: "9572707da46acf23789b0c9c83eb1906ae2cfd51"
+source_repo: "https://github.com/livetemplate/docs"
+source_path: "content/recipes/apps/flash-messages.md"
 ---
 
 # Flash Messages App Recipe

@@ -127,7 +127,7 @@ To prove it, here are two embeds against the same counter, side by side:
 
 Click `+1` in one — watch the other update in real time. They're talking to the same upstream session, and the Mount-side `Subscribe(SelfTopic())` plus action-side `Publish(SelfTopic(), ...)` are what makes them stay synced. (On a narrow viewport the embeds stack vertically — the fan-out still works.)
 
-> **Why does this stay scoped to your browser?** LiveTemplate's default authenticator (`AnonymousAuthenticator`) uses a cookie to assign each browser a stable session group. Tabs from the same browser share that group — that's why the two embeds above sync. Different browsers — or an incognito window in the same browser — get different cookies, different groups, and isolated state. For a public docs site this is the right default: every visitor gets a clean slate, and the peer-fan-out demo still proves the feature within their own browser. See [Recipes/Counter, deeper](/recipes/counter) for the full session-group + scaling story.
+> **Why does this stay scoped to your browser?** LiveTemplate's default authenticator (`AnonymousAuthenticator`) uses a cookie to assign each browser a stable session group. Tabs from the same browser share that group — that's why the two embeds above sync. Different browsers — or an incognito window in the same browser — get different cookies, different groups, and isolated state. For a public docs site this is the right default: every visitor gets a clean slate, and the peer-fan-out demo still proves the feature within their own browser. See [Recipes/Counter, deeper](/recipes/counter/) for the full session-group + scaling story.
 
 ## What you just built
 

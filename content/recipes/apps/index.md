@@ -1,14 +1,13 @@
 ---
 title: "App Recipes"
 description: "Runnable LiveTemplate applications that demonstrate todos, chat, auth, uploads, progressive enhancement, and other app-level patterns."
-source_repo: "https://github.com/livetemplate/examples"
-source_path: "README.md"
-source_commit: "8dd1b75ebabbc8a20786d3b369797a2599a1be42"
+source_repo: "https://github.com/livetemplate/docs"
+source_path: "content/recipes/apps/index.md"
 ---
 
 # App Recipes
 
-Runnable application recipes demonstrating LiveTemplate usage with various features and patterns. These pages are mirrored from the `livetemplate/examples` repository, but they live here as the app-focused part of Recipes.
+Runnable application recipes demonstrating LiveTemplate usage with various features and patterns. Each page documents an app under [`examples/`](https://github.com/livetemplate/docs/tree/main/examples) in this repository — the apps and these pages are edited together, so a change to one is reviewed alongside the other.
 
 ## Showcase: Todo App
 
