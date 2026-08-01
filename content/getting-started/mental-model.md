@@ -26,6 +26,7 @@ A user clicking a button runs it. A second tab reacting to that click runs it. A
 | What happened | When the action runs | Who gets the patch |
 |---|---|---|
 | This user clicked | Immediately, on their connection | This connection |
+| This user started slow work | Twice — once now, once when `livetemplate.Async` work completes | This connection |
 | Another tab should follow | After the action, via `ctx.Publish` | Same user's other tabs (or any subscribed connections) |
 | Another user should follow | After the action, via `ctx.Publish` to a shared topic | Everyone subscribed to that topic |
 | The server decided | Whenever the server calls `session.TriggerAction` | The target connection(s) |
@@ -85,6 +86,10 @@ After an action changes state, LiveTemplate renders the template on the server a
 
 That means templates remain the source of truth. The browser client is there to preserve focus, submit actions, apply patches, and handle optional client attributes; it is not a second application.
 
+Give repeated items a stable `data-key` and the diff can patch a row in place instead of removing and re-inserting it — see [Delete Row](/recipes/ui-patterns/lists/delete-row) for the shape.
+
+This holds for nested structures too. A `{{define}}` block may invoke **itself**, so file trees, comment threads, and nested navigation render as ordinary templates and stay inside the reactive tree — editing one leaf five levels down sends a patch addressing that leaf, not its whole branch. Depth is capped at 128 by default (`WithMaxTemplateDepth`, or `LVT_MAX_TEMPLATE_DEPTH`) so self-referential *data* surfaces an error instead of overflowing the stack. The [File Tree recipe](/recipes/apps/file-tree) is a worked example.
+
 ## When to use lvt-* attributes
 
 Use plain HTML first:
@@ -94,7 +99,9 @@ Use plain HTML first:
 - Use normal inputs for form data.
 - Use links for navigation when a full page navigation is correct.
 
-Reach for `lvt-*` attributes when HTML cannot express the interaction cleanly: debounced input, explicit loading states, client-side DOM effects, click-away behavior, or SPA-style navigation that should keep the current LiveTemplate session.
+Reach for `lvt-*` attributes when HTML cannot express the interaction cleanly: debounced input, instant client-side pending feedback, client-side DOM effects, click-away behavior, or SPA-style navigation that should keep the current LiveTemplate session.
+
+Server-owned loading is deliberately *not* on that list. `livetemplate.Async` runs slow work off the event loop and `{{.lvt.Pending}}` renders the spinner, both through ordinary template conditionals — no attributes involved.
 
 ## When to use pub/sub
 

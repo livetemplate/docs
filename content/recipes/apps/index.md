@@ -36,8 +36,9 @@ All examples follow the [progressive complexity](https://github.com/livetemplate
 | `file-tree/` | 1 | **Recursive template** — a directory tree whose template invokes itself; deep edits scope to one leaf | None |
 | `todos/` | 1+2 | Full CRUD with SQLite, auth, modal + toast components | `lvt-on:change`, `lvt-fx:animate`, `lvt-fx:highlight`, `lvt-el:setAttr` |
 | `flash-messages/` | 1 | Flash notification patterns | None |
-| `avatar-upload/` | 1+2 | File upload with progress (Volume mode) | `lvt-upload` |
-| `upload-modes/` | 1+2 | Four upload modes (Volume/Direct/Proxied/Preview), one input | `lvt-upload` |
+| `avatar-upload/` | 1 | File upload on the ordinary form submit (Volume mode) — a plain file input, no upload attribute | None |
+| `upload-autoupload/` | 1+2 | Upload that fires on file selection, streaming over the WebSocket | `lvt-upload` |
+| `upload-modes/` | 1+2 | Four upload modes (Volume/Direct/Proxied/Preview), one input | `lvt-upload`, `lvt-upload-with` |
 | `progressive-enhancement/` | 1 | Works with/without JS | None |
 | `ws-disabled/` | 1 | HTTP-only mode | None |
 | `live-preview/` | 1 | Change() live updates | None |
@@ -91,11 +92,13 @@ The test script is also used in GitHub Actions. See `.github/workflows/test.yml`
 
 ### Production (CDN)
 
-App recipes are configured to use the CDN version of the client library:
+App recipes load the client through the framework-provided template functions,
+which render the CDN URL for the bundle this server release is wire-compatible
+with — pinned, never `@latest`:
 
 ```html
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@livetemplate/client@latest/livetemplate.css">
-<script defer src="https://cdn.jsdelivr.net/npm/@livetemplate/client@latest/dist/livetemplate-client.browser.js"></script>
+<link rel="stylesheet" href="{{lvtClientStyleURL}}">
+<script defer src="{{lvtClientScriptURL}}"></script>
 ```
 
 ### Development (Local)
@@ -104,9 +107,9 @@ For local development, examples can serve the client library locally using `gith
 
 ## Dependencies
 
-- **Core Library**: `github.com/livetemplate/livetemplate v0.8.15`
-- **LVT Testing** (for examples with E2E tests): `github.com/livetemplate/lvt` (latest)
-- **Client Library**: `@livetemplate/client@latest` (via CDN)
+- **Core Library**: `github.com/livetemplate/livetemplate` — the version pinned in this repo's `go.mod`
+- **LVT Testing** (for examples with E2E tests): `github.com/livetemplate/lvt`
+- **Client Library**: `@livetemplate/client`, pinned to `livetemplate.ClientVersion` and served via CDN by `{{lvtClientScriptURL}}`
 
 ## Related Projects
 

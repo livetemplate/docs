@@ -93,6 +93,6 @@ would recurse forever. LiveTemplate caps invocation depth at **128** by
 default, surfacing an error rather than overflowing the stack. Raise it with
 `WithMaxTemplateDepth(n)` or `LVT_MAX_TEMPLATE_DEPTH` only when your data is
 legitimately deeper — see the
-[template support matrix](/references/template-support-matrix#recursion-depth)
+[template support matrix](/reference/template-support-matrix#recursion-depth)
 for the full behavior, including why a too-low cap can go unnoticed on first
 render.

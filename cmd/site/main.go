@@ -168,16 +168,18 @@ func main() {
 		livetemplate.WithAllowedOrigins(allowedOrigins),
 		livetemplate.WithWebSocketDisabled(),
 	)))
-	// Step 3 also shows the server-owned loading variant. This one keeps
-	// Loading in server state and clears it with a follow-up server push, so it
-	// keeps WebSocket enabled.
+	// The manual two-action variant: Loading lives in server state and is
+	// cleared by a follow-up server push. Since the Async swap it is no longer
+	// on the landing page — it is referenced from the loading-states recipe as
+	// the shape you still need when the spinner must survive a reconnect, which
+	// {{.lvt.Pending}} cannot express. Keeps WebSocket enabled.
 	mux.Handle("/apps/greet-loading-server/", http.StripPrefix("/apps/greet-loading-server", greetloadingserver.Handler(
 		livetemplate.WithAllowedOrigins(allowedOrigins),
 	)))
-	// greet-async is the Async+Pending variant: same server-owned loading
-	// behavior as greet-loading-server but collapsed to one method via
-	// livetemplate.Async and {{.lvt.Pending}}. WebSocket-enabled (Async
-	// dispatches the completion via DispatchChan on the event loop).
+	// Step 4's server-owned loading panel: same behavior as
+	// greet-loading-server but collapsed to one method via livetemplate.Async
+	// and {{.lvt.Pending}}, with no Loading field in state. WebSocket-enabled
+	// (Async dispatches the completion via DispatchChan on the event loop).
 	mux.Handle("/apps/greet-async/", http.StripPrefix("/apps/greet-async", greetasync.Handler(
 		livetemplate.WithAllowedOrigins(allowedOrigins),
 	)))

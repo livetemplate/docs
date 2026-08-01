@@ -40,10 +40,15 @@ import (
 // finding google-chrome-stable on PATH instead.
 const chromiumPath = "/run/current-system/sw/bin/chromium"
 
-// clientJSURL is the CDN bundle the draft.tmpl loads. The test needs it to
-// reach the browser for the WS tier to come alive; if the CDN is unreachable
-// we skip rather than hang on a never-connecting client.
-const clientJSURL = "https://cdn.jsdelivr.net/npm/@livetemplate/client@latest/dist/livetemplate-client.browser.js"
+// clientJSURL is the CDN bundle draft.tmpl loads. The test needs it to reach
+// the browser for the WS tier to come alive; if the CDN is unreachable we skip
+// rather than hang on a never-connecting client.
+//
+// Taken from livetemplate.ClientScriptURL rather than hardcoded, so this probes
+// the exact pinned bundle {{lvtClientScriptURL}} renders. Hardcoding @latest
+// would report the CDN healthy while the pinned version 404s — the one failure
+// mode this check exists to catch.
+var clientJSURL = livetemplate.ClientScriptURL
 
 // syncBuf is a mutex-guarded buffer so slog (which may write from background
 // goroutines) and the test reader don't race.

@@ -5,49 +5,68 @@ A simple example demonstrating LiveTemplate's file upload feature with avatar up
 ## Features
 
 - 📸 **Image Upload**: Upload JPEG, PNG, or GIF avatars
-- 📊 **Real-time Progress**: WebSocket chunked upload with live progress tracking
+- 🧩 **Tier 1 markup**: a plain `<input type="file">` — no `lvt-*` upload attribute
 - ✅ **Validation**: Automatic file type and size validation (5MB limit)
-- 🎨 **Beautiful UI**: Gradient design with smooth animations
 - 🔄 **Live Updates**: Profile updates instantly without page reload
 
 ## What This Example Demonstrates
 
 ### Upload Configuration
+
+Uploads are registered on the template with `WithUpload`, keyed by the name the
+file input carries:
+
 ```go
-func (s *ProfileStore) AllowUploads() map[string]livetemplate.UploadConfig {
-    return map[string]livetemplate.UploadConfig{
-        "avatar": {
-            Accept:      []string{"image/jpeg", "image/png", "image/gif"},
-            MaxFileSize: 5 * 1024 * 1024, // 5MB
-            MaxEntries:  1,                // Single file
-            AutoUpload:  false,            // Manual upload on form submit
-            ChunkSize:   256 * 1024,       // 256KB chunks
-        },
-    }
-}
+lt := livetemplate.Must(livetemplate.New("avatar-upload",
+    livetemplate.WithParseFiles("avatar-upload.tmpl"),
+    livetemplate.WithDevMode(true),
+    livetemplate.WithUpload("avatar", livetemplate.UploadConfig{
+        Accept:      []string{"image/jpeg", "image/png", "image/gif"},
+        MaxFileSize: 5 * 1024 * 1024, // 5MB
+        MaxEntries:  1,               // Single file
+    }),
+))
 ```
+
+Mode is omitted, so this is **Volume** — the default. The bytes are staged on
+the server and the app owns the file from there.
 
 ### Upload Processing
-```go
-func (s *ProfileStore) ConsumeUpload(ctx context.Context, name string, entries []*livetemplate.UploadEntry) error {
-    for _, entry := range entries {
-        // Move from temp to permanent location
-        permanentPath := filepath.Join("uploads", fmt.Sprintf("avatar-%s%s", entry.ID, ext))
-        os.Rename(entry.TempPath, permanentPath)
 
-        // Update store with new avatar
-        s.AvatarPath = permanentPath
-        s.AvatarURL = "/" + permanentPath
+The file arrives with the ordinary form submit, so the same action that saves
+the profile also consumes the upload:
+
+```go
+func (c *ProfileController) UpdateProfile(state ProfileState, ctx *livetemplate.Context) (ProfileState, error) {
+    state.Name = ctx.GetString("name")
+    state.Email = ctx.GetString("email")
+
+    if ctx.HasUploads("avatar") {
+        var err error
+        state, err = c.processAvatarUpload(state, ctx) // moves entry.TempPath into uploads/
+        if err != nil {
+            return state, err
+        }
     }
-    return nil
+
+    ctx.SetFlash("success", "Profile updated")
+    return state, nil
 }
 ```
 
-### Template Helpers
-```html
-<input type="file" lvt-upload="avatar" accept="image/jpeg,image/png,image/gif">
+`processAvatarUpload` reads `ctx.GetCompletedUploads("avatar")` and renames each
+`entry.TempPath` to a permanent path under `uploads/`.
 
-<!-- Show upload progress -->
+### Template Helpers
+
+The file input needs **no upload attribute** — `name="avatar"` is what pairs it
+with the `WithUpload("avatar", …)` registration, and the file rides the form's
+`multipart/form-data` submit:
+
+```html
+<input type="file" id="avatar" name="avatar" accept="image/jpeg,image/png,image/gif">
+
+<!-- Render the resulting upload entries -->
 {{range .lvt.Uploads "avatar"}}
     <div class="upload-entry">
         <span>{{.ClientName}} - {{.Progress}}%</span>
@@ -57,12 +76,18 @@ func (s *ProfileStore) ConsumeUpload(ctx context.Context, name string, entries [
 {{end}}
 ```
 
+Because the whole file arrives in one multipart POST, the entry is already
+complete when it first renders — the `<progress>` reports a finished upload
+rather than animating toward one. Add `lvt-upload="avatar"` to switch to the
+chunked WebSocket transport if you want byte-by-byte progress; see
+`examples/upload-autoupload` and `examples/upload-modes`.
+
 ## Running the Example
 
 ### 1. Install Dependencies
 
 ```bash
-cd /Users/adnaan/code/livetemplate/examples/avatar-upload
+cd examples/avatar-upload
 go mod download
 ```
 
@@ -140,7 +165,9 @@ Want to extend this example?
 
 ## Learn More
 
-- [Upload Documentation](../../livetemplate/.worktrees/feature-uploads/docs/uploads.md)
+- [Upload Reference](https://livetemplate.fly.dev/reference/uploads)
+- [Avatar Upload recipe](https://livetemplate.fly.dev/recipes/apps/avatar-upload)
+- [Upload Modes recipe](https://livetemplate.fly.dev/recipes/apps/upload-modes) — Volume, Direct, Proxied, Preview
 - [LiveTemplate Documentation](https://github.com/livetemplate/livetemplate)
 - [Other Examples](../)
 
@@ -163,4 +190,4 @@ Want to extend this example?
 
 ---
 
-Built with ❤️ using [LiveTemplate v0.3.0](https://github.com/livetemplate/livetemplate)
+Built with ❤️ using [LiveTemplate](https://github.com/livetemplate/livetemplate)

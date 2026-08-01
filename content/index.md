@@ -32,7 +32,7 @@ layout: landing
     <div class="code"><div class="code-bar"><span class="dots"><i></i><i></i><i></i></span><span class="file">app.tmpl &nbsp;— the entire template, just standard HTML</span></div>
 <pre><span class="tag">&lt;!DOCTYPE html&gt;</span>
 <span class="tag">&lt;html&gt;&lt;head&gt;</span>
-  <span class="tag">&lt;script</span> <span class="attr">defer src</span>=<span class="str">"https://cdn.jsdelivr.net/npm/@livetemplate/client"</span><span class="tag">&gt;&lt;/script&gt;</span>
+  <span class="tag">&lt;script</span> <span class="attr">defer src</span>=<span class="str">"{{lvtClientScriptURL}}"</span><span class="tag">&gt;&lt;/script&gt;</span>
 <span class="tag">&lt;/head&gt;&lt;body&gt;</span>
   <span class="tag">&lt;h1&gt;</span>Hello, {{<span class="fn">.Name</span>}}<span class="tag">&lt;/h1&gt;</span>
   <span class="tag">&lt;form</span> <span class="attr">method</span>=<span class="str">"POST"</span><span class="tag">&gt;</span>
@@ -132,7 +132,7 @@ func main() {
   <div>
     <div class="code" style="max-width:680px;margin:0 auto"><div class="code-bar"><span class="dots"><i></i><i></i><i></i></span><span class="file">app.tmpl · one form, either transport</span></div>
 <pre><span class="com">&lt;!-- the only line that flips the transport: --&gt;</span>
-<span class="tag">&lt;script</span> <span class="attr">defer src</span>=<span class="str">"…@livetemplate/client"</span><span class="tag">&gt;&lt;/script&gt;</span>
+<span class="tag">&lt;script</span> <span class="attr">defer src</span>=<span class="str">"{{lvtClientScriptURL}}"</span><span class="tag">&gt;&lt;/script&gt;</span>
 
 <span class="tag">&lt;form</span> <span class="attr">method</span>=<span class="str">"POST"</span><span class="tag">&gt;</span>   <span class="com">&lt;!-- JS on → fetch + patch · JS off → native POST --&gt;</span>
   <span class="tag">&lt;input</span> <span class="attr">name</span>=<span class="str">"name"</span><span class="tag">&gt;</span>
@@ -185,47 +185,40 @@ func main() {
 <section class="alt"><div class="wrap">
   <div class="sec-tag">Step 4 · Loading state</div>
   <h2>Two ways to show pending state, in HTTP and WebSocket mode.</h2>
-  <p class="lead">LiveTemplate works in both <b>plain HTTP</b> and <b>live-session WebSocket</b> mode. You can model loading in <b>server state</b> with ordinary template conditionals, or use a small <b>button-level escape hatch</b> when the server code should stay unchanged. The server-state version below needs a <b>live session connection</b> for its follow-up push; the attribute version works as a single request/response.</p>
+  <p class="lead">LiveTemplate works in both <b>plain HTTP</b> and <b>live-session WebSocket</b> mode. You can run slow work on the server and render its pending state with <b>ordinary template conditionals</b>, or use a small <b>button-level escape hatch</b> when the server code should stay unchanged. The server-side version below needs a <b>live session connection</b> for its completion render; the attribute version works as a single request/response.</p>
   <div class="two loading-cols" style="margin-top:28px">
     <div class="loading-col">
       <div class="live-card">
         <div class="live-bar"><span class="live-badge"><span class="pulse"></span> live</span><span class="live-meta">greet loading server owned</span></div>
         <div class="live-body">
 
-```embed-lvt path="/apps/greet-loading-server/" upstream="http://localhost:9091" height="200px"
+```embed-lvt path="/apps/greet-async/" upstream="http://localhost:9091" height="200px"
 ```
 
 </div>
       </div>
-      <div class="code delta"><div class="code-bar"><span class="dots"><i></i><i></i><i></i></span><span class="file">app.tmpl · server-owned loading, only template variables</span></div>
-<pre><span class="tag">&lt;button</span> <span class="attr">class</span>=<span class="str">"greet-btn"</span> {{<span class="kw">if</span> <span class="fn">.Loading</span>}}<span class="attr">type</span>=<span class="str">"button"</span> <span class="attr">aria-busy</span>=<span class="str">"true"</span> <span class="attr">disabled</span>{{<span class="kw">else</span>}}<span class="attr">name</span>=<span class="str">"greet"</span>{{<span class="kw">end</span>}}<span class="tag">&gt;</span>Say hi<span class="tag">&lt;/button&gt;</span></pre></div>
-      <div class="code delta"><div class="code-bar"><span class="dots"><i></i><i></i><i></i></span><span class="file">app.go · set Loading, then finish via server push</span></div>
+      <div class="code delta"><div class="code-bar"><span class="dots"><i></i><i></i><i></i></span><span class="file">app.tmpl · server-owned pending, only template variables</span></div>
+<pre><span class="tag">&lt;button</span> <span class="attr">class</span>=<span class="str">"greet-btn"</span> {{<span class="kw">if</span> <span class="fn">.lvt.Pending</span>}}<span class="attr">type</span>=<span class="str">"button"</span> <span class="attr">aria-busy</span>=<span class="str">"true"</span> <span class="attr">disabled</span>{{<span class="kw">else</span>}}<span class="attr">name</span>=<span class="str">"greet"</span>{{<span class="kw">end</span>}}<span class="tag">&gt;</span>Say hi<span class="tag">&lt;/button&gt;</span></pre></div>
+      <div class="code delta"><div class="code-bar"><span class="dots"><i></i><i></i><i></i></span><span class="file">app.go · one method, no Loading field</span></div>
 <pre class="language-go"><code class="language-go">func (a *App) Greet(s State, ctx *lvt.Context) (State, error) {
-    if s.Loading {
-        return s, nil
-    }
-    session := ctx.Session()
-    if session == nil {
-        return s, nil
-    }
     name := strings.TrimSpace(ctx.GetString("name"))
-    s.Loading = true
-    go func() {
-        time.Sleep(700 * time.Millisecond)
-        _ = session.TriggerAction("finishGreet", map[string]any{"name": name})
-    }()
-    return s, nil
-}
-func (a *App) FinishGreet(s State, ctx *lvt.Context) (State, error) {
-    s.Name = ctx.GetString("name")
-    s.Loading = false
+    lvt.Async(ctx,
+        func(context.Context) (string, error) {
+            time.Sleep(700 * time.Millisecond)
+            return name, nil
+        },
+        func(s State, name string, _ error) (State, error) {
+            s.Name = name
+            return s, nil
+        },
+    )
     return s, nil
 }</code></pre></div>
-      <p class="demo-cap loading-cap" style="margin-top:18px">This version keeps loading entirely in <b>server state</b>, but it needs a second action over the live session to clear the spinner. It is a good fit when loading is part of the app's actual state machine.</p>
-      <div class="wire"><span class="wlabel">on the wire · server-state version</span>
+      <p class="demo-cap loading-cap" style="margin-top:18px"><code>lvt.Async</code> runs the slow work off the event loop and re-enters the loop to apply the result, so there is <b>no second action to wire up</b> and <b>no <code>Loading</code> field</b> in state — <code>{{.lvt.Pending}}</code> is true only on the render that started the work. Reach for an explicit state field when the spinner has to survive a reconnect.</p>
+      <div class="wire"><span class="wlabel">on the wire · server-side version</span>
         <span class="wf up">▲ {"action":"greet","data":{"name":"Ada"}}</span>
         <span class="wf dn">▼ {"tree":{"1":{"aria-busy":"true","disabled":true,"type":"button"}}}</span>
-        <span class="wf dn">▼ {"action":"finishGreet","data":{"name":"Ada"}} → {"tree":{"0":"Ada","1":{"name":"greet"}}}</span>
+        <span class="wf dn">▼ {"tree":{"0":"Ada","1":{"name":"greet"}}}</span>
       </div>
     </div>
     <div class="loading-col">

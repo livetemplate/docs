@@ -17,6 +17,16 @@ error — are all just values the template branches on.
 ```embed-lvt path="/apps/ui-patterns/loading/async-operations" upstream="http://localhost:9091" height="360px"
 ```
 
+> **Start with `livetemplate.Async` instead.** For most async work the two-action
+> shape below is more than you need: [`Async`](/reference/api#async) runs the work
+> off the event loop and applies the result in one method, with the goroutine,
+> cancellation and completion render handled for you. Its `apply` closure receives
+> only `(state, result, err)` — no `*Context` — so it cannot raise a flash on the
+> completion render, which is exactly why *this* pattern keeps two actions: it
+> flashes on both the success and error branch. Reach for the shape below when the
+> second render needs `ctx` (flash, cookie, navigation), when the work starts
+> outside an action handler, or when it reports progress more than once.
+
 ## Template
 
 The button disables itself and shows "Fetching..." while `Status` is `loading`. Success
