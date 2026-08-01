@@ -242,11 +242,11 @@ Patch versions are independent and can be incremented for client-specific fixes.
 
 ## Contributing
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for development guidelines.
+See [CONTRIBUTING.md](/contributing/client) for development guidelines.
 
 ## License
 
-MIT License - see [LICENSE](LICENSE) for details.
+MIT License - see [LICENSE](https://github.com/livetemplate/client/blob/v0.20.0/LICENSE) for details.
 
 ## Support
 

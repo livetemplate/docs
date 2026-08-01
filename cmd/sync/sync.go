@@ -384,11 +384,37 @@ func newLinkRewriter(cfg *SourceOfTruth) *linkRewriter {
 	return &linkRewriter{urlToSiteURL: m, repoPathToSiteURL: byPath}
 }
 
-// relativeLinkRE matches a markdown link whose target is upstream-relative
-// ("./x.md", "../references/y.md"). Only the `](...)` form is matched:
-// upstream prose also contains bare relative paths that are not links, and
-// rewriting those would corrupt them.
-var relativeLinkRE = regexp.MustCompile(`\]\((\.[^)\s]*)\)`)
+// markdownLinkRE matches the target of a `](...)` markdown link. Only that
+// form is matched: upstream prose also contains bare relative paths that are
+// not links, and rewriting those would corrupt them. isRelativeRef then
+// decides which targets are upstream-relative.
+var markdownLinkRE = regexp.MustCompile(`\]\(([^)\s]+)\)`)
+
+// isRelativeRef reports whether a markdown link target is a path relative to
+// the page's own location upstream — the kind that breaks once mirrored.
+//
+// Both spellings occur and both break: the dot-prefixed form
+// ("../references/api-reference.md") and the bare sibling form
+// ("controller-pattern.md", which upstream uses for same-directory links).
+// The bare form is the more common of the two and resolves on the docs site
+// to a URL ending in .md, which tinkerdown does not serve.
+func isRelativeRef(target string) bool {
+	switch {
+	case target == "":
+		return false
+	case strings.HasPrefix(target, "#"): // in-page anchor
+		return false
+	case strings.HasPrefix(target, "/"): // site-absolute, incl. protocol-relative
+		return false
+	}
+	// A scheme (http:, https:, mailto:, tel:) means it is not relative. Look
+	// for ':' before the first '/' so that "docs/a:b.md" is not mistaken for
+	// one.
+	if i := strings.IndexAny(target, ":/"); i >= 0 && target[i] == ':' {
+		return false
+	}
+	return true
+}
 
 // RewriteRelative resolves upstream-relative markdown links against the
 // mirrored page's own location in its source repo.
@@ -421,8 +447,11 @@ func (r *linkRewriter) RewriteRelative(body string, page PageEntry, ref string) 
 		if inFence {
 			continue
 		}
-		lines[i] = relativeLinkRE.ReplaceAllStringFunc(ln, func(m string) string {
-			target := relativeLinkRE.FindStringSubmatch(m)[1]
+		lines[i] = markdownLinkRE.ReplaceAllStringFunc(ln, func(m string) string {
+			target := markdownLinkRE.FindStringSubmatch(m)[1]
+			if !isRelativeRef(target) {
+				return m
+			}
 			return "](" + r.resolveRelative(target, repo, srcDir, ref) + ")"
 		})
 	}

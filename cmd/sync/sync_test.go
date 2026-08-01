@@ -485,3 +485,49 @@ func TestRewriteRelative_CrossRepoPathDoesNotMatch(t *testing.T) {
 		t.Errorf("expected GitHub fallback for the other repo's path: %q", got)
 	}
 }
+
+func TestRewriteRelative_BareSiblingLink(t *testing.T) {
+	// Upstream links same-directory siblings without any ./ prefix. These are
+	// the majority of relative links and resolve on the site to a URL ending
+	// in .md, which tinkerdown does not serve.
+	r := newLinkRewriter(relCfg())
+	page := PageEntry{SiteURL: "/reference/api", SourceRepo: "https://github.com/livetemplate/livetemplate", SourcePath: "docs/references/api-reference.md"}
+
+	body := "See [the API](api-reference.md) and [scaling](../guides/SCALING.md)."
+	got := r.RewriteRelative(body, page, "v0.22.0")
+
+	if !strings.Contains(got, "[the API](/reference/api)") {
+		t.Errorf("bare sibling not rewritten: %q", got)
+	}
+	if !strings.Contains(got, "[scaling](/guides/scaling)") {
+		t.Errorf("dot-prefixed link regressed: %q", got)
+	}
+}
+
+func TestRewriteRelative_LeavesNonRelativeTargetsAlone(t *testing.T) {
+	r := newLinkRewriter(relCfg())
+	page := PageEntry{SiteURL: "/reference/api", SourceRepo: "https://github.com/livetemplate/livetemplate", SourcePath: "docs/references/api-reference.md"}
+
+	body := "[ext](https://example.com/x.md) [abs](/reference/session) [anchor](#async) " +
+		"[mail](mailto:a@b.co) [proto](//cdn.example.com/x.js) [go](https://pkg.go.dev/log/slog)"
+	got := r.RewriteRelative(body, page, "v0.22.0")
+
+	if got != body {
+		t.Errorf("non-relative targets must be untouched:\nbefore: %q\nafter:  %q", body, got)
+	}
+}
+
+func TestRewriteRelative_BareUnmappedBecomesGitHubURL(t *testing.T) {
+	// docs/guides/OBSERVABILITY.md links [ARCHITECTURE.md](ARCHITECTURE.md),
+	// a sibling that does not exist upstream either — the reader should get a
+	// GitHub URL rather than a site path that 404s.
+	r := newLinkRewriter(relCfg())
+	page := PageEntry{SiteURL: "/guides/observability", SourceRepo: "https://github.com/livetemplate/livetemplate", SourcePath: "docs/guides/OBSERVABILITY.md"}
+
+	body := "[arch](ARCHITECTURE.md)"
+	got := r.RewriteRelative(body, page, "v0.22.0")
+
+	if !strings.Contains(got, "blob/v0.22.0/docs/guides/ARCHITECTURE.md") {
+		t.Errorf("bare unmapped sibling not rewritten to GitHub: %q", got)
+	}
+}

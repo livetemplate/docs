@@ -177,7 +177,7 @@ Tier 2 is only for behaviors standard HTML cannot express. For example, debounce
     placeholder="Search...">
 ```
 
-See the [Progressive Complexity Guide](progressive-complexity.md) for the complete walkthrough.
+See the [Progressive Complexity Guide](/guides/progressive-complexity) for the complete walkthrough.
 
 ---
 
@@ -203,7 +203,7 @@ See the [Progressive Complexity Guide](progressive-complexity.md) for the comple
 
 ## See Also
 
-- [Progressive Complexity Guide](progressive-complexity.md) — Full walkthrough from standard HTML to `lvt-*` attributes
+- [Progressive Complexity Guide](/guides/progressive-complexity) — Full walkthrough from standard HTML to `lvt-*` attributes
 - [Progressive Complexity Reference](/reference/progressive-complexity) — Quick-lookup table
 - [Controller+State Pattern](/reference/controller-pattern) — Core architecture pattern
 - [Client Attributes](/reference/client-attributes) — Complete `lvt-*` reference

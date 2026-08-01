@@ -320,7 +320,7 @@ headline feature as unsupported.
 
 There is no dual-emit period. Operators must update dashboards, recording rules, and alert
 configurations in lockstep with the deploy. See the
-[Metric Migration section in OBSERVABILITY.md](docs/guides/OBSERVABILITY.md#metric-migration-v010x--v0110)
+[Metric Migration section in OBSERVABILITY.md](/guides/observability#metric-migration-v010x--v0110)
 for the sed one-liners.
 
 ### Terminology cleanup

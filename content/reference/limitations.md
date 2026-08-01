@@ -27,7 +27,7 @@ These Go template constructs trigger a fallback to HTML segmentation, which prod
 | `{{block}}` with dynamic template names | Use `{{template "name" .}}` with static names | By design (fallback) |
 | `iter.Seq` ranges | Collect iterator to slice before passing to template | Blocked on Go templates |
 
-See [HTML Fallback Coverage](https://github.com/livetemplate/livetemplate/blob/v0.22.0/docs/roadmap/html-fallback-coverage.md) for test coverage details and [Template Support Matrix](template-support-matrix.md) for full Go template feature support.
+See [HTML Fallback Coverage](https://github.com/livetemplate/livetemplate/blob/v0.22.0/docs/roadmap/html-fallback-coverage.md) for test coverage details and [Template Support Matrix](/reference/template-support-matrix) for full Go template feature support.
 
 ---
 
@@ -44,7 +44,7 @@ These features require the JavaScript client (fetch or WebSocket transport). Sta
 | Server push / broadcast | N/A — poll or page reload | Requires WebSocket connection |
 | SPA navigation (link interception) | Standard full-page navigation | Requires JS to intercept clicks and use `fetch()` |
 
-See the [Transport Compatibility table](progressive-complexity-reference.md#transport-compatibility) for a complete feature-by-transport breakdown.
+See the [Transport Compatibility table](/reference/progressive-complexity#transport-compatibility) for a complete feature-by-transport breakdown.
 
 ---
 
@@ -54,9 +54,9 @@ See the [Transport Compatibility table](progressive-complexity-reference.md#tran
 |-----------|--------|-----------|
 | JSON serialization overhead | State is cloned via JSON marshal/unmarshal per session | Keep state structs small; avoid large nested structures |
 | State must be JSON-serializable | Functions, channels, and unexported fields cannot be in state | Put non-serializable dependencies in the controller |
-| Dependency detection is heuristic | `AsState[T]()` only catches 9 known dependency patterns (stdlib + `*redis.Client`) | Add `AssertPureState[T](t)` to test files for stricter validation |
+| Dependency detection is heuristic | `AsState[T]()` only catches 9 known dependency patterns (stdlib + `*redis.Client`) | Add `AssertPureState[T](https://github.com/livetemplate/livetemplate/blob/v0.22.0/docs/references/t)` to test files for stricter validation |
 
-See [Session Reference — State Safety](session.md#state-safety) for the full enforcement architecture.
+See [Session Reference — State Safety](/reference/session#state-safety) for the full enforcement architecture.
 
 ---
 
@@ -67,7 +67,7 @@ See [Session Reference — State Safety](session.md#state-safety) for the full e
 | Tabs don't update each other by default | Each connection owns its state independently (peer fan-out is opt-in) | Subscribe to `ctx.SelfTopic()` in `Mount`, then `ctx.Publish(ctx.SelfTopic(), "Action", data)` from the action that mutated shared state |
 | Concurrent HTTP requests serialized | Per-group mutex in HTTP mode processes one action at a time | By design — prevents data races on shared state |
 
-See [Session Reference](session.md) for session stores and connection management.
+See [Session Reference](/reference/session) for session stores and connection management.
 
 ---
 
@@ -109,7 +109,7 @@ See [Known Bottlenecks](https://github.com/livetemplate/livetemplate/blob/v0.22.
 ## See Also
 
 - [Roadmap](https://github.com/livetemplate/livetemplate/blob/v0.22.0/ROADMAP.md) — Planned improvements and feature timeline
-- [Session Reference — State Safety](session.md#state-safety) — Enforcement layers for state purity and session isolation
-- [Template Support Matrix](template-support-matrix.md) — Supported Go template features
+- [Session Reference — State Safety](/reference/session#state-safety) — Enforcement layers for state purity and session isolation
+- [Template Support Matrix](/reference/template-support-matrix) — Supported Go template features
 - [HTML Fallback Coverage](https://github.com/livetemplate/livetemplate/blob/v0.22.0/docs/roadmap/html-fallback-coverage.md) — Fallback trigger test coverage
 - [Known Bottlenecks](https://github.com/livetemplate/livetemplate/blob/v0.22.0/docs/performance/known-bottlenecks.md) — Performance profiling and optimization

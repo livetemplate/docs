@@ -277,7 +277,7 @@ precomputed, as above); only *argument-accepting* methods need the field.
 
 ## Context API
 
-For the complete Context API (data extraction, HTTP operations, struct binding), see [API Reference — Context](api-reference.md#context).
+For the complete Context API (data extraction, HTTP operations, struct binding), see [API Reference — Context](/reference/api#context).
 
 ### Request context
 
@@ -309,7 +309,7 @@ a fire-and-forget goroutine you start from the action) — not for the action's 
 
 ## Error Handling
 
-For validation errors, field errors, and template error display, see [Error Handling Reference](error-handling.md).
+For validation errors, field errors, and template error display, see [Error Handling Reference](/reference/error-handling).
 
 ## Common Patterns
 
@@ -524,7 +524,7 @@ func (c *RoomController) Mount(state RoomState, ctx *livetemplate.Context) (Room
 }
 ```
 
-**(2) Propagate the error to surface `lvt:error`.** When a controller propagates a `*TopicForbiddenError` from `Mount` on the WS-connect path, the server emits a `{"type":"error","code":"topic_forbidden","topic":<denied>}` envelope, logs a structured warning, and **keeps the connection open** — adopting the controller's returned state and continuing the normal mount lifecycle (`persistState`, `OnConnect`, initial-tree send). The client dispatches a `lvt:error` `CustomEvent` on the `[data-lvt-id]` wrapper element. See the [Client Error Envelope section in the PubSub reference](pubsub.md#client-error-envelope-lvterror) for the wire-level contract.
+**(2) Propagate the error to surface `lvt:error`.** When a controller propagates a `*TopicForbiddenError` from `Mount` on the WS-connect path, the server emits a `{"type":"error","code":"topic_forbidden","topic":<denied>}` envelope, logs a structured warning, and **keeps the connection open** — adopting the controller's returned state and continuing the normal mount lifecycle (`persistState`, `OnConnect`, initial-tree send). The client dispatches a `lvt:error` `CustomEvent` on the `[data-lvt-id]` wrapper element. See the [Client Error Envelope section in the PubSub reference](/reference/pubsub#client-error-envelope-lvterror) for the wire-level contract.
 
 **(3) Don't swallow the error if you want it surfaced.** A controller that swallows the denied Subscribe — `_ = ctx.Subscribe("denied"); return s, nil` — emits **no envelope**. The Phase 4 contract is on the propagated-error scenario only; if you want the client to see `lvt:error`, return the error. Returning `nil` is a quiet allow-and-continue.
 
@@ -577,7 +577,7 @@ The prefix just has to be distinct from your app's own routes — `ServeMux` doe
 
 ## Upload Access
 
-For file upload configuration and handling, see [Upload Reference](uploads.md).
+For file upload configuration and handling, see [Upload Reference](/reference/uploads).
 
 ## Testing
 
@@ -592,8 +592,8 @@ func TestState(t *testing.T) {
 
 ## See Also
 
-- [Server Actions Reference](server-actions.md) - Server-initiated updates with TriggerAction
-- [Session Reference](session.md) - State safety, session stores, and connection management
-- [Error Handling Reference](error-handling.md) - Detailed error handling patterns
-- [Authentication Reference](authentication.md) - User identification and session grouping
-- [Upload Reference](uploads.md) - File upload configuration and handling
+- [Server Actions Reference](/reference/server-actions) - Server-initiated updates with TriggerAction
+- [Session Reference](/reference/session) - State safety, session stores, and connection management
+- [Error Handling Reference](/reference/error-handling) - Detailed error handling patterns
+- [Authentication Reference](/reference/authentication) - User identification and session grouping
+- [Upload Reference](/reference/uploads) - File upload configuration and handling

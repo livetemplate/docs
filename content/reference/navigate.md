@@ -148,8 +148,8 @@ repo (`data-lvt-heartbeat-ms`).
 
 ## See Also
 
-- [Controller+State Pattern](controller-pattern.md) — Mount-time conventions
-- [Client Attributes](client-attributes.md) — `lvt-nav:no-intercept` opt-out
+- [Controller+State Pattern](/reference/controller-pattern) — Mount-time conventions
+- [Client Attributes](/reference/client-attributes) — `lvt-nav:no-intercept` opt-out
 - [Standard HTML Reactivity](/guides/standard-html-reactivity) — Why navigation is a Tier 1 concern
 - [PR #344](https://github.com/livetemplate/livetemplate/pull/344) — Original implementation
 - Follow-up issues: [#345](https://github.com/livetemplate/livetemplate/issues/345) (`ClearAllFlash`), [#346](https://github.com/livetemplate/livetemplate/issues/346) (peer-fan-out inside `Mount` on navigate — see `ctx.Publish` to `SelfTopic()`), [#347](https://github.com/livetemplate/livetemplate/issues/347), [#348](https://github.com/livetemplate/livetemplate/issues/348)

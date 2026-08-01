@@ -49,7 +49,7 @@ type Session interface {
 - `TriggerAction()` calls your action method just like client-initiated actions
 - Updates are sent to ALL connections in the current session group
   (typically all tabs of the browser session; for authenticated flows
-  the group mapping depends on the `Authenticator` — see [API Reference](api-reference.md#session))
+  the group mapping depends on the `Authenticator` — see [API Reference](/reference/api#session))
 - Scoped to a session group only — cannot target other groups or other users
 - Thread-safe - can be called from any goroutine
 
@@ -413,7 +413,7 @@ handler.Publish(livetemplate.UserTopic("alice"), "Refresh", nil)
 
 **Shared across all viewers (a developer topic) — requires an ACL.** Developer
 topics are **deny-all by default**: a connection may only subscribe if you
-configure [`WithTopicACL`](pubsub.md#topic-subscribe--publish-api) (or
+configure [`WithTopicACL`](/reference/pubsub#topic-subscribe--publish-api) (or
 `WithOpenTopics` in trusted single-tenant tools). This is deliberate — a
 developer topic is cross-user, so its ACL is the only boundary.
 
@@ -445,7 +445,7 @@ handler.Publish("dashboard", "Refresh", nil)
   spans two separate handlers (e.g. a `/home` and a `/board` page backed by
   different controllers), publish on each handler.
 - For horizontally scaled (multi-instance) deployments, configure
-  [`WithPubSubBroadcaster`](pubsub.md#setup) so topic fan-out crosses instances.
+  [`WithPubSubBroadcaster`](/reference/pubsub#setup) so topic fan-out crosses instances.
 
 ## Thread Safety
 
@@ -607,12 +607,12 @@ For unbounded or externally-cancellable work, the goroutine needs a
 `context.CancelFunc` — but **do not** store that cancel on the
 controller as a single field. Controllers are singletons (one
 `*Controller` serves every session — see
-[controller-pattern.md](controller-pattern.md)), so a single `stopWork`
+[controller-pattern.md](/reference/controller-pattern)), so a single `stopWork`
 slot is overwritten by the next user's `OnConnect`, and `OnDisconnect()`
 has no parameter to identify which session is disconnecting. Cancel
 funcs must be keyed by `groupID` (or similar per-session identifier) in
 a `sync.Map`, mirroring the `NotificationController` pattern in
-[controller-pattern.md](controller-pattern.md). Do **not** pass
+[controller-pattern.md](/reference/controller-pattern). Do **not** pass
 `*livetemplate.Context` to the goroutine — that context lives only for
 the duration of one action call.
 
@@ -698,7 +698,7 @@ persisted history at all" from "any persisted state was restored" — it
 does **not** separate "first WS after page load" from "WS resumed after
 a blip," since both have persisted state and so both produce
 `IsReconnect()==true, IsNewConnect()==false`. See the [Controller
-Pattern reference](controller-pattern.md) for the full semantics.
+Pattern reference](/reference/controller-pattern) for the full semantics.
 
 ### When the contract is not enough
 
@@ -713,12 +713,12 @@ gated on a real use case.
 
 ## Distributed Deployments
 
-In multi-instance deployments, `TriggerAction()` automatically publishes to Redis so all instances can update their local connections. See the [PubSub Reference](pubsub.md) for setup, channel schema, and subscription lifecycle.
+In multi-instance deployments, `TriggerAction()` automatically publishes to Redis so all instances can update their local connections. See the [PubSub Reference](/reference/pubsub) for setup, channel schema, and subscription lifecycle.
 
 ## See Also
 
-- [Controller+State Pattern](controller-pattern.md) - Core architecture pattern
-- [Session Reference](session.md) - Session stores and connection management
-- [Authentication Reference](authentication.md) - User identification and custom authenticators
-- [PubSub Reference](pubsub.md#topic-subscribe--publish-api) - Topic grammar, ACL, and out-of-band `handler.Publish`
+- [Controller+State Pattern](/reference/controller-pattern) - Core architecture pattern
+- [Session Reference](/reference/session) - Session stores and connection management
+- [Authentication Reference](/reference/authentication) - User identification and custom authenticators
+- [PubSub Reference](/reference/pubsub#topic-subscribe--publish-api) - Topic grammar, ACL, and out-of-band `handler.Publish`
 - [Scaling Guide](/guides/scaling) - Horizontal scaling with Redis

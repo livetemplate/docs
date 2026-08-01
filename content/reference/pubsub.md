@@ -10,7 +10,7 @@ source_commit: "22a4853506a682583b511e470bdd1e6193f4d5fe"
 
 Cross-instance messaging for horizontally scaled deployments.
 
-For server-initiated actions, see [Server Actions](server-actions.md). For scaling tiers and Redis configuration, see [Scaling Guide](/guides/scaling).
+For server-initiated actions, see [Server Actions](/reference/server-actions). For scaling tiers and Redis configuration, see [Scaling Guide](/guides/scaling).
 
 ## Overview
 
@@ -175,7 +175,7 @@ Neither layer alone is sufficient. Transport isolation limits what data *reaches
 
 ## Topic Subscribe / Publish API
 
-`ctx.Subscribe(topic)` opts the calling connection into a topic; `ctx.Publish(topic, action, data)` fans out a named action to every connection subscribed to that topic. The complete primer is in the [Controller+State Pattern reference](controller-pattern.md#cross-tab-updates-with-subscribe--publish); this section documents the wire-level + operator contracts that controllers and operators need to know about.
+`ctx.Subscribe(topic)` opts the calling connection into a topic; `ctx.Publish(topic, action, data)` fans out a named action to every connection subscribed to that topic. The complete primer is in the [Controller+State Pattern reference](/reference/controller-pattern#cross-tab-updates-with-subscribe--publish); this section documents the wire-level + operator contracts that controllers and operators need to know about.
 
 ### Topic Grammar
 
@@ -227,7 +227,7 @@ document.addEventListener("lvt:error", (event) => {
 
 **Envelope is emitted only on propagated error.** A controller that swallows the denied Subscribe — `_ = ctx.Subscribe("denied"); return s, nil` — produces **no envelope**, no Warn, no `lvt:error`. The propagation is the signal.
 
-**HTTP GET path does not get `lvt:error`.** The keep-open lifecycle is the WS-connect-path Mount only. A denied Subscribe on the HTTP GET path surfaces as HTTP 500 (pre-existing Phase-1 behavior). The [`IsInitialMount` guard pattern](controller-pattern.md#subscribing-to-acl-gated-developer-topics) is how controllers avoid the 500 — skip the gated Subscribe on the initial GET so the WS can exercise keep-open.
+**HTTP GET path does not get `lvt:error`.** The keep-open lifecycle is the WS-connect-path Mount only. A denied Subscribe on the HTTP GET path surfaces as HTTP 500 (pre-existing Phase-1 behavior). The [`IsInitialMount` guard pattern](/reference/controller-pattern#subscribing-to-acl-gated-developer-topics) is how controllers avoid the 500 — skip the gated Subscribe on the initial GET so the WS can exercise keep-open.
 
 ### Out-of-Band `handler.Publish`
 
@@ -263,8 +263,8 @@ Grep for `event=topic_action_subscribe_failed` in production logs (the structure
 
 ## See Also
 
-- [Server Actions Reference](server-actions.md) — `TriggerAction` API
-- [Session Reference](session.md) — Session stores and connection management
+- [Server Actions Reference](/reference/server-actions) — `TriggerAction` API
+- [Session Reference](/reference/session) — Session stores and connection management
 - [Multi-Session Isolation](https://github.com/livetemplate/livetemplate/blob/v0.22.0/docs/design/multi-session-isolation.md) — State isolation model
 - [Scaling Guide](/guides/scaling) — Redis configuration and scaling tiers
-- [Configuration Reference](CONFIGURATION.md) — Environment variables and WebSocket settings
+- [Configuration Reference](/reference/configuration) — Environment variables and WebSocket settings
