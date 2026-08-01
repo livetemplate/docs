@@ -452,7 +452,7 @@ func (c *NotificationController) AddMessage(state NotificationState, ctx *livete
 }
 ```
 
-> `TriggerAction` is also the mechanism behind the server-owned loading pattern (set `Loading=true`, spawn a goroutine, trigger a second action to clear it). See [Loading States §7.3](../guides/progressive-complexity.md#73-server-owned-loading-tier-1) in the Progressive Complexity Guide.
+> `TriggerAction` is also the mechanism behind the server-owned loading pattern (set `Loading=true`, spawn a goroutine, trigger a second action to clear it). See [Loading States §7.3](/guides/progressive-complexity#73-server-owned-loading-tier-1) in the Progressive Complexity Guide.
 
 ### Cross-Tab Updates with Subscribe + Publish
 

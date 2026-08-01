@@ -8,7 +8,7 @@ source_commit: "22a4853506a682583b511e470bdd1e6193f4d5fe"
 
 # Progressive Complexity Reference
 
-Quick-reference for how standard HTML maps to LiveTemplate behavior. For the learning walkthrough, see the [Progressive Complexity Guide](../guides/progressive-complexity.md). For `lvt-*` attributes, see the [Client Attributes Reference](client-attributes.md).
+Quick-reference for how standard HTML maps to LiveTemplate behavior. For the learning walkthrough, see the [Progressive Complexity Guide](/guides/progressive-complexity). For `lvt-*` attributes, see the [Client Attributes Reference](client-attributes.md).
 
 ---
 

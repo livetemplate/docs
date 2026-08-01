@@ -84,7 +84,7 @@ LVT_MAX_CONNECTIONS=10000 LVT_ALLOWED_ORIGINS="https://example.com" go run main.
 LVT_METRICS_ENABLED=false go run main.go
 ```
 
-For more details, see [CONFIGURATION.md](../../docs/CONFIGURATION.md).
+For more details, see the [Configuration reference](/reference/configuration).
 
 ## How It Works
 

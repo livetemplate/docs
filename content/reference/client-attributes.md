@@ -403,7 +403,7 @@ These execute client-side with no server round-trip.
 </button>
 ```
 
-> For choosing between client-owned pending (`lvt-el:*:on:pending`) and server-owned loading (`{{if .Loading}}`), see [Loading States](../guides/progressive-complexity.md#7-loading-states) in the Progressive Complexity Guide.
+> For choosing between client-owned pending (`lvt-el:*:on:pending`) and server-owned loading (`{{if .Loading}}`), see [Loading States](/guides/progressive-complexity#7-loading-states) in the Progressive Complexity Guide.
 
 **Form Reset on Success:**
 
@@ -800,7 +800,7 @@ Any form inside a `<dialog>` that completes successfully will have its parent di
 
 A `<form method="dialog">` inside a `<dialog>` closes the dialog immediately on submit (before the server responds). Use this only when you don't need server-side validation feedback inside the dialog.
 
-See [Progressive Complexity Guide — Dialogs](../guides/progressive-complexity.md#5-dialogs) for the full walkthrough.
+See [Progressive Complexity Guide — Dialogs](/guides/progressive-complexity#5-dialogs) for the full walkthrough.
 
 ### Server-managed modals
 
@@ -1191,5 +1191,5 @@ form.addEventListener('lvt:pending', (e) => {
 - **[Go API Reference](https://pkg.go.dev/github.com/livetemplate/livetemplate)** - Server-side API
 - **[Error Handling Reference](error-handling.md)** - Validation, error display, client-side handling
 - **[Template Support Matrix](template-support-matrix.md)** - Supported Go template features
-- **[Architecture](../design/ARCHITECTURE.md)** - System architecture
-- **[Contributing Guide](../../CONTRIBUTING.md)** - How to contribute
+- **[Architecture](https://github.com/livetemplate/livetemplate/blob/v0.22.0/docs/design/ARCHITECTURE.md)** - System architecture
+- **[Contributing Guide](/contributing/livetemplate)** - How to contribute

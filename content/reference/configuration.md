@@ -425,6 +425,6 @@ if err := envConfig.Validate(); err != nil {
 
 ## See Also
 
-- [ROADMAP.md](../../ROADMAP.md) - Project roadmap
-- [OBSERVABILITY.md](../guides/OBSERVABILITY.md) - Logging and metrics guide
-- [SCALING.md](../guides/SCALING.md) - Scaling recommendations
+- [ROADMAP.md](https://github.com/livetemplate/livetemplate/blob/v0.22.0/ROADMAP.md) - Project roadmap
+- [OBSERVABILITY.md](/guides/observability) - Logging and metrics guide
+- [SCALING.md](/guides/scaling) - Scaling recommendations

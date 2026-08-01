@@ -569,4 +569,4 @@ See [Current Limitations](current-limitations.md) for the full limitations refer
 - [Server Actions Reference](server-actions.md) - TriggerAction API for server-initiated updates
 - [Authentication Reference](authentication.md) - User identification and custom authenticators
 - [Current Limitations](current-limitations.md) - All known limitations and workarounds
-- [Scaling Guide](../guides/SCALING.md) - Horizontal scaling with Redis
+- [Scaling Guide](/guides/scaling) - Horizontal scaling with Redis

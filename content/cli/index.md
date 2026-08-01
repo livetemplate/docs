@@ -349,7 +349,7 @@ http.Handle("/dashboard", protectedHandler)
 
 **Customizing CSS Framework:**
 
-The generated auth templates use Tailwind CSS by default. To use a different CSS framework (Bulma, Pico, or plain HTML), see the [Auth Customization Guide](./auth-customization.md) for complete examples and instructions.
+The generated auth templates use Tailwind CSS by default. To use a different CSS framework (Bulma, Pico, or plain HTML), see the [Auth Customization Guide](/cli/auth-customization) for complete examples and instructions.
 
 **E2E Testing:**
 
@@ -828,6 +828,6 @@ go run cmd/mysocial/main.go
 5. **Deploy** - Build and deploy your app
 
 For more information:
-- [API Reference](../references/api-reference.md)
-- [Template Support Matrix](../references/template-support-matrix.md)
+- [API Reference](https://github.com/livetemplate/lvt/blob/v0.2.0/docs/references/api-reference.md)
+- [Template Support Matrix](https://github.com/livetemplate/lvt/blob/v0.2.0/docs/references/template-support-matrix.md)
 - [LiveTemplate Documentation](https://github.com/livetemplate/livetemplate)

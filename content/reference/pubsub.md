@@ -10,7 +10,7 @@ source_commit: "22a4853506a682583b511e470bdd1e6193f4d5fe"
 
 Cross-instance messaging for horizontally scaled deployments.
 
-For server-initiated actions, see [Server Actions](server-actions.md). For scaling tiers and Redis configuration, see [Scaling Guide](../guides/SCALING.md).
+For server-initiated actions, see [Server Actions](server-actions.md). For scaling tiers and Redis configuration, see [Scaling Guide](/guides/scaling).
 
 ## Overview
 
@@ -160,7 +160,7 @@ LiveTemplate uses two independent isolation models:
 
 ### Session Isolation (State Boundaries)
 
-Handled by the session store and connection registry. All connections with the same `groupID` share the same state instance. Different groups have completely separate state. This is unaffected by pubsub. See [Multi-Session Isolation](../design/multi-session-isolation.md) for details.
+Handled by the session store and connection registry. All connections with the same `groupID` share the same state instance. Different groups have completely separate state. This is unaffected by pubsub. See [Multi-Session Isolation](https://github.com/livetemplate/livetemplate/blob/v0.22.0/docs/design/multi-session-isolation.md) for details.
 
 ### Message Routing Isolation (PubSub)
 
@@ -265,6 +265,6 @@ Grep for `event=topic_action_subscribe_failed` in production logs (the structure
 
 - [Server Actions Reference](server-actions.md) — `TriggerAction` API
 - [Session Reference](session.md) — Session stores and connection management
-- [Multi-Session Isolation](../design/multi-session-isolation.md) — State isolation model
-- [Scaling Guide](../guides/SCALING.md) — Redis configuration and scaling tiers
+- [Multi-Session Isolation](https://github.com/livetemplate/livetemplate/blob/v0.22.0/docs/design/multi-session-isolation.md) — State isolation model
+- [Scaling Guide](/guides/scaling) — Redis configuration and scaling tiers
 - [Configuration Reference](CONFIGURATION.md) — Environment variables and WebSocket settings

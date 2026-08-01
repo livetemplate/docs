@@ -523,7 +523,8 @@ Same pattern, different data!
 
 ## Related Documentation
 
-- [LiveTemplate Core Docs](../../README.md)
-- [Broadcasting Guide](../../docs/design/IMPLEMENTATION_STATUS.md)
+- [Server API reference](/reference/api)
+- [PubSub reference](/reference/pubsub) — the fan-out this app is built on
+- [Server push](/recipes/server-push)
 - [Template Syntax](https://pkg.go.dev/html/template)
 - [LiveTemplate API](https://pkg.go.dev/github.com/livetemplate/livetemplate)

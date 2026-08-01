@@ -308,7 +308,7 @@ func Async[S any, R any](
 
 Runs `work` off the connection event loop, then re-enters the loop to apply
 its result to the **current** session state and re-render the originating
-connection. Reduces the [manual two-action loading pattern](../guides/progressive-complexity.md#73-server-owned-loading-tier-1)
+connection. Reduces the [manual two-action loading pattern](/guides/progressive-complexity#73-server-owned-loading-tier-1)
 from ~15 lines / 2 methods to ~7 lines / 1 method.
 
 - **`work`** runs in a supervised goroutine. It receives a `context.Context`
@@ -371,7 +371,7 @@ single-action flows are the norm:
 </button>
 ```
 
-See [Loading States §7.3](../guides/progressive-complexity.md#73-server-owned-loading-tier-1)
+See [Loading States §7.3](/guides/progressive-complexity#73-server-owned-loading-tier-1)
 for the full comparison of loading approaches.
 
 ---
