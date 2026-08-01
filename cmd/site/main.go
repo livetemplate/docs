@@ -241,7 +241,7 @@ func main() {
 	// path the recipe redirects to after Login/Logout — http.StripPrefix
 	// strips it before the handler sees the request URL, so the handler
 	// can't reconstruct it.
-	mux.Handle("/apps/login/", http.StripPrefix("/apps/login", loginrecipe.Handler("/apps/login/",
+	mux.Handle("/apps/login/", http.StripPrefix("/apps/login", loginrecipe.Handler(
 		livetemplate.WithAllowedOrigins(allowedOrigins),
 	)))
 

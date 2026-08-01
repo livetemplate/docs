@@ -67,10 +67,10 @@ func main() {
 
 	mux := http.NewServeMux()
 	if mountPath == "/" {
-		mux.Handle("/", loginrecipe.Handler(mountPath, opts...))
+		mux.Handle("/", loginrecipe.Handler(opts...))
 	} else {
 		stripped := strings.TrimSuffix(mountPath, "/")
-		mux.Handle(mountPath, http.StripPrefix(stripped, loginrecipe.Handler(mountPath, opts...)))
+		mux.Handle(mountPath, http.StripPrefix(stripped, loginrecipe.Handler(opts...)))
 	}
 
 	log.Printf("login listening on :%s (mount: %s)", port, mountPath)
