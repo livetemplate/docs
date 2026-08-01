@@ -355,3 +355,179 @@ func TestLinkRewriter_AlsoHandlesEditURLs(t *testing.T) {
 		t.Errorf("edit URL not rewritten: %q", got)
 	}
 }
+
+// relCfg is the fixture for the RewriteRelative tests: two mirrored pages in
+// the livetemplate repo (one under docs/guides, one under docs/references)
+// plus one in lvt, so same-repo resolution can be told apart from cross-repo.
+func relCfg() *SourceOfTruth {
+	return &SourceOfTruth{
+		Pages: []PageEntry{
+			{SiteURL: "/guides/scaling", SourceRepo: "https://github.com/livetemplate/livetemplate", SourcePath: "docs/guides/SCALING.md"},
+			{SiteURL: "/reference/api", SourceRepo: "https://github.com/livetemplate/livetemplate", SourcePath: "docs/references/api-reference.md"},
+			{SiteURL: "/cli/auth-customization", SourceRepo: "https://github.com/livetemplate/lvt", SourcePath: "docs/guides/auth-customization.md"},
+		},
+	}
+}
+
+func TestRewriteRelative_MappedSiblingBecomesSiteURL(t *testing.T) {
+	r := newLinkRewriter(relCfg())
+	page := PageEntry{SiteURL: "/guides/scaling", SourceRepo: "https://github.com/livetemplate/livetemplate", SourcePath: "docs/guides/SCALING.md"}
+
+	body := "See [the API](../references/api-reference.md) for details."
+	got := r.RewriteRelative(body, page, "v0.22.0")
+
+	if !strings.Contains(got, "[the API](/reference/api)") {
+		t.Errorf("sibling not rewritten to site URL: %q", got)
+	}
+}
+
+func TestRewriteRelative_PreservesFragment(t *testing.T) {
+	r := newLinkRewriter(relCfg())
+	page := PageEntry{SiteURL: "/guides/scaling", SourceRepo: "https://github.com/livetemplate/livetemplate", SourcePath: "docs/guides/SCALING.md"}
+
+	body := "See [Async](../references/api-reference.md#async)."
+	got := r.RewriteRelative(body, page, "v0.22.0")
+
+	if !strings.Contains(got, "[Async](/reference/api#async)") {
+		t.Errorf("fragment dropped or link not rewritten: %q", got)
+	}
+}
+
+func TestRewriteRelative_DotSlashResolvesWithinSameDir(t *testing.T) {
+	// content/cli/index.md links a sibling as ./auth-customization.md; it must
+	// resolve against the page's own directory, not the repo root.
+	r := newLinkRewriter(relCfg())
+	page := PageEntry{SiteURL: "/cli/", SourceRepo: "https://github.com/livetemplate/lvt", SourcePath: "docs/guides/lvt-cli-guide.md"}
+
+	body := "See [auth](./auth-customization.md)."
+	got := r.RewriteRelative(body, page, "v0.2.0")
+
+	if !strings.Contains(got, "[auth](/cli/auth-customization)") {
+		t.Errorf("./ sibling not resolved: %q", got)
+	}
+}
+
+func TestRewriteRelative_UnmappedUpstreamFileBecomesGitHubURL(t *testing.T) {
+	// ../../ROADMAP.md is a real file upstream but is not mirrored, so the
+	// reader should still reach it on GitHub rather than a 404.
+	r := newLinkRewriter(relCfg())
+	page := PageEntry{SiteURL: "/reference/api", SourceRepo: "https://github.com/livetemplate/livetemplate", SourcePath: "docs/references/api-reference.md"}
+
+	body := "See [the roadmap](../../ROADMAP.md) and [a proposal](../proposals/patterns.md)."
+	got := r.RewriteRelative(body, page, "v0.22.0")
+
+	if !strings.Contains(got, "[the roadmap](https://github.com/livetemplate/livetemplate/blob/v0.22.0/ROADMAP.md)") {
+		t.Errorf("repo-root file not rewritten to GitHub URL: %q", got)
+	}
+	if !strings.Contains(got, "[a proposal](https://github.com/livetemplate/livetemplate/blob/v0.22.0/docs/proposals/patterns.md)") {
+		t.Errorf("unmapped sibling not rewritten to GitHub URL: %q", got)
+	}
+}
+
+func TestRewriteRelative_DirectoryTargetUsesTreeURL(t *testing.T) {
+	r := newLinkRewriter(relCfg())
+	page := PageEntry{SiteURL: "/guides/observability", SourceRepo: "https://github.com/livetemplate/livetemplate", SourcePath: "docs/guides/OBSERVABILITY.md"}
+
+	body := "See [the package](../internal/observe/)."
+	got := r.RewriteRelative(body, page, "v0.22.0")
+
+	if !strings.Contains(got, "/tree/v0.22.0/docs/internal/observe") {
+		t.Errorf("directory target should use /tree/, got: %q", got)
+	}
+}
+
+func TestRewriteRelative_LeavesFencedCodeBlocksAlone(t *testing.T) {
+	// A relative path inside an example is part of the example. This is the
+	// regression the blunt ReplaceAll approach would have caused.
+	r := newLinkRewriter(relCfg())
+	page := PageEntry{SiteURL: "/guides/scaling", SourceRepo: "https://github.com/livetemplate/livetemplate", SourcePath: "docs/guides/SCALING.md"}
+
+	body := "Prose [x](../references/api-reference.md).\n" +
+		"```md\n" +
+		"[keep me](../references/api-reference.md)\n" +
+		"```\n" +
+		"After [y](../references/api-reference.md).\n"
+	got := r.RewriteRelative(body, page, "v0.22.0")
+
+	if !strings.Contains(got, "[keep me](../references/api-reference.md)") {
+		t.Errorf("link inside fenced block was rewritten: %q", got)
+	}
+	if strings.Count(got, "(/reference/api)") != 2 {
+		t.Errorf("expected both prose links rewritten, got: %q", got)
+	}
+}
+
+func TestRewriteRelative_LeavesEscapingAndAbsoluteTargetsAlone(t *testing.T) {
+	r := newLinkRewriter(relCfg())
+	page := PageEntry{SiteURL: "/reference/api", SourceRepo: "https://github.com/livetemplate/livetemplate", SourcePath: "docs/references/api-reference.md"}
+
+	body := "[up](../../../outside.md) [abs](/reference/session) [ext](https://example.com/x.md)"
+	got := r.RewriteRelative(body, page, "v0.22.0")
+
+	if got != body {
+		t.Errorf("non-resolvable / already-absolute targets should be untouched:\nbefore: %q\nafter:  %q", body, got)
+	}
+}
+
+func TestRewriteRelative_CrossRepoPathDoesNotMatch(t *testing.T) {
+	// docs/guides/auth-customization.md is mirrored, but only for the lvt
+	// repo. The same path resolved inside livetemplate must NOT pick it up.
+	r := newLinkRewriter(relCfg())
+	page := PageEntry{SiteURL: "/guides/scaling", SourceRepo: "https://github.com/livetemplate/livetemplate", SourcePath: "docs/guides/SCALING.md"}
+
+	body := "[auth](./auth-customization.md)"
+	got := r.RewriteRelative(body, page, "v0.22.0")
+
+	if strings.Contains(got, "/cli/auth-customization") {
+		t.Errorf("cross-repo path collision: %q", got)
+	}
+	if !strings.Contains(got, "blob/v0.22.0/docs/guides/auth-customization.md") {
+		t.Errorf("expected GitHub fallback for the other repo's path: %q", got)
+	}
+}
+
+func TestRewriteRelative_BareSiblingLink(t *testing.T) {
+	// Upstream links same-directory siblings without any ./ prefix. These are
+	// the majority of relative links and resolve on the site to a URL ending
+	// in .md, which tinkerdown does not serve.
+	r := newLinkRewriter(relCfg())
+	page := PageEntry{SiteURL: "/reference/api", SourceRepo: "https://github.com/livetemplate/livetemplate", SourcePath: "docs/references/api-reference.md"}
+
+	body := "See [the API](api-reference.md) and [scaling](../guides/SCALING.md)."
+	got := r.RewriteRelative(body, page, "v0.22.0")
+
+	if !strings.Contains(got, "[the API](/reference/api)") {
+		t.Errorf("bare sibling not rewritten: %q", got)
+	}
+	if !strings.Contains(got, "[scaling](/guides/scaling)") {
+		t.Errorf("dot-prefixed link regressed: %q", got)
+	}
+}
+
+func TestRewriteRelative_LeavesNonRelativeTargetsAlone(t *testing.T) {
+	r := newLinkRewriter(relCfg())
+	page := PageEntry{SiteURL: "/reference/api", SourceRepo: "https://github.com/livetemplate/livetemplate", SourcePath: "docs/references/api-reference.md"}
+
+	body := "[ext](https://example.com/x.md) [abs](/reference/session) [anchor](#async) " +
+		"[mail](mailto:a@b.co) [proto](//cdn.example.com/x.js) [go](https://pkg.go.dev/log/slog)"
+	got := r.RewriteRelative(body, page, "v0.22.0")
+
+	if got != body {
+		t.Errorf("non-relative targets must be untouched:\nbefore: %q\nafter:  %q", body, got)
+	}
+}
+
+func TestRewriteRelative_BareUnmappedBecomesGitHubURL(t *testing.T) {
+	// docs/guides/OBSERVABILITY.md links [ARCHITECTURE.md](ARCHITECTURE.md),
+	// a sibling that does not exist upstream either — the reader should get a
+	// GitHub URL rather than a site path that 404s.
+	r := newLinkRewriter(relCfg())
+	page := PageEntry{SiteURL: "/guides/observability", SourceRepo: "https://github.com/livetemplate/livetemplate", SourcePath: "docs/guides/OBSERVABILITY.md"}
+
+	body := "[arch](ARCHITECTURE.md)"
+	got := r.RewriteRelative(body, page, "v0.22.0")
+
+	if !strings.Contains(got, "blob/v0.22.0/docs/guides/ARCHITECTURE.md") {
+		t.Errorf("bare unmapped sibling not rewritten to GitHub: %q", got)
+	}
+}

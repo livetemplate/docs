@@ -62,7 +62,7 @@ type AppState struct {
 }
 ```
 
-> **Note on `AssertPureState`**: If your tests use `lvt/testing.AssertPureState[T](t)` to verify state contains no dependency types, `*toast.Container` will need to be excluded. Component containers are not external dependencies — they hold transient UI data, not connections or handles. Use `AssertPureState` with the `IgnoreFields` option, or structure your state so component fields live in a separate struct that is not checked.
+> **Note on `AssertPureState`**: If your tests use `lvt/testing.AssertPureState[T](https://github.com/livetemplate/livetemplate/blob/v0.22.0/docs/guides/t)` to verify state contains no dependency types, `*toast.Container` will need to be excluded. Component containers are not external dependencies — they hold transient UI data, not connections or handles. Use `AssertPureState` with the `IgnoreFields` option, or structure your state so component fields live in a separate struct that is not checked.
 
 ### Initialization
 
@@ -277,4 +277,4 @@ handleAlertDirectives(element);
 
 ---
 
-See also: [Progressive Complexity Guide](progressive-complexity.md) for the broader Tier 1/Tier 2 model.
+See also: [Progressive Complexity Guide](/guides/progressive-complexity) for the broader Tier 1/Tier 2 model.

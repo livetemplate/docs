@@ -863,7 +863,7 @@ form.addEventListener('lvt:success', (e) => {
 
 ## Related Documentation
 
-- **[Client Attributes Reference](client-attributes.md)** - Form lifecycle events
+- **[Client Attributes Reference](/reference/client-attributes)** - Form lifecycle events
 - **[Go API Reference](https://pkg.go.dev/github.com/livetemplate/livetemplate)** - Error types API
 - **[go-playground/validator](https://pkg.go.dev/github.com/go-playground/validator/v10)** - Validation tags
-- **[Template Support Matrix](template-support-matrix.md)** - Template syntax
+- **[Template Support Matrix](/reference/template-support-matrix)** - Template syntax

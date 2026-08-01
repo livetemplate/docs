@@ -191,7 +191,7 @@ Maximum nesting depth for recursive `{{template}}` invocations while building th
 - **Validation**: Must be a positive integer; an invalid value is a hard startup error
 - **Option**: `WithMaxTemplateDepth(n)`
 
-**Use case**: Recursive templates (file trees, comment threads, nested navigation) render self-referential data. This cap stops a *cycle in the data* — a node whose children contain itself — from overflowing the stack, surfacing an error instead. Raise it only when your data is legitimately deeper than the default; the cap is a safety net, not a tuning knob. See [Template Support Matrix — Recursion depth](template-support-matrix.md#recursion-depth) for the first-render versus update behavior.
+**Use case**: Recursive templates (file trees, comment threads, nested navigation) render self-referential data. This cap stops a *cycle in the data* — a node whose children contain itself — from overflowing the stack, surfacing an error instead. Raise it only when your data is legitimately deeper than the default; the cap is a safety net, not a tuning knob. See [Template Support Matrix — Recursion depth](/reference/template-support-matrix#recursion-depth) for the first-render versus update behavior.
 
 ### Graceful Shutdown
 
@@ -353,7 +353,7 @@ tmpl := livetemplate.New("app",
 | Option | Description |
 |--------|-------------|
 | `WithUpgrader(upgrader)` | Custom `*websocket.Upgrader` for WebSocket connections |
-| `WithUpload(name, config)` | Configure file upload fields (see [Upload Reference](uploads.md)) |
+| `WithUpload(name, config)` | Configure file upload fields (see [Upload Reference](/reference/uploads)) |
 | `WithPubSubBroadcaster(broadcaster)` | Redis pub/sub for distributed deployments |
 | `WithComponentTemplates(sets...)` | Register component template sets |
 | `WithIgnoreTemplateDirs(dirs...)` | Skip directories during template discovery |
@@ -425,6 +425,6 @@ if err := envConfig.Validate(); err != nil {
 
 ## See Also
 
-- [ROADMAP.md](../../ROADMAP.md) - Project roadmap
-- [OBSERVABILITY.md](../guides/OBSERVABILITY.md) - Logging and metrics guide
-- [SCALING.md](../guides/SCALING.md) - Scaling recommendations
+- [ROADMAP.md](https://github.com/livetemplate/livetemplate/blob/v0.22.0/ROADMAP.md) - Project roadmap
+- [OBSERVABILITY.md](/guides/observability) - Logging and metrics guide
+- [SCALING.md](/guides/scaling) - Scaling recommendations

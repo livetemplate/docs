@@ -1,0 +1,871 @@
+---
+title: "Changelog"
+source_repo: "https://github.com/livetemplate/client"
+source_path: "CHANGELOG.md"
+source_ref: "v0.20.0"
+source_commit: "03d463fddee48ef85b58d5d31984f0e941cebbb3"
+---
+
+# Changelog
+
+All notable changes to @livetemplate/client will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [v0.20.0] - 2026-07-20
+
+### Changes
+
+- fix(upload): warn when marked fields cannot travel on a chunked upload (#152) (cdf1c3f)
+- fix(release): run tests before mutating, restore files on abort (#151) (769f77e)
+- docs(changelog): curate the v0.19.1 entry after release.sh (588863e)
+
+
+
+## [v0.19.1] - 2026-07-19
+
+### Changed
+
+- **BREAKING** feat(upload): form fields travel with a Proxied upload only when
+  marked `lvt-upload-with`, replacing the previous serialize-everything-except-
+  `type="password"` denylist (#150, livetemplate#452). A Proxied upload auto-fires
+  on file selection, so the old default silently POSTed every co-located field —
+  CSRF tokens, hidden secrets — to the upload endpoint with no submit-time moment
+  for the user to notice. **Migration:** add `lvt-upload-with` to each field an
+  `OnUpload` handler reads (typically a record id); an unmarked field now
+  surfaces as a missing value in the handler rather than as a silent leak.
+
+  This release jumps 0.18.2 → 0.19.1 to re-sync the client's major.minor with the
+  core library (livetemplate v0.19.1), which `scripts/release.sh` enforces.
+
+## [v0.18.2] - 2026-07-15
+
+### Changes
+
+- fix(event-delegation): bare-key shortcuts no longer fire under Ctrl/Meta/Alt (117b4fc)
+
+
+
+## [v0.18.1] - 2026-07-14
+
+### Changes
+
+- fix(lvt-el): preserve client-applied class/attr state across morphs (#147) (#148) (015aa94)
+
+
+
+## [v0.16.5] - 2026-07-09
+
+### Changes
+
+- ci: pin publish npm back to 11 (npm 12 --provenance is broken) (bc68eab)
+
+
+
+## [v0.16.4] - 2026-07-09
+
+### Changes
+
+- chore(ci): bump CI to Node 22, return publish to npm@latest (#146) (c9141ad)
+- ci: pin npm to the 11 line in publish workflow (Node 20 compat) (#145) (f1a0c1d)
+
+
+
+## [v0.16.3] - 2026-07-09
+
+### Changes
+
+- feat(dom): text-select on rendered surfaces via data-surface="block" (3412905)
+
+
+
+## [v0.16.2] - 2026-07-08
+
+### Changes
+
+- feat: lvt-fx:viewport-report directive for read-progress reporting (#144) (6377a0e)
+
+
+
+## [v0.16.1] - 2026-07-05
+
+### Changes
+
+- fix: preserve one-shot scroll/autofocus guards across morphdom (#143) (8d5d3ec)
+
+
+
+## [v0.16.0] - 2026-07-05
+
+### Changes
+
+- feat(client): liveness heartbeat — detect dead/zombie sockets and reconnect (#142) (60d1e3c)
+
+
+
+## [v0.15.0] - 2026-07-01
+
+### Changes
+
+- feat(dom): lvt-fx:text-select — character-range selection over diff text (#140) (392c829)
+- feat(dom): lvt-fx:preview-bridge for opaque-origin iframe previews (#139) (f6bf9a9)
+
+
+
+## [v0.14.6] - 2026-06-28
+
+### Changes
+
+- feat(events): lvt-key modifier matching (Mod/Meta/Ctrl/Shift/Alt + key) (#138) (c2c837b)
+
+
+
+## [v0.14.5] - 2026-06-28
+
+### Changes
+
+- Add opt-in lvt-mod:skip-when-typing guard for window keyboard bindings (#137) (2276693)
+
+
+
+## [v0.14.4] - 2026-06-26
+
+### Changes
+
+- Durable <details> open + generic lvt-fx:resize directive (#136) (8b40091)
+
+
+
+## [v0.14.3] - 2026-06-20
+
+### Changes
+
+- fix(morphdom): make lvt-on:click checkboxes/radios server-authoritative (#135) (28609e1)
+
+
+
+## [v0.14.2] - 2026-06-17
+
+### Changes
+
+- feat: proxy-bridge directive + touch drag recovery (prereview --external) (#134) (bc55c01)
+
+
+
+## [v0.14.1] - 2026-06-15
+
+### Changes
+
+- feat(directives): lvt-fx:region-select + shared box-drag spine (#133) (1f705d0)
+
+
+
+## [v0.14.0] - 2026-06-13
+
+### Changes
+
+- feat(upload): WS-disabled fallbacks for Direct completion and Volume (#448, #449) (#132) (2bc5214)
+
+
+
+## [v0.13.1] - 2026-06-12
+
+### Changes
+
+- fix(upload): bind SSR'd lvt-upload change handler on connect (#453) (#131) (6eb53ff)
+
+
+
+## [v0.13.0] - 2026-06-11
+
+### Changes
+
+- feat(upload): serialize the form's fields into a Proxied upload (#130) (a4911c3)
+
+
+
+## [v0.12.0] - 2026-06-11
+
+### Changes
+
+- feat(upload): client mode dispatch + Proxied/Preview/WS-disabled transport (#129) (947e52f)
+
+
+
+## [v0.11.9] - 2026-06-06
+
+### Changes
+
+- Fix loading lifecycle stuck when an action produces no render diff (#128) (b1725cc)
+
+
+
+## [v0.11.8] - 2026-06-01
+
+### Changes
+
+- chore(changelog): drop Unreleased block ahead of release (210bddb)
+- feat: data-lvt-redact — Preview-mode field redaction (#127) (6e3f7c9)
+
+
+
+## [v0.11.7] - 2026-05-30
+
+### Changes
+
+- feat: lvt-fx:url-hash — bidirectional location.hash ↔ state sync (#126) (77c23d7)
+
+
+
+## [v0.11.6] - 2026-05-30
+
+### Changes
+
+- feat: lvt-fx:area-select — drag-rectangle pointer directive with final-coords dispatch (#125) (b590edc)
+
+
+
+## [v0.11.5] - 2026-05-29
+
+### Changes
+
+- feat: hydrate Declarative Shadow DOM after morphdom inserts templates (#124) (8121860)
+
+
+
+## [v0.11.4] - 2026-05-28
+
+### Changes
+
+- chore(changelog): strip v0.11.4 stub so release.sh regenerates it (55508c5)
+- feat: per-action loading bar + lvt-fx:scroll=reset-on + lvt-fx:auto-click (#123) (08b37bb)
+
+
+
+## [v0.11.3] - 2026-05-25
+
+### Changes
+
+- feat: lvt-spy directive for scroll-spy in-page navigation (#122) (dfc2cff)
+
+
+
+## [v0.9.3] - 2026-05-25
+
+### Changes
+
+- feat: lvt-spy scroll-spy directive for in-page navigation highlighting
+
+  New client-side directive that highlights `[lvt-spy-link]` anchor elements
+  as the reader scrolls past corresponding `[lvt-spy]` targets in the page.
+  Two modes: container (`lvt-spy="h1, h2, h3"` watches matching descendants)
+  and element (empty attribute — the element itself is the target). Active
+  link receives the `lvt-active` class. Trigger line is configurable via
+  `--lvt-spy-margin` (default 25vh). Pure client-side, no server round-trips
+  per scroll tick. Mirrors the lifecycle shape of `lvt-scroll-away`.
+
+
+
+## [v0.9.2] - 2026-05-20
+
+### Changes
+
+- feat: lvt:error CustomEvent for topic_forbidden envelope (livetemplate#415, V14) (#121) (6d1d5b8)
+
+
+
+## [v0.9.0] - 2026-05-13
+
+This release aligns the client to the core library's v0.9.0 minor cut
+(see https://github.com/livetemplate/livetemplate/releases/tag/v0.9.0).
+
+### Changes
+
+- feat: emit explicit submitter on the wire (livetemplate#237 Phase 2) (1385a5e)
+
+  Client-side implementation of the explicit-submitter contract documented
+  in livetemplate/livetemplate's `docs/proposals/explicit-submitter.md`.
+  Phase 1 (server-side acceptance) shipped in livetemplate/livetemplate v0.9.0;
+  this client release adds the client-side emission so the server can route
+  the clicked-button action without falling back to the empty-value heuristic.
+
+  - WS action message envelope now includes `submitter: <name>` when
+    `SubmitEvent.submitter.name` is non-empty.
+  - HTTP Tier 1 multipart submissions include an `lvt-submitter` form key
+    alongside `lvt-action`.
+  - New `lvt-form:emit-submitter` directive (opt-in, paired with
+    `lvt-form:no-intercept`) injects a hidden `<input type="hidden"
+    name="lvt-submitter">` into natively-submitted forms before the browser
+    serializes. Wrapper-delegated so DOM swaps preserve it. Logs a one-shot
+    `warn` per form when used on a GET form (URL-pollution caveat).
+
+  `lvt-submitter` is now a reserved form field name (same shape as the
+  existing `lvt-action` reservation). Apps that previously used a field
+  named `lvt-submitter` for user data will see that value routed as the
+  action; rename the field to avoid the collision.
+
+
+
+## [v0.8.42] - 2026-05-06
+
+### Changes
+
+- fix: stylesheet check must run for non-LiveTemplate destinations too (369a060)
+
+
+
+## [v0.8.41] - 2026-05-06
+
+### Changes
+
+- fix: full reload when SPA navigation crosses an app boundary (#119) (067827a)
+- refactor: remove dead StaticsMap code (#17) (226811f)
+- docs(README): cross-link to https://livetemplate.fly.dev docs site (#117) (c168b97)
+- chore: Phase 1A migration ergonomics — shim, tests, docs (#46, #47, #48) (#116) (df2c1fd)
+- ci: dispatch livetemplate/docs sync on release tag (#115) (dc0147f)
+
+
+
+## Migration: Phase 1A breaking changes (v0.8.13 / v0.8.14)
+
+If you're upgrading from `< 0.8.13`, the attribute surface changed substantially. Run
+`grep -rn 'lvt-' <your-template-dir>` (or `grep -rn 'lvt-' .` from your app root) to
+find call-sites that need updating.
+
+### Renamed attributes
+
+| Old | New | Phase |
+|-----|-----|-------|
+| `lvt-click`, `lvt-input`, `lvt-change`, `lvt-keydown`, `lvt-submit`, ... (16 event-specific attributes) | `lvt-on:{event}` (generic event router) | v0.8.13 |
+| `lvt-{action}-on:{event}` (reactive shortcuts) | `lvt-el:{method}:on:{state}` | v0.8.13 |
+| `lvt-data-*`, `lvt-value-*` | standard `data-*` attributes | v0.8.13 |
+| `lvt-disable-with` | `lvt-form:disable-with` | v0.8.13 |
+| `lvt-no-intercept` (on `<a>` links) | `lvt-nav:no-intercept` | v0.8.14 |
+| `lvt-no-intercept` (on `<form>`) | `lvt-form:no-intercept` | v0.8.14 |
+| (form action routing — implicit) | `lvt-form:action="..."` (explicit, highest priority) | v0.8.14 |
+
+### Removed (no replacement — use the standard-HTML alternative)
+
+| Removed | Use instead |
+|---------|-------------|
+| `ModalManager` / `lvt-modal-open` / `lvt-modal-close` | Native `<dialog>` element + `dialog.showModal()` / `dialog.close()` |
+| `lvt-confirm="message"` | `onclick="return confirm('message')"` (standard browser API) |
+| `lvt-disable-on:{event}` / `lvt-enable-on:{event}` reactive actions | `lvt-el:{method}:on:{state}` (e.g. `lvt-el:setAttr:disabled:on:save:pending`) |
+
+### New Tier 2 namespaces
+
+- `lvt-on:{event}` — DOM event handlers (Tier 1: standard HTML `onclick=...` is preferred when no server round-trip is needed)
+- `lvt-el:{method}:on:{state}` — reactive DOM mutations driven by client state
+- `lvt-fx:{directive}` — visual effects (`lvt-fx:scroll`, `lvt-fx:highlight`, `lvt-fx:animate`)
+- `lvt-form:{behavior}` — form-scoped behaviors (`preserve`, `disable-with`, `action`, `no-intercept`)
+- `lvt-nav:{behavior}` — navigation-scoped behaviors (`no-intercept`)
+- `lvt-mod:{modifier}` — event-handling modifiers (`debounce`, `throttle`)
+
+### Backward-compat shims
+
+The legacy `lvt-no-intercept` attribute is recognized on both `<a>` links and `<form>`
+elements via a shared shim in `utils/legacy-attr.ts`. Apps that upgrade the client
+without renaming all templates in lockstep keep working. The first time a legacy
+attribute is encountered the client logs a one-time deprecation warning so app authors
+can find call-sites to migrate. **The shim will be removed in v0.9.0** — migrate to
+`lvt-nav:no-intercept` (links) and `lvt-form:no-intercept` (forms) before then.
+
+For the full design rationale, see the [attribute-reduction proposal](https://github.com/livetemplate/livetemplate/blob/main/docs/archive/proposals/attribute-reduction-proposal.md) in the server repo.
+
+## [v0.8.40] - 2026-05-02
+
+### Changes
+
+- fix: always run fire-on-change directive scans (#107) (#114) (dff1765)
+
+
+
+## [v0.8.39] - 2026-05-02
+
+### Changes
+
+- feat: per-op targeted DOM mutation for range diff ops (#107) (#108) (8f34384)
+
+
+
+## [v0.8.38] - 2026-04-28
+
+### Changes
+
+- feat: HTML5 drag-and-drop event support (#101) (#106) (54ebdec)
+
+
+
+## [v0.8.37] - 2026-04-28
+
+### Changes
+
+- fix(directives): remove empty style attr after highlight cleanup (#105) (187de33)
+
+
+
+## [v0.8.36] - 2026-04-28
+
+### Changes
+
+- feat: lvt-scroll-away top edge for scroll-to-top buttons (#103) (661b8c2)
+
+
+
+## [v0.8.35] - 2026-04-27
+
+### Changes
+
+- feat: reconnect WebSocket on visibility change (iOS background fix) (#99) (ef57b41)
+
+
+
+## [v0.8.34] - 2026-04-22
+
+### Changes
+
+- fix(release): use explicit refspec to update tracking ref before sync check (#98) (51b5510)
+- feat: data-lvt-target for scroll effects + lvt-scroll-away visibility toggle (#94) (860861b)
+
+
+
+## [v0.8.33] - 2026-04-20
+
+### Changes
+
+- fix(morphdom): allow child updates inside open dialogs (#93) (ae78517)
+- refactor(observer): replace scroll-sentinel id with lvt-scroll-sentinel attribute (#92) (e8666db)
+
+
+
+## [v0.8.32] - 2026-04-20
+
+### Changes
+
+- fix(ws): detach handlers before closing socket on disconnect (#91) (f38891d)
+
+
+
+## [v0.8.31] - 2026-04-20
+
+### Changes
+
+- fix(morphdom): preserve datalist while connected input is focused (#85) (ef9edea)
+
+
+
+## [v0.8.30] - 2026-04-19
+
+### Changes
+
+- feat: hash-driven element activation for deep-linking (#86) (c85d36c)
+
+
+
+## [v0.8.29] - 2026-04-18
+
+### Changes
+
+- fix(release): prompt before releasing with un-pushed local commits (54e5b08)
+- fix(release): auto-switch to main before releasing (81d3c75)
+- fix(morphdom): preserve checkbox/radio checked state across updates (#81) (ab879f7)
+- Revert "fix(morphdom): preserve checkbox/radio checked state across updates" (adc9e55)
+- fix(morphdom): preserve checkbox/radio checked state across updates (0d791e0)
+
+
+
+## [v0.8.28] - 2026-04-18
+
+### Changes
+
+- fix(checkbox): send array of values for multiple same-name checkboxes (#78) (2bca20e)
+- chore(release): v0.8.27 (72a925f)
+- fix(link-interceptor): fix popstate back/forward navigation regression (053a6b7)
+
+
+
+## [v0.8.27] - 2026-04-17
+
+### Changes
+
+- fix(link-interceptor): fix popstate back/forward navigation regression (053a6b7)
+
+
+
+## [v0.8.26] - 2026-04-17
+
+### Changes
+
+- feat: lvt-ignore attributes, __navigate__ SPA nav, DOMParser script fix (#72) (966d65d)
+
+
+
+## [Unreleased]
+
+### Added
+
+- `lvt-ignore` attribute: morphdom escape hatch that skips an element and its entire subtree during diff (equivalent to Phoenix LiveView's `phx-update="ignore"`). Checked on `fromEl` (live DOM) so both server templates and client JS can use it. Use `data-lvt-force-update` on the server's version to bypass and resume diffing.
+- `lvt-ignore-attrs` attribute: morphdom escape hatch that preserves user-managed attributes (e.g. `open` on `<details>`) while still diffing children. Checked on `fromEl` for consistency with `lvt-ignore`. Use `data-lvt-force-update` to bypass.
+- In-band `__navigate__` SPA navigation: same-pathname link clicks send `{action:"__navigate__", data:<params>}` over the existing WebSocket instead of fetching new HTML. Requires server-side support (livetemplate/livetemplate#344).
+- DOMParser fallback in `updateDOM`: HTML containing `<script>` tags is now parsed via `DOMParser` to avoid a Chrome `innerHTML` bug that creates phantom duplicate DOM nodes after script tags.
+
+### Breaking Changes
+
+- **Cross-pathname same-handler navigation now always reconnects.** Previously, if two routes shared the same `data-lvt-id`, navigating between them would do an in-place DOM swap without reconnecting. This fast path has been removed; all cross-pathname navigations (regardless of handler ID) now trigger a full WebSocket reconnect. This is the correct behavior — same-ID across paths means two distinct routes, and `sendNavigate` cannot express a path change. **If your app shares a `data-lvt-id` across routes, expect a reconnect flash where there was none before.**
+
+### Deployment note
+
+The `__navigate__` in-band action is a no-op on server versions before livetemplate/livetemplate#344. Deploy the server update before or simultaneously with this client version to avoid same-pathname link clicks sending an unrecognized WebSocket action.
+
+## [v0.8.25] - 2026-04-15
+
+### Changes
+
+- fix(ci): upgrade npm in publish workflow for OIDC trusted publishing (74bd7c5)
+
+
+
+## [v0.8.24] - 2026-04-15
+
+### Changes
+
+- chore: gitignore .claude/scheduled_tasks.lock (28e30e7)
+- ci: publish to npm via OIDC trusted publishing (#71) (9053e38)
+
+
+
+## [v0.8.23] - 2026-04-14
+
+### Changes
+
+- fix: cross-handler SPA nav, infinite scroll race, animation cleanup (#69) (e40f4b1)
+
+
+
+## [v0.8.22] - 2026-04-13
+
+### Changes
+
+- fix: cross-handler SPA navigation, navigation edge cases, and Tier 1 file uploads (#58) (798ca90)
+
+
+
+## [v0.8.21] - 2026-04-11
+
+### Changes
+
+- feat: polyfill command/commandfor for cross-browser dialog support (#57) (565176c)
+
+
+
+## [v0.8.20] - 2026-04-10
+
+### Changes
+
+- feat: extend livetemplate.css with shared utilities and chat styles (#54) (c12e1e8)
+
+
+
+## [v0.8.19] - 2026-04-05
+
+### Changes
+
+- feat: add data-lvt-target for cross-element targeting in lvt-el: methods (#53) (89aa203)
+
+
+
+## [Unreleased]
+
+### Added
+
+- feat: `data-lvt-target` attribute for cross-element targeting — `lvt-el:` methods can now operate on a different element via `#id` or `closest:selector`
+
+## [v0.8.18] - 2026-04-05
+
+### Changes
+
+- chore(release): v0.8.17 (d6b41a4)
+- feat: extend lvt-el: to support native DOM event triggers (#49) (ddf92c2)
+- fix: form.name DOM shadowing + skip File objects in FormData parsing (58cf0c2)
+
+
+
+## [Unreleased]
+
+### Added
+
+- feat: `lvt-el:{method}:on:{event}` now supports any native DOM event as trigger (click, focusin, focusout, mouseenter, mouseleave, keydown, etc.) — no server round-trip, CSP-safe
+- feat: `lvt-fx:{effect}:on:{event}` supports DOM event triggers (e.g., `lvt-fx:highlight:on:click="flash"`) and lifecycle triggers (e.g., `lvt-fx:highlight:on:success="flash"`)
+
+## [v0.8.17] - 2026-04-05
+
+### Changes
+
+- fix: form.name DOM shadowing + skip File objects in FormData parsing (58cf0c2)
+
+
+## [v0.8.16] - 2026-04-04
+
+### Changes
+
+
+
+
+## [v0.8.15] - 2026-04-04
+
+### Changes
+
+- feat: Tier 1 file uploads — HTTP fetch for forms with file inputs (387e2fe)
+
+
+
+## [v0.8.14] - 2026-04-04
+
+### Changes
+
+- fix: lvt-form:action routing, lvt-nav:no-intercept, unreserve action field (#45) (6598832)
+
+
+
+## [v0.8.13] - 2026-04-04
+
+### Changes
+
+- Phase 1A: Client attribute reduction — generic event router + removals (#44) (5328b85)
+
+
+
+## [v0.8.12] - 2026-04-02
+
+### Changes
+
+- feat: add client-side toast directive (#42) (5f3a1e2)
+
+
+
+## [v0.8.10] - 2026-03-30
+
+### Changes
+
+- feat: auto-wire Change() for <select> elements & fix cursor reset (#40) (b2ddc56)
+
+
+
+## [v0.8.9] - 2026-03-30
+
+### Changes
+
+- fix: harden release script with clean build and verification (#37) (b2b59e4)
+- fix: pull latest from remote before releasing (#36) (74d6f74)
+
+
+
+## [v0.8.8] - 2026-03-29
+
+### Changes
+
+
+
+
+## [v0.8.7] - 2026-03-27
+
+### Changes
+
+- feat: formless standalone button support (#29) (55c4dca)
+- feat: implement Change() auto-inference client support (#25) (64476eb)
+- feat: auto-intercept forms for progressive complexity (#23) (b4b9672)
+- fix: use wss:// for WebSocket on HTTPS pages (#22) (398f752)
+
+
+
+## [v0.8.6] - 2026-03-26
+
+### Changes
+
+- fix: use current branch name in release script instead of hardcoded main (97c79ec)
+- feat: implement Change() auto-inference client support (#25) (64476eb)
+- feat: auto-intercept forms for progressive complexity (#23) (b4b9672)
+- fix: use wss:// for WebSocket on HTTPS pages (#22) (398f752)
+
+
+
+## [v0.8.5] - 2026-03-25
+
+### Changes
+
+- feat: auto-intercept forms for progressive complexity (#23) (b4b9672)
+- fix: use wss:// for WebSocket on HTTPS pages (#22) (398f752)
+
+
+
+## [v0.8.4] - 2026-03-14
+
+### Changes
+
+
+
+
+## [v0.8.3] - 2026-02-27
+
+### Changes
+
+- chore: upgrade Go to 1.26 in CI workflows (#21) (dcf15f7)
+
+
+
+## [v0.8.2] - 2026-02-02
+
+### Changes
+
+- fix: use deep merge for update operations to preserve statics (#20) (a71c25d)
+- fix: preserve large integers as strings to prevent precision loss (#19) (8c13758)
+- feat: support auto-generated _k keys in range item matching (#18) (5d5f727)
+
+
+
+## [v0.8.0] - 2026-01-18
+
+### Changes
+
+
+
+
+## [v0.7.12] - 2026-01-10
+
+### Changes
+
+- fix(event-delegation): debounce captures latest input value (3d5b5e9)
+- fix(client): skip debounce for search event (clear button) (35adeb7)
+- fix(client): handle search event for input type="search" clear button (9afc00e)
+
+
+
+## [v0.7.11] - 2026-01-05
+
+### Changes
+
+- fix(tree-renderer): handle range→non-range transitions in deepMergeTreeNodes (#16) (f95a08b)
+
+
+
+## [v0.7.10] - 2026-01-04
+
+### Changes
+
+- feat(modal): add data-modal-close-action attribute support (#15) (c8321b3)
+- fix(ci): increase max-turns and simplify review prompt (bba2fe7)
+- fix(ci): use stable claude-code-action v1 with correct inputs (eb2d2e4)
+- feat(modal): add data-modal-close-action attribute support (8bf64f4)
+- fix(ci): use correct input parameter for claude-code-action (50c8a1f)
+
+
+
+## [v0.7.9] - 2026-01-03
+
+### Changes
+
+- fix(release): sync with full core library version (9d5be47)
+- fix(modal): simplify modal close button handling (#14) (404b210)
+
+
+
+## [v0.7.7] - 2025-12-26
+
+### Changes
+
+- fix: query params in WebSocket URL + password field handling (#13) (42604a6)
+
+
+
+## [v0.7.4] - 2025-12-23
+
+### Changes
+
+- add .npmrc (0e1ef6e)
+
+
+
+## [v0.7.3] - 2025-12-22
+
+### Changes
+
+- fix: support heterogeneous range items with per-item statics (#12) (badad08)
+- fix: handle plain data objects gracefully in tree renderer (#11) (c64fb24)
+- feat: client updates for livepage features (#10) (cb6af54)
+- fix: apply differential ops to existing range structures (#9) (50a3ebc)
+- fix: handle objects with only numeric keys in renderValue (#8) (b1c7827)
+- feat: add lvt-focus-trap and lvt-autofocus attributes (#7) (7b14402)
+- feat: add reactive attributes for action lifecycle events (#6) (46e2065)
+
+
+
+## [v0.7.2] - 2025-12-20
+
+### Changes
+
+- fix: support heterogeneous range items with per-item statics (#12)
+- fix: handle plain data objects gracefully in tree renderer (#11) (c64fb24)
+- feat: client updates for livepage features (#10) (cb6af54)
+- fix: apply differential ops to existing range structures (#9) (50a3ebc)
+- fix: handle objects with only numeric keys in renderValue (#8) (b1c7827)
+- feat: add lvt-focus-trap and lvt-autofocus attributes (#7) (7b14402)
+- feat: add reactive attributes for action lifecycle events (#6) (46e2065)
+
+
+
+## [v0.7.1] - 2025-12-14
+
+### Changes
+
+- fix: apply differential ops to existing range structures (#9) (50a3ebc)
+- fix: handle objects with only numeric keys in renderValue (#8) (b1c7827)
+- feat: add lvt-focus-trap and lvt-autofocus attributes (#7) (7b14402)
+- feat: add reactive attributes for action lifecycle events (#6) (46e2065)
+
+
+
+## [v0.7.0] - 2025-12-10
+
+### Changes
+
+
+
+
+## [v0.7.0] - 2025-12-10
+
+### Changes
+
+- feat: add lvt-focus-trap and lvt-autofocus attributes (#7) (7b14402)
+- feat: add reactive attributes for action lifecycle events (#6) (46e2065)
+
+
+
+## [v0.4.1] - 2025-11-27
+
+### Changes
+
+- feat: improve test coverage from 38% to 60% (#4) (9755643)
+- Add Claude Code GitHub Workflow (#5) (79e3d0b)
+
+
+
+## [v0.4.0] - 2025-11-22
+
+### Changes
+
+- fix: use numeric constant instead of WebSocket.OPEN (#3) (6462ccb)
+- fix(upload): clear file input after successful upload to prevent duplicate uploads (af6f7aa)
+- feat(upload): implement AutoUpload config and form submit trigger (b77e1ff)
+
+
+Initial release of @livetemplate/client as a standalone package.
+
+### Features
+
+- TypeScript client for LiveTemplate tree-based updates
+- WebSocket transport for real-time updates
+- DOM morphing with morphdom
+- Focus management and form lifecycle
+- Event delegation
+- Modal management

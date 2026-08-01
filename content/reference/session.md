@@ -10,7 +10,7 @@ source_commit: "22a4853506a682583b511e470bdd1e6193f4d5fe"
 
 Session infrastructure in LiveTemplate handles state storage, connection management, and WebSocket configuration. This guide covers state safety guarantees, session stores, connection management, and performance tuning for production deployments.
 
-For pushing updates from server-side code, see [Server Actions Reference](server-actions.md).
+For pushing updates from server-side code, see [Server Actions Reference](/reference/server-actions).
 
 ## Overview
 
@@ -115,7 +115,7 @@ func (c *TodoController) RefreshTodos(state TodoState, ctx *livetemplate.Context
 
 ## State Safety
 
-LiveTemplate ensures safe state management through two dimensions: **purity enforcement** (preventing dependency types in state) and **session isolation** (preventing cross-user data leakage). For the full Controller+State pattern, see the [Controller+State Pattern Reference](controller-pattern.md).
+LiveTemplate ensures safe state management through two dimensions: **purity enforcement** (preventing dependency types in state) and **session isolation** (preventing cross-user data leakage). For the full Controller+State pattern, see the [Controller+State Pattern Reference](/reference/controller-pattern).
 
 ### State Purity
 
@@ -174,7 +174,7 @@ If state contains functions, channels, or circular references, the JSON round-tr
 
 #### Layer 4: Test Helper
 
-`AssertPureState[T](t)` runs the same validation as Layer 2 but fails the test instead of panicking:
+`AssertPureState[T](https://github.com/livetemplate/livetemplate/blob/v0.22.0/docs/references/t)` runs the same validation as Layer 2 but fails the test instead of panicking:
 
 ```go
 func TestState(t *testing.T) {
@@ -190,7 +190,7 @@ Add this to every state type's test file. It catches dependency leakage in CI be
 |-----------|---------------|---------|
 | Dependency type in state struct | `AsState[T]()` at handler registration | **Panic** with field name and type |
 | Non-serializable field (func, chan) | First session clone at runtime | JSON marshal error |
-| Dependency in test | `AssertPureState[T](t)` in test suite | Test failure with field name and type |
+| Dependency in test | `AssertPureState[T](https://github.com/livetemplate/livetemplate/blob/v0.22.0/docs/references/t)` in test suite | Test failure with field name and type |
 
 ### Session Isolation
 
@@ -557,16 +557,16 @@ var (
 
 ## Limitations
 
-- **Dependency detection is heuristic**: Only catches 9 known dependency patterns (stdlib types like `*sql.DB` plus common third-party types like `*redis.Client`). `AssertPureState[T](t)` uses the same `validatePureState` heuristics as `AsState`—it helps you catch the *same* issues earlier in CI / tests without panicking, but it does not broaden detection. Truly unknown custom wrappers or third-party types will not be flagged unless you extend the framework's pattern list or add custom validation.
+- **Dependency detection is heuristic**: Only catches 9 known dependency patterns (stdlib types like `*sql.DB` plus common third-party types like `*redis.Client`). `AssertPureState[T](https://github.com/livetemplate/livetemplate/blob/v0.22.0/docs/references/t)` uses the same `validatePureState` heuristics as `AsState`—it helps you catch the *same* issues earlier in CI / tests without panicking, but it does not broaden detection. Truly unknown custom wrappers or third-party types will not be flagged unless you extend the framework's pattern list or add custom validation.
 - **Warning — Session isolation depends on Authenticator**: A custom `Authenticator` that returns the same `groupID` for different users would break isolation. Use the built-in authenticators or ensure `GetSessionGroup` maps distinct users to distinct groups.
 - **JSON serialization overhead**: State cloning involves a JSON round-trip per session. Keep state structs small for best performance.
 
-See [Current Limitations](current-limitations.md) for the full limitations reference.
+See [Current Limitations](/reference/limitations) for the full limitations reference.
 
 ## See Also
 
-- [Controller+State Pattern](controller-pattern.md) - Full pattern reference with lifecycle methods and examples
-- [Server Actions Reference](server-actions.md) - TriggerAction API for server-initiated updates
-- [Authentication Reference](authentication.md) - User identification and custom authenticators
-- [Current Limitations](current-limitations.md) - All known limitations and workarounds
-- [Scaling Guide](../guides/SCALING.md) - Horizontal scaling with Redis
+- [Controller+State Pattern](/reference/controller-pattern) - Full pattern reference with lifecycle methods and examples
+- [Server Actions Reference](/reference/server-actions) - TriggerAction API for server-initiated updates
+- [Authentication Reference](/reference/authentication) - User identification and custom authenticators
+- [Current Limitations](/reference/limitations) - All known limitations and workarounds
+- [Scaling Guide](/guides/scaling) - Horizontal scaling with Redis

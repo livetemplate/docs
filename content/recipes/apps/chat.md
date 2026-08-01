@@ -1,9 +1,8 @@
 ---
 title: "Chat"
 description: "A runnable realtime chat app showing LiveTemplate actions, shared state, server push, and scroll behavior."
-source_repo: "https://github.com/livetemplate/examples"
-source_path: "chat/README.md"
-source_commit: "5054ed6726d9596d294a50b80f11488302b3ec2d"
+source_repo: "https://github.com/livetemplate/docs"
+source_path: "content/recipes/apps/chat.md"
 ---
 
 # Building a Real-Time Chat App with LiveTemplate
@@ -523,7 +522,8 @@ Same pattern, different data!
 
 ## Related Documentation
 
-- [LiveTemplate Core Docs](../../README.md)
-- [Broadcasting Guide](../../docs/design/IMPLEMENTATION_STATUS.md)
+- [Server API reference](/reference/api)
+- [PubSub reference](/reference/pubsub) — the fan-out this app is built on
+- [Server push](/recipes/server-push)
 - [Template Syntax](https://pkg.go.dev/html/template)
 - [LiveTemplate API](https://pkg.go.dev/github.com/livetemplate/livetemplate)

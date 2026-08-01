@@ -293,7 +293,7 @@ The `pending` state fires instantly on click (before the server even receives th
 
 **Trade-offs:** the pending state is client-only — it does not fan out to peer tabs, does not survive reconnect, and cannot drive server-side logic. The action blocks the event loop for its duration (no other clicks or peer pushes until it returns). For loading that is real application state, use 7.3.
 
-See the [Client Attributes Reference — Reactive Attributes](../references/client-attributes.md#reactive-attributes) for the full `lvt-el:*` pattern.
+See the [Client Attributes Reference — Reactive Attributes](/reference/client-attributes#reactive-attributes) for the full `lvt-el:*` pattern.
 
 ### 7.3 Server-Owned Loading (Tier 1)
 
@@ -377,7 +377,7 @@ The template is identical — `{{if .Loading}}` works the same way. The key guar
 - **Connection-scoped** — only the originating connection gets the completion render
 - **Lifetime-bound** — if the connection closes, the goroutine is cancelled and `apply` is skipped
 
-See the [Async API reference](../references/api-reference.md#async) for the full contract.
+See the [Async API reference](/reference/api#async) for the full contract.
 
 #### Zero-boilerplate with `{{.lvt.Pending}}`
 
@@ -570,7 +570,7 @@ The server determines the client's transport from the HTTP request:
 
 ### What Works at Each Level
 
-For a complete feature-by-transport breakdown, see the [Transport Compatibility table](../references/progressive-complexity-reference.md#transport-compatibility) in the reference doc.
+For a complete feature-by-transport breakdown, see the [Transport Compatibility table](/reference/progressive-complexity#transport-compatibility) in the reference doc.
 
 ### Disabling Progressive Enhancement
 
@@ -586,7 +586,7 @@ When disabled, POST requests from non-JS browsers return JSON instead of HTML. O
 
 ## 13. Tier 2: `lvt-*` Attributes
 
-Use `lvt-*` attributes only when standard HTML cannot express the behavior. For the complete attribute reference, see the [Client Attributes Reference](../references/client-attributes.md).
+Use `lvt-*` attributes only when standard HTML cannot express the behavior. For the complete attribute reference, see the [Client Attributes Reference](/reference/client-attributes).
 
 ### 13.1 Event Bindings Outside Forms
 
@@ -602,7 +602,7 @@ For interactions outside the form submit lifecycle — hover effects, focus/blur
 
 > **Prefer Tier 1 when possible:** For buttons that trigger actions, use `<form>` + `<button name="action" value="save">` instead of `lvt-on:click`. See [Section 2](#2-multiple-actions-with-button-names).
 
-See [Client Attributes Reference — Event Bindings](../references/client-attributes.md#event-bindings) for the full list of `lvt-on:{event}` bindings.
+See [Client Attributes Reference — Event Bindings](/reference/client-attributes#event-bindings) for the full list of `lvt-on:{event}` bindings.
 
 ### 13.2 Rate Limiting
 
@@ -616,7 +616,7 @@ HTML has no mechanism for debounce or throttle. **Debounce** waits until the use
 <div lvt-on:window:scroll="loadMore" lvt-mod:throttle="100">...</div>
 ```
 
-See [Client Attributes Reference — Rate Limiting](../references/client-attributes.md#rate-limiting) for details.
+See [Client Attributes Reference — Rate Limiting](/reference/client-attributes#rate-limiting) for details.
 
 ### 13.3 Keyboard Shortcuts
 
@@ -632,7 +632,7 @@ Filter events by key and listen at the window level for global shortcuts:
 </div>
 ```
 
-See [Client Attributes Reference — Keyboard Events](../references/client-attributes.md#keyboard-events) for valid key values.
+See [Client Attributes Reference — Keyboard Events](/reference/client-attributes#keyboard-events) for valid key values.
 
 ### 13.4 Reactive DOM
 
@@ -656,7 +656,7 @@ Declarative DOM mutations tied to the action lifecycle (`pending`, `success`, `e
 
 Available reactive actions: `lvt-el:addClass:on:*`, `lvt-el:removeClass:on:*`, `lvt-el:toggleClass:on:*`, `lvt-el:setAttr:on:*`, `lvt-el:toggleAttr:on:*`, `lvt-el:reset:on:*`.
 
-See [Client Attributes Reference — Reactive Attributes](../references/client-attributes.md#reactive-attributes) for the full pattern.
+See [Client Attributes Reference — Reactive Attributes](/reference/client-attributes#reactive-attributes) for the full pattern.
 
 ### 13.5 Directives
 
@@ -698,7 +698,7 @@ Directives also support lifecycle and DOM event triggers via `:on:` syntax. With
 <div lvt-fx:highlight:on:click="flash">Click to highlight</div>
 ```
 
-See [Client Attributes Reference — Directives](../references/client-attributes.md#directives) for all scroll, highlight, and animation options.
+See [Client Attributes Reference — Directives](/reference/client-attributes#directives) for all scroll, highlight, and animation options.
 
 ### 13.6 Complete Tier 2 Example
 
@@ -774,4 +774,4 @@ func (c *SearchController) ClearSearch(state SearchState, ctx *livetemplate.Cont
 
 ---
 
-See also: [Progressive Complexity Reference](../references/progressive-complexity-reference.md) for a quick-lookup table of HTML attributes and their framework behaviors, [Client Attributes Reference](../references/client-attributes.md) for the complete `lvt-*` attribute listing, and [Ephemeral Components Guide](ephemeral-components.md) for implementing client-side toast/alert patterns.
+See also: [Progressive Complexity Reference](/reference/progressive-complexity) for a quick-lookup table of HTML attributes and their framework behaviors, [Client Attributes Reference](/reference/client-attributes) for the complete `lvt-*` attribute listing, and [Ephemeral Components Guide](/guides/ephemeral-components) for implementing client-side toast/alert patterns.

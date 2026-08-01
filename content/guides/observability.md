@@ -409,6 +409,6 @@ func RequestIDMiddleware(next http.Handler) http.Handler {
 
 ## Related Documentation
 
-- [ARCHITECTURE.md](ARCHITECTURE.md) - System architecture overview
-- [internal/observe/](../internal/observe/) - Package implementation
+- [ARCHITECTURE.md](https://github.com/livetemplate/livetemplate/blob/v0.22.0/docs/guides/ARCHITECTURE.md) - System architecture overview
+- [internal/observe/](https://github.com/livetemplate/livetemplate/tree/v0.22.0/docs/internal/observe) - Package implementation
 - [Go slog documentation](https://pkg.go.dev/log/slog) - Standard library reference

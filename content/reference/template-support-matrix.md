@@ -212,7 +212,7 @@ Two behaviours differ from that and are worth knowing:
 | Built-in Go functions | ✅ | All standard functions supported |
 | User-defined functions | ⚠️ | Must be registered with Go template engine |
 | Zero-arg method calls on data | ✅ | Public methods; precomputed from State (`{{.Count}}`) |
-| Arg-accepting method calls | ⚠️ | Only on a struct **field**, not top-level State — `{{.Views.Class .ID}}`, not `{{.Class .ID}}` (see [Controller Pattern — view helpers](controller-pattern.md#methods-that-take-arguments-view-helpers)) |
+| Arg-accepting method calls | ⚠️ | Only on a struct **field**, not top-level State — `{{.Views.Class .ID}}`, not `{{.Class .ID}}` (see [Controller Pattern — view helpers](/reference/controller-pattern#methods-that-take-arguments-view-helpers)) |
 
 ## Performance Considerations
 

@@ -6,6 +6,7 @@ import (
 	"io"
 	"os"
 	"os/exec"
+	"path"
 	"path/filepath"
 	"regexp"
 	"strings"
@@ -114,6 +115,7 @@ func Run(opts Options) (Result, error) {
 			continue
 		}
 		rewritten := rewriter.Rewrite(stripped)
+		rewritten = rewriter.RewriteRelative(rewritten, p, opts.Ref)
 		out := composeWithFrontmatter(title, p.SourceRepo, p.SourcePath, opts.Ref, commit, upstreamFM, rewritten)
 
 		existing, _ := os.ReadFile(dest)
@@ -358,21 +360,129 @@ func writeFrontmatterValue(b *strings.Builder, key string, v any) {
 // known page are left untouched (so external GitHub references survive).
 type linkRewriter struct {
 	urlToSiteURL map[string]string
+	// repoPathToSiteURL maps repo+"\x00"+source_path to a page's site URL.
+	// RewriteRelative needs the lookup keyed by repo-relative path rather
+	// than by full GitHub URL, since that is what resolving an
+	// upstream-relative link produces.
+	repoPathToSiteURL map[string]string
 }
 
 func newLinkRewriter(cfg *SourceOfTruth) *linkRewriter {
 	m := make(map[string]string, len(cfg.Pages)*2)
+	byPath := make(map[string]string, len(cfg.Pages))
 	for _, p := range cfg.Pages {
 		repo := strings.TrimSuffix(strings.TrimSpace(p.SourceRepo), "/")
-		path := strings.TrimPrefix(strings.TrimSpace(p.SourcePath), "/")
-		if repo == "" || path == "" {
+		srcPath := strings.TrimPrefix(strings.TrimSpace(p.SourcePath), "/")
+		if repo == "" || srcPath == "" {
 			continue
 		}
 		// Both the canonical edit-form URL and the blob form should rewrite.
-		m[repo+"/blob/main/"+path] = p.SiteURL
-		m[repo+"/edit/main/"+path] = p.SiteURL
+		m[repo+"/blob/main/"+srcPath] = p.SiteURL
+		m[repo+"/edit/main/"+srcPath] = p.SiteURL
+		byPath[repo+"\x00"+srcPath] = p.SiteURL
 	}
-	return &linkRewriter{urlToSiteURL: m}
+	return &linkRewriter{urlToSiteURL: m, repoPathToSiteURL: byPath}
+}
+
+// markdownLinkRE matches the target of a `](...)` markdown link. Only that
+// form is matched: upstream prose also contains bare relative paths that are
+// not links, and rewriting those would corrupt them. isRelativeRef then
+// decides which targets are upstream-relative.
+var markdownLinkRE = regexp.MustCompile(`\]\(([^)\s]+)\)`)
+
+// isRelativeRef reports whether a markdown link target is a path relative to
+// the page's own location upstream — the kind that breaks once mirrored.
+//
+// Both spellings occur and both break: the dot-prefixed form
+// ("../references/api-reference.md") and the bare sibling form
+// ("controller-pattern.md", which upstream uses for same-directory links).
+// The bare form is the more common of the two and resolves on the docs site
+// to a URL ending in .md, which tinkerdown does not serve.
+func isRelativeRef(target string) bool {
+	switch {
+	case target == "":
+		return false
+	case strings.HasPrefix(target, "#"): // in-page anchor
+		return false
+	case strings.HasPrefix(target, "/"): // site-absolute, incl. protocol-relative
+		return false
+	}
+	// A scheme (http:, https:, mailto:, tel:) means it is not relative. Look
+	// for ':' before the first '/' so that "docs/a:b.md" is not mistaken for
+	// one.
+	if i := strings.IndexAny(target, ":/"); i >= 0 && target[i] == ':' {
+		return false
+	}
+	return true
+}
+
+// RewriteRelative resolves upstream-relative markdown links against the
+// mirrored page's own location in its source repo.
+//
+// Upstream links its siblings relatively — `../references/api-reference.md`
+// from `docs/guides/foo.md` — which is correct *in that repo* and dead once
+// mirrored, because the docs site has no such path. Resolving against
+// page.SourcePath's directory yields the repo-relative target, which either
+// maps to a mirrored page (rewrite to its site URL) or is a real upstream
+// file that is not mirrored (rewrite to its GitHub URL, so the reader still
+// reaches it rather than a 404).
+//
+// Fenced code blocks are skipped: a relative path inside an example is part
+// of the example.
+func (r *linkRewriter) RewriteRelative(body string, page PageEntry, ref string) string {
+	repo := strings.TrimSuffix(strings.TrimSpace(page.SourceRepo), "/")
+	srcPath := strings.TrimPrefix(strings.TrimSpace(page.SourcePath), "/")
+	if repo == "" || srcPath == "" || ref == "" {
+		return body
+	}
+	srcDir := path.Dir(srcPath)
+
+	lines := strings.Split(body, "\n")
+	inFence := false
+	for i, ln := range lines {
+		if strings.HasPrefix(strings.TrimSpace(ln), "```") {
+			inFence = !inFence
+			continue
+		}
+		if inFence {
+			continue
+		}
+		lines[i] = markdownLinkRE.ReplaceAllStringFunc(ln, func(m string) string {
+			target := markdownLinkRE.FindStringSubmatch(m)[1]
+			if !isRelativeRef(target) {
+				return m
+			}
+			return "](" + r.resolveRelative(target, repo, srcDir, ref) + ")"
+		})
+	}
+	return strings.Join(lines, "\n")
+}
+
+// resolveRelative maps one upstream-relative link target to its docs-site or
+// GitHub destination, preserving any #fragment.
+func (r *linkRewriter) resolveRelative(target, repo, srcDir, ref string) string {
+	frag := ""
+	if i := strings.IndexByte(target, '#'); i >= 0 {
+		frag, target = target[i:], target[:i]
+	}
+	if target == "" {
+		return target + frag
+	}
+	isDir := strings.HasSuffix(target, "/")
+	resolved := path.Join(srcDir, target)
+	// A target that climbs above the repo root cannot be resolved to
+	// anything meaningful; leave it exactly as it was.
+	if resolved == ".." || strings.HasPrefix(resolved, "../") {
+		return target + frag
+	}
+	if site, ok := r.repoPathToSiteURL[repo+"\x00"+resolved]; ok {
+		return site + frag
+	}
+	kind := "blob"
+	if isDir {
+		kind = "tree"
+	}
+	return repo + "/" + kind + "/" + ref + "/" + resolved + frag
 }
 
 // Rewrite applies the rewrite rules to the input markdown body. Only

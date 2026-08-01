@@ -106,4 +106,4 @@ for the full pattern and the per-user vs shared-group distinction.
   — the source for the many-sessions demo above: one goroutine, `handler.Publish`,
   every viewer refreshed.
 - [Pubsub](/recipes/pubsub) — the peer fan-out side: `Subscribe` + `Publish`.
-- [Login](/recipes/login) — pushes a completed background result to the browser.
+- [Login](/recipes/login/) — pushes a completed background result to the browser.

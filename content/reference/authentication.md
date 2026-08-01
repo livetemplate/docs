@@ -454,7 +454,7 @@ LiveTemplate's `Redirect()` method automatically prevents open redirects by:
 
 ## See Also
 
-- [Server Actions Reference](server-actions.md) - Push updates from server-side code
-- [Session Reference](session.md) - Session stores and connection management
-- [Error Handling](error-handling.md) - Validation and error display
-- [Scaling Guide](../guides/SCALING.md) - Redis-backed session stores for distributed deployments
+- [Server Actions Reference](/reference/server-actions) - Push updates from server-side code
+- [Session Reference](/reference/session) - Session stores and connection management
+- [Error Handling](/reference/error-handling) - Validation and error display
+- [Scaling Guide](/guides/scaling) - Redis-backed session stores for distributed deployments

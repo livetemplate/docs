@@ -58,7 +58,7 @@ if err := ctx.BindAndValidate(&input, c.validate); err != nil {
 }
 ```
 
-For HTML-attribute-based validation (`required`, `pattern`, `min`, `max`), see the [Error Handling reference](../references/error-handling.md) for the `ValidateForm` + `WithFormSchema` pattern.
+For HTML-attribute-based validation (`required`, `pattern`, `min`, `max`), see the [Error Handling reference](/reference/error-handling) for the `ValidateForm` + `WithFormSchema` pattern.
 
 ---
 
@@ -97,7 +97,7 @@ tmpl, _ := livetemplate.New("app",
 )
 ```
 
-See [PubSub Reference](../references/pubsub.md) for details.
+See [PubSub Reference](/reference/pubsub) for details.
 
 ---
 
@@ -147,16 +147,16 @@ LiveTemplate is inspired by Phoenix LiveView but does not yet cover its full fea
 
 | Feature | LiveView | LiveTemplate | Notes |
 |---------|----------|-------------|-------|
-| **Live Navigation** | `push_navigate`, `push_patch` | Partial — `__navigate__` action covers same-handler query-string navigation (no reconnect). Different-handler nav still falls back to fetch or full page load. | See [Navigate Action](../references/navigate.md). |
+| **Live Navigation** | `push_navigate`, `push_patch` | Partial — `__navigate__` action covers same-handler query-string navigation (no reconnect). Different-handler nav still falls back to fetch or full page load. | See [Navigate Action](/reference/navigate). |
 | **Stateful Components** | `LiveComponent` with own lifecycle | Stateless templates only | `{{template}}` invocations work but have no component-level state or event handling. |
 | **Streams** | `stream/3` for large lists | Not yet | LiveView streams handle large/infinite lists without keeping all items in server memory. Streaming-range rendering (PRs #366/#368/#369/#370) is the latest step toward this. |
-| **JS Commands** | `JS.push`, `JS.toggle`, `JS.show` | Partial | [`lvt-*` reactive attributes](../references/client-attributes.md) cover common cases (disable, add/remove class, set attribute) but aren't as composable as LiveView's server-defined JS chains. |
-| **Client Hooks** | `phx-hook` lifecycle callbacks | Proposed | [`lvt-hook` proposal](../proposals/lifecycle-hooks-proposal.md) covers third-party JS library integration; not yet shipped. |
+| **JS Commands** | `JS.push`, `JS.toggle`, `JS.show` | Partial | [`lvt-*` reactive attributes](/reference/client-attributes) cover common cases (disable, add/remove class, set attribute) but aren't as composable as LiveView's server-defined JS chains. |
+| **Client Hooks** | `phx-hook` lifecycle callbacks | Proposed | [`lvt-hook` proposal](https://github.com/livetemplate/livetemplate/blob/v0.22.0/docs/proposals/lifecycle-hooks-proposal.md) covers third-party JS library integration; not yet shipped. |
 | **Presence** | `Phoenix.Presence` | Not built-in | Can be built on LiveTemplate's session stores; requires manual implementation. |
 | **Testing Helpers** | `live/2`, `render_click/3` | Minimal | `AssertPureState` exists; no view-level test DSL. Browser tests use chromedp. |
 | **Form Recovery** | Automatic on reconnect | Partial — `lvt-form:preserve` retains specific fields across re-renders | Full automatic recovery on WS reconnection is not yet built in. |
 
-For day-to-day workarounds, see [Current Limitations](../references/current-limitations.md).
+For day-to-day workarounds, see [Current Limitations](/reference/limitations).
 
 ---
 
@@ -177,7 +177,7 @@ Tier 2 is only for behaviors standard HTML cannot express. For example, debounce
     placeholder="Search...">
 ```
 
-See the [Progressive Complexity Guide](progressive-complexity.md) for the complete walkthrough.
+See the [Progressive Complexity Guide](/guides/progressive-complexity) for the complete walkthrough.
 
 ---
 
@@ -203,8 +203,8 @@ See the [Progressive Complexity Guide](progressive-complexity.md) for the comple
 
 ## See Also
 
-- [Progressive Complexity Guide](progressive-complexity.md) — Full walkthrough from standard HTML to `lvt-*` attributes
-- [Progressive Complexity Reference](../references/progressive-complexity-reference.md) — Quick-lookup table
-- [Controller+State Pattern](../references/controller-pattern.md) — Core architecture pattern
-- [Client Attributes](../references/client-attributes.md) — Complete `lvt-*` reference
+- [Progressive Complexity Guide](/guides/progressive-complexity) — Full walkthrough from standard HTML to `lvt-*` attributes
+- [Progressive Complexity Reference](/reference/progressive-complexity) — Quick-lookup table
+- [Controller+State Pattern](/reference/controller-pattern) — Core architecture pattern
+- [Client Attributes](/reference/client-attributes) — Complete `lvt-*` reference
 - [Examples](https://github.com/livetemplate/examples) — Counter, Todos, Chat, and more

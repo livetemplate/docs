@@ -8,7 +8,7 @@ source_commit: "22a4853506a682583b511e470bdd1e6193f4d5fe"
 
 # Current Limitations
 
-Known limitations of LiveTemplate, organized by category. Each entry includes the impact, workaround, and current status. For planned improvements, see the [Roadmap](../../ROADMAP.md).
+Known limitations of LiveTemplate, organized by category. Each entry includes the impact, workaround, and current status. For planned improvements, see the [Roadmap](https://github.com/livetemplate/livetemplate/blob/v0.22.0/ROADMAP.md).
 
 All limitations verified against the current codebase.
 
@@ -27,7 +27,7 @@ These Go template constructs trigger a fallback to HTML segmentation, which prod
 | `{{block}}` with dynamic template names | Use `{{template "name" .}}` with static names | By design (fallback) |
 | `iter.Seq` ranges | Collect iterator to slice before passing to template | Blocked on Go templates |
 
-See [HTML Fallback Coverage](../roadmap/html-fallback-coverage.md) for test coverage details and [Template Support Matrix](template-support-matrix.md) for full Go template feature support.
+See [HTML Fallback Coverage](https://github.com/livetemplate/livetemplate/blob/v0.22.0/docs/roadmap/html-fallback-coverage.md) for test coverage details and [Template Support Matrix](/reference/template-support-matrix) for full Go template feature support.
 
 ---
 
@@ -40,11 +40,11 @@ These features require the JavaScript client (fetch or WebSocket transport). Sta
 | Standalone buttons outside `<form>` | Wrap in `<form method="POST">` | Button click events require JS to intercept |
 | `Change()` live input binding | N/A — form is submit-only | Requires client to detect input changes and send to server |
 | `form.name` routing | Use `button name` instead | JS client reads `form.name` as an action router — standard HTML POST ignores it as a routing signal |
-| `lvt-*` attributes | Use standard HTML equivalents (see [Progressive Complexity Guide](../guides/progressive-complexity.md)) | Custom attributes require JS to interpret |
+| `lvt-*` attributes | Use standard HTML equivalents (see [Progressive Complexity Guide](/guides/progressive-complexity)) | Custom attributes require JS to interpret |
 | Server push / broadcast | N/A — poll or page reload | Requires WebSocket connection |
 | SPA navigation (link interception) | Standard full-page navigation | Requires JS to intercept clicks and use `fetch()` |
 
-See the [Transport Compatibility table](progressive-complexity-reference.md#transport-compatibility) for a complete feature-by-transport breakdown.
+See the [Transport Compatibility table](/reference/progressive-complexity#transport-compatibility) for a complete feature-by-transport breakdown.
 
 ---
 
@@ -54,9 +54,9 @@ See the [Transport Compatibility table](progressive-complexity-reference.md#tran
 |-----------|--------|-----------|
 | JSON serialization overhead | State is cloned via JSON marshal/unmarshal per session | Keep state structs small; avoid large nested structures |
 | State must be JSON-serializable | Functions, channels, and unexported fields cannot be in state | Put non-serializable dependencies in the controller |
-| Dependency detection is heuristic | `AsState[T]()` only catches 9 known dependency patterns (stdlib + `*redis.Client`) | Add `AssertPureState[T](t)` to test files for stricter validation |
+| Dependency detection is heuristic | `AsState[T]()` only catches 9 known dependency patterns (stdlib + `*redis.Client`) | Add `AssertPureState[T](https://github.com/livetemplate/livetemplate/blob/v0.22.0/docs/references/t)` to test files for stricter validation |
 
-See [Session Reference — State Safety](session.md#state-safety) for the full enforcement architecture.
+See [Session Reference — State Safety](/reference/session#state-safety) for the full enforcement architecture.
 
 ---
 
@@ -67,7 +67,7 @@ See [Session Reference — State Safety](session.md#state-safety) for the full e
 | Tabs don't update each other by default | Each connection owns its state independently (peer fan-out is opt-in) | Subscribe to `ctx.SelfTopic()` in `Mount`, then `ctx.Publish(ctx.SelfTopic(), "Action", data)` from the action that mutated shared state |
 | Concurrent HTTP requests serialized | Per-group mutex in HTTP mode processes one action at a time | By design — prevents data races on shared state |
 
-See [Session Reference](session.md) for session stores and connection management.
+See [Session Reference](/reference/session) for session stores and connection management.
 
 ---
 
@@ -102,14 +102,14 @@ Use `ctx.IsHTTP()` to check which transport is active in an action method.
 | State cloning JSON round-trip | Per-session cost on first request | Keep state small; subsequent renders are fast (~3 KB, 61 allocs) |
 | HTML fallback parsing (3.05% of allocations) | Triggered by unsupported template constructs (see Template Features above) | Improve template construct coverage to reduce fallback frequency |
 
-See [Known Bottlenecks](../performance/known-bottlenecks.md) for detailed profiling data and optimization history.
+See [Known Bottlenecks](https://github.com/livetemplate/livetemplate/blob/v0.22.0/docs/performance/known-bottlenecks.md) for detailed profiling data and optimization history.
 
 ---
 
 ## See Also
 
-- [Roadmap](../../ROADMAP.md) — Planned improvements and feature timeline
-- [Session Reference — State Safety](session.md#state-safety) — Enforcement layers for state purity and session isolation
-- [Template Support Matrix](template-support-matrix.md) — Supported Go template features
-- [HTML Fallback Coverage](../roadmap/html-fallback-coverage.md) — Fallback trigger test coverage
-- [Known Bottlenecks](../performance/known-bottlenecks.md) — Performance profiling and optimization
+- [Roadmap](https://github.com/livetemplate/livetemplate/blob/v0.22.0/ROADMAP.md) — Planned improvements and feature timeline
+- [Session Reference — State Safety](/reference/session#state-safety) — Enforcement layers for state purity and session isolation
+- [Template Support Matrix](/reference/template-support-matrix) — Supported Go template features
+- [HTML Fallback Coverage](https://github.com/livetemplate/livetemplate/blob/v0.22.0/docs/roadmap/html-fallback-coverage.md) — Fallback trigger test coverage
+- [Known Bottlenecks](https://github.com/livetemplate/livetemplate/blob/v0.22.0/docs/performance/known-bottlenecks.md) — Performance profiling and optimization

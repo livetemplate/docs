@@ -14,6 +14,7 @@ package e2e
 import (
 	"context"
 	"net/http"
+	"net/url"
 	"os"
 	"strings"
 	"sync"
@@ -257,18 +258,25 @@ func TestSidebarWalk(t *testing.T) {
 		"/cli/testing",
 		"/client/",
 		"/recipes/",
-		"/recipes/counter",
-		"/recipes/todos",
-		"/recipes/progressive-enhancement",
+		"/recipes/counter/",
+		"/recipes/todos/",
+		"/recipes/progressive-enhancement/",
 		"/recipes/ui-patterns/",
 		"/recipes/apps/",
 		"/recipes/apps/counter",
-		"/recipes/apps/todos",
 		"/recipes/apps/chat",
 		"/recipes/apps/avatar-upload",
+		"/recipes/apps/upload-modes",
+		"/recipes/apps/seat-picker",
+		"/recipes/apps/file-tree",
 		"/recipes/apps/flash-messages",
 		"/recipes/apps/progressive-enhancement",
 		"/recipes/apps/ws-disabled",
+		"/recipes/formnovalidate",
+		"/recipes/shared-notepad/",
+		"/recipes/login/",
+		"/reference/progressive-complexity",
+		"/cli/ai-assistants",
 		"/recipes/pubsub",
 		"/recipes/architecture-flow",
 		"/recipes/progressive-complexity-tree",
@@ -286,7 +294,19 @@ func TestSidebarWalk(t *testing.T) {
 	// plain HTTP GET per URL with the test's existing client. Each URL
 	// visited via 200 status is sufficient for the regression — chromedp
 	// covers behaviour-level checks in the other tests.
-	client := &http.Client{Timeout: 15 * time.Second}
+	// Redirects are NOT followed. tinkerdown serves only nav-registered
+	// pages and bounces everything else to the site root with a 303, so a
+	// following client sees the home page's 200 and the walk passes while
+	// the page is unreachable. That is exactly how five stranded pages
+	// (formnovalidate, ephemeral-components, ai-assistants, the
+	// progressive-complexity reference, and an orphaned todos mirror) sat
+	// undetected in this list.
+	client := &http.Client{
+		Timeout: 15 * time.Second,
+		CheckRedirect: func(*http.Request, []*http.Request) error {
+			return http.ErrUseLastResponse
+		},
+	}
 	failures := 0
 	for _, u := range urls {
 		full := baseURL() + u
@@ -297,12 +317,25 @@ func TestSidebarWalk(t *testing.T) {
 			continue
 		}
 		resp.Body.Close()
-		// 303 is acceptable: tinkerdown redirects /cli to /cli/ when
-		// only the index variant exists. Anything else outside 2xx
-		// counts as a failure.
-		ok := (resp.StatusCode >= 200 && resp.StatusCode < 300) || resp.StatusCode == 303
-		if !ok {
+
+		ok := resp.StatusCode >= 200 && resp.StatusCode < 300
+		if resp.StatusCode == 303 {
+			// The one legitimate redirect is the trailing-slash variant
+			// (/cli -> /cli/) that tinkerdown emits when only the index
+			// form exists. A redirect anywhere else — in practice, to the
+			// site root — means the page is not registered in the nav.
+			loc := resp.Header.Get("Location")
+			if parsed, perr := url.Parse(loc); perr == nil {
+				loc = parsed.Path
+			}
+			ok = strings.TrimSuffix(loc, "/") == strings.TrimSuffix(u, "/")
+			if !ok {
+				t.Errorf("%s: 303 -> %q (page is not in the sidebar nav, so tinkerdown does not serve it)", u, loc)
+			}
+		} else if !ok {
 			t.Errorf("%s: HTTP %d", u, resp.StatusCode)
+		}
+		if !ok {
 			failures++
 		}
 	}

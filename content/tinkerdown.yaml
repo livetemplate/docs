@@ -39,6 +39,8 @@ navigation:
         path: "guides/progressive-complexity.md"
       - title: "The lvt-* Decision Tree"
         path: "recipes/progressive-complexity-tree.md"
+      - title: "Ephemeral Components"
+        path: "guides/ephemeral-components.md"
       - title: "Controller & State Pattern"
         path: "reference/controller-pattern.md"
       - title: "Error Handling"
@@ -61,6 +63,8 @@ navigation:
         path: "recipes/index.md"
       - title: "Counter"
         path: "recipes/apps/counter.md"
+      - title: "Skip Validation (formnovalidate)"
+        path: "recipes/formnovalidate.md"
       - title: "Counter (Deep Dive)"
         path: "recipes/counter/index.md"
       - title: "Progressive Enhancement"
@@ -212,6 +216,8 @@ navigation:
         path: "reference/navigate.md"
       - title: "Template Support"
         path: "reference/template-support-matrix.md"
+      - title: "Progressive Complexity (Reference)"
+        path: "reference/progressive-complexity.md"
       - title: "Limitations"
         path: "reference/limitations.md"
 
@@ -242,6 +248,8 @@ navigation:
         path: "cli/index.md"
       - title: "CLI: Auth Customization"
         path: "cli/auth-customization.md"
+      - title: "CLI: AI Assistants"
+        path: "cli/ai-assistants.md"
       - title: "CLI: Components"
         path: "cli/components.md"
       - title: "CLI: Testing"
@@ -262,6 +270,12 @@ navigation:
         path: "recipes/how-this-site-works.md"
       - title: "Changelog"
         path: "changelog.md"
+      - title: "Changelog: Core Library"
+        path: "changelog/livetemplate.md"
+      - title: "Changelog: Browser Client"
+        path: "changelog/client.md"
+      - title: "Changelog: CLI"
+        path: "changelog/cli.md"
 
 sources:
   # UI pattern recipe catalog index: served by the docs-site recipes binary

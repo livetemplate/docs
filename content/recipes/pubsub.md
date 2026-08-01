@@ -113,7 +113,7 @@ a client action, see [Server push](/recipes/server-push).
 
 ## Worked example: a multi-author message log
 
-[Counter, deeper](/recipes/counter) shared one integer across a browser's tabs.
+[Counter, deeper](/recipes/counter/) shared one integer across a browser's tabs.
 This shares a multi-author message log across the same scope — the same
 Subscribe/Publish primitives, with two design choices that change everything:
 which fields are per-connection vs. persisted, and where the source of truth

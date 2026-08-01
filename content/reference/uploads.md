@@ -607,6 +607,6 @@ func detectContentType(path string) (string, error) {
 
 ## See Also
 
-- [Controller+State Pattern](controller-pattern.md) - Core architecture pattern
-- [Client Attributes Reference](client-attributes.md) - `lvt-upload` attribute details
+- [Controller+State Pattern](/reference/controller-pattern) - Core architecture pattern
+- [Client Attributes Reference](/reference/client-attributes) - `lvt-upload` attribute details
 - [Client Library](https://github.com/livetemplate/client) - TypeScript client

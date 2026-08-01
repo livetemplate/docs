@@ -286,7 +286,7 @@ No `lvt` CLI installation required — components are a standalone Go library.
 
 ## Contributing
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines on:
+See [CONTRIBUTING.md](https://github.com/livetemplate/lvt/blob/v0.2.0/components/CONTRIBUTING.md) for guidelines on:
 - Component naming conventions
 - Template requirements
 - Test requirements

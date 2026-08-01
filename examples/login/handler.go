@@ -69,23 +69,17 @@ func extractTemplate() string {
 }
 
 // Handler returns the login recipe app as an http.Handler ready to
-// mount. The mountPath is the absolute URL prefix the caller mounts at
-// — "/apps/login/" for cmd/site, "/" for the in-test test-server — and
-// becomes the post-Login / post-Logout redirect target. The mountPath
-// is required because livetemplate.Context.Redirect needs an absolute
-// URL and http.StripPrefix strips the mount before the recipe handler
-// sees the request URL.
+// mount. It takes no mount path: Login and Logout redirect to
+// ctx.Redirect("", …), the "reload self" form, which the browser
+// resolves against the un-stripped request URL. Mount it under a
+// trailing-slash pattern ("/apps/login/") and it works at any prefix.
 //
 // Production callers (cmd/site) supply WithAllowedOrigins; test-server
 // callers run in dev mode (WithDevMode(true)), which relaxes the origin
 // check so random test ports work.
-func Handler(mountPath string, opts ...livetemplate.Option) http.Handler {
-	if mountPath == "" {
-		mountPath = "/"
-	}
+func Handler(opts ...livetemplate.Option) http.Handler {
 	controller := &AuthController{
-		sessions:  make(map[string]livetemplate.Session),
-		mountPath: mountPath,
+		sessions: make(map[string]livetemplate.Session),
 	}
 	initialState := &AuthState{}
 

@@ -1,9 +1,8 @@
 ---
 title: "Counter"
 description: "A small LiveTemplate counter app demonstrating controller actions, per-session state, DOM patches, and optional realtime sync."
-source_repo: "https://github.com/livetemplate/examples"
-source_path: "counter/README.md"
-source_commit: "5054ed6726d9596d294a50b80f11488302b3ec2d"
+source_repo: "https://github.com/livetemplate/docs"
+source_path: "content/recipes/apps/counter.md"
 ---
 
 # LiveTemplate Counter App Recipe
@@ -84,7 +83,7 @@ LVT_MAX_CONNECTIONS=10000 LVT_ALLOWED_ORIGINS="https://example.com" go run main.
 LVT_METRICS_ENABLED=false go run main.go
 ```
 
-For more details, see [CONFIGURATION.md](../../docs/CONFIGURATION.md).
+For more details, see the [Configuration reference](/reference/configuration).
 
 ## How It Works
 

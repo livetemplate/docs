@@ -109,7 +109,7 @@ The client resolves the action name in this order (first match wins):
 4. `form name="X"` → action is `X`
 5. None of the above → defaults to `"submit"` → routes to `Submit()`
 
-> **Legacy attribute:** `lvt-submit` is kept for backward compatibility but should be avoided in new code. Prefer button `name` (e.g., `<button name="save">`) or form `name` (e.g., `<form name="search">`) — these work natively without JavaScript. See [Progressive Complexity Reference — Action Resolution Order](progressive-complexity-reference.md#action-resolution-order-tier-1) for the Tier 1 (standard HTML) routing rules.
+> **Legacy attribute:** `lvt-submit` is kept for backward compatibility but should be avoided in new code. Prefer button `name` (e.g., `<button name="save">`) or form `name` (e.g., `<form name="search">`) — these work natively without JavaScript. See [Progressive Complexity Reference — Action Resolution Order](/reference/progressive-complexity#action-resolution-order-tier-1) for the Tier 1 (standard HTML) routing rules.
 
 > **Note:** The form field name `action` is **not** reserved. A form field `<input name="action" value="approve">` flows through to `ActionData` as normal data. Use `lvt-form:action` on the `<form>` element for routing.
 
@@ -403,7 +403,7 @@ These execute client-side with no server round-trip.
 </button>
 ```
 
-> For choosing between client-owned pending (`lvt-el:*:on:pending`) and server-owned loading (`{{if .Loading}}`), see [Loading States](../guides/progressive-complexity.md#7-loading-states) in the Progressive Complexity Guide.
+> For choosing between client-owned pending (`lvt-el:*:on:pending`) and server-owned loading (`{{if .Loading}}`), see [Loading States](/guides/progressive-complexity#7-loading-states) in the Progressive Complexity Guide.
 
 **Form Reset on Success:**
 
@@ -800,7 +800,7 @@ Any form inside a `<dialog>` that completes successfully will have its parent di
 
 A `<form method="dialog">` inside a `<dialog>` closes the dialog immediately on submit (before the server responds). Use this only when you don't need server-side validation feedback inside the dialog.
 
-See [Progressive Complexity Guide — Dialogs](../guides/progressive-complexity.md#5-dialogs) for the full walkthrough.
+See [Progressive Complexity Guide — Dialogs](/guides/progressive-complexity#5-dialogs) for the full walkthrough.
 
 ### Server-managed modals
 
@@ -930,7 +930,7 @@ Handle file uploads with progress tracking.
 Uploads fire on file selection, not on form submit, and progress events are
 emitted as the bytes move. Because there is no submit for the user to review,
 nothing else in the form travels with the upload unless it is marked
-`lvt-upload-with` — see [Sending form fields with an upload](uploads.md#sending-form-fields-with-an-upload).
+`lvt-upload-with` — see [Sending form fields with an upload](/reference/uploads#sending-form-fields-with-an-upload).
 
 ---
 
@@ -1057,7 +1057,7 @@ Directives use CSS custom properties for configuration: `--lvt-scroll-behavior`,
 | Attribute | Description | Example |
 |-----------|-------------|---------|
 | `lvt-upload` | File upload identifier | `lvt-upload="avatar"` |
-| `lvt-upload-with` | Send this field along with an upload fired from the same form. Opt-in — unmarked fields never reach the upload endpoint. Multipart path only; see [Upload Reference](uploads.md) | `<input type="hidden" name="id" lvt-upload-with>` |
+| `lvt-upload-with` | Send this field along with an upload fired from the same form. Opt-in — unmarked fields never reach the upload endpoint. Multipart path only; see [Upload Reference](/reference/uploads) | `<input type="hidden" name="id" lvt-upload-with>` |
 
 ### Preservation Attributes
 
@@ -1189,7 +1189,7 @@ form.addEventListener('lvt:pending', (e) => {
 ## Related Documentation
 
 - **[Go API Reference](https://pkg.go.dev/github.com/livetemplate/livetemplate)** - Server-side API
-- **[Error Handling Reference](error-handling.md)** - Validation, error display, client-side handling
-- **[Template Support Matrix](template-support-matrix.md)** - Supported Go template features
-- **[Architecture](../design/ARCHITECTURE.md)** - System architecture
-- **[Contributing Guide](../../CONTRIBUTING.md)** - How to contribute
+- **[Error Handling Reference](/reference/error-handling)** - Validation, error display, client-side handling
+- **[Template Support Matrix](/reference/template-support-matrix)** - Supported Go template features
+- **[Architecture](https://github.com/livetemplate/livetemplate/blob/v0.22.0/docs/design/ARCHITECTURE.md)** - System architecture
+- **[Contributing Guide](/contributing/livetemplate)** - How to contribute

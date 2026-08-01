@@ -8,7 +8,7 @@ source_commit: "22a4853506a682583b511e470bdd1e6193f4d5fe"
 
 # Progressive Complexity Reference
 
-Quick-reference for how standard HTML maps to LiveTemplate behavior. For the learning walkthrough, see the [Progressive Complexity Guide](../guides/progressive-complexity.md). For `lvt-*` attributes, see the [Client Attributes Reference](client-attributes.md).
+Quick-reference for how standard HTML maps to LiveTemplate behavior. For the learning walkthrough, see the [Progressive Complexity Guide](/guides/progressive-complexity). For `lvt-*` attributes, see the [Client Attributes Reference](/reference/client-attributes).
 
 ---
 
@@ -32,7 +32,7 @@ When a standard HTML form is submitted, the action is resolved in this order (fi
 2. Form's `name` attribute
 3. Default: `"submit"` → `Submit()`
 
-For the full resolution order including `lvt-form:action` and other Tier 2 attributes, see [Client Attributes Reference — Action Resolution Order](client-attributes.md#action-resolution-order).
+For the full resolution order including `lvt-form:action` and other Tier 2 attributes, see [Client Attributes Reference — Action Resolution Order](/reference/client-attributes#action-resolution-order).
 
 ## Live Updates (Change Convention)
 
@@ -126,7 +126,7 @@ Some `lvt-*` attributes are standalone (not prefixed):
 | `lvt-scroll-sentinel` | Infinite scroll trigger | `<div lvt-scroll-sentinel data-key="sentinel">Loading…</div>` |
 | `lvt-scroll-away` | Scroll-position visibility | `<button lvt-scroll-away="bottom" data-lvt-target="#log">↓</button>` |
 
-See the [Client Attributes Reference](client-attributes.md) for the complete listing.
+See the [Client Attributes Reference](/reference/client-attributes) for the complete listing.
 
 ### Recipe: Chat with Infinite Scroll
 

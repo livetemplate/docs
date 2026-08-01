@@ -119,7 +119,7 @@ handler := tmpl.Handle(&TodoController{DB: db}, livetemplate.AsState(&TodoState{
 
 ## Controller+State Pattern
 
-For patterns, examples, and usage guide, see [Controller+State Pattern](controller-pattern.md).
+For patterns, examples, and usage guide, see [Controller+State Pattern](/reference/controller-pattern).
 
 ### State Interface
 
@@ -248,7 +248,7 @@ func FlashExpiry(d time.Duration) FlashOption
 
 Manages flash messages available in templates via `.lvt.Flash(key)`. Common keys: `"success"`, `"error"`, `"info"`, `"warning"`.
 
-Flash **persists until explicitly cleared** with `ClearFlash` (or until `FlashExpiry` elapses). Background updates such as `TriggerAction` or scan-loop refreshes do not touch flash. See [Flash Message Lifecycle](error-handling.md#flash-message-lifecycle) for the full lifecycle, multi-tab behavior, and v0.8 → v0.9 migration guidance.
+Flash **persists until explicitly cleared** with `ClearFlash` (or until `FlashExpiry` elapses). Background updates such as `TriggerAction` or scan-loop refreshes do not touch flash. See [Flash Message Lifecycle](/reference/error-handling#flash-message-lifecycle) for the full lifecycle, multi-tab behavior, and v0.8 → v0.9 migration guidance.
 
 ### Context Builders
 
@@ -292,7 +292,7 @@ on how the `Authenticator` assigns groupIDs:
 Accessed via `ctx.Session()` inside your controller's `OnConnect(state, ctx)`
 lifecycle method (or any action method). The returned `Session` handle
 can be captured and used from background goroutines. See
-[Server Actions](server-actions.md) for examples.
+[Server Actions](/reference/server-actions) for examples.
 
 ---
 
@@ -308,7 +308,7 @@ func Async[S any, R any](
 
 Runs `work` off the connection event loop, then re-enters the loop to apply
 its result to the **current** session state and re-render the originating
-connection. Reduces the [manual two-action loading pattern](../guides/progressive-complexity.md#73-server-owned-loading-tier-1)
+connection. Reduces the [manual two-action loading pattern](/guides/progressive-complexity#73-server-owned-loading-tier-1)
 from ~15 lines / 2 methods to ~7 lines / 1 method.
 
 - **`work`** runs in a supervised goroutine. It receives a `context.Context`
@@ -371,7 +371,7 @@ single-action flows are the norm:
 </button>
 ```
 
-See [Loading States §7.3](../guides/progressive-complexity.md#73-server-owned-loading-tier-1)
+See [Loading States §7.3](/guides/progressive-complexity#73-server-owned-loading-tier-1)
 for the full comparison of loading approaches.
 
 ---
@@ -575,7 +575,7 @@ type UploadMeta struct {
 }
 ```
 
-For complete upload documentation including S3 configuration, see [Upload Reference](uploads.md).
+For complete upload documentation including S3 configuration, see [Upload Reference](/reference/uploads).
 
 ---
 
@@ -603,7 +603,7 @@ Built-in: `NewSessionStoreHealthChecker(store)`, `NewRedisHealthChecker(store)`.
 
 ## PubSub (Cross-Instance Peer Fan-Out)
 
-Package `pubsub` provides cross-instance messaging for horizontally scaled deployments. See the [PubSub Reference](pubsub.md) for the complete API including `Broadcaster`, `DynamicSubscriber`, the `livetemplate:broadcast:*` channel namespace, channel schema, and subscription lifecycle.
+Package `pubsub` provides cross-instance messaging for horizontally scaled deployments. See the [PubSub Reference](/reference/pubsub) for the complete API including `Broadcaster`, `DynamicSubscriber`, the `livetemplate:broadcast:*` channel namespace, channel schema, and subscription lifecycle.
 
 ---
 
@@ -649,11 +649,11 @@ Converts `go-playground/validator` errors to `MultiError`.
 
 ## See Also
 
-- [Controller+State Pattern](controller-pattern.md) - Architecture guide
-- [Upload Reference](uploads.md) - File upload system
-- [Configuration](CONFIGURATION.md) - Environment and option configuration
-- [Authentication](authentication.md) - Auth setup
-- [Session Management](session.md) - Session stores and persistence
-- [Server Actions](server-actions.md) - Peer fan-out and server-initiated updates
-- [Error Handling](error-handling.md) - Validation and error display
-- [Client Attributes](client-attributes.md) - Template attribute reference
+- [Controller+State Pattern](/reference/controller-pattern) - Architecture guide
+- [Upload Reference](/reference/uploads) - File upload system
+- [Configuration](/reference/configuration) - Environment and option configuration
+- [Authentication](/reference/authentication) - Auth setup
+- [Session Management](/reference/session) - Session stores and persistence
+- [Server Actions](/reference/server-actions) - Peer fan-out and server-initiated updates
+- [Error Handling](/reference/error-handling) - Validation and error display
+- [Client Attributes](/reference/client-attributes) - Template attribute reference
