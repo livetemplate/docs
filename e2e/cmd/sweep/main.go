@@ -71,6 +71,7 @@ func main() {
 		fmt.Fprintln(os.Stderr, "fetch sitemap:", err)
 		os.Exit(1)
 	}
+	urls = rehost(base, urls)
 	sort.Strings(urls)
 	fmt.Fprintf(os.Stderr, "discovered %d URLs in sitemap\n", len(urls))
 
@@ -140,6 +141,32 @@ func fetchSitemap(u string) ([]string, error) {
 		out = append(out, e.Loc)
 	}
 	return out, nil
+}
+
+// rehost rewrites each sitemap URL onto the base the caller asked for,
+// keeping only the path.
+//
+// The sitemap is generated with the site's canonical absolute base URL
+// (tinkerdown.yaml's site.base_url), so every <loc> points at production no
+// matter which host served the sitemap. Sweeping a local build therefore
+// screenshotted the deployed site instead — silently reporting on content the
+// caller had not changed.
+func rehost(base string, urls []string) []string {
+	out := make([]string, 0, len(urls))
+	for _, raw := range urls {
+		u, err := url.Parse(raw)
+		if err != nil {
+			// Not parseable as a URL: it may already be a bare path.
+			out = append(out, base+raw)
+			continue
+		}
+		p := u.EscapedPath()
+		if u.RawQuery != "" {
+			p += "?" + u.RawQuery
+		}
+		out = append(out, base+p)
+	}
+	return out
 }
 
 func visit(parent context.Context, target string, v viewport, outDir string) pageReport {

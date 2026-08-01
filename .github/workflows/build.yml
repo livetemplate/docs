@@ -82,3 +82,44 @@ jobs:
       - name: Container logs on failure
         if: failure()
         run: docker logs docs
+
+  # Upload-modes browser e2e (docs#77). Not part of the job above: that suite
+  # drives the docs SITE, while this one boots examples/upload-modes directly
+  # and exercises all four upload destinations plus the WebSocket-disabled
+  # fallbacks. It needs a real client bundle on disk because the modes are a
+  # client-side transport decision — the server config alone cannot be tested.
+  #
+  # The bundle is fetched at livetemplate.ClientVersion, the exact version
+  # {{lvtClientScriptURL}} serves, so this also guards the pairing: a Go
+  # dependency bump that moves ClientVersion to a client which breaks uploads
+  # fails here rather than in production.
+  upload-modes-e2e:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.26'
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Fetch the pinned client bundle
+        run: |
+          VER="$(go run ./cmd/clientversion)"
+          echo "pinned @livetemplate/client version: $VER"
+          npm pack "@livetemplate/client@${VER}"
+          tar -xzf livetemplate-client-*.tgz
+          BUNDLE="$PWD/package/dist/livetemplate-client.browser.js"
+          test -s "$BUNDLE" || { echo "bundle missing from the npm tarball"; exit 1; }
+          echo "LVT_LOCAL_CLIENT=$BUNDLE" >> "$GITHUB_ENV"
+
+      # The suite allocates Chrome via LVT_CHROME (default "chromium", which
+      # ubuntu-latest does not ship); google-chrome-stable is present.
+      - name: Run upload-modes browser e2e
+        env:
+          LVT_UPLOAD_MODES_E2E: '1'
+          LVT_CHROME: google-chrome-stable
+        run: go test ./examples/upload-modes/... -count=1 -v -timeout 600s
