@@ -2,13 +2,13 @@
 title: "Current Limitations"
 source_repo: "https://github.com/livetemplate/livetemplate"
 source_path: "docs/references/current-limitations.md"
-source_ref: "v0.22.0"
-source_commit: "22a4853506a682583b511e470bdd1e6193f4d5fe"
+source_ref: "v0.23.0"
+source_commit: "8294ce439a46a6a1f92e2a77b8a4978c9e526cc6"
 ---
 
 # Current Limitations
 
-Known limitations of LiveTemplate, organized by category. Each entry includes the impact, workaround, and current status. For planned improvements, see the [Roadmap](https://github.com/livetemplate/livetemplate/blob/v0.22.0/ROADMAP.md).
+Known limitations of LiveTemplate, organized by category. Each entry includes the impact, workaround, and current status. For planned improvements, see the [Roadmap](https://github.com/livetemplate/livetemplate/blob/v0.23.0/ROADMAP.md).
 
 All limitations verified against the current codebase.
 
@@ -27,7 +27,7 @@ These Go template constructs trigger a fallback to HTML segmentation, which prod
 | `{{block}}` with dynamic template names | Use `{{template "name" .}}` with static names | By design (fallback) |
 | `iter.Seq` ranges | Collect iterator to slice before passing to template | Blocked on Go templates |
 
-See [HTML Fallback Coverage](https://github.com/livetemplate/livetemplate/blob/v0.22.0/docs/roadmap/html-fallback-coverage.md) for test coverage details and [Template Support Matrix](/reference/template-support-matrix) for full Go template feature support.
+See [HTML Fallback Coverage](https://github.com/livetemplate/livetemplate/blob/v0.23.0/docs/roadmap/html-fallback-coverage.md) for test coverage details and [Template Support Matrix](/reference/template-support-matrix) for full Go template feature support.
 
 ---
 
@@ -54,7 +54,7 @@ See the [Transport Compatibility table](/reference/progressive-complexity#transp
 |-----------|--------|-----------|
 | JSON serialization overhead | State is cloned via JSON marshal/unmarshal per session | Keep state structs small; avoid large nested structures |
 | State must be JSON-serializable | Functions, channels, and unexported fields cannot be in state | Put non-serializable dependencies in the controller |
-| Dependency detection is heuristic | `AsState[T]()` only catches 9 known dependency patterns (stdlib + `*redis.Client`) | Add `AssertPureState[T](https://github.com/livetemplate/livetemplate/blob/v0.22.0/docs/references/t)` to test files for stricter validation |
+| Dependency detection is heuristic | `AsState[T]()` only catches 9 known dependency patterns (stdlib + `*redis.Client`) | Add `AssertPureState[T](https://github.com/livetemplate/livetemplate/blob/v0.23.0/docs/references/t)` to test files for stricter validation |
 
 See [Session Reference — State Safety](/reference/session#state-safety) for the full enforcement architecture.
 
@@ -102,14 +102,14 @@ Use `ctx.IsHTTP()` to check which transport is active in an action method.
 | State cloning JSON round-trip | Per-session cost on first request | Keep state small; subsequent renders are fast (~3 KB, 61 allocs) |
 | HTML fallback parsing (3.05% of allocations) | Triggered by unsupported template constructs (see Template Features above) | Improve template construct coverage to reduce fallback frequency |
 
-See [Known Bottlenecks](https://github.com/livetemplate/livetemplate/blob/v0.22.0/docs/performance/known-bottlenecks.md) for detailed profiling data and optimization history.
+See [Known Bottlenecks](https://github.com/livetemplate/livetemplate/blob/v0.23.0/docs/performance/known-bottlenecks.md) for detailed profiling data and optimization history.
 
 ---
 
 ## See Also
 
-- [Roadmap](https://github.com/livetemplate/livetemplate/blob/v0.22.0/ROADMAP.md) — Planned improvements and feature timeline
+- [Roadmap](https://github.com/livetemplate/livetemplate/blob/v0.23.0/ROADMAP.md) — Planned improvements and feature timeline
 - [Session Reference — State Safety](/reference/session#state-safety) — Enforcement layers for state purity and session isolation
 - [Template Support Matrix](/reference/template-support-matrix) — Supported Go template features
-- [HTML Fallback Coverage](https://github.com/livetemplate/livetemplate/blob/v0.22.0/docs/roadmap/html-fallback-coverage.md) — Fallback trigger test coverage
-- [Known Bottlenecks](https://github.com/livetemplate/livetemplate/blob/v0.22.0/docs/performance/known-bottlenecks.md) — Performance profiling and optimization
+- [HTML Fallback Coverage](https://github.com/livetemplate/livetemplate/blob/v0.23.0/docs/roadmap/html-fallback-coverage.md) — Fallback trigger test coverage
+- [Known Bottlenecks](https://github.com/livetemplate/livetemplate/blob/v0.23.0/docs/performance/known-bottlenecks.md) — Performance profiling and optimization
