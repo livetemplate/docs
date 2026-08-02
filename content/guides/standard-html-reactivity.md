@@ -2,8 +2,8 @@
 title: "Standard HTML Reactivity"
 source_repo: "https://github.com/livetemplate/livetemplate"
 source_path: "docs/guides/standard-html-reactivity.md"
-source_ref: "v0.22.0"
-source_commit: "22a4853506a682583b511e470bdd1e6193f4d5fe"
+source_ref: "v0.23.0"
+source_commit: "8294ce439a46a6a1f92e2a77b8a4978c9e526cc6"
 ---
 
 # Standard HTML Reactivity
@@ -151,7 +151,7 @@ LiveTemplate is inspired by Phoenix LiveView but does not yet cover its full fea
 | **Stateful Components** | `LiveComponent` with own lifecycle | Stateless templates only | `{{template}}` invocations work but have no component-level state or event handling. |
 | **Streams** | `stream/3` for large lists | Not yet | LiveView streams handle large/infinite lists without keeping all items in server memory. Streaming-range rendering (PRs #366/#368/#369/#370) is the latest step toward this. |
 | **JS Commands** | `JS.push`, `JS.toggle`, `JS.show` | Partial | [`lvt-*` reactive attributes](/reference/client-attributes) cover common cases (disable, add/remove class, set attribute) but aren't as composable as LiveView's server-defined JS chains. |
-| **Client Hooks** | `phx-hook` lifecycle callbacks | Proposed | [`lvt-hook` proposal](https://github.com/livetemplate/livetemplate/blob/v0.22.0/docs/proposals/lifecycle-hooks-proposal.md) covers third-party JS library integration; not yet shipped. |
+| **Client Hooks** | `phx-hook` lifecycle callbacks | Proposed | [`lvt-hook` proposal](https://github.com/livetemplate/livetemplate/blob/v0.23.0/docs/proposals/lifecycle-hooks-proposal.md) covers third-party JS library integration; not yet shipped. |
 | **Presence** | `Phoenix.Presence` | Not built-in | Can be built on LiveTemplate's session stores; requires manual implementation. |
 | **Testing Helpers** | `live/2`, `render_click/3` | Minimal | `AssertPureState` exists; no view-level test DSL. Browser tests use chromedp. |
 | **Form Recovery** | Automatic on reconnect | Partial — `lvt-form:preserve` retains specific fields across re-renders | Full automatic recovery on WS reconnection is not yet built in. |

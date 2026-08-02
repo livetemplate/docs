@@ -447,15 +447,52 @@ func (r *linkRewriter) RewriteRelative(body string, page PageEntry, ref string) 
 		if inFence {
 			continue
 		}
-		lines[i] = markdownLinkRE.ReplaceAllStringFunc(ln, func(m string) string {
-			target := markdownLinkRE.FindStringSubmatch(m)[1]
-			if !isRelativeRef(target) {
-				return m
-			}
-			return "](" + r.resolveRelative(target, repo, srcDir, ref) + ")"
+		lines[i] = rewriteOutsideCodeSpans(ln, func(seg string) string {
+			return markdownLinkRE.ReplaceAllStringFunc(seg, func(m string) string {
+				target := markdownLinkRE.FindStringSubmatch(m)[1]
+				if !isRelativeRef(target) {
+					return m
+				}
+				return "](" + r.resolveRelative(target, repo, srcDir, ref) + ")"
+			})
 		})
 	}
 	return strings.Join(lines, "\n")
+}
+
+// rewriteOutsideCodeSpans applies f to the parts of a line that are NOT inside
+// a backtick-delimited inline code span.
+//
+// Fenced blocks were already skipped, but inline spans were not, and Go generic
+// call syntax inside one — `AssertPureState[T](t)` — contains the exact
+// `](...)` shape a markdown link does. Rewriting it turned documented code into
+// a URL in five places across the reference and guides before this was caught.
+//
+// Splitting on ` gives alternating outside/inside segments: even indices are
+// prose, odd indices are code.
+//
+// An ODD number of backticks means the spans cannot be paired, and the parity
+// is then wrong from the stray one onward — code would land on an "outside"
+// index and be rewritten, which is the corruption this exists to prevent. Such
+// a line is left entirely alone. The cost is a genuine link on a malformed line
+// going un-rewritten, which leaves it exactly as upstream wrote it; the
+// alternative is mangling documented code, and only one of those is recoverable
+// by a later fix.
+func rewriteOutsideCodeSpans(line string, f func(string) string) string {
+	n := strings.Count(line, "`")
+	if n == 0 {
+		return f(line)
+	}
+	if n%2 != 0 {
+		return line
+	}
+	parts := strings.Split(line, "`")
+	for i := range parts {
+		if i%2 == 0 {
+			parts[i] = f(parts[i])
+		}
+	}
+	return strings.Join(parts, "`")
 }
 
 // resolveRelative maps one upstream-relative link target to its docs-site or

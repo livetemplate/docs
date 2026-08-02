@@ -2,8 +2,8 @@
 title: "LiveTemplate Scaling Guide"
 source_repo: "https://github.com/livetemplate/livetemplate"
 source_path: "docs/guides/SCALING.md"
-source_ref: "v0.22.0"
-source_commit: "22a4853506a682583b511e470bdd1e6193f4d5fe"
+source_ref: "v0.23.0"
+source_commit: "8294ce439a46a6a1f92e2a77b8a4978c9e526cc6"
 ---
 
 # LiveTemplate Scaling Guide
@@ -1401,7 +1401,7 @@ If issues arise after migration:
 3. **Set up alerting** for Redis connectivity issues
 4. **Review capacity planning** for expected load
 
-See [SESSION.md](https://github.com/livetemplate/livetemplate/blob/v0.22.0/docs/guides/SESSION.md) for the Session API guide on server-initiated actions.
+See [session.md](/reference/session) for the Session API guide on server-initiated actions.
 
 ---
 
@@ -1869,8 +1869,8 @@ redis_connected_clients{instance="redis1"} > 9000  # 90% of Redis max clients
 
 ## Next Steps
 
-- **Roadmap:** See [ROADMAP.md](https://github.com/livetemplate/livetemplate/blob/v0.22.0/ROADMAP.md) for upcoming scaling features
-- **Architecture:** See [ARCHITECTURE.md](https://github.com/livetemplate/livetemplate/blob/v0.22.0/docs/guides/ARCHITECTURE.md) for system design
+- **Roadmap:** See [ROADMAP.md](https://github.com/livetemplate/livetemplate/blob/v0.23.0/ROADMAP.md) for upcoming scaling features
+- **Architecture:** See [ARCHITECTURE.md](https://github.com/livetemplate/livetemplate/blob/v0.23.0/docs/design/ARCHITECTURE.md) for system design
 
 ---
 

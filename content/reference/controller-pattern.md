@@ -2,8 +2,8 @@
 title: "Controller+State Pattern Reference"
 source_repo: "https://github.com/livetemplate/livetemplate"
 source_path: "docs/references/controller-pattern.md"
-source_ref: "v0.22.0"
-source_commit: "22a4853506a682583b511e470bdd1e6193f4d5fe"
+source_ref: "v0.23.0"
+source_commit: "8294ce439a46a6a1f92e2a77b8a4978c9e526cc6"
 ---
 
 # Controller+State Pattern Reference
@@ -452,7 +452,7 @@ func (c *NotificationController) AddMessage(state NotificationState, ctx *livete
 }
 ```
 
-> `TriggerAction` is also the mechanism behind the server-owned loading pattern (set `Loading=true`, spawn a goroutine, trigger a second action to clear it). See [Loading States §7.3](/guides/progressive-complexity#73-server-owned-loading-tier-1) in the Progressive Complexity Guide.
+> `TriggerAction` is the mechanism *behind* server-owned loading, but you rarely write it by hand for that: [`Async`](/reference/api#async) collapses the set-`Loading`/spawn/trigger-a-second-action dance into one method. Reach for `TriggerAction` directly when the work starts somewhere `Async` cannot run (`Mount`, `OnConnect`, upload handlers) or reports progress repeatedly rather than completing once. See [Loading States §7.3](/guides/progressive-complexity#73-server-owned-loading-tier-1) in the Progressive Complexity Guide.
 
 ### Cross-Tab Updates with Subscribe + Publish
 
