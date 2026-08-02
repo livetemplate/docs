@@ -531,3 +531,52 @@ func TestRewriteRelative_BareUnmappedBecomesGitHubURL(t *testing.T) {
 		t.Errorf("bare unmapped sibling not rewritten to GitHub: %q", got)
 	}
 }
+
+func TestRewriteRelative_LeavesInlineCodeSpansAlone(t *testing.T) {
+	// Go generic call syntax inside a code span contains the same ](...)
+	// shape a markdown link does. Rewriting it corrupted documented code in
+	// five places across the reference and guides before this was caught.
+	r := newLinkRewriter(relCfg())
+	page := PageEntry{SiteURL: "/reference/session", SourceRepo: "https://github.com/livetemplate/livetemplate", SourcePath: "docs/references/session.md"}
+
+	body := "Use `AssertPureState[T](t)` in tests, and see [the API](api-reference.md)."
+	got := r.RewriteRelative(body, page, "v0.23.0")
+
+	if !strings.Contains(got, "`AssertPureState[T](t)`") {
+		t.Errorf("inline code span was rewritten: %q", got)
+	}
+	if !strings.Contains(got, "[the API](/reference/api)") {
+		t.Errorf("real link outside the span should still rewrite: %q", got)
+	}
+}
+
+func TestRewriteRelative_MultipleCodeSpansOnOneLine(t *testing.T) {
+	r := newLinkRewriter(relCfg())
+	page := PageEntry{SiteURL: "/reference/session", SourceRepo: "https://github.com/livetemplate/livetemplate", SourcePath: "docs/references/session.md"}
+
+	body := "`f[A](t)` then [x](api-reference.md) then `g[B](t)` then [y](../guides/SCALING.md)"
+	got := r.RewriteRelative(body, page, "v0.23.0")
+
+	for _, keep := range []string{"`f[A](t)`", "`g[B](t)`"} {
+		if !strings.Contains(got, keep) {
+			t.Errorf("code span %s was rewritten: %q", keep, got)
+		}
+	}
+	if !strings.Contains(got, "[x](/reference/api)") || !strings.Contains(got, "[y](/guides/scaling)") {
+		t.Errorf("links between spans should rewrite: %q", got)
+	}
+}
+
+func TestRewriteRelative_UnbalancedBacktickErrsTowardNotRewriting(t *testing.T) {
+	// A stray backtick should not cause a corrupting rewrite; leaving the
+	// remainder alone is the safe failure direction.
+	r := newLinkRewriter(relCfg())
+	page := PageEntry{SiteURL: "/reference/session", SourceRepo: "https://github.com/livetemplate/livetemplate", SourcePath: "docs/references/session.md"}
+
+	body := "a stray ` backtick then `AssertPureState[T](t)`"
+	got := r.RewriteRelative(body, page, "v0.23.0")
+
+	if strings.Contains(got, "github.com") {
+		t.Errorf("unbalanced backtick produced a rewrite: %q", got)
+	}
+}

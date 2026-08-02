@@ -2,8 +2,8 @@
 title: "Server Actions Reference"
 source_repo: "https://github.com/livetemplate/livetemplate"
 source_path: "docs/references/server-actions.md"
-source_ref: "v0.22.0"
-source_commit: "22a4853506a682583b511e470bdd1e6193f4d5fe"
+source_ref: "v0.23.0"
+source_commit: "8294ce439a46a6a1f92e2a77b8a4978c9e526cc6"
 ---
 
 # Server Actions Reference
@@ -247,90 +247,53 @@ func (c *AuthController) ServerWelcome(state AuthState, ctx *livetemplate.Contex
 
 ### Background Job Completion
 
-Notify users when async jobs finish. Use proper cleanup with context cancellation:
+A job kicked off by a user action — an export, a report, a slow upstream call — should use [`Async`](/reference/api#async) rather than a hand-rolled goroutine. `Async` runs the work off the event loop and re-enters the loop to apply the result:
 
 ```go
 type ExportState struct {
     ExportStatus string
+    DownloadURL  string
 }
 
-type ExportController struct {
-    session      livetemplate.Session
-    cancelExport context.CancelFunc
-    mu           sync.Mutex
-}
-
-func (c *ExportController) OnConnect(state ExportState, ctx *livetemplate.Context) (ExportState, error) {
-    c.mu.Lock()
-    c.session = ctx.Session()
-    c.mu.Unlock()
-    return state, nil
-}
-
-func (c *ExportController) OnDisconnect() {
-    c.mu.Lock()
-    defer c.mu.Unlock()
-
-    // Cancel any running export when user disconnects
-    if c.cancelExport != nil {
-        c.cancelExport()
-        c.cancelExport = nil
-    }
-    c.session = nil
-}
+type ExportController struct{}
 
 func (c *ExportController) StartExport(state ExportState, ctx *livetemplate.Context) (ExportState, error) {
-    // Create cancellable context for the background job
-    jobCtx, cancel := context.WithCancel(context.Background())
-
-    c.mu.Lock()
-    c.cancelExport = cancel
-    c.mu.Unlock()
-
-    go func() {
-        defer cancel() // Clean up when done
-
-        result, err := performLongRunningExport(jobCtx)
-
-        // Check if cancelled before notifying
-        select {
-        case <-jobCtx.Done():
-            return // User disconnected, don't notify
-        default:
-        }
-
-        c.mu.Lock()
-        session := c.session
-        c.mu.Unlock()
-
-        if session != nil {
+    livetemplate.Async(ctx,
+        func(jobCtx context.Context) (ExportResult, error) {
+            return performLongRunningExport(jobCtx) // jobCtx is cancelled on disconnect
+        },
+        func(s ExportState, result ExportResult, err error) (ExportState, error) {
             if err != nil {
-                session.TriggerAction("exportFailed", map[string]interface{}{
-                    "error": err.Error(),
-                })
-            } else {
-                session.TriggerAction("exportComplete", map[string]interface{}{
-                    "downloadURL": result.URL,
-                })
+                s.ExportStatus = "Failed: " + err.Error()
+                return s, nil
             }
-        }
-    }()
+            s.ExportStatus = "Complete"
+            s.DownloadURL = result.URL
+            return s, nil
+        },
+    )
 
     state.ExportStatus = "Processing..."
-    return state, nil
-}
-
-func (c *ExportController) ExportComplete(state ExportState, ctx *livetemplate.Context) (ExportState, error) {
-    state.ExportStatus = "Complete"
-    state.DownloadURL = ctx.GetString("downloadURL")
-    return state, nil
-}
-
-func (c *ExportController) ExportFailed(state ExportState, ctx *livetemplate.Context) (ExportState, error) {
-    state.ExportStatus = "Failed: " + ctx.GetString("error")
-    return state, nil
+    return state, nil // render #1; the completion render follows automatically
 }
 ```
+
+That is the whole controller. `Async` supplies what the manual version had to build by hand:
+
+| Hand-rolled | Supplied by `Async` |
+|---|---|
+| `context.WithCancel` + a `cancelExport` field + `OnDisconnect` cleanup | `work` receives a context already bound to the connection's lifetime |
+| A `select` on `jobCtx.Done()` before notifying | If the connection closed, `apply` never runs |
+| A `session` field, an `OnConnect` to capture it, and a `sync.Mutex` guarding both | `apply` runs on the event loop against the current state |
+| `exportComplete` / `exportFailed` actions and their two handler methods | The `err` parameter of `apply` |
+
+**When you still need the manual pattern.** `Async` is scoped to action handlers and is one-shot — one `work`, one `apply`. Keep a goroutine plus `TriggerAction` when the job:
+
+- **reports progress repeatedly** (a percentage, a streaming log) rather than completing once;
+- **must outlive the connection** — `Async` cancels its work on disconnect, so a job that has to finish server-side regardless needs its own lifetime and should notify through a topic;
+- **starts outside an action handler**, e.g. re-spawned from `OnConnect` after a reconnect. See [Recovery contract](#recovery-contract-idempotent-handlers--onconnect-re-spawn).
+
+In those cases capture the session in `OnConnect` under a mutex, cancel from `OnDisconnect`, and check `jobCtx.Done()` before notifying — the shape the table above replaces.
 
 ### Real-time Notifications (legacy `sync.Map` pattern)
 
@@ -541,7 +504,7 @@ buffer or replay it. The cookie-bound `groupID` is stable across reconnects,
 so the *next* `TriggerAction` after the WebSocket comes back will reach the
 user, but the dispatch that fired during the gap is gone.
 
-This is a deliberate design — see the [TriggerAction reconnect-buffering proposal](https://github.com/livetemplate/livetemplate/blob/v0.22.0/docs/proposals/triggeraction-reconnect-buffering.md).
+This is a deliberate design — see the [TriggerAction reconnect-buffering proposal](https://github.com/livetemplate/livetemplate/blob/v0.23.0/docs/proposals/triggeraction-reconnect-buffering.md).
 
 ### Detecting the gap
 
@@ -622,7 +585,7 @@ Two rules cover the gap:
 
 1. **Push handlers must be idempotent.** A handler that runs once must
    produce the same final state as one that runs twice. The
-   [reconnect-during-loading double-fire race documented under Implementation Notes in `patterns.md`](https://github.com/livetemplate/livetemplate/blob/v0.22.0/docs/proposals/patterns.md#implementation-notes-accumulated-from-completed-sessions)
+   [reconnect-during-loading double-fire race documented under Implementation Notes in `patterns.md`](https://github.com/livetemplate/livetemplate/blob/v0.23.0/docs/proposals/patterns.md#implementation-notes-accumulated-from-completed-sessions)
    makes this concrete: if the client disconnects and reconnects while a
    goroutine is still sleeping, two goroutines may race to dispatch — both
    land successfully on the new connection. Idempotent handlers absorb
@@ -707,7 +670,7 @@ once-only audit log, paid-API result stream, etc.) the implicit contract
 is not enough. Open a new issue referencing
 [#342](https://github.com/livetemplate/livetemplate/issues/342) and
 describing the exact non-idempotency. The
-[buffering proposal](https://github.com/livetemplate/livetemplate/blob/v0.22.0/docs/proposals/triggeraction-reconnect-buffering.md)
+[buffering proposal](https://github.com/livetemplate/livetemplate/blob/v0.23.0/docs/proposals/triggeraction-reconnect-buffering.md)
 captures the design sketch for the durable variant that would solve it,
 gated on a real use case.
 

@@ -2,8 +2,8 @@
 title: "Ephemeral Components Guide"
 source_repo: "https://github.com/livetemplate/livetemplate"
 source_path: "docs/guides/ephemeral-components.md"
-source_ref: "v0.22.0"
-source_commit: "22a4853506a682583b511e470bdd1e6193f4d5fe"
+source_ref: "v0.23.0"
+source_commit: "8294ce439a46a6a1f92e2a77b8a4978c9e526cc6"
 ---
 
 # Ephemeral Components Guide
@@ -62,7 +62,7 @@ type AppState struct {
 }
 ```
 
-> **Note on `AssertPureState`**: If your tests use `lvt/testing.AssertPureState[T](https://github.com/livetemplate/livetemplate/blob/v0.22.0/docs/guides/t)` to verify state contains no dependency types, `*toast.Container` will need to be excluded. Component containers are not external dependencies — they hold transient UI data, not connections or handles. Use `AssertPureState` with the `IgnoreFields` option, or structure your state so component fields live in a separate struct that is not checked.
+> **Note on `AssertPureState`**: If your tests use `lvt/testing.AssertPureState[T](t)` to verify state contains no dependency types, `*toast.Container` will need to be excluded. Component containers are not external dependencies — they hold transient UI data, not connections or handles. Use `AssertPureState` with the `IgnoreFields` option, or structure your state so component fields live in a separate struct that is not checked.
 
 ### Initialization
 
