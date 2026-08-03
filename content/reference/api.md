@@ -2,8 +2,8 @@
 title: "Go Library API Reference"
 source_repo: "https://github.com/livetemplate/livetemplate"
 source_path: "docs/references/api-reference.md"
-source_ref: "v0.23.0"
-source_commit: "8294ce439a46a6a1f92e2a77b8a4978c9e526cc6"
+source_ref: "v0.24.0"
+source_commit: "5a4633f246e41650479fbbf1b5361d599fe5a378"
 ---
 
 # Go Library API Reference
@@ -278,8 +278,21 @@ Primarily useful in tests. In production, Context is created internally and pass
 | `GetString` | `(key string) string` | Get a string value from action data |
 | `GetInt` | `(key string) int` | Get an integer value |
 | `GetFloat` | `(key string) float64` | Get a float value |
-| `GetBool` | `(key string) bool` | Get a boolean value |
+| `GetBool` | `(key string) bool` | Get a boolean value — this is the accessor for checkbox state (see below) |
 | `Has` | `(key string) bool` | Check if a key exists in action data |
+
+**Reading a checkbox.** Use `GetBool`, not `GetString`. The same box reaches the
+handler as a different type depending on how the form was submitted: over the
+WebSocket the client sends `input.checked` (a bool — the `value` attribute is
+discarded), while a plain POST carries the `value` attribute as a string
+(`"1"`, or `"on"` when the input has no `value`). An unchecked box is not
+posted at all, so the key is simply absent. `GetBool` accepts all of these and
+reads an absent key as `false`, which is what lets one handler serve both
+transports:
+
+```go
+enabled := ctx.GetBool("notifications")  // correct with and without JS
+```
 | `Get` | `(key string) interface{}` | Get a raw value |
 | `Bind` | `(v interface{}) error` | Unmarshal action data into a struct |
 | `BindAndValidate` | `(v interface{}, validate *validator.Validate) error` | Bind and validate in one step |

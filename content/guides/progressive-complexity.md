@@ -2,8 +2,8 @@
 title: "Progressive Complexity Guide"
 source_repo: "https://github.com/livetemplate/livetemplate"
 source_path: "docs/guides/progressive-complexity.md"
-source_ref: "v0.23.0"
-source_commit: "8294ce439a46a6a1f92e2a77b8a4978c9e526cc6"
+source_ref: "v0.24.0"
+source_commit: "5a4633f246e41650479fbbf1b5361d599fe5a378"
 ---
 
 # Progressive Complexity Guide
