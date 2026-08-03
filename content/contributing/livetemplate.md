@@ -2,8 +2,8 @@
 title: "Contributing to LiveTemplate Core Library"
 source_repo: "https://github.com/livetemplate/livetemplate"
 source_path: "CONTRIBUTING.md"
-source_ref: "v0.23.0"
-source_commit: "8294ce439a46a6a1f92e2a77b8a4978c9e526cc6"
+source_ref: "v0.24.0"
+source_commit: "5a4633f246e41650479fbbf1b5361d599fe5a378"
 ---
 
 # Contributing to LiveTemplate Core Library
@@ -226,7 +226,7 @@ livetemplate/
 └── scripts/             # Development scripts
 ```
 
-For the complete file-by-file map with line counts and dependencies, see [docs/design/CODE_STRUCTURE.md](https://github.com/livetemplate/livetemplate/blob/v0.23.0/docs/design/CODE_STRUCTURE.md).
+For the complete file-by-file map with line counts and dependencies, see [docs/design/CODE_STRUCTURE.md](https://github.com/livetemplate/livetemplate/blob/v0.24.0/docs/design/CODE_STRUCTURE.md).
 
 **Note:** The client library, CLI tool, and examples are now in separate repositories:
 - Client: https://github.com/livetemplate/client
@@ -528,7 +528,7 @@ Look for issues labeled `good first issue` - these are:
 ### Learning the Codebase
 
 1. **Start with the Contributor Walkthrough**
-   - [`docs/guides/new-contributor-walkthrough.md`](https://github.com/livetemplate/livetemplate/blob/v0.23.0/docs/guides/new-contributor-walkthrough.md) - **START HERE!** Comprehensive guide to the 5-phase architecture with links to all code and tests
+   - [`docs/guides/new-contributor-walkthrough.md`](https://github.com/livetemplate/livetemplate/blob/v0.24.0/docs/guides/new-contributor-walkthrough.md) - **START HERE!** Comprehensive guide to the 5-phase architecture with links to all code and tests
 
 2. **Read the architecture docs**
    - `CLAUDE.md` - Development guidelines

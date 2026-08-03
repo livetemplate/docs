@@ -2,8 +2,8 @@
 title: "LiveTemplate Scaling Guide"
 source_repo: "https://github.com/livetemplate/livetemplate"
 source_path: "docs/guides/SCALING.md"
-source_ref: "v0.23.0"
-source_commit: "8294ce439a46a6a1f92e2a77b8a4978c9e526cc6"
+source_ref: "v0.24.0"
+source_commit: "5a4633f246e41650479fbbf1b5361d599fe5a378"
 ---
 
 # LiveTemplate Scaling Guide
@@ -1869,8 +1869,8 @@ redis_connected_clients{instance="redis1"} > 9000  # 90% of Redis max clients
 
 ## Next Steps
 
-- **Roadmap:** See [ROADMAP.md](https://github.com/livetemplate/livetemplate/blob/v0.23.0/ROADMAP.md) for upcoming scaling features
-- **Architecture:** See [ARCHITECTURE.md](https://github.com/livetemplate/livetemplate/blob/v0.23.0/docs/design/ARCHITECTURE.md) for system design
+- **Roadmap:** See [ROADMAP.md](https://github.com/livetemplate/livetemplate/blob/v0.24.0/ROADMAP.md) for upcoming scaling features
+- **Architecture:** See [ARCHITECTURE.md](https://github.com/livetemplate/livetemplate/blob/v0.24.0/docs/design/ARCHITECTURE.md) for system design
 
 ---
 
