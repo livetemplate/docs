@@ -1,0 +1,566 @@
+/* The docs shell: archetype A (article), B (section index), C (reference entry).
+   Loaded via @import from brand.css, so it reaches every page — every selector
+   below is scoped to docs-shell markup the landing does not have.
+
+   This file overrides tinkerdown's `clean` theme rather than replacing it. Two
+   consequences run through everything here:
+
+   1. The theme sets h1/h2/h3 with !important, so those need !important back.
+   2. The theme's sidebar offset is a `position: fixed` sidebar plus
+      `body:has(...) { margin-left: W; width: calc(100% - W) }`, restated at
+      three breakpoints. That arithmetic is what keeps the page from scrolling
+      sideways on desktop and from collapsing to 33px on mobile — both covered
+      by e2e/responsive_test.go. We change W and keep the mechanism. */
+
+:root {
+  /* The article measure. Every body-level sibling of .content-wrapper is
+     pinned to it so breadcrumb, article, prev/next and the edit line form one
+     column instead of four differently-indented bands. */
+  --lt-col: 720px;
+  --lt-sidebar: 236px;
+}
+
+/* ══ Shell geometry ══════════════════════════════════════════════════════ */
+
+.tinkerdown-nav-sidebar { width: var(--lt-sidebar) }
+
+/* Mirrors the theme's own rule with a narrower sidebar. The explicit width is
+   load-bearing: margins sit outside the box even under border-box, so without
+   it body stays 100vw wide AND shifted right. */
+body:has(.tinkerdown-nav-sidebar) {
+  margin-left: var(--lt-sidebar);
+  width: calc(100% - var(--lt-sidebar));
+}
+
+/* The theme drops the same override at <=768px, where the sidebar translates
+   off-canvas. Ours loads later in the cascade, so it has to be restated at the
+   same breakpoint or the desktop offset would leak onto mobile. */
+@media (max-width: 768px) {
+  body:has(.tinkerdown-nav-sidebar) { margin-left: 0; width: 100% }
+}
+
+.content-wrapper,
+nav.breadcrumbs,
+.page-source-meta,
+.page-edit-link,
+nav.page-nav {
+  max-width: var(--lt-col);
+  margin-inline: auto;
+  padding-inline: 0;
+}
+
+.content-wrapper { padding-block: 8px 0 }
+
+/* The theme bleeds code blocks and demos outward with
+   `margin-inline: calc((800px - 100%) / 2 * -1); max-width: 1000px`, sized for
+   its own ~800px measure. Against a 720px column that pushes an 800px box out
+   of a 640px container at 924px wide — horizontal page overflow, which is the
+   one thing the acceptance criteria name. The calm design has no bleed: code
+   sits in the column with a border. Specificity (0,1,1) beats the theme's bare
+   type selectors inside its own media query. */
+@media (min-width: 900px) {
+  .content-wrapper pre,
+  .content-wrapper .tinkerdown-wasm-block,
+  .content-wrapper .tinkerdown-interactive-block,
+  .content-wrapper .tinkerdown-lvt-demo {
+    margin-left: 0;
+    margin-right: 0;
+    max-width: 100%;
+  }
+}
+
+/* ══ Type scale (archetype A) ════════════════════════════════════════════ */
+
+.content-wrapper h1 {
+  font-size: 34px !important;
+  line-height: 1.2 !important;
+  letter-spacing: -0.02em !important;
+  font-weight: 600 !important;
+  margin: 0 0 16px !important;
+  padding-bottom: 0 !important;
+  border-bottom: 0 !important;   /* theme draws a 3px accent rule under h1 */
+  color: var(--text-heading) !important;
+}
+
+/* Each h2 is preceded by a hairline rule, not followed by one. */
+.content-wrapper h2 {
+  font-size: 22px !important;
+  line-height: 1.3 !important;
+  letter-spacing: -0.015em !important;
+  font-weight: 600 !important;
+  margin: 36px 0 12px !important;
+  padding-top: 10px !important;
+  padding-bottom: 0 !important;
+  border-top: 1px solid var(--lt-line-soft) !important;
+  border-bottom: 0 !important;
+  color: var(--text-heading) !important;
+}
+
+/* Archetype C separates reference entries with a rule above each h3. That part
+   applies to every h3 — it is the sectioning device, and the docs put 807 of
+   them across the tree.
+
+   The design also sets the entry name in mono, because its sample entries are
+   symbol names (ctx.Subscribe, livetemplate.Async). The real content is not
+   shaped that way: 804 of those 807 headings are prose ("Available Metrics",
+   "1. Percentiles over Averages") and the symbols live in tables underneath,
+   which the definition-grid rules below already handle. So mono is applied
+   only where the heading genuinely IS a symbol — a heading that is inline
+   code, e.g. ### `.lvt.Uploads "name"`. */
+.content-wrapper h3 {
+  font-size: 17px !important;
+  font-weight: 600 !important;
+  line-height: 1.4 !important;
+  letter-spacing: -0.01em !important;
+  margin: 30px 0 10px !important;
+  padding-top: 22px !important;
+  border-top: 1px solid var(--lt-line-soft) !important;
+  color: var(--text-heading) !important;
+}
+.content-wrapper h3:has(> code) {
+  font-family: 'JetBrains Mono', ui-monospace, monospace !important;
+  font-weight: 500 !important;
+  letter-spacing: 0 !important;
+}
+.content-wrapper h3 > code { background: none; padding: 0; font-size: inherit }
+
+/* content/reference/api.md carries 17 `---` separators AND ### headings.
+   Drawing both gives every entry a doubled rule. The h3 border wins. */
+.content-wrapper hr { display: none }
+
+.content-wrapper h4 {
+  font-size: 15px !important;
+  font-weight: 600 !important;
+  margin: 24px 0 8px !important;
+  color: var(--text-heading) !important;
+}
+
+.content-wrapper p,
+.content-wrapper li {
+  font-size: 17px;
+  line-height: 1.7;
+  color: var(--text-primary);
+}
+
+/* The lede: the first paragraph after the page title. */
+.content-wrapper h1 + p { font-size: 17px; line-height: 1.7; margin-bottom: 20px }
+
+/* ══ Links ═══════════════════════════════════════════════════════════════ */
+
+/* The theme underlines every content link with a hardcoded rgba(0,102,204)
+   border and shifts padding on hover — a 0.4px jitter on every link. Visited
+   is hardcoded purple, so it needs naming explicitly rather than inheriting. */
+.content-wrapper a:not(.prev-next-link),
+.content-wrapper a:not(.prev-next-link):visited {
+  color: var(--accent);
+  border-bottom: 0;
+  text-decoration: none;
+  font-weight: inherit;
+  background: none;
+  padding: 0;
+  margin: 0;
+}
+.content-wrapper a:not(.prev-next-link):hover,
+.content-wrapper a:not(.prev-next-link):visited:hover {
+  color: var(--lt-accent-hover);
+  text-decoration: underline;
+  border-bottom: 0;
+  background: none;
+  padding: 0;
+  margin: 0;
+}
+
+/* ══ Code ════════════════════════════════════════════════════════════════ */
+
+.content-wrapper pre {
+  background: var(--pre-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  padding: 14px 16px;
+  font-size: 13px;
+  line-height: 1.65;
+  overflow-x: auto;          /* the <pre> scrolls, never the page */
+  box-shadow: none;
+  margin: 0 0 20px;
+}
+
+.content-wrapper :not(pre) > code {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 14.5px;
+  background: var(--code-bg);
+  border: 0;
+  padding: 1px 5px;
+  border-radius: 4px;
+  color: var(--text-primary);
+}
+
+/* ══ Tables → the definition grid (archetype C) ══════════════════════════ */
+
+/* The theme makes tables `display: block; overflow-x: auto` so wide ones scroll
+   inside their column instead of the page. /reference/template-support-matrix
+   is in responsive_test.go precisely for this — keep it. */
+.content-wrapper table {
+  display: block;
+  max-width: 100%;
+  overflow-x: auto;
+  border-collapse: collapse;
+  font-size: 15px;
+  margin: 0 0 24px;
+}
+.content-wrapper th,
+.content-wrapper td {
+  border: 0;
+  border-bottom: 1px solid var(--lt-line-soft);
+  padding: 10px 14px 10px 0;
+  text-align: left;
+  vertical-align: top;
+  background: none;
+}
+.content-wrapper th {
+  border-bottom: 1px solid var(--border-color);
+  font-weight: 500;
+  font-size: 11.5px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--lt-meta);
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+}
+/* First column reads as the term in a definition list — the 130px/1fr grid the
+   design draws, expressed as a table because that is what markdown emits. */
+.content-wrapper td:first-child {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 13.5px;
+  color: var(--text-heading);
+  min-width: 130px;
+  word-break: normal;
+  overflow-wrap: normal;
+}
+/* A term is a symbol name, and most are written as inline code. The table is
+   display:block at 100% width, so the column gets squeezed and `SeverityWarning`
+   breaks after "SeverityWarnin". nowrap on the code makes the term the column's
+   min-content width, so auto table layout widens this column and narrows the
+   description instead of hyphenating an identifier. */
+.content-wrapper td:first-child code { white-space: nowrap }
+
+/* ══ Lists, and the grouped link lists of archetype B ════════════════════ */
+
+.content-wrapper ul,
+.content-wrapper ol { padding-left: 1.2em; margin: 0 0 20px }
+.content-wrapper li { margin: 4px 0 }
+/* Pico's `ul li { list-style: square }` sets the marker on the li directly, so
+   the calm treatment has to be applied there too — an inherited value from the
+   ul never wins against a directly-set one. */
+.content-wrapper li::marker { color: var(--lt-meta) }
+
+/* A section index (/recipes/, /reference/, /guides/) is markdown bullets where
+   every item opens with a link. :has() is the only signal available — the
+   renderer emits no page-type class and <body> carries no attributes.
+
+   Both authored shapes have to be named: `[Title](/x) — gloss` gives
+   `li > a`, and `**[Title](/x)** — gloss` gives `li > strong > a`. Across
+   content/ the pair matches 48 lists — 47 where every item is a link, 1 where
+   four of five are. None of the 434 prose lists in the tree is touched.
+
+   The design justifies title left / gloss right. That needs a wrapper around
+   the gloss which markdown never emits, and flex-on-li can't stand in: every
+   inline <code> and <em> in a gloss would become its own flex item and spread
+   across the row. Inline flow with the contrast carried by weight and color is
+   the robust version of the same idea. */
+.content-wrapper ul:has(> li > a:first-child),
+.content-wrapper ul:has(> li > strong:first-child > a:first-child) {
+  list-style: none;
+  padding-left: 0;
+  border-top: 1px solid var(--lt-line-soft);
+}
+.content-wrapper ul:has(> li > a:first-child) > li,
+.content-wrapper ul:has(> li > strong:first-child > a:first-child) > li {
+  list-style: none;   /* beats Pico's `ul li { list-style: square }` */
+  margin: 0;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--lt-line-soft);
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--lt-meta);          /* the gloss after the em-dash */
+}
+.content-wrapper ul:has(> li > a:first-child) > li > a:first-child,
+.content-wrapper ul:has(> li > strong:first-child > a:first-child) > li > strong:first-child,
+.content-wrapper ul:has(> li > strong:first-child > a:first-child) > li > strong:first-child > a {
+  font-size: 15.5px;
+  font-weight: 500;                /* not <strong>'s 700 — the design's title weight */
+  color: var(--text-heading);
+}
+.content-wrapper ul:has(> li > a:first-child) > li > a:first-child:hover,
+.content-wrapper ul:has(> li > strong:first-child > a:first-child) > li > strong:first-child > a:hover {
+  color: var(--accent);
+}
+
+/* Two columns only where there is room for them. At 924px the article column is
+   ~640px, and two ~300px columns of "title — gloss" wrap into mush. */
+@media (min-width: 1100px) {
+  .content-wrapper ul:has(> li > a:first-child),
+  .content-wrapper ul:has(> li > strong:first-child > a:first-child) {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    column-gap: 32px;
+  }
+}
+
+/* ══ Callouts ════════════════════════════════════════════════════════════ */
+
+/* Markdown has no admonition syntax here, so a blockquote is the Note callout.
+   No icon, no emoji, no colored fill — a hairline and a tinted left edge. */
+.content-wrapper blockquote {
+  border: 1px solid var(--card-border);
+  border-left: 1px solid var(--accent);
+  border-radius: 6px;
+  background: var(--lt-bg-sunk);
+  padding: 14px 16px;
+  margin: 0 0 24px;
+  font-size: 15.5px;
+  line-height: 1.65;
+  color: var(--text-primary);
+}
+.content-wrapper blockquote > :last-child { margin-bottom: 0 }
+.content-wrapper blockquote p { font-size: 15.5px; line-height: 1.65 }
+
+/* The design gives callouts a mono uppercase label. Rather than inventing one
+   with ::before — which would stamp "NOTE" onto the nine that say Note, the two
+   that say Security note, and the ones that are neither — promote the bold
+   lead-in the markdown already carries. Callouts without one simply have no
+   label, which is the honest rendering. */
+.content-wrapper blockquote > p:first-child > strong:first-child {
+  display: block;
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 11.5px;
+  font-weight: 400;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 6px;
+}
+
+/* ══ Breadcrumb ══════════════════════════════════════════════════════════ */
+
+nav.breadcrumbs {
+  padding: 22px 0 0;
+  margin-bottom: 18px;
+  border-bottom: 0;
+}
+nav.breadcrumbs a,
+nav.breadcrumbs .current,
+nav.breadcrumbs .crumb-label,
+nav.breadcrumbs .separator {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--lt-meta);
+}
+nav.breadcrumbs a { text-decoration: none }
+nav.breadcrumbs a:hover { color: var(--accent); text-decoration: underline }
+nav.breadcrumbs .current { color: var(--text-primary); font-weight: 400 }
+nav.breadcrumbs .separator { margin: 0 0.4rem }
+
+/* ══ Prev / next ═════════════════════════════════════════════════════════ */
+
+nav.page-nav {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 16px;
+  margin-top: 40px;
+  padding-top: 24px;
+  border-top: 1px solid var(--border-color);
+}
+nav.page-nav a {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  padding: 14px 16px;
+  background: none;
+  border: 1px solid var(--card-border);
+  border-radius: 6px;
+  color: var(--text-heading);
+  text-decoration: none;
+}
+/* Cards darken their border. They do not lift, scale, or cast a shadow —
+   nothing on this page moves unless the app itself is updating. */
+nav.page-nav a:hover {
+  border-color: var(--text-heading);
+  background: none;
+  transform: none;
+  box-shadow: none;
+}
+/* The theme emits the prev card as [arrow, label] and the next card as
+   [label, arrow]. Both want the mono direction cue above the title, so the
+   next card reads its two children in reverse. */
+nav.page-nav .page-nav-next {
+  flex-direction: column-reverse;
+  align-items: flex-end;
+  text-align: right;
+  margin-left: 0;
+}
+nav.page-nav .arrow {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 11.5px;
+  color: var(--lt-meta);
+}
+nav.page-nav .label { font-size: 15px; font-weight: 500; color: var(--text-heading) }
+
+/* ══ Source + edit lines ═════════════════════════════════════════════════ */
+
+.page-source-meta,
+.page-edit-link {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 11.5px;
+  line-height: 1.7;
+  color: var(--lt-meta);
+  margin-top: 20px;
+}
+.page-source-meta a,
+.page-edit-link a { color: var(--lt-meta); text-decoration: none; border-bottom: 0 }
+.page-source-meta a:hover,
+.page-edit-link a:hover { color: var(--accent); text-decoration: underline }
+/* Measured at 10.12px on the shipped theme: 0.85rem on the container times
+   0.85em here, against a 14px root. Both multipliers are relative, so the
+   floor has to be restated in px. */
+.page-source-meta code { font-size: 11.5px !important; background: none; padding: 0 }
+
+/* ══ Sidebar ═════════════════════════════════════════════════════════════ */
+
+.tinkerdown-nav-sidebar {
+  background: var(--bg-primary);
+  border-right: 1px solid var(--lt-line-soft);
+  box-shadow: none;
+}
+#tinkerdown-sidebar .nav-section-title,
+#tinkerdown-sidebar .nav-group-title {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 11.5px;      /* .nav-group-title measured 10.92px (0.78rem @ 14px) */
+  font-weight: 400;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--lt-meta);
+  background: none;       /* the theme fills section titles with --code-bg */
+}
+#tinkerdown-sidebar .nav-section-title { padding: 14px 20px 6px }
+#tinkerdown-sidebar .nav-group-title { padding: 10px 20px 4px 28px }
+
+#tinkerdown-sidebar .nav-page-link {
+  font-size: 14px;
+  color: var(--text-secondary);
+  padding: 3px 20px;
+  border-left: 2px solid transparent;
+  background: none;
+  text-decoration: none;
+}
+#tinkerdown-sidebar .nav-group .nav-pages li a { padding-left: 34px }
+#tinkerdown-sidebar .nav-page-link:hover {
+  color: var(--text-heading);
+  border-left-color: var(--lt-line-soft);
+  background: none;
+}
+#tinkerdown-sidebar .nav-pages li a.active,
+#tinkerdown-sidebar .nav-page-link.active {
+  color: var(--text-heading);
+  font-weight: 500;
+  border-left: 2px solid var(--accent);
+  background: none;
+}
+
+/* The search affordance. Its <kbd> measured 11.0px on the shipped theme. */
+#tinkerdown-sidebar .search-button {
+  border: 1px solid var(--card-border);
+  border-radius: 5px;
+  background: var(--card-bg);
+  font-size: 13.5px;
+  color: var(--lt-meta);
+  box-shadow: none;
+}
+#tinkerdown-sidebar .search-button:hover { border-color: var(--text-heading) }
+#tinkerdown-sidebar .search-button kbd {
+  font-size: 11.5px;
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  border: 1px solid var(--border-color);
+  border-radius: 3px;
+  background: none;
+  color: var(--lt-meta);
+}
+
+/* ══ On this page ════════════════════════════════════════════════════════ */
+
+/* tinkerdown's client injects the page TOC as a <ul> nested inside the active
+   page's sidebar <li>, not as a right-hand rail. We restyle it where it lands:
+   pulling it out of a scrolling sidebar into a fixed gutter column leaves a
+   hole behind it and makes the page width depend on 100vw arithmetic, which is
+   the fastest way to fail the no-horizontal-overflow criterion. */
+.page-toc-list {
+  background: none;
+  border-left: 0;
+  margin: 6px 0 10px;
+  padding: 0 0 0 20px;
+}
+.page-toc-list::before {
+  content: "On this page";
+  display: block;
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 11.5px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--lt-meta);
+  padding: 6px 0 4px;
+}
+.page-toc-link {
+  font-size: 13.5px;
+  color: var(--text-secondary);
+  padding: 2px 0 2px 10px;
+  border-left: 2px solid var(--border-color);
+  background: none;
+  text-decoration: none;
+}
+.page-toc-link:hover { color: var(--text-heading); background: none }
+.page-toc-item.active > .page-toc-link,
+.page-toc-link.active {
+  color: var(--text-heading);
+  border-left-color: var(--accent);
+  background: none;
+}
+/* On long reference pages the client adds H3 entries and shrinks them to
+   .8rem — 11.2px against a 14px root, under the floor. Matching the theme's
+   two-class specificity is what makes this stick. The design sets reference
+   TOC entries in mono anyway. */
+.page-toc-level-3 .page-toc-link {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 12.5px;
+  padding-left: 22px;
+}
+.page-toc-level-3 .page-toc-link::before { content: none }
+
+/* ══ Chrome that must stop moving ════════════════════════════════════════ */
+
+.page-toolbar { box-shadow: none; border: 1px solid var(--card-border); background: var(--card-bg) }
+.page-toolbar:hover { box-shadow: none }
+
+/* Embedded live demos and interactive blocks: hairline card, no lift. */
+.content-wrapper .tinkerdown-lvt-demo,
+.content-wrapper .tinkerdown-interactive-block,
+.content-wrapper .tinkerdown-embed-lvt {
+  border: 1px solid var(--card-border);
+  border-radius: 6px;
+  box-shadow: none;
+  background: var(--card-bg);
+}
+.content-wrapper .tinkerdown-lvt-demo:hover,
+.content-wrapper .tinkerdown-interactive-block:hover,
+.content-wrapper .tinkerdown-embed-lvt:hover {
+  transform: none;
+  box-shadow: none;
+}
+.content-wrapper .tinkerdown-lvt-demo::before,
+.content-wrapper .tinkerdown-lvt-demo .tinkerdown-interactive-block::before,
+.content-wrapper .tinkerdown-lvt-demo .tinkerdown-embed-lvt::before {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 11.5px;
+  letter-spacing: 0.08em;
+  color: var(--lt-meta);
+  background: none;
+}
