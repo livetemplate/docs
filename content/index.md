@@ -1,46 +1,87 @@
 ---
 title: "LiveTemplate — Build interactive web apps in Go with standard HTML templates"
-description: "Use html/template and Go handlers to build rich app screens without writing JavaScript for the common cases."
+description: "Write html/template and Go handlers, and the page updates itself. No SPA, no JSON API, no build step."
 layout: landing
 ---
 
-<header class="nav"><div class="wrap nav-in">
-  <div class="brand"><span class="glyph">◇</span> LiveTemplate</div>
-  <nav class="nav-links"><a href="/getting-started/introduction">Docs</a><a href="/recipes/">Recipes</a><a href="/reference/api">Reference</a><a href="https://github.com/livetemplate/livetemplate">GitHub</a><a class="btn btn-primary" href="/getting-started/install">Get started →</a></nav>
+<!-- NOTE FOR EDITORS: never put a blank line inside a <pre> block on this page.
+     Goldmark ends an HTML block at the first blank line, so everything after it
+     is re-parsed as markdown: indentation is stripped and <p> tags appear
+     inside the <code>. Keep snippets compact instead. -->
+
+<header class="site"><div class="hdr-in">
+  <a class="logo" href="#top">
+    <svg width="19" height="19" viewBox="0 0 20 20" fill="none" aria-hidden="true"><rect x="1.5" y="1.5" width="17" height="17" rx="4" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M11.2 4.2 L6.6 10.6 H9.6 L8.8 15.8 L13.4 9.4 H10.4 Z" fill="var(--accent)"/></svg>
+    LiveTemplate
+  </a>
+  <nav class="hdr-nav">
+    <a href="/getting-started/introduction">Docs</a>
+    <a href="/recipes/">Recipes</a>
+    <a href="/reference/api">Reference</a>
+    <a href="https://github.com/livetemplate/livetemplate">GitHub</a>
+    <a class="btn btn-primary" href="/getting-started/install">Get started</a>
+  </nav>
 </div></header>
 
-<!-- HERO -->
-<section class="hero"><div class="wrap">
-  <span class="eyebrow">A simpler way to build interactive Go web apps · Alpha</span>
-  <h1 class="head">Build interactive web apps in Go with <span class="g">standard HTML templates.</span></h1>
-  <p class="sub">Use <b><code>html/template</code> and Go handlers</b> to build rich app screens without writing JavaScript for the common cases.</p>
-  <div class="cta-row">
-    <a class="btn btn-primary btn-lg" href="/getting-started/install">Get started →</a>
-    <a class="btn btn-ghost btn-lg" href="/getting-started/introduction">Read the docs</a>
-  </div>
-  <div class="hero-snip">
-    <div class="live-card">
-      <div class="live-bar"><span class="live-badge"><span class="pulse"></span> live</span><span class="live-meta">greet · running in this page</span></div>
-      <div class="live-body">
+<div id="top" class="shell">
 
-```embed-lvt path="/apps/greet/" upstream="http://localhost:9091" height="200px"
+<aside class="rail">
+  <div class="rail-label">On this page</div>
+  <a href="#whole-app">The whole app</a>
+  <a href="#steps">Five more steps</a>
+  <a class="sub" href="#step-2">2 · No JavaScript</a>
+  <a class="sub" href="#step-3">3 · Validation</a>
+  <a class="sub" href="#step-4">4 · Loading state</a>
+  <a class="sub" href="#step-5">5 · Sync tabs</a>
+  <a class="sub" href="#step-6">6 · Shared wall</a>
+  <a href="#compare">How it compares</a>
+  <a href="#more">Everything else</a>
+</aside>
+
+<main class="doc">
+
+<section class="hero">
+  <div class="eyebrow">Alpha · a Go library for server-rendered app screens</div>
+  <h1>Build interactive web apps in Go with standard HTML templates.</h1>
+  <p class="sub">Write <code>html/template</code> and Go handlers, and the page updates itself. The goal is app-like screens without an SPA, a JSON API or a build step, so there's no JavaScript here that you have to write.</p>
+  <div class="cta-row">
+    <a class="btn btn-primary" href="/getting-started/install">Get started →</a>
+    <a class="btn btn-ghost" href="/getting-started/introduction">Read the docs</a>
+    <code class="get">go get github.com/livetemplate/livetemplate</code>
+  </div>
+</section>
+
+<section id="whole-app">
+  <div class="eyebrow">Step 1 · Render</div>
+  <h2>This is the whole app, running on this page.</h2>
+  <p class="lead">Type a name and hit Say hi. The submit calls a Go method, the server re-renders the template, and only the changed HTML comes back.</p>
+
+  <div class="demo">
+    <div class="demo-bar"><span class="dot"></span> greet · running in this page</div>
+    <div class="demo-body">
+
+```embed-lvt path="/apps/greet/" upstream="http://localhost:9091" height="130px"
 ```
 
 </div>
+  </div>
+
+  <div class="pair">
+    <div class="snip">
+      <div class="snip-label">app.tmpl — the entire template</div>
+<pre>&lt;!DOCTYPE html&gt;
+&lt;html&gt;&lt;head&gt;
+  &lt;script defer src="{{lvtClientScriptURL}}"&gt;&lt;/script&gt;
+&lt;/head&gt;&lt;body&gt;
+  &lt;h1&gt;Hello, {{.Name}}&lt;/h1&gt;
+  &lt;form method="POST"&gt;
+    &lt;input name="name" placeholder="Your name"&gt;
+    &lt;button name="greet"&gt;Say hi&lt;/button&gt;
+  &lt;/form&gt;
+&lt;/body&gt;&lt;/html&gt;</pre>
     </div>
-    <p class="hero-cap" style="margin:14px 0 8px">↑ a real, running app. Type a name, hit <b>Say hi</b>. Below is <b>the whole thing</b> — the template and the Go code, complete:</p>
-    <div class="code"><div class="code-bar"><span class="dots"><i></i><i></i><i></i></span><span class="file">app.tmpl &nbsp;— the entire template, just standard HTML</span></div>
-<pre><span class="tag">&lt;!DOCTYPE html&gt;</span>
-<span class="tag">&lt;html&gt;&lt;head&gt;</span>
-  <span class="tag">&lt;script</span> <span class="attr">defer src</span>=<span class="str">"{{lvtClientScriptURL}}"</span><span class="tag">&gt;&lt;/script&gt;</span>
-<span class="tag">&lt;/head&gt;&lt;body&gt;</span>
-  <span class="tag">&lt;h1&gt;</span>Hello, {{<span class="fn">.Name</span>}}<span class="tag">&lt;/h1&gt;</span>
-  <span class="tag">&lt;form</span> <span class="attr">method</span>=<span class="str">"POST"</span><span class="tag">&gt;</span>
-    <span class="tag">&lt;input</span> <span class="attr">name</span>=<span class="str">"name"</span> <span class="attr">placeholder</span>=<span class="str">"Your name"</span><span class="tag">&gt;</span>
-    <span class="tag">&lt;button</span> <span class="attr">name</span>=<span class="str">"greet"</span><span class="tag">&gt;</span>Say hi<span class="tag">&lt;/button&gt;</span>
-  <span class="tag">&lt;/form&gt;</span>
-<span class="tag">&lt;/body&gt;&lt;/html&gt;</span></pre></div>
-    <div class="code"><div class="code-bar"><span class="dots"><i></i><i></i><i></i></span><span class="file">app.go &nbsp;— the entire program</span></div>
+    <div class="snip">
+      <div class="snip-label">app.go — the entire program</div>
 <pre class="language-go"><code class="language-go">package main
 import (
     "net/http"
@@ -56,227 +97,194 @@ func main() {
     app := lvt.Must(lvt.New("app", lvt.WithParseFiles("app.tmpl")))
     http.ListenAndServe(":8080",
         app.Handle(&amp;App{}, lvt.AsState(&amp;State{Name: "there"})))
-}</code></pre></div>
-    <p class="hero-cap">That's the whole app — ~20 lines of Go and standard HTML. No SPA framework, no REST API, no build step.</p>
-    <p class="hero-cap">It reads like a classic server-rendered form, but it <b>behaves like a modern app</b>: the page updates live, with no full reload and no JavaScript you had to write. From here, everything you'd reach for a frontend framework to do — form validation, loading states, progressive enhancement, real-time sync across tabs, multiplayer/collaborative views, file uploads — is a <b>small diff on this exact code</b>. The rest of this page builds them, one step at a time.</p>
-  </div>
-</div></section>
-
-<!-- UNDER THE HOOD: animated request/response over the wire -->
-<section><div class="wrap">
-  <div class="sec-tag">Step 1 · Render</div>
-  <h2>This is the whole app, not a toy example.</h2>
-  <p class="lead">These are the <b>real frames</b> on the wire. A form submit calls your Go method, the server re-renders the template, and <b>only the changed HTML comes back</b> — no reload, no extra JSON API, no client route you had to build.</p>
-  <div class="uh">
-    <!-- browser -->
-    <div class="uh-side uh-browser">
-      <span class="uh-tag">browser</span>
-      <div class="uh-app">
-        <div class="uh-h"><span class="uh-there">Hello, there</span><span class="uh-ada">Hello, Ada</span></div>
-        <button class="uh-btn">Say&nbsp;hi</button>
-      </div>
-    </div>
-    <!-- the wire -->
-    <div class="uh-wire">
-      <span class="uh-wlabel">WebSocket</span>
-      <div class="uh-lane">
-        <span class="uh-arrow">▲ action · 40 B</span>
-        <span class="uh-pkt uh-up">{"action":<b>"greet"</b>,"data":{"name":"Ada"}}</span>
-      </div>
-      <div class="uh-lane">
-        <span class="uh-arrow">▼ diff · 20 B</span>
-        <span class="uh-pkt uh-down">{"tree":{"0":<b>"Ada"</b>}}</span>
-      </div>
-    </div>
-    <!-- go server -->
-    <div class="uh-side uh-server">
-      <span class="uh-tag">Go server</span>
-      <div class="uh-go">Greet(state)</div>
-      <div class="uh-steps">
-        <span class="uh-step st1">re-render</span>
-        <span class="uh-step st2">diff</span>
-      </div>
+}</code></pre>
     </div>
   </div>
-  <p class="wiring-foot">All of it comes from the <b>two files above</b> plus one <code>&lt;script&gt;</code>. The framework handles transport and DOM patching, so you stay in Go handlers and HTML templates.</p>
-</div></section>
 
-<!-- SPINE INTRO -->
-<section class="alt"><div class="wrap spine-intro">
-  <div class="sec-tag">One app, six steps</div>
-  <h2>Start with a normal Go app. Then add the parts real apps need.</h2>
-  <p class="lead">Everything below is the <b>same greeting app</b>. We add plain POST fallback, validation, pending state, then WebSocket updates. Each step is a <b>small diff</b>. You keep one Go codebase and one place for application logic.</p>
-</div></section>
+  <div class="wire">
+    <div class="wire-label">on the wire · WebSocket</div>
+    <div>▲ action · 40 B <span class="payload">{"action":"greet","data":{"name":"Ada"}}</span></div>
+    <div>▼ diff &nbsp;· 20 B <span class="payload">{"tree":{"0":"Ada"}}</span></div>
+  </div>
 
-<!-- STEP 2 · WORKS WITHOUT JS -->
-<section><div class="wrap two code-right">
-  <div>
-    <div class="sec-tag">Step 2 · Works without JavaScript</div>
-    <h2>The same app. With and without JavaScript.</h2>
-    <p class="lead">Both cards run the <b>identical app</b>, with WebSocket off. <b>Left, JS on:</b> the browser enhances the form submit and patches the headline in place. <b>Right, JS disabled:</b> the same <code>&lt;form&gt;</code> does a plain POST and the server renders the page. JavaScript changes the <b>browser behavior</b>, not the app you have to build. Type a name in each.</p>
-    <div class="two" style="margin-top:28px">
-      <div class="live-card">
-        <div class="live-bar"><span class="live-badge"><span class="pulse"></span> live</span><span class="live-meta">JavaScript on · fetch + DOM patch</span></div>
-        <div class="live-body">
+  <p class="close">That's the whole app, about 20 lines of Go and some standard HTML. Everything else on this page is a small diff on it.</p>
+</section>
+
+<section id="steps" class="intro">
+  <div class="eyebrow">One app, five more steps</div>
+  <h2>Adding the things an app usually ends up needing.</h2>
+  <p class="lead">Everything below is the same greeting app. It picks up a plain POST fallback, then validation, then a pending state, then live updates over a WebSocket. It stays one Go codebase, and application logic never ends up in two places.</p>
+</section>
+
+<section id="step-2" class="step">
+  <div class="eyebrow">Step 2 · Works without JavaScript</div>
+  <h2>The same app works with JavaScript disabled.</h2>
+  <p class="lead">When the script loads, the client enhances the submit and patches the headline. When it doesn't, the same <code>&lt;form&gt;</code> does a native POST and the server renders the page. There's no <code>if jsEnabled</code> branch to write. Both cards below run the same app — the right one has scripting switched off.</p>
+
+  <div class="pair">
+    <div class="demo">
+      <div class="demo-bar"><span class="dot"></span> JavaScript on · fetch + patch</div>
+      <div class="demo-body">
         <iframe class="nojs-frame" src="/apps/greet-nojs/" sandbox="allow-forms allow-same-origin allow-scripts" title="The greeting app with JavaScript enabled"></iframe>
-</div>
       </div>
-      <div class="live-card">
-        <div class="live-bar"><span class="live-badge nojs">○ no JS</span><span class="live-meta">JavaScript off · form POST → full render</span></div>
-        <div class="live-body">
-          <iframe class="nojs-frame" src="/apps/greet-nojs/" sandbox="allow-forms allow-same-origin" title="The greeting app with JavaScript disabled"></iframe>
-        </div>
+    </div>
+    <div class="demo">
+      <div class="demo-bar"><span class="dot off"></span> JavaScript off · form POST → full render</div>
+      <div class="demo-body">
+        <iframe class="nojs-frame" src="/apps/greet-nojs/" sandbox="allow-forms allow-same-origin" title="The greeting app with JavaScript disabled"></iframe>
       </div>
     </div>
   </div>
-  <div>
-    <div class="code" style="max-width:680px;margin:0 auto"><div class="code-bar"><span class="dots"><i></i><i></i><i></i></span><span class="file">app.tmpl · one form, either transport</span></div>
-<pre><span class="com">&lt;!-- the only line that flips the transport: --&gt;</span>
-<span class="tag">&lt;script</span> <span class="attr">defer src</span>=<span class="str">"{{lvtClientScriptURL}}"</span><span class="tag">&gt;&lt;/script&gt;</span>
 
-<span class="tag">&lt;form</span> <span class="attr">method</span>=<span class="str">"POST"</span><span class="tag">&gt;</span>   <span class="com">&lt;!-- JS on → fetch + patch · JS off → native POST --&gt;</span>
-  <span class="tag">&lt;input</span> <span class="attr">name</span>=<span class="str">"name"</span><span class="tag">&gt;</span>
-  <span class="tag">&lt;button</span> <span class="attr">name</span>=<span class="str">"greet"</span><span class="tag">&gt;</span>Say hi<span class="tag">&lt;/button&gt;</span>
-<span class="tag">&lt;/form&gt;</span></pre></div>
-    <p class="demo-cap loading-cap" style="margin-top:14px">Same <code>&lt;form&gt;</code> and the same <code>Greet</code> handler as Step 1 — no <code>if jsEnabled</code> branch anywhere. When the <code>&lt;script&gt;</code> loads, the client enhances the submit; when it doesn't, the browser falls back to a native POST.</p>
+  <div class="snip">
+    <div class="snip-label">app.tmpl — one form, either transport</div>
+<pre>&lt;!-- the only line that flips the transport --&gt;
+&lt;script defer src="{{lvtClientScriptURL}}"&gt;&lt;/script&gt;
+&lt;form method="POST"&gt;   &lt;!-- JS on → fetch + patch · JS off → native POST --&gt;
+  &lt;input name="name"&gt;
+  &lt;button name="greet"&gt;Say hi&lt;/button&gt;
+&lt;/form&gt;</pre>
   </div>
-</div></section>
+</section>
 
-<!-- STEP 3 · VALIDATE -->
-<section><div class="wrap two code-right">
-  <div>
-    <div class="sec-tag">Step 3 · Validation</div>
-    <h2>Write the rule in HTML. Enforce it again on the server.</h2>
-    <p class="lead">Use standard HTML attributes like <code>required</code> and <code>type="email"</code>. <code>ctx.ValidateForm()</code> re-runs the <b>same</b> rules server-side, then you can add Go-only checks for business rules. Submit empty, or type <b>admin</b>:</p>
-    <div class="live-card" style="margin-top:24px">
-      <div class="live-bar"><span class="live-badge"><span class="pulse"></span> live</span><span class="live-meta">greet-validate · server-checked</span></div>
-      <div class="live-body">
+<section id="step-3" class="step">
+  <div class="eyebrow">Step 3 · Validation</div>
+  <h2>Validation rules written in HTML, re-checked in Go.</h2>
+  <p class="lead">Standard attributes like <code>required</code> run again server-side via <code>ctx.ValidateForm()</code>, then you add the rules HTML cannot express. Try an empty submit, or type <em>admin</em>.</p>
 
-```embed-lvt path="/apps/greet-validate/" upstream="http://localhost:9091" height="220px"
+  <div class="demo">
+    <div class="demo-bar"><span class="dot"></span> greet-validate · server-checked</div>
+    <div class="demo-body">
+
+```embed-lvt path="/apps/greet-validate/" upstream="http://localhost:9091" height="160px"
 ```
 
 </div>
-    </div>
   </div>
-  <div>
-    <div class="code delta"><div class="code-bar"><span class="dots"><i></i><i></i><i></i></span><span class="file">app.tmpl · the rule, written once</span></div>
-<pre><span class="tag">&lt;input</span> <span class="attr">name</span>=<span class="str">"name"</span> <span class="attr">required</span> {{<span class="fn">.lvt.AriaInvalid</span> <span class="str">"name"</span>}}<span class="tag">&gt;</span>
-{{<span class="fn">.lvt.ErrorTag</span> <span class="str">"name"</span>}}</pre></div>
-    <div class="code delta"><div class="code-bar"><span class="dots"><i></i><i></i><i></i></span><span class="file">app.go · the server re-checks, then adds its own rule</span></div>
+
+  <div class="pair">
+    <div class="snip">
+      <div class="snip-label">app.tmpl · the rule, written once</div>
+<pre>&lt;input name="name" required {{.lvt.AriaInvalid "name"}}&gt;
+{{.lvt.ErrorTag "name"}}</pre>
+    </div>
+    <div class="snip">
+      <div class="snip-label">app.go · re-check, then add your own rule</div>
 <pre class="language-go"><code class="language-go">func (a *App) Greet(s State, ctx *lvt.Context) (State, error) {
-    if err := ctx.ValidateForm(); err != nil {   // re-runs the HTML rules server-side
-        return s, err
+    if err := ctx.ValidateForm(); err != nil {
+        return s, err                 // re-runs the HTML rules
     }
     name := strings.TrimSpace(ctx.GetString("name"))
-    if strings.EqualFold(name, "admin") {         // a rule HTML can't express
-        return s, lvt.NewFieldError("name", errors.New(`"admin" is reserved`))
+    if strings.EqualFold(name, "admin") {
+        return s, lvt.NewFieldError("name",
+            errors.New(`"admin" is reserved`))
     }
     s.Name = name
     return s, nil
-}</code></pre></div>
-    <div class="wire"><span class="wlabel">on the wire · HTTP fetch</span>
-      <span class="wf up">▲ {"action":"greet","data":{"name":"admin"}}</span>
-      <span class="wf dn">▼ {"meta":{"errors":{"name":"\"admin\" is reserved"}}}</span>
+}</code></pre>
     </div>
   </div>
-</div></section>
 
-<!-- STEP 4 · LOADING -->
-<section class="alt"><div class="wrap">
-  <div class="sec-tag">Step 4 · Loading state</div>
-  <h2>Two ways to show pending state, in HTTP and WebSocket mode.</h2>
-  <p class="lead">LiveTemplate works in both <b>plain HTTP</b> and <b>live-session WebSocket</b> mode. You can run slow work on the server and render its pending state with <b>ordinary template conditionals</b>, or use a small <b>button-level escape hatch</b> when the server code should stay unchanged. The server-side version below needs a <b>live session connection</b> for its completion render; the attribute version works as a single request/response.</p>
-  <div class="two loading-cols" style="margin-top:28px">
-    <div class="loading-col">
-      <div class="live-card">
-        <div class="live-bar"><span class="live-badge"><span class="pulse"></span> live</span><span class="live-meta">greet loading server owned</span></div>
-        <div class="live-body">
+  <div class="wire">
+    <div class="wire-label">on the wire · HTTP fetch</div>
+    <div>▲ <span class="payload">{"action":"greet","data":{"name":"admin"}}</span></div>
+    <div>▼ <span class="payload">{"meta":{"errors":{"name":"\"admin\" is reserved"}}}</span></div>
+  </div>
+</section>
 
-```embed-lvt path="/apps/greet-async/" upstream="http://localhost:9091" height="200px"
+<section id="step-4" class="step">
+  <div class="eyebrow">Step 4 · Loading state</div>
+  <h2>Two ways to show a pending state.</h2>
+  <p class="lead">The slow work runs on the server, so you can render its pending state with ordinary template conditionals. If you'd rather not touch the Go code at all, there's a button-level attribute for that.</p>
+
+  <div class="pair">
+    <div>
+      <div class="snip-label">A · server-owned, template variables only</div>
+      <div class="demo">
+        <div class="demo-bar"><span class="dot"></span> greet-async · server-owned pending</div>
+        <div class="demo-body">
+
+```embed-lvt path="/apps/greet-async/" upstream="http://localhost:9091" height="130px"
 ```
 
 </div>
       </div>
-      <div class="code delta"><div class="code-bar"><span class="dots"><i></i><i></i><i></i></span><span class="file">app.tmpl · server-owned pending, only template variables</span></div>
-<pre><span class="tag">&lt;button</span> <span class="attr">class</span>=<span class="str">"greet-btn"</span> {{<span class="kw">if</span> <span class="fn">.lvt.Pending</span>}}<span class="attr">type</span>=<span class="str">"button"</span> <span class="attr">aria-busy</span>=<span class="str">"true"</span> <span class="attr">disabled</span>{{<span class="kw">else</span>}}<span class="attr">name</span>=<span class="str">"greet"</span>{{<span class="kw">end</span>}}<span class="tag">&gt;</span>Say hi<span class="tag">&lt;/button&gt;</span></pre></div>
-      <div class="code delta"><div class="code-bar"><span class="dots"><i></i><i></i><i></i></span><span class="file">app.go · one method, no Loading field</span></div>
-<pre class="language-go"><code class="language-go">func (a *App) Greet(s State, ctx *lvt.Context) (State, error) {
-    name := strings.TrimSpace(ctx.GetString("name"))
-    lvt.Async(ctx,
-        func(context.Context) (string, error) {
-            time.Sleep(700 * time.Millisecond)
-            return name, nil
-        },
-        func(s State, name string, _ error) (State, error) {
-            s.Name = name
-            return s, nil
-        },
-    )
-    return s, nil
-}</code></pre></div>
-      <p class="demo-cap loading-cap" style="margin-top:18px"><code>lvt.Async</code> runs the slow work off the event loop and re-enters the loop to apply the result, so there is <b>no second action to wire up</b> and <b>no <code>Loading</code> field</b> in state — <code>{{.lvt.Pending}}</code> is true only on the render that started the work. Reach for an explicit state field when the spinner has to survive a reconnect.</p>
-      <div class="wire"><span class="wlabel">on the wire · server-side version</span>
-        <span class="wf up">▲ {"action":"greet","data":{"name":"Ada"}}</span>
-        <span class="wf dn">▼ {"tree":{"1":{"aria-busy":"true","disabled":true,"type":"button"}}}</span>
-        <span class="wf dn">▼ {"tree":{"0":"Ada","1":{"name":"greet"}}}</span>
-      </div>
+<pre>&lt;button {{if .lvt.Pending}}type="button" aria-busy="true"
+  disabled{{else}}name="greet"{{end}}&gt;Say hi&lt;/button&gt;</pre>
+<pre class="language-go"><code class="language-go">lvt.Async(ctx,
+    func(context.Context) (string, error) {
+        time.Sleep(700 * time.Millisecond)
+        return name, nil
+    },
+    func(s State, name string, _ error) (State, error) {
+        s.Name = name
+        return s, nil
+    },
+)</code></pre>
+      <p class="note">No second action to wire up and no <code>Loading</code> field in state, though it does need a live session for the completion render.</p>
     </div>
-    <div class="loading-col">
-      <div class="live-card">
-        <div class="live-bar"><span class="live-badge"><span class="pulse"></span> live</span><span class="live-meta">greet loading attribute</span></div>
-        <div class="live-body">
+    <div>
+      <div class="snip-label">B · button-level escape hatch</div>
+      <div class="demo">
+        <div class="demo-bar"><span class="dot"></span> greet-loading · attribute version</div>
+        <div class="demo-body">
 
-```embed-lvt path="/apps/greet-loading/" upstream="http://localhost:9091" height="200px"
+```embed-lvt path="/apps/greet-loading/" upstream="http://localhost:9091" height="130px"
 ```
 
 </div>
       </div>
-      <div class="code delta"><div class="code-bar"><span class="dots"><i></i><i></i><i></i></span><span class="file">app.tmpl · button-level pending with two <code>lvt-*</code> attributes</span></div>
-<pre><span class="tag">&lt;button</span> <span class="attr">name</span>=<span class="str">"greet"</span>
-  <span class="attr">lvt-el:addClass:on:pending</span>=<span class="str">"is-loading"</span>
-  <span class="attr">lvt-el:removeClass:on:done</span>=<span class="str">"is-loading"</span><span class="tag">&gt;</span>Say hi<span class="tag">&lt;/button&gt;</span></pre></div>
-      <div class="code delta"><div class="code-bar"><span class="dots"><i></i><i></i><i></i></span><span class="file">app.go · no loading state machine needed</span></div>
+<pre>&lt;button name="greet"
+  lvt-el:addClass:on:pending="is-loading"
+  lvt-el:removeClass:on:done="is-loading"&gt;Say hi&lt;/button&gt;</pre>
 <pre class="language-go"><code class="language-go">func (a *App) Greet(s State, ctx *lvt.Context) (State, error) {
     time.Sleep(700 * time.Millisecond)
-    if name := strings.TrimSpace(ctx.GetString("name")); name != "" {
+    if name := strings.TrimSpace(
+        ctx.GetString("name")); name != "" {
         s.Name = name
     }
     return s, nil
-}</code></pre></div>
-      <p class="demo-cap loading-cap" style="margin-top:18px">This version keeps the <b>Go code simpler</b> by leaving pending UI out of server state. It works as a single request/response, so use it when the loading indicator is just button chrome rather than meaningful application state.</p>
-      <div class="wire"><span class="wlabel">on the wire · attribute version</span>
-        <span class="wf up">▲ {"action":"greet","data":{"name":"Ada"}}</span>
-        <span class="wf dn">▼ {"tree":{"0":"Ada"}}</span>
-      </div>
+}</code></pre>
+      <p class="note">This one keeps pending UI out of server state and works as a single request/response. It's the right one when the spinner is just button chrome rather than something the app cares about.</p>
     </div>
   </div>
-</div></section>
 
-<!-- STEP 5 · YOUR TABS -->
-<section class="alt"><div class="wrap">
-  <div class="sec-tag">Step 5 · Sync your own tabs</div>
-  <h2>Add WebSocket updates. Keep your tabs in sync.</h2>
-  <p class="lead">Subscribe this browser session to its own topic and publish after a handler runs — <b>two calls</b> — and your greeting syncs across every open tab. The same live session also lets the <b>server push first</b> when it has something new to say.</p>
-  <div class="pipe" style="margin-top:26px">
-    <div class="step"><div class="k">1 · state</div><div class="v">state changes</div></div><div class="arrow">→</div>
-    <div class="step"><div class="k">2 · render</div><div class="v">re-render template</div></div><div class="arrow">→</div>
-    <div class="step"><div class="k">3 · diff</div><div class="v">diff vs last render</div></div><div class="arrow">→</div>
-    <div class="step"><div class="k">4 · patch</div><div class="v">patch the browser</div></div>
+  <div class="wire">
+    <div class="wire-label">on the wire · A, server-side</div>
+    <div>▲ <span class="payload">{"action":"greet","data":{"name":"Ada"}}</span></div>
+    <div>▼ <span class="payload">{"tree":{"1":{"aria-busy":"true","disabled":true,"type":"button"}}}</span></div>
+    <div>▼ <span class="payload">{"tree":{"0":"Ada","1":{"name":"greet"}}}</span></div>
+    <div class="wire-label second">on the wire · B, attribute version</div>
+    <div>▲ <span class="payload">{"action":"greet","data":{"name":"Ada"}}</span> &nbsp; ▼ <span class="payload">{"tree":{"0":"Ada"}}</span></div>
   </div>
-  <div class="live-card" style="margin:32px auto 0;max-width:540px">
-    <div class="live-bar"><span class="live-badge"><span class="pulse"></span> live</span><span class="live-meta">greet wall · WebSocket on</span></div>
-    <div class="live-body">
+</section>
 
-```embed-lvt path="/apps/greet-wall/" upstream="http://localhost:9091" height="260px"
+<section id="step-5" class="step">
+  <div class="eyebrow">Step 5 · Sync your own tabs</div>
+  <h2>Keeping your own tabs in sync with two calls.</h2>
+  <p class="lead">Subscribe the session to its own topic and publish after the handler runs. The same live session also lets the server push first, without waiting for a click.</p>
+
+  <div class="pipe">
+    <span>1 state changes</span><span class="arrow">→</span>
+    <span>2 re-render</span><span class="arrow">→</span>
+    <span>3 diff vs last render</span><span class="arrow">→</span>
+    <span>4 patch the browser</span>
+  </div>
+
+  <div class="demo">
+    <div class="demo-bar"><span class="dot"></span> greet-wall · WebSocket on</div>
+    <div class="demo-body">
+
+```embed-lvt path="/apps/greet-wall/" upstream="http://localhost:9091" height="200px"
 ```
 
 </div>
   </div>
-  <p class="demo-cap"><b>Open this page in a second tab</b>, greet in either, and your headline updates in <b>both</b> — live, no reload. The same connection also allows <b>server-initiated refreshes</b> in this app, without waiting for a user click. This is the kind of step from "single-page form" to "real workflow" that usually pushes teams toward a separate frontend.</p>
-  <div class="code delta" style="max-width:820px;margin:26px auto 0"><div class="code-bar"><span class="dots"><i></i><i></i><i></i></span><span class="file">app.go · subscribe, publish on greet, and the Refresh it runs</span></div>
+  <p class="note">Open this page in a second tab, greet in either, and the headline updates in both.</p>
+
 <pre class="language-go"><code class="language-go">func (a *App) Mount(s State, ctx *lvt.Context) (State, error) {
     ctx.Subscribe(ctx.SelfTopic())                 // your tabs share a topic
-    s.Name = a.name(ctx.GroupID())                 // load your latest name
+    s.Name = a.name(ctx.GroupID())
     return s, nil
 }
 func (a *App) Greet(s State, ctx *lvt.Context) (State, error) {
@@ -286,155 +294,159 @@ func (a *App) Greet(s State, ctx *lvt.Context) (State, error) {
 }
 // Refresh is an ordinary action — the publish above runs it on each peer tab.
 func (a *App) Refresh(s State, ctx *lvt.Context) (State, error) {
-    s.Name = a.name(ctx.GroupID())                 // re-read state, then re-render
+    s.Name = a.name(ctx.GroupID())
     return s, nil
-}</code></pre></div>
-  <p class="demo-cap" style="margin-top:14px">No magic: <code>Publish(ctx.SelfTopic(), "Refresh", nil)</code> just <b>runs your <code>Refresh</code> method on your other tabs</b>. It re-reads shared data and returns new state; the framework diffs and patches.</p>
-  <div class="wire" style="max-width:820px;margin:14px auto 0"><span class="wlabel">on the wire · WebSocket</span>
-    <span class="wf up">▲ this tab · {"action":"greet","data":{"name":"Ada"}}</span>
-    <span class="wf dn">▼ your other tab · {"tree":{"0":"Ada"}}</span>
-  </div>
-  <div class="code delta" style="max-width:820px;margin:18px auto 0"><div class="code-bar"><span class="dots"><i></i><i></i><i></i></span><span class="file">app.go · the same session can be pushed by the server</span></div>
-<pre class="language-go"><code class="language-go">func (a *App) OnConnect(s State, ctx *lvt.Context) (State, error) {
-    a.keep(ctx.GroupID(), ctx.Session())   // remember who's connected
-    return s, nil
-}
-func (a *App) heartbeat() {
-    for range time.Tick(30 * time.Second) {
-        a.serverAt = now()                      // replace one slot in place
-        for _, sess := range a.sessions {
-            sess.TriggerAction("ServerRefresh", nil)
-        }
-    }
-}</code></pre></div>
-  <div class="wire" style="max-width:820px;margin:14px auto 0"><span class="wlabel">on the wire · server push</span>
-    <span class="wf dn">▼ {"tree":{"3":{"0":"15:04:08"}}}</span>
-    <span class="wf note">(no ▲ — the server started it; just the changed value goes down)</span>
-  </div>
-</div></section>
+}</code></pre>
 
-<!-- STEP 6 · EVERYONE -->
-<section><div class="wrap">
-  <div class="sec-tag">Step 6 · A wall everyone shares</div>
-  <h2>Change the topic, and it becomes cross-user.</h2>
-  <p class="lead">Swap the self-topic for a <b>shared</b> topic — admitted by a small ACL — and the same publish fans out to <b>every visitor</b>. The two cards below are <b>separate sessions, like two different people</b>. Greet in one and your line lands on the other's wall, live.</p>
-  <div class="two" style="margin-top:28px">
-    <div class="live-card"><div class="live-bar"><span class="live-badge"><span class="pulse"></span> live</span><span class="live-meta">visitor 1 · WebSocket on</span></div><div class="live-body">
+  <p class="lead">There's no magic here. The publish just runs your <code>Refresh</code> method on your other tabs. It re-reads the shared data and returns new state, and the framework does the diffing and patching. The server can start the same cycle itself with <code>sess.TriggerAction("ServerRefresh", nil)</code>.</p>
 
-```embed-lvt path="/apps/greet-wall/" upstream="http://localhost:9091" height="260px"
+  <div class="wire">
+    <div class="wire-label">on the wire · WebSocket</div>
+    <div>▲ this tab &nbsp;&nbsp;<span class="payload">{"action":"greet","data":{"name":"Ada"}}</span></div>
+    <div>▼ other tab &nbsp;<span class="payload">{"tree":{"0":"Ada"}}</span></div>
+    <div>▼ server push <span class="payload">{"tree":{"3":{"0":"15:04:08"}}}</span> — no ▲; just the changed value goes down</div>
+  </div>
+</section>
+
+<section id="step-6" class="step">
+  <div class="eyebrow">Step 6 · A wall everyone shares</div>
+  <h2>Changing the topic makes it cross-user.</h2>
+  <p class="lead">Swap the self-topic for a shared one, admitted by a small ACL, and the same publish fans out to every visitor. The two cards below are separate sessions, like two different people. Greet in one and the line shows up on both walls.</p>
+
+  <div class="pair">
+    <div class="demo">
+      <div class="demo-bar"><span class="dot"></span> visitor 1 · WebSocket on</div>
+      <div class="demo-body">
+
+```embed-lvt path="/apps/greet-wall/" upstream="http://localhost:9091" height="200px"
 ```
 
-</div></div>
-    <div class="live-card"><div class="live-bar"><span class="live-badge"><span class="pulse"></span> live</span><span class="live-meta">visitor 2 · WebSocket on</span></div><div class="live-body">
-
-```embed-lvt path="/apps/greet-wall/" upstream="http://localhost:9091" height="260px"
-```
-
-</div></div>
-  </div>
-  <p class="demo-cap">Two independent sessions, one shared wall — type in either card and watch the <b>list</b> appear in both. This is the same pattern you would use for shared dashboards, approval queues, team status boards, or lightweight collaboration.</p>
-  <div class="two code-right" style="margin-top:26px">
-    <div>
-      <p class="lead">Headlines stay independent (each card is its own session), but the wall is global — so a greeting crosses from one session to the other. That's the whole cross-user story: the same two pub/sub calls as step 5, with a different topic and an ACL around it.</p>
-      <div class="wire"><span class="wlabel">on the wire · WebSocket</span>
-        <span class="wf up">▲ visitor 1 · {"action":"greet","data":{"name":"Ada"}}</span>
-        <span class="wf dn">▼ visitor 2 · {"tree":{"3":[["a",[{"0":"Ada","1":"15:04"}]]]}}</span>
-      </div>
+</div>
     </div>
-    <div>
-      <div class="code delta"><div class="code-bar"><span class="dots"><i></i><i></i><i></i></span><span class="file">app.go · the topic is the only difference</span></div>
+    <div class="demo">
+      <div class="demo-bar"><span class="dot"></span> visitor 2 · WebSocket on</div>
+      <div class="demo-body">
+
+```embed-lvt path="/apps/greet-wall/" upstream="http://localhost:9091" height="200px"
+```
+
+</div>
+    </div>
+  </div>
+
+  <div class="pair">
+    <div class="snip">
+      <div class="snip-label">app.go · the topic is the only difference</div>
 <pre class="language-go"><code class="language-go">func (a *App) Mount(s State, ctx *lvt.Context) (State, error) {
-    ctx.Subscribe("wall")                       // a shared, cross-user topic
+    ctx.Subscribe("wall")           // shared, cross-user topic
     return s, nil
 }
 func (a *App) Greet(s State, ctx *lvt.Context) (State, error) {
-    a.append(sanitize(ctx.GetString("name")))   // shared, capped, ephemeral
-    ctx.Publish("wall", "WallRefresh", nil)     // fan out to every visitor
+    a.append(sanitize(ctx.GetString("name")))
+    ctx.Publish("wall", "WallRefresh", nil)
     return s, nil
-}</code></pre></div>
-      <div class="code delta"><div class="code-bar"><span class="dots"><i></i><i></i><i></i></span><span class="file">app.go · admit the shared topic</span></div>
-<pre class="language-go"><code class="language-go">lvt.WithTopicACL(func(topic, _ string, _ *http.Request) (bool, error) {
-    return topic == "wall", nil   // deny-all by default; admit just this one
-})</code></pre></div>
+}</code></pre>
+    </div>
+    <div class="snip">
+      <div class="snip-label">app.go · admit the shared topic</div>
+<pre class="language-go"><code class="language-go">lvt.WithTopicACL(
+    func(topic, _ string, _ *http.Request) (bool, error) {
+        return topic == "wall", nil   // deny-all by default
+    })</code></pre>
+      <p class="note">Each card is its own session, so the headlines stay independent, but the wall is global. It's the same two pubsub calls as step 5, with a different topic.</p>
     </div>
   </div>
-</div></section>
 
-<!-- DIFF -->
-<section><div class="wrap two">
+  <div class="wire">
+    <div class="wire-label">on the wire · WebSocket</div>
+    <div>▲ visitor 1 <span class="payload">{"action":"greet","data":{"name":"Ada"}}</span></div>
+    <div>▼ visitor 2 <span class="payload">{"tree":{"3":[["a",[{"0":"Ada","1":"15:04"}]]]}}</span></div>
+  </div>
+</section>
+
+<section class="step">
+  <div class="diff-split">
+    <div>
+      <div class="eyebrow">Only the diff goes over the wire</div>
+      <h2>Only the changed values go over the wire.</h2>
+      <p class="lead">Templates get split into static structure, which is cached, and dynamic values, so a greeting comes back as <code>{"tree":{"0":"Ada"}}</code> instead of a page.</p>
+    </div>
+    <div class="bars">
+      <div class="bar-row"><span>full HTML</span><span>2.4 KB</span></div>
+      <div class="bar full"><span></span></div>
+      <div class="bar-row"><span>lvt diff</span><span>340 B</span></div>
+      <div class="bar diff"><span></span></div>
+      <div class="bar-note">86% smaller per update</div>
+    </div>
+  </div>
+</section>
+
+<section id="compare" class="step">
+  <div class="eyebrow">How it compares</div>
+  <h2>How this sits next to htmx, templ and LiveView.</h2>
+  <p class="lead">Here a plain <code>&lt;button name="greet"&gt;</code> is already the action. <code>lvt-*</code> attributes are an escape hatch for what HTML cannot express, not the main interface.</p>
+  <div class="rows">
+    <div class="row-k">htmx</div>
+    <div class="row-v">A similar HTML-first feel, with server-owned state and diffing built in, so there is less request wiring in the markup.</div>
+    <div class="row-k">templ + htmx</div>
+    <div class="row-v">Use Go's built-in <code>html/template</code> and keep live behavior in one app model instead of stacking layers.</div>
+    <div class="row-k">Alpine.js</div>
+    <div class="row-v">Richer behavior without keeping a second copy of state in the browser.</div>
+    <div class="row-k">Phoenix LiveView</div>
+    <div class="row-v">The same server-driven idea, in Go, and it still falls back to plain HTTP forms.</div>
+    <div class="row-k">React SPA</div>
+    <div class="row-v">Forms, CRUD, dashboards and shared views without splitting the product into an API and a frontend.</div>
+  </div>
+</section>
+
+<section id="more" class="step">
+  <div class="eyebrow">Everything else</div>
+  <h2>Other things in here.</h2>
+  <p class="lead">This is aimed at what Go teams actually ship: admin screens, internal tools, CRUD, dashboards, approvals, uploads, auth, and the occasional shared view.</p>
+  <div class="links">
+    <a href="/reference/uploads"><span class="link-t">File uploads</span><span class="link-g">live progress, same app</span></a>
+    <a href="/reference/pubsub"><span class="link-t">Shared views</span><span class="link-g">Subscribe &amp; Publish</span></a>
+    <a href="/reference/session"><span class="link-t">Sessions &amp; state</span><span class="link-g">scoped per browser or user</span></a>
+    <a href="/reference/error-handling"><span class="link-t">Forms &amp; errors</span><span class="link-g">Go errors, same template</span></a>
+    <a href="/cli/"><span class="link-t">Scaffolding</span><span class="link-g">generate common app shapes</span></a>
+    <a href="/client/"><span class="link-t">Browser client</span><span class="link-g">transport &amp; DOM patching</span></a>
+    <a href="/guides/observability"><span class="link-t">Observability</span><span class="link-g">metrics &amp; tracing hooks</span></a>
+    <a href="/guides/scaling"><span class="link-t">Scaling</span><span class="link-g">session groups &amp; fan-out</span></a>
+  </div>
+  <p class="lead">The <a href="/recipes/ui-patterns/">UI patterns catalog</a> has focused examples: loading states, inline validation, SPA-style navigation, sortable tables, pubsub, presence, server push. This site runs on LiveTemplate itself. <a href="/recipes/how-this-site-works">See how it works</a>.</p>
+</section>
+
+<section class="cta">
   <div>
-    <div class="sec-tag">Only the diff goes over the wire</div>
-    <h2>Send what changed, not the whole page.</h2>
-    <p class="lead">Templates split into <b>static structure (cached)</b> and <b>dynamic values</b>. On change, LiveTemplate sends only the changed values — typically <b>85%+ less bandwidth</b> than re-sending full HTML. A greeting comes back as <code>{"tree":{"0":"Ada"}}</code>, not a page.</p>
+    <h2>Getting started.</h2>
+<pre class="install">$ go get github.com/livetemplate/livetemplate</pre>
+    <div class="cta-row">
+      <a class="btn btn-primary" href="/getting-started/install">Get started →</a>
+      <a class="btn btn-ghost" href="/recipes/">Browse recipes</a>
+    </div>
+    <p class="note">This is alpha: the core works and is tested, but the API may still change before v1.0.</p>
   </div>
-  <div class="bars">
-    <div class="bar-row"><span class="lab">full HTML</span><span class="bar full"><span></span></span><span class="val" style="color:var(--slate-2)">2.4 KB</span></div>
-    <div class="bar-row"><span class="lab">lvt diff</span><span class="bar diff"><span></span></span><span class="val" style="color:var(--sig-d)">340 B</span></div>
-    <div style="font:500 13px 'JetBrains Mono';color:var(--slate);margin-top:8px">↓ 86% smaller per update</div>
+  <img class="gopher" src="/assets/gopher-front.svg" alt="The Go gopher" width="132">
+</section>
+
+</main>
+</div>
+
+<footer class="site"><div class="foot-in">
+  <div class="foot-brand">
+    <svg width="17" height="17" viewBox="0 0 20 20" fill="none" aria-hidden="true"><rect x="1.5" y="1.5" width="17" height="17" rx="4" fill="none" stroke="#6B6862" stroke-width="1.6"/><path d="M11.2 4.2 L6.6 10.6 H9.6 L8.8 15.8 L13.4 9.4 H10.4 Z" fill="#6B6862"/></svg>
+    LiveTemplate
   </div>
-</div></section>
-
-<section><div class="wrap">
-  <div class="sec-tag">UI Patterns</div>
-  <h2>Want deeper demos?</h2>
-  <p class="lead">The <a href="/recipes/ui-patterns/">UI patterns catalog</a> breaks these ideas out into focused examples: loading states, inline validation, SPA-style navigation, sortable tables, pubsub, presence, server push, and more.</p>
-</div></section>
-
-<!-- FEATURES -->
-<section class="alt"><div class="wrap">
-  <div class="sec-tag">And so much more</div>
-  <h2>The pieces real Go apps need.</h2>
-  <p class="lead">This is aimed at the kinds of apps Go teams actually ship: admin screens, internal tools, CRUD flows, dashboards, approval systems, uploads, auth, and lightweight collaborative views.</p>
-  <div class="grid">
-    <a class="feat" href="/reference/uploads"><div class="ico"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></div><h4>File uploads</h4><p>Handle uploads in the same app and show live progress, without bolting on a separate upload flow.</p></a>
-    <a class="feat" href="/reference/pubsub"><div class="ico"><svg viewBox="0 0 24 24"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg></div><h4>Shared views</h4><p>Keep tabs, dashboards, queues, and team screens in sync with <code>Subscribe</code> and <code>Publish</code>.</p></a>
-    <a class="feat" href="/reference/session"><div class="ico"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div><h4>Sessions &amp; state</h4><p>Keep UI state on the server, scoped per browser or per user, without leaking data across sessions.</p></a>
-    <a class="feat" href="/reference/error-handling"><div class="ico"><svg viewBox="0 0 24 24"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div><h4>Forms &amp; errors</h4><p>Return validation and business-rule errors from Go and render them back into the same template.</p></a>
-    <a class="feat" href="/cli/"><div class="ico"><svg viewBox="0 0 24 24"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg></div><h4>Scaffolding</h4><p>Generate a starting point for common app shapes so teams can get to real screens faster.</p></a>
-    <a class="feat" href="/client/"><div class="ico"><svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg></div><h4>Browser client</h4><p>The browser layer handles DOM patching and transport so your application logic stays in Go.</p></a>
-    <a class="feat" href="/guides/observability"><div class="ico"><svg viewBox="0 0 24 24"><line x1="6" y1="20" x2="6" y2="14"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="18" y1="20" x2="18" y2="10"/></svg></div><h4>Observability</h4><p>Measure handler timings, update paths, and runtime behavior with hooks for metrics and tracing.</p></a>
-    <a class="feat" href="/guides/scaling"><div class="ico"><svg viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div><h4>Scaling</h4><p>Run the same model in production with guidance for session groups, fan-out, and deployment shape.</p></a>
+  <div class="foot-links">
+    <a href="/getting-started/introduction">Docs</a>
+    <a href="/recipes/">Recipes</a>
+    <a href="/reference/api">Reference</a>
+    <a href="https://github.com/livetemplate/livetemplate">GitHub</a>
+    <a href="/changelog">Changelog</a>
+    <a href="https://github.com/livetemplate/livetemplate/blob/main/LICENSE">License</a>
   </div>
-</div></section>
-
-<!-- COMPARE -->
-<section><div class="wrap">
-  <div class="sec-tag">How it compares</div>
-  <h2>Others add a frontend layer. LiveTemplate keeps the app in Go.</h2>
-  <p class="lead">Other tools carry more behavior in the markup — <code>hx-*</code>, <code>x-*</code>, <code>phx-*</code>, or a DSL. Here a plain <code>&lt;button name="greet"&gt;</code> is already the action, handlers stay in Go, and state lives on the server. <code>lvt-*</code> attributes exist only as an escape hatch for what HTML can't express.</p>
-  <table class="cmp">
-    <thead><tr><th>If you’re using…</th><th>LiveTemplate gives you…</th></tr></thead>
-    <tbody>
-      <tr><td>htmx</td><td class="give">A similar HTML-first feel, but with server-owned state and DOM diffing built in, so there is less request wiring in markup.</td></tr>
-      <tr><td>templ + htmx</td><td class="give">Use Go's built-in <code>html/template</code> and keep live behavior in one app model instead of composing multiple layers.</td></tr>
-      <tr><td>Alpine.js</td><td class="give">Handle richer app behavior without introducing a separate client-side state model for common server-rendered screens.</td></tr>
-      <tr><td>Phoenix LiveView</td><td class="give">A comparable server-driven model, but staying in Go and still falling back cleanly to plain HTTP forms.</td></tr>
-      <tr><td>React SPA</td><td class="give">Get modern app behavior for forms, CRUD, dashboards, and shared views without splitting the product into an API plus a frontend app.</td></tr>
-    </tbody>
-  </table>
-</div></section>
-
-<!-- DOGFOOD -->
-<section class="alt"><div class="wrap">
-  <div class="dogfood">
-    <div><svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="#047857" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></div>
-    <p><b>Built in Go. This site proves the point.</b> Every step above is a real LiveTemplate app, embedded live through this docs site — which itself runs on LiveTemplate + tinkerdown. <a href="/recipes/how-this-site-works">See how this site works →</a></p>
+  <div class="attrib">
+    <span>© the LiveTemplate authors</span>
+    <span>Gopher by <a href="http://reneefrench.blogspot.com/">Renée French</a>, vector by <a href="https://github.com/golang-samples/gopher-vector">Takuya Ueda</a> · <a href="https://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a></span>
   </div>
-</div></section>
-
-<!-- FINAL -->
-<section class="final"><div class="wrap">
-  <h2>Build a real Go web app. Start in 30 seconds.</h2>
-  <div class="install"><span class="p">$</span> go get github.com/livetemplate/livetemplate</div>
-  <div class="cta-row">
-    <a class="btn btn-primary btn-lg" href="/getting-started/install">Get started →</a>
-    <a class="btn btn-ghost btn-lg" href="/recipes/">Browse recipes</a>
-  </div>
-  <div class="alpha">⚠ Alpha — core features work and are tested; the API may change before v1.0</div>
-</div></section>
-
-<footer><div class="wrap foot-in">
-  <div class="brand" style="color:#fff"><span class="glyph">◇</span> LiveTemplate</div>
-  <div class="foot-links"><a href="/getting-started/introduction">Docs</a><a href="/recipes/">Recipes</a><a href="/reference/api">Reference</a><a href="https://github.com/livetemplate/livetemplate">GitHub</a><a href="/changelog">Changelog</a><a href="https://github.com/livetemplate/livetemplate/blob/main/LICENSE">License</a></div>
-  <div style="font-size:13px">© the LiveTemplate authors</div>
 </div></footer>

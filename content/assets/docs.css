@@ -184,6 +184,10 @@ nav.page-nav {
   margin: 0 0 20px;
 }
 
+/* The client injects a copy button over the top-right of every highlighted
+   block; without a gutter it sits on the first line of code. */
+.content-wrapper .code-block-wrapper pre { padding-right: 46px }
+
 .content-wrapper :not(pre) > code {
   font-family: 'JetBrains Mono', ui-monospace, monospace;
   font-size: 14.5px;
