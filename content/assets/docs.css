@@ -57,7 +57,12 @@ nav.page-nav {
    of a 640px container at 924px wide — horizontal page overflow, which is the
    one thing the acceptance criteria name. The calm design has no bleed: code
    sits in the column with a border. Specificity (0,1,1) beats the theme's bare
-   type selectors inside its own media query. */
+   type selectors inside its own media query.
+
+   The selector list deliberately mirrors the theme's, block types included that
+   content/ does not currently use (it authors embed-lvt and nothing else). They
+   are cheap to carry, and dropping them would let the overflow come back the
+   day someone adds a wasm or interactive block. */
 @media (min-width: 900px) {
   .content-wrapper pre,
   .content-wrapper .tinkerdown-wasm-block,
@@ -142,24 +147,25 @@ nav.page-nav {
   color: var(--text-primary);
 }
 
-/* The lede: the first paragraph after the page title. */
-.content-wrapper h1 + p { font-size: 17px; line-height: 1.7; margin-bottom: 20px }
+/* The lede: the first paragraph after the page title. Size and leading already
+   come from the paragraph rule above; only the extra breathing room is new. */
+.content-wrapper h1 + p { margin-bottom: 20px }
 
 /* ══ Links ═══════════════════════════════════════════════════════════════ */
 
 /* The theme underlines every content link with a hardcoded rgba(0,102,204)
-   border and shifts padding on hover — a 0.4px jitter on every link. Visited
-   is hardcoded purple, so it needs naming explicitly rather than inheriting. */
+   border and bolds it to 500. Visited is a hardcoded purple, so it has to be
+   named explicitly rather than left to inherit. */
 .content-wrapper a:not(.prev-next-link),
 .content-wrapper a:not(.prev-next-link):visited {
   color: var(--accent);
   border-bottom: 0;
   text-decoration: none;
   font-weight: inherit;
-  background: none;
-  padding: 0;
-  margin: 0;
 }
+/* The theme's hover adds a tinted background and shifts padding by 0.2rem with
+   a negative margin — every link twitches under the cursor. Undoing the shift
+   is what the padding and margin resets are for. */
 .content-wrapper a:not(.prev-next-link):hover,
 .content-wrapper a:not(.prev-next-link):visited:hover {
   color: var(--lt-accent-hover);
@@ -522,8 +528,8 @@ nav.page-nav .label { font-size: 15px; font-weight: 500; color: var(--text-headi
   text-decoration: none;
 }
 .page-toc-link:hover { color: var(--text-heading); background: none }
-.page-toc-item.active > .page-toc-link,
-.page-toc-link.active {
+/* Scroll tracking toggles .active on the <li>, not on the <a> inside it. */
+.page-toc-item.active > .page-toc-link {
   color: var(--text-heading);
   border-left-color: var(--accent);
   background: none;
