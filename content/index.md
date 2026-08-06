@@ -55,7 +55,7 @@ layout: landing
 <section id="the-app" class="lead-in">
   <div class="eyebrow">The app</div>
   <h2>A shared greeting wall, running on this page.</h2>
-  <p class="lead">Type a name. Your headline updates, your line joins the wall, and so does everyone else's — including anyone else reading this page right now. The code for all of it is directly below.</p>
+  <p class="lead">Type a name. Your headline updates and your line joins the wall, along with everyone else's — including anyone else reading this page right now. <a href="/" target="_blank" rel="noopener">Open this page in a second tab</a> and watch it land there too, with no reload. The code for all of it is directly below.</p>
 
   <div class="demo">
     <div class="demo-bar"><span class="dot"></span> greet-wall · live, shared with every visitor</div>
