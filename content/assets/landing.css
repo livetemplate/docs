@@ -174,9 +174,10 @@ section { scroll-margin-top: 72px }
 .close { margin: 28px 0 0 }
 .note { font-size: 15px; line-height: 1.6; color: var(--body-muted); max-width: 62ch }
 
-.hero { padding: 88px 0 64px }
+.hero { padding: 88px 0 40px }
 .hero .sub { font-size: 18px; line-height: 1.6; color: var(--body); margin: 0; max-width: 56ch }
-#whole-app { padding: 56px 0; border-top: 1px solid var(--line) }
+/* The app is the hero's payload, not the next topic — no rule between them. */
+.lead-in { padding: 0 0 56px }
 .intro { padding: 56px 0 24px; border-top: 1px solid var(--line) }
 .step { padding: 40px 0; border-top: 1px solid var(--line-soft) }
 .cta {
@@ -326,6 +327,13 @@ section { scroll-margin-top: 72px }
   margin-bottom: 4px;
 }
 .pair > * { min-width: 0 }
+
+/* The hero's two snippets are read in sequence — template, then the Go that
+   serves it — not compared. Side by side they get ~420px each at 1440px, and
+   these signatures run past 60 characters, so every interesting line clipped.
+   Full width fits them without a scrollbar. */
+.stack { display: grid; gap: 16px; margin-bottom: 4px }
+.stack > * { min-width: 0 }
 
 /* ══ On the wire ═════════════════════════════════════════════════════════ */
 
