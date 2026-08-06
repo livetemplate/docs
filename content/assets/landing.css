@@ -270,8 +270,10 @@ section { scroll-margin-top: 72px }
   border-color: var(--border);
   color: var(--meta);
 }
-/* Field errors come back from Go as <small> next to the input. */
-.demo-body small { display: block; width: 100%; font-size: 13px; color: var(--danger); font-family: var(--mono) }
+/* Field errors come back from Go as a <small> next to the input, via
+   .lvt.ErrorTag. Scoped to the form: the wall app also emits <small>, for
+   greeting timestamps, and they are not errors. */
+.demo-body form small { display: block; width: 100%; font-size: 13px; color: var(--danger); font-family: var(--mono) }
 .demo-body input[aria-invalid="true"] { border-color: var(--danger) }
 /* An iframe card supplies its own padding inside the frame. */
 .demo-body:has(> .nojs-frame) { padding: 0 }

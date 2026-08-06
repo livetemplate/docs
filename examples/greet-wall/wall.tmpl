@@ -11,8 +11,18 @@
     <!-- Styles live in <body>: embed-lvt drops the embedded app's <head>, so
          anything in <head> is lost once this app is mounted on the landing. -->
     <style>
-        .from-server{display:flex;align-items:center;justify-content:center;gap:.45rem;
+        /* The server line and the greeting rows are one column: both start at
+           the container's left edge, so the heartbeat reads as the newest entry
+           above the wall rather than as a floating caption. Centring one and
+           left-aligning the other is what made them look unrelated. */
+        .from-server{display:flex;align-items:center;gap:.45rem;
             font-size:.82rem;color:#6B6862;margin:.2rem 0 .9rem}
+        .wall{margin:0;padding:0}
+        /* Pico sets `ul li{list-style:square}` on the li itself, so a
+           list-style on the ul never wins — it has to be stated here. */
+        .wall li{list-style:none;padding:2px 0}
+        .wall b{font-weight:500;color:#1B1A17}
+        .wall small{color:#6B6862;font-size:.82rem}
         /* The pulse stays. The design's rule is that nothing moves unless the
            app is updating — and this dot marks a server-initiated push, which
            is exactly the app updating. Only the hue changes, to the calm
