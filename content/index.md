@@ -69,7 +69,7 @@ layout: landing
   <div class="pair">
     <div class="snip">
       <div class="snip-label">app.tmpl — the entire template</div>
-<pre>&lt;!DOCTYPE html&gt;
+<pre class="language-html"><code class="language-html">&lt;!DOCTYPE html&gt;
 &lt;html&gt;&lt;head&gt;
   &lt;script defer src="{{lvtClientScriptURL}}"&gt;&lt;/script&gt;
 &lt;/head&gt;&lt;body&gt;
@@ -78,7 +78,7 @@ layout: landing
     &lt;input name="name" placeholder="Your name"&gt;
     &lt;button name="greet"&gt;Say hi&lt;/button&gt;
   &lt;/form&gt;
-&lt;/body&gt;&lt;/html&gt;</pre>
+&lt;/body&gt;&lt;/html&gt;</code></pre>
     </div>
     <div class="snip">
       <div class="snip-label">app.go — the entire program</div>
@@ -138,12 +138,12 @@ func main() {
 
   <div class="snip">
     <div class="snip-label">app.tmpl — one form, either transport</div>
-<pre>&lt;!-- the only line that flips the transport --&gt;
+<pre class="language-html"><code class="language-html">&lt;!-- the only line that flips the transport --&gt;
 &lt;script defer src="{{lvtClientScriptURL}}"&gt;&lt;/script&gt;
 &lt;form method="POST"&gt;   &lt;!-- JS on → fetch + patch · JS off → native POST --&gt;
   &lt;input name="name"&gt;
   &lt;button name="greet"&gt;Say hi&lt;/button&gt;
-&lt;/form&gt;</pre>
+&lt;/form&gt;</code></pre>
   </div>
 </section>
 
@@ -165,8 +165,8 @@ func main() {
   <div class="pair">
     <div class="snip">
       <div class="snip-label">app.tmpl · the rule, written once</div>
-<pre>&lt;input name="name" required {{.lvt.AriaInvalid "name"}}&gt;
-{{.lvt.ErrorTag "name"}}</pre>
+<pre class="language-html"><code class="language-html">&lt;input name="name" required {{.lvt.AriaInvalid "name"}}&gt;
+{{.lvt.ErrorTag "name"}}</code></pre>
     </div>
     <div class="snip">
       <div class="snip-label">app.go · re-check, then add your own rule</div>
@@ -209,8 +209,8 @@ func main() {
 
 </div>
       </div>
-<pre>&lt;button {{if .lvt.Pending}}type="button" aria-busy="true"
-  disabled{{else}}name="greet"{{end}}&gt;Say hi&lt;/button&gt;</pre>
+<pre class="language-html"><code class="language-html">&lt;button {{if .lvt.Pending}}type="button" aria-busy="true"
+  disabled{{else}}name="greet"{{end}}&gt;Say hi&lt;/button&gt;</code></pre>
 <pre class="language-go"><code class="language-go">lvt.Async(ctx,
     func(context.Context) (string, error) {
         time.Sleep(700 * time.Millisecond)
@@ -234,9 +234,9 @@ func main() {
 
 </div>
       </div>
-<pre>&lt;button name="greet"
+<pre class="language-html"><code class="language-html">&lt;button name="greet"
   lvt-el:addClass:on:pending="is-loading"
-  lvt-el:removeClass:on:done="is-loading"&gt;Say hi&lt;/button&gt;</pre>
+  lvt-el:removeClass:on:done="is-loading"&gt;Say hi&lt;/button&gt;</code></pre>
 <pre class="language-go"><code class="language-go">func (a *App) Greet(s State, ctx *lvt.Context) (State, error) {
     time.Sleep(700 * time.Millisecond)
     if name := strings.TrimSpace(
