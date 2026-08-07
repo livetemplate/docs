@@ -74,7 +74,8 @@
   --lt-code-comment: #6B6862;
   --lt-code-string:  #4A6B52;
   --lt-code-keyword: #2F5D8A;
-  --lt-code-name:    #5A5560;  /* declared names: func names, types, HTML tags */
+  --lt-code-name:    #6B4A7A;  /* declared names: func names, HTML tags */
+  --lt-code-type:    #7D5226;  /* built-in types, numbers, booleans */
 }
 
 /* ── Prism, neutralised ──
@@ -87,12 +88,13 @@ pre[class*="language-"] { color: var(--pre-text); text-shadow: none }
 .token.comment, .token.prolog, .token.doctype, .token.cdata { color: var(--lt-code-comment) }
 /* What the code declares or invokes, and what an HTML element IS. */
 .token.tag, .token.function, .token.class-name { color: var(--lt-code-name) }
+/* The things a value IS: Go's built-in types, literals. */
+.token.builtin, .token.number, .token.boolean, .token.constant { color: var(--lt-code-type) }
 .token.punctuation, .token.operator, .token.entity, .token.url,
-.token.property, .token.boolean, .token.number,
-.token.constant, .token.symbol, .token.deleted, .token.namespace,
+.token.property, .token.symbol, .token.deleted, .token.namespace,
 .token.regex, .token.important, .token.variable { color: var(--pre-text) }
 .token.selector, .token.attr-name, .token.string, .token.char,
-.token.builtin, .token.inserted,
+.token.inserted,
 .language-css .token.string, .style .token.string { color: var(--lt-code-string) }
 .token.atrule, .token.attr-value, .token.keyword { color: var(--lt-code-keyword) }
 

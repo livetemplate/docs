@@ -70,7 +70,8 @@ layout: landing
   <div class="stack">
     <div class="snip">
       <div class="snip-label">app.tmpl — the whole template, verbatim</div>
-<pre class="language-html"><code class="language-html">&lt;h1&gt;Hello, {{.Name}}&lt;/h1&gt;
+<pre class="language-html"><code class="language-html">&lt;script defer src="{{lvtClientScriptURL}}"&gt;&lt;/script&gt;
+&lt;h1&gt;Hello, {{.Name}}&lt;/h1&gt;
 &lt;form method="POST"&gt;
   &lt;input name="name" placeholder="Your name" {{.lvt.AriaInvalid "name"}}&gt;
   {{.lvt.ErrorTag "name"}}
@@ -119,13 +120,13 @@ func (a *App) WallRefresh(s State, ctx *lvt.Context) (State, error) {
 <section id="inside" class="intro">
   <div class="eyebrow">What's going on</div>
   <h2>The parts of that worth a second look.</h2>
-  <p class="lead">Everything below points back at lines you have already read. Each one is a live app, so you can check the claim rather than take it.</p>
+  <p class="lead">Most of what follows points back at lines you have already read. Two of them — the pending state and the standalone twenty-line version — are different apps, and say so where they appear. Each one runs here, so you can check the claim rather than take it.</p>
 </section>
 
 <section id="actions" class="step">
   <div class="eyebrow">No attributes</div>
   <h2>The button's name is the action.</h2>
-  <p class="lead"><code>&lt;button name="greet"&gt;</code> calls <code>Greet</code>. That's the whole binding — no <code>hx-post</code>, no <code>onClick</code>, no route to register. Strip the wall away and the same idea is a complete app in twenty lines.</p>
+  <p class="lead"><code>&lt;button name="greet"&gt;</code> calls <code>Greet</code>. That's the whole binding — no <code>hx-post</code>, no <code>onClick</code>, no route to register. Strip the wall away and the same idea is a complete app in twenty lines, this time with nothing elided at all.</p>
 
   <div class="pair">
     <div class="demo">
@@ -185,10 +186,19 @@ func main() {
 <section id="validation" class="step">
   <div class="eyebrow">Validation</div>
   <h2>The HTML rule runs again in Go.</h2>
-  <p class="lead">You saw <code>{{.lvt.AriaInvalid "name"}}</code> and <code>{{.lvt.ErrorTag "name"}}</code> in the template, and a <code>NewFieldError</code> in <code>Greet</code>. That's the pair: standard attributes like <code>required</code> are re-checked server-side by <code>ctx.ValidateForm()</code>, then you add the rules HTML can't express. Try an empty submit, or type <em>admin</em>.</p>
+  <p class="lead">Three lines you already read do this. <code>{{.lvt.AriaInvalid "name"}}</code> and <code>{{.lvt.ErrorTag "name"}}</code> mark up the field, and <code>Greet</code> returns a <code>NewFieldError</code> when the name is empty. An error return renders as an inline message against the right field — you don't route it anywhere.</p>
+
+  <div class="snip">
+    <div class="snip-label">app.go · the rule the wall already enforces</div>
+<pre class="language-go"><code class="language-go">if name == "" {
+    return s, lvt.NewFieldError("name", errors.New("Please enter a name"))
+}</code></pre>
+  </div>
+
+  <p class="lead">The other half is for rules HTML can already state. Put <code>required</code> or <code>type="email"</code> on the input and <code>ctx.ValidateForm()</code> re-runs exactly those, server-side, so a client that skipped them gets the same answer. The app below adds both — try an empty submit, or type <em>admin</em>.</p>
 
   <div class="demo">
-    <div class="demo-bar"><span class="dot"></span> greet-validate · server-checked</div>
+    <div class="demo-bar"><span class="dot"></span> greet-validate · a second app, with both halves</div>
     <div class="demo-body">
 
 ```embed-lvt path="/apps/greet-validate/" upstream="http://localhost:9091" height="160px"
@@ -198,7 +208,7 @@ func main() {
   </div>
 
   <div class="snip">
-    <div class="snip-label">app.go · re-check, then add your own rule</div>
+    <div class="snip-label">greet-validate · re-check the HTML rules, then add your own</div>
 <pre class="language-go"><code class="language-go">if err := ctx.ValidateForm(); err != nil {
     return s, err                          // re-runs the HTML rules
 }
@@ -217,7 +227,7 @@ if strings.EqualFold(name, "admin") {      // a rule HTML can't express
 <section id="pending" class="step">
   <div class="eyebrow">Pending state</div>
   <h2>Slow work has a pending state you can render.</h2>
-  <p class="lead">The work runs on the server, so its pending state is an ordinary template conditional. If you'd rather not touch the Go at all, there's a button-level attribute that does it without server state.</p>
+  <p class="lead">The wall answers instantly, so it has nothing to show here — these are two different apps. Both make the same point: the work runs on the server, so its pending state is an ordinary template conditional. If you'd rather not touch the Go at all, there's a button-level attribute that does it without server state.</p>
 
   <div class="pair">
     <div>
