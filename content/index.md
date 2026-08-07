@@ -75,9 +75,7 @@ layout: landing
 &lt;form method="POST"&gt;
   &lt;input name="name" placeholder="Your name" required {{.lvt.AriaInvalid "name"}}&gt;
   {{.lvt.ErrorTag "name"}}
-  &lt;button name="greet"
-    lvt-el:addClass:on:pending="is-loading"
-    lvt-el:removeClass:on:done="is-loading"&gt;Say hi&lt;/button&gt;
+  &lt;button name="greet"&gt;Say hi&lt;/button&gt;
 &lt;/form&gt;
 &lt;ul&gt;
   {{range .Wall}}&lt;li&gt;&lt;b&gt;{{.Name}}&lt;/b&gt; said hi {{.At}}&lt;/li&gt;{{end}}
@@ -138,7 +136,7 @@ func main() {
 <section id="inside" class="intro">
   <div class="eyebrow">What's going on</div>
   <h2>The parts of that worth a second look.</h2>
-  <p class="lead">Every section below points at lines you have just read. Each one also runs here as its own app, so you can check the claim rather than take it.</p>
+  <p class="lead">Every section below points at lines you have just read — except the pending state, which the wall has no slow work to demonstrate, and which says so. Each one also runs here as its own app, so you can check the claim rather than take it.</p>
 </section>
 
 <section id="actions" class="step">
@@ -228,11 +226,11 @@ func main() {
 <section id="pending" class="step">
   <div class="eyebrow">Pending state</div>
   <h2>Slow work has a pending state you can render.</h2>
-  <p class="lead">The two <code>lvt-el:</code> attributes on that button are the version you already read: they toggle a class for the life of the round trip, with no server state at all. The wall answers fast, so it is a brief dip rather than a spinner. When the work is genuinely slow, the server can own the pending state instead and render it as an ordinary template conditional.</p>
+  <p class="lead">This is the one thing the app above cannot show you: the wall answers instantly, so it has no pending state to render. Both apps below do have slow work. The first is the way to reach for — the pending flag is a template variable, so the spinner is ordinary Go and ordinary HTML, with no new attribute to learn.</p>
 
   <div class="pair">
     <div>
-      <div class="snip-label">A · server-owned, template variables only</div>
+      <div class="snip-label">A · server-owned — template variables, no attributes</div>
       <div class="demo">
         <div class="demo-bar"><span class="dot"></span> greet-async</div>
         <div class="demo-body">
@@ -254,7 +252,7 @@ func main() {
       <p class="note">No second action to wire up and no <code>Loading</code> field in state, though it does need a live session for the completion render.</p>
     </div>
     <div>
-      <div class="snip-label">B · button-level escape hatch</div>
+      <div class="snip-label">B · the escape hatch, when the Go should not change</div>
       <div class="demo">
         <div class="demo-bar"><span class="dot"></span> greet-loading</div>
         <div class="demo-body">
@@ -267,7 +265,7 @@ func main() {
 <pre class="language-html"><code class="language-html">&lt;button name="greet"
   lvt-el:addClass:on:pending="is-loading"
   lvt-el:removeClass:on:done="is-loading"&gt;Say hi&lt;/button&gt;</code></pre>
-      <p class="note">This one keeps pending UI out of server state and works as a single request/response. It's the right one when the spinner is just button chrome rather than something the app cares about.</p>
+      <p class="note">Two <code>lvt-*</code> attributes, and the Go is untouched. This is what the escape hatch is for: the spinner is button chrome, not something the app models. It also works as a single request/response, where A needs a live session for its completion render.</p>
     </div>
   </div>
 </section>

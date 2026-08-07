@@ -17,10 +17,6 @@
            left-aligning the other is what made them look unrelated. */
         .from-server{display:flex;align-items:center;gap:.45rem;
             font-size:.82rem;color:#6B6862;margin:.2rem 0 .9rem}
-        /* Toggled by the button's lvt-el:*:on:pending/done attributes for the
-           life of the round trip. No server state and no spinner element —
-           on a fast action it is a brief dip, which is the honest signal. */
-        .is-loading{opacity:.55;cursor:progress}
         .wall{margin:0;padding:0}
         /* Pico sets `ul li{list-style:square}` on the li itself, so a
            list-style on the ul never wins — it has to be stated here. */
@@ -44,9 +40,7 @@
         <form method="POST">
             <input name="name" placeholder="Your name" required {{.lvt.AriaInvalid "name"}}>
             {{.lvt.ErrorTag "name"}}
-            <button name="greet"
-                lvt-el:addClass:on:pending="is-loading"
-                lvt-el:removeClass:on:done="is-loading">Say hi</button>
+            <button name="greet">Say hi</button>
         </form>
         <!-- Step 7: the server speaks first. A single slot the server REPLACES
              in place on its heartbeat — never a row appended to the wall. -->
