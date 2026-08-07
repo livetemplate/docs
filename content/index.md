@@ -73,16 +73,18 @@ layout: landing
 <pre class="language-html"><code class="language-html">&lt;script defer src="{{lvtClientScriptURL}}"&gt;&lt;/script&gt;
 &lt;h1&gt;Hello, {{.Name}}&lt;/h1&gt;
 &lt;form method="POST"&gt;
-  &lt;input name="name" placeholder="Your name" {{.lvt.AriaInvalid "name"}}&gt;
+  &lt;input name="name" placeholder="Your name" required {{.lvt.AriaInvalid "name"}}&gt;
   {{.lvt.ErrorTag "name"}}
-  &lt;button name="greet"&gt;Say hi&lt;/button&gt;
+  &lt;button name="greet"
+    lvt-el:addClass:on:pending="is-loading"
+    lvt-el:removeClass:on:done="is-loading"&gt;Say hi&lt;/button&gt;
 &lt;/form&gt;
 &lt;ul&gt;
   {{range .Wall}}&lt;li&gt;&lt;b&gt;{{.Name}}&lt;/b&gt; said hi {{.At}}&lt;/li&gt;{{end}}
 &lt;/ul&gt;</code></pre>
     </div>
     <div class="snip">
-      <div class="snip-label">app.go — the four methods that do the work</div>
+      <div class="snip-label">app.go — the whole controller, and the wiring</div>
 <pre class="language-go"><code class="language-go">type State struct {
     Name string      // your headline, synced across your tabs
     Wall []Greeting  // the shared list, synced across everyone
@@ -94,9 +96,15 @@ func (a *App) Mount(s State, ctx *lvt.Context) (State, error) {
     return s, nil
 }
 func (a *App) Greet(s State, ctx *lvt.Context) (State, error) {
+    if err := ctx.ValidateForm(); err != nil {
+        return s, err                        // re-runs the HTML rules
+    }
     name := sanitize(ctx.GetString("name"))
     if name == "" {
         return s, lvt.NewFieldError("name", errors.New("Please enter a name"))
+    }
+    if strings.EqualFold(name, "admin") {    // a rule HTML can't express
+        return s, lvt.NewFieldError("name", errors.New(`"admin" is reserved`))
     }
     a.record(ctx.GroupID(), name)
     s.Name, s.Wall = name, a.snapshot()
@@ -110,17 +118,27 @@ func (a *App) Refresh(s State, ctx *lvt.Context) (State, error) {
 }
 func (a *App) WallRefresh(s State, ctx *lvt.Context) (State, error) {
     s.Wall = a.snapshot(); return s, nil
+}
+func main() {
+    app := lvt.Must(lvt.New("wall",
+        lvt.WithParseFiles("app.tmpl"),
+        // Developer topics are deny-all; admit just this one. Each user's
+        // own SelfTopic() is always permitted.
+        lvt.WithTopicACL(func(topic, _ string, _ *http.Request) (bool, error) {
+            return topic == "wall", nil
+        })))
+    http.ListenAndServe(":8080", app.Handle(&amp;App{}, lvt.AsState(&amp;State{Name: "there"})))
 }</code></pre>
     </div>
   </div>
 
-  <p class="close">That is the whole interface: a template, four methods, and no JavaScript you had to write. The running demo adds about forty more lines of ordinary Go — <code>sanitize</code>, <code>snapshot</code>, a twenty-line cap and a per-session throttle — none of which is framework API. <a href="https://github.com/livetemplate/docs/blob/main/examples/greet-wall/wall.go">Read the real file</a>.</p>
+  <p class="close">That is the whole interface: a template, four methods and a <code>main</code>, with no JavaScript you had to write. The running demo adds about forty more lines of ordinary Go — <code>sanitize</code>, <code>snapshot</code>, a twenty-line cap and a per-session throttle — none of which is framework API. <a href="https://github.com/livetemplate/docs/blob/main/examples/greet-wall/wall.go">Read the real file</a>.</p>
 </section>
 
 <section id="inside" class="intro">
   <div class="eyebrow">What's going on</div>
   <h2>The parts of that worth a second look.</h2>
-  <p class="lead">Most of what follows points back at lines you have already read. Two of them — the pending state and the standalone twenty-line version — are different apps, and say so where they appear. Each one runs here, so you can check the claim rather than take it.</p>
+  <p class="lead">Every section below points at lines you have just read. Each one also runs here as its own app, so you can check the claim rather than take it.</p>
 </section>
 
 <section id="actions" class="step">
@@ -186,19 +204,12 @@ func main() {
 <section id="validation" class="step">
   <div class="eyebrow">Validation</div>
   <h2>The HTML rule runs again in Go.</h2>
-  <p class="lead">Three lines you already read do this. <code>{{.lvt.AriaInvalid "name"}}</code> and <code>{{.lvt.ErrorTag "name"}}</code> mark up the field, and <code>Greet</code> returns a <code>NewFieldError</code> when the name is empty. An error return renders as an inline message against the right field — you don't route it anywhere.</p>
+  <p class="lead">Both halves are in the app above. The input carries <code>required</code>, and <code>ctx.ValidateForm()</code> re-runs exactly that rule on the server — a client that skipped it, scripting off or a direct POST, gets the same answer. Then <code>strings.EqualFold(name, "admin")</code> adds the rule HTML has no way to state.</p>
 
-  <div class="snip">
-    <div class="snip-label">app.go · the rule the wall already enforces</div>
-<pre class="language-go"><code class="language-go">if name == "" {
-    return s, lvt.NewFieldError("name", errors.New("Please enter a name"))
-}</code></pre>
-  </div>
-
-  <p class="lead">The other half is for rules HTML can already state. Put <code>required</code> or <code>type="email"</code> on the input and <code>ctx.ValidateForm()</code> re-runs exactly those, server-side, so a client that skipped them gets the same answer. The app below adds both — try an empty submit, or type <em>admin</em>.</p>
+  <p class="lead">The template side is the other two lines you read: <code>{{.lvt.AriaInvalid "name"}}</code> marks the field, <code>{{.lvt.ErrorTag "name"}}</code> is where the message lands. Returning an error from <code>Greet</code> is the whole mechanism — there's nothing to route. Scroll up and type <em>admin</em>, or try the smaller app here.</p>
 
   <div class="demo">
-    <div class="demo-bar"><span class="dot"></span> greet-validate · a second app, with both halves</div>
+    <div class="demo-bar"><span class="dot"></span> greet-validate · the same pair, on its own</div>
     <div class="demo-body">
 
 ```embed-lvt path="/apps/greet-validate/" upstream="http://localhost:9091" height="160px"
@@ -207,18 +218,8 @@ func main() {
 </div>
   </div>
 
-  <div class="snip">
-    <div class="snip-label">greet-validate · re-check the HTML rules, then add your own</div>
-<pre class="language-go"><code class="language-go">if err := ctx.ValidateForm(); err != nil {
-    return s, err                          // re-runs the HTML rules
-}
-if strings.EqualFold(name, "admin") {      // a rule HTML can't express
-    return s, lvt.NewFieldError("name", errors.New(`"admin" is reserved`))
-}</code></pre>
-  </div>
-
   <div class="wire">
-    <div class="wire-label">on the wire · HTTP fetch</div>
+    <div class="wire-label">on the wire · the rejected submit</div>
     <div>▲ <span class="payload">{"action":"greet","data":{"name":"admin"}}</span></div>
     <div>▼ <span class="payload">{"meta":{"errors":{"name":"\"admin\" is reserved"}}}</span></div>
   </div>
@@ -227,7 +228,7 @@ if strings.EqualFold(name, "admin") {      // a rule HTML can't express
 <section id="pending" class="step">
   <div class="eyebrow">Pending state</div>
   <h2>Slow work has a pending state you can render.</h2>
-  <p class="lead">The wall answers instantly, so it has nothing to show here — these are two different apps. Both make the same point: the work runs on the server, so its pending state is an ordinary template conditional. If you'd rather not touch the Go at all, there's a button-level attribute that does it without server state.</p>
+  <p class="lead">The two <code>lvt-el:</code> attributes on that button are the version you already read: they toggle a class for the life of the round trip, with no server state at all. The wall answers fast, so it is a brief dip rather than a spinner. When the work is genuinely slow, the server can own the pending state instead and render it as an ordinary template conditional.</p>
 
   <div class="pair">
     <div>
@@ -306,43 +307,12 @@ if strings.EqualFold(name, "admin") {      // a rule HTML can't express
     </div>
   </div>
 
-  <div class="pair">
-    <div class="snip">
-      <div class="snip-label">app.go · admit the shared topic</div>
-<pre class="language-go"><code class="language-go">lvt.WithTopicACL(
-    func(topic, _ string, _ *http.Request) (bool, error) {
-        return topic == "wall", nil   // deny-all by default
-    })</code></pre>
-    </div>
-    <div class="snip">
-      <div class="snip-label">app.go · the server can start the cycle too</div>
+  <div class="snip">
+    <div class="snip-label">app.go · the server can start the same cycle</div>
 <pre class="language-go"><code class="language-go">sess.TriggerAction("ServerRefresh", nil)</code></pre>
-      <p class="note">Same mechanism, no user action — that's the "the server said hi at …" line in the cards above, pushed on a timer.</p>
-    </div>
+    <p class="note">You already read the <code>WithTopicACL</code> in <code>main</code> that admits <code>"wall"</code> — developer topics are deny-all until one is named. This is the same publish path with no user action behind it: the "the server said hi at …" line in the cards above, pushed on a timer.</p>
   </div>
 
-  <div class="wire">
-    <div class="wire-label">on the wire · WebSocket</div>
-    <div>▲ visitor 1 <span class="payload">{"action":"greet","data":{"name":"Ada"}}</span></div>
-    <div>▼ visitor 2 <span class="payload">{"tree":{"3":[["a",[{"0":"Ada","1":"15:04"}]]]}}</span></div>
-    <div>▼ server push <span class="payload">{"tree":{"3":{"0":"15:04:08"}}}</span> — no ▲; just the changed value goes down</div>
-  </div>
-</section>
-
-<section id="diff" class="step">
-  <div class="diff-split">
-    <div>
-      <div class="eyebrow">Only the diff</div>
-      <h2>Only the changed values go over the wire.</h2>
-      <p class="lead">Templates get split into static structure, which is cached, and dynamic values, so a greeting comes back as <code>{"tree":{"0":"Ada"}}</code> instead of a page.</p>
-    </div>
-    <div class="bars">
-      <div class="bar-row"><span>full HTML</span><span>2.4 KB</span></div>
-      <div class="bar full"><span></span></div>
-      <div class="bar-row"><span>lvt diff</span><span>340 B</span></div>
-      <div class="bar diff"><span></span></div>
-    </div>
-  </div>
 </section>
 
 <section id="compare" class="step">
