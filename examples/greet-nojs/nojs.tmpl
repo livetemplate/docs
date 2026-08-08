@@ -6,39 +6,49 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
     <link rel="stylesheet" href="{{lvtClientStyleURL}}">
     <script defer src="{{lvtClientScriptURL}}"></script>
-    <!-- Emerald styling so the JS-off <iframe> on the landing matches the
-         JS-on embed beside it (the landing themes its embed via CSS it can't
-         reach across an iframe boundary, so the brand styling lives here). -->
+    <!-- The calm theme, restated here. This app is shown on the landing inside
+         an <iframe>, and CSS does not cross that boundary — so unlike the other
+         demos (which the landing styles directly) this one has to carry the
+         palette itself, or the JS-off card would not match the JS-on card
+         beside it. The font is self-hosted and same-origin, so the sandboxed
+         frame can load it under font-src 'self'. -->
     <style>
+        @font-face{font-family:'IBM Plex Sans';font-style:normal;font-weight:400;font-display:swap;src:url('/assets/fonts/plexsans-400.woff2') format('woff2')}
+        @font-face{font-family:'IBM Plex Sans';font-style:normal;font-weight:500;font-display:swap;src:url('/assets/fonts/plexsans-500.woff2') format('woff2')}
+        @font-face{font-family:'IBM Plex Sans';font-style:normal;font-weight:600;font-display:swap;src:url('/assets/fonts/plexsans-600.woff2') format('woff2')}
         :root{
             color-scheme:light;
             --pico-background-color:#fff;
-            --pico-color:#0f172a;
-            --pico-muted-color:#475569;
-            --pico-form-element-background-color:#fff;
-            --pico-form-element-border-color:#cbd5e1;
-            --pico-form-element-color:#0f172a;
-            --pico-primary:#047857;
-            --pico-primary-background:#047857;
-            --pico-primary-border:#047857;
-            --pico-primary-hover:#065f46;
-            --pico-primary-hover-background:#065f46;
-            --pico-primary-hover-border:#065f46;
+            --pico-color:#1B1A17;
+            --pico-muted-color:#6B6862;
+            --pico-form-element-background-color:#FBFAF8;
+            --pico-form-element-border-color:#DCD8D0;
+            --pico-form-element-color:#1B1A17;
+            --pico-primary:#1B1A17;
+            --pico-primary-background:#1B1A17;
+            --pico-primary-border:#1B1A17;
+            --pico-primary-hover:#2F5D8A;
+            --pico-primary-hover-background:#2F5D8A;
+            --pico-primary-hover-border:#2F5D8A;
         }
         *,*::before,*::after{box-sizing:border-box}
-        html,body{margin:0;background:#fff !important;color:#0f172a !important}
-        body{font-family:system-ui,-apple-system,sans-serif;background:#fff !important;color:#0f172a !important}
-        main.container{max-width:none;margin:0;padding:.25rem 0;text-align:center;background:#fff}
-        h1{font-size:26px;font-weight:800;letter-spacing:-.02em;margin:0 0 14px;color:#0f172a !important}
-        form{display:flex;flex-wrap:wrap;align-items:stretch;gap:8px;max-width:360px;margin:0 auto}
-        input,button[name="greet"]{font:600 16px/1.25 system-ui,-apple-system,sans-serif}
-        input{margin:0;flex:1 1 60%;min-width:0;height:44px;min-height:44px;padding:0 .875rem;line-height:42px;
-            background:#fff !important;color:#0f172a !important;border:1px solid #cbd5e1 !important;
-            border-radius:8px;box-shadow:none;appearance:none}
-        button[name="greet"]{--pico-background-color:#047857;--pico-border-color:#047857;
-            background:#047857 !important;border:1px solid #047857 !important;color:#fff !important;
-            width:auto;white-space:nowrap;height:46px;min-height:46px;padding:0 1rem;border-radius:8px;
-            display:inline-flex;align-items:center;justify-content:center;line-height:44px;appearance:none}
+        html,body{margin:0;background:#fff !important;color:#4A4842 !important}
+        body{font-family:'IBM Plex Sans',system-ui,-apple-system,sans-serif;background:#fff !important}
+        main.container{max-width:none;margin:0;padding:24px;background:#fff}
+        h1{font-size:26px;font-weight:600;letter-spacing:-.015em;margin:0 0 18px;color:#1B1A17 !important}
+        form{display:flex;flex-wrap:wrap;align-items:stretch;gap:8px;margin:0}
+        input,button[name="greet"]{font:400 14px/1.25 'IBM Plex Sans',system-ui,sans-serif}
+        /* Pico sizes inputs with input:not([type=checkbox]){width:100%} — a
+           bare `input` selector ties on specificity and loses, so the width
+           has to be stated on a selector that outranks it. */
+        form input[name="name"]{margin:0;width:190px;flex:0 0 auto;min-width:0;padding:8px 12px;
+            background:#FBFAF8 !important;color:#1B1A17 !important;border:1px solid #DCD8D0 !important;
+            border-radius:5px;box-shadow:none;appearance:none}
+        button[name="greet"]{--pico-background-color:#1B1A17;--pico-border-color:#1B1A17;
+            background:#1B1A17 !important;border:1px solid #1B1A17 !important;color:#FBFAF8 !important;
+            width:auto;white-space:nowrap;padding:8px 16px;border-radius:5px;font-weight:500;
+            display:inline-flex;align-items:center;justify-content:center;appearance:none}
+        button[name="greet"]:hover{background:#2F5D8A !important;border-color:#2F5D8A !important}
     </style>
 </head>
 <body>

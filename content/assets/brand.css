@@ -1,20 +1,101 @@
-/* Shared brand primitives loaded on EVERY page via styling.site_css —
-   the calm docs shell and the vibrant landing alike. Keep this file to
-   foundations only (self-hosted fonts); landing-specific gradients and
-   layout live in landing.css (styling.custom_css, landing pages only).
+/* Shared brand foundations, loaded on EVERY page via styling.site_css — the
+   docs shell and the landing alike. Three things live here and nowhere else:
+   the calm design tokens, the self-hosted @font-face rules, and the neutralised
+   prism palette. Page layout is docs.css (imported below) and landing.css
+   (styling.custom_css, landing pages only).
 
-   Fonts are self-hosted under /assets/fonts so they satisfy the CSP
-   font-src 'self'. The body font-family itself is set by tinkerdown from
-   styling.font ("Inter"); these @font-face rules make that family load. */
+   Load order matters and is load-bearing. tinkerdown emits, in <head>:
+     pico.css → tinkerdown-client.css → theme <style> → styling <style>
+     → prism.css → THIS FILE
+   Being last is what lets a plain token override win at equal specificity. */
 
-/* ── Inter (display / body) ── */
-@font-face{font-family:'Inter';font-style:normal;font-weight:400;font-display:swap;src:url('/assets/fonts/inter-400.woff2') format('woff2')}
-@font-face{font-family:'Inter';font-style:normal;font-weight:600;font-display:swap;src:url('/assets/fonts/inter-600.woff2') format('woff2')}
-@font-face{font-family:'Inter';font-style:normal;font-weight:700;font-display:swap;src:url('/assets/fonts/inter-700.woff2') format('woff2')}
-@font-face{font-family:'Inter';font-style:normal;font-weight:800;font-display:swap;src:url('/assets/fonts/inter-800.woff2') format('woff2')}
-@font-face{font-family:'Inter';font-style:normal;font-weight:900;font-display:swap;src:url('/assets/fonts/inter-900.woff2') format('woff2')}
+/* docs.css can't get its own <link>: styling.site_css is a single path and
+   buildCustomCSSLink emits exactly one <link>. @import is the file split. It
+   also loads on the landing, where none of its selectors match. */
+@import url("/assets/docs.css?v=1");
 
-/* ── JetBrains Mono (code) ── */
+/* ── IBM Plex Sans (display / body) ──
+   The family is selected by styling.font; these rules make it load. Latin
+   subset from @fontsource/ibm-plex-sans, self-hosted for CSP font-src 'self'. */
+@font-face{font-family:'IBM Plex Sans';font-style:normal;font-weight:400;font-display:swap;src:url('/assets/fonts/plexsans-400.woff2') format('woff2')}
+@font-face{font-family:'IBM Plex Sans';font-style:normal;font-weight:500;font-display:swap;src:url('/assets/fonts/plexsans-500.woff2') format('woff2')}
+@font-face{font-family:'IBM Plex Sans';font-style:normal;font-weight:600;font-display:swap;src:url('/assets/fonts/plexsans-600.woff2') format('woff2')}
+
+/* ── JetBrains Mono (code) ──
+   The design specifies IBM Plex Mono but does not depend on it; JBMono already
+   ships, so we don't add a fourth face for a difference nobody can name. */
 @font-face{font-family:'JetBrains Mono';font-style:normal;font-weight:400;font-display:swap;src:url('/assets/fonts/jbmono-400.woff2') format('woff2')}
 @font-face{font-family:'JetBrains Mono';font-style:normal;font-weight:500;font-display:swap;src:url('/assets/fonts/jbmono-500.woff2') format('woff2')}
 @font-face{font-family:'JetBrains Mono';font-style:normal;font-weight:600;font-display:swap;src:url('/assets/fonts/jbmono-600.woff2') format('woff2')}
+
+/* ── Calm design tokens ──
+   These override tinkerdown's own semantic custom properties rather than
+   hardcoding hexes into rules, so the shell's dark theme keeps working: its
+   [data-theme="dark"] block drives the same variables.
+
+   The :not() is not decoration. [data-theme="dark"] and :root are both
+   specificity (0,1,0), and this file loads AFTER the theme <style> — a bare
+   :root block would beat the dark palette on source order and silently break
+   the theme toggle. Scoping the light values out of dark mode is what keeps
+   both correct. #theme-auto resolves in JS and stamps an explicit light|dark,
+   so there is no third state to handle. */
+:root:not([data-theme="dark"]) {
+  --bg-primary:     #FBFAF8;
+  --bg-secondary:   #FBFAF8;   /* a flat value here is what kills the body gradient */
+  --text-primary:   #4A4842;
+  --text-secondary: #57544D;
+  --text-heading:   #1B1A17;
+  --border-color:   #E7E4DD;
+  --card-bg:        #FFFFFF;
+  --card-border:    #DCD8D0;
+  --card-shadow:    transparent;
+  --code-bg:        #F1EFE9;   /* inline code */
+  --code-border:    #E7E4DD;
+  --pre-bg:         #F4F2ED;   /* code blocks */
+  --pre-text:       #33312C;
+}
+
+/* Tokens the design needs that tinkerdown has no equivalent for. Not scoped to
+   light: they are referenced only by rules that already carry their own theme
+   handling, and leaving them defined in both modes avoids silent unset vars. */
+:root {
+  --lt-line-soft:    #EDEAE3;  /* list + table row rules */
+  --lt-meta:         #6B6862;  /* 11.5-13px mono meta. The contrast floor: no
+                                  text at or below 13px may be lighter. */
+  --lt-bg-sunk:      #F7F5F1;  /* footer, note callouts */
+  --lt-danger:       #9A3B32;
+  --lt-ok:           #5C9169;  /* live-demo status dot — never used for text */
+  --lt-accent-hover: #1B3E60;
+
+  /* Syntax highlighting, reduced to four hues over --pre-text: enough that
+     structure reads at a glance, not so much that a code block becomes a paint
+     chart. All four are darker than --lt-meta, because code blocks set
+     12.5-13px and that is inside the range the contrast floor governs. */
+  --lt-code-comment: #6B6862;
+  --lt-code-string:  #4A6B52;
+  --lt-code-keyword: #2F5D8A;
+  --lt-code-name:    #5A5560;  /* declared names: func names, types, HTML tags */
+}
+
+/* ── Prism, neutralised ──
+   prism.css loads immediately before this file, so these win on source order
+   at equal specificity. Everything not named below falls back to --pre-text;
+   the design renders code near-monochrome, not as a paint chart. */
+code[class*="language-"],
+pre[class*="language-"] { color: var(--pre-text); text-shadow: none }
+
+.token.comment, .token.prolog, .token.doctype, .token.cdata { color: var(--lt-code-comment) }
+/* What the code declares or invokes, and what an HTML element IS. */
+.token.tag, .token.function, .token.class-name { color: var(--lt-code-name) }
+.token.punctuation, .token.operator, .token.entity, .token.url,
+.token.property, .token.boolean, .token.number,
+.token.constant, .token.symbol, .token.deleted, .token.namespace,
+.token.regex, .token.important, .token.variable { color: var(--pre-text) }
+.token.selector, .token.attr-name, .token.string, .token.char,
+.token.builtin, .token.inserted,
+.language-css .token.string, .style .token.string { color: var(--lt-code-string) }
+.token.atrule, .token.attr-value, .token.keyword { color: var(--lt-code-keyword) }
+
+/* Prism sets these on .important/.bold and .italic; the design has neither. */
+.token.important, .token.bold { font-weight: 500 }
+.token.italic { font-style: normal }

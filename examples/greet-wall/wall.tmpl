@@ -11,14 +11,28 @@
     <!-- Styles live in <body>: embed-lvt drops the embedded app's <head>, so
          anything in <head> is lost once this app is mounted on the landing. -->
     <style>
-        .from-server{display:flex;align-items:center;justify-content:center;gap:.45rem;
-            font-size:.82rem;color:#475569;margin:.2rem 0 .9rem}
-        .from-server .dot{flex:none;width:8px;height:8px;border-radius:50%;background:#10b981;
+        /* The server line and the greeting rows are one column: both start at
+           the container's left edge, so the heartbeat reads as the newest entry
+           above the wall rather than as a floating caption. Centring one and
+           left-aligning the other is what made them look unrelated. */
+        .from-server{display:flex;align-items:center;gap:.45rem;
+            font-size:.82rem;color:#6B6862;margin:.2rem 0 .9rem}
+        .wall{margin:0;padding:0}
+        /* Pico sets `ul li{list-style:square}` on the li itself, so a
+           list-style on the ul never wins — it has to be stated here. */
+        .wall li{list-style:none;padding:2px 0}
+        .wall b{font-weight:500;color:#1B1A17}
+        .wall small{color:#6B6862;font-size:.82rem}
+        /* The pulse stays. The design's rule is that nothing moves unless the
+           app is updating — and this dot marks a server-initiated push, which
+           is exactly the app updating. Only the hue changes, to the calm
+           live-status green. */
+        .from-server .dot{flex:none;width:8px;height:8px;border-radius:50%;background:#5C9169;
             animation:fromServerPulse 2s ease-out infinite}
         @keyframes fromServerPulse{
-            0%{box-shadow:0 0 0 0 rgba(16,185,129,.5)}
-            70%{box-shadow:0 0 0 7px rgba(16,185,129,0)}
-            100%{box-shadow:0 0 0 0 rgba(16,185,129,0)}}
+            0%{box-shadow:0 0 0 0 rgba(92,145,105,.5)}
+            70%{box-shadow:0 0 0 7px rgba(92,145,105,0)}
+            100%{box-shadow:0 0 0 0 rgba(92,145,105,0)}}
         @media(prefers-reduced-motion:reduce){.from-server .dot{animation:none}}
     </style>
     <main class="container">

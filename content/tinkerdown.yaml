@@ -326,18 +326,22 @@ server:
 
 styling:
   theme: "clean"
-  # Emerald signature — matches the landing brand (gradient #047857 → #10b981).
-  # Docs stay calm: this single hue drives links + the active nav item; the
-  # vibrant gradients/dark code live only in landing.css (layout: landing).
-  primary_color: "#047857"
-  # Inter matches the landing's display font; @font-face ships in brand.css
-  # (site_css) so it loads in the docs shell too, not just on the landing.
-  # Requires tinkerdown >= v0.3.7 (styling.site_css); see Dockerfile.
-  font: "Inter"
-  # Shared brand primitives (self-hosted fonts) — injected on EVERY page.
-  site_css: "assets/brand.css?v=1"
-  # Bespoke emerald landing styling — injected only on layout: landing pages.
-  custom_css: "assets/landing.css?v=15"
+  # The calm theme's single accent. tinkerdown turns this into :root{--accent},
+  # which is the ONLY thing on the page it tints: links, the active nav item,
+  # and focus rings. Nothing else is coloured. (Replaced emerald #047857 when
+  # the landing and the docs shell converged on one visual system.)
+  primary_color: "#2F5D8A"
+  # @font-face ships in brand.css (site_css) so the family loads in the docs
+  # shell too, not just on the landing. Requires tinkerdown >= v0.3.7
+  # (styling.site_css); see Dockerfile.
+  font: "IBM Plex Sans"
+  # Design tokens, fonts and the neutralised prism palette — every page. Also
+  # @imports docs.css (the docs shell), which cannot get its own link: site_css
+  # takes a single path. Bump ?v= on every change; assets are served no-cache
+  # but proxies and phones still hold stale copies without it.
+  site_css: "assets/brand.css?v=2"
+  # Landing-only layout — injected on layout: landing pages, after site_css.
+  custom_css: "assets/landing.css?v=16"
 
 blocks:
   auto_id: true

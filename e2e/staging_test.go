@@ -159,9 +159,10 @@ func TestThemeTogglePersists(t *testing.T) {
 }
 
 // TestThemeAccentInjected verifies end-to-end that the user's primary_color
-// from tinkerdown.yaml (emerald "#047857") is injected into the --accent CSS
-// custom property the docs styling reads. Runs against a docs page — the
-// marketing landing ("/") uses its own --sig token, not --accent.
+// from tinkerdown.yaml (the calm theme's "#2F5D8A") is injected into the
+// --accent CSS custom property the docs styling reads. Runs against a docs
+// page: the landing restates its own tokens in landing.css so it stays light
+// regardless of the visitor's stored theme.
 func TestThemeAccentInjected(t *testing.T) {
 	ctx, cancel := newCtx(t)
 	defer cancel()
@@ -176,7 +177,7 @@ func TestThemeAccentInjected(t *testing.T) {
 	); err != nil {
 		t.Fatalf("read --accent: %v", err)
 	}
-	want := "#047857"
+	want := "#2F5D8A"
 	if !strings.EqualFold(accent, want) {
 		t.Errorf("--accent = %q, want %q (primary_color in tinkerdown.yaml)", accent, want)
 	}
