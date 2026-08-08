@@ -104,7 +104,10 @@ func (a *App) Greet(s State, ctx *lvt.Context) (State, error) {
     if strings.EqualFold(name, "admin") {    // a rule HTML can't express
         return s, lvt.NewFieldError("name", errors.New(`"admin" is reserved`))
     }
-    a.record(ctx.GroupID(), name)
+    a.saveName(ctx.GroupID(), name)   // so Refresh can re-read it on your tabs
+    a.appendWall(name)                // the one shared list everyone sees
+    // A publish skips the connection that called it, so this one renders
+    // from the values returned here.
     s.Name, s.Wall = name, a.snapshot()
     ctx.Publish(ctx.SelfTopic(), "Refresh", nil)  // your other tabs
     ctx.Publish("wall", "WallRefresh", nil)       // everyone else
@@ -130,7 +133,7 @@ func main() {
     </div>
   </div>
 
-  <p class="close">That is the whole interface: a template, four methods and a <code>main</code>, with no JavaScript you had to write. The running demo adds about forty more lines of ordinary Go — <code>sanitize</code>, <code>snapshot</code>, a twenty-line cap and a per-session throttle — none of which is framework API. <a href="https://github.com/livetemplate/docs/blob/main/examples/greet-wall/wall.go">Read the real file</a>.</p>
+  <p class="close">That is the whole interface: a template, four methods and a <code>main</code>, with no JavaScript you had to write. The running demo adds about forty more lines of ordinary Go — <code>sanitize</code>, the map writes behind <code>saveName</code>, a twenty-line cap in <code>appendWall</code> and a per-session throttle — none of which is framework API. <a href="https://github.com/livetemplate/docs/blob/main/examples/greet-wall/wall.go">Read the real file</a>.</p>
 </section>
 
 <section id="inside" class="intro">
