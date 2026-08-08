@@ -119,9 +119,20 @@ func (c *Controller) OnConnect(s State, ctx *livetemplate.Context) (State, error
 // headline, Step 5) and the wall topic -> WallRefresh (everyone's list, Step
 // 6). The calling connection is excluded from both — it already has the result.
 func (c *Controller) Greet(s State, ctx *livetemplate.Context) (State, error) {
+	// Re-run the rules the template already declared (the input carries
+	// `required`) on the server. A client that never enforced them — scripting
+	// off, or a direct POST — gets the same answer as one that did.
+	if err := ctx.ValidateForm(); err != nil {
+		return s, err
+	}
 	name := sanitize(ctx.GetString("name"))
 	if name == "" {
 		return s, livetemplate.NewFieldError("name", errors.New("Please enter a name"))
+	}
+	// A rule HTML has no way to state. The wall is public, so one name is
+	// held back rather than letting a visitor pose as the server.
+	if strings.EqualFold(name, "admin") {
+		return s, livetemplate.NewFieldError("name", errors.New(`"admin" is reserved`))
 	}
 
 	group := ctx.GroupID()
