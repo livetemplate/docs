@@ -13,15 +13,13 @@ The important constraint is also the useful part: start with HTML that works as 
 
 ## One model, every surface
 
-This is the idea the rest of the page elaborates, so it's worth stating once up front.
-
-Every reactive thing LiveTemplate does is the same four-step pipeline:
+Every reactive thing here is the same four steps:
 
 ```
 state changes  →  re-render the template  →  diff against the last render  →  patch the browser
 ```
 
-A user clicking a button runs it. A second tab reacting to that click runs it. A *different user* seeing a live update runs it. The server pushing an update on its own — a timer, a job finishing — runs it. There is no separate "real-time engine," no client-side store, no merge logic to reconcile. The only things that differ between these cases are **when** the action is enqueued and **which** connections receive the resulting patch:
+A user clicking a button runs it. A second tab reacting to that click runs it. A *different user* seeing a live update runs it. The server pushing an update on its own — a timer, a job finishing — runs it. There's no separate real-time engine underneath: a second tab catching up and a background job pushing an update are the same pipeline, entered at a different point. What differs is **when** the action is enqueued and **which** connections receive the resulting patch:
 
 | What happened | When the action runs | Who gets the patch |
 |---|---|---|

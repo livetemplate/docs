@@ -48,7 +48,8 @@ The `simple` kit generates a minimal structure:
 - `go.mod` - Go module configuration
 - `README.md` - Documentation
 
-No cmd/, internal/, or database directories. Perfect for focused applications!
+No `cmd/`, no `internal/`, no database. A larger app will grow some of those; a
+chat room this size doesn't need them.
 
 ### Step 2: Define the Chat State
 
@@ -293,8 +294,8 @@ Open <http://localhost:8090> in multiple browser tabs:
 - Open 2+ tabs in Chrome
 - Login with any username in tab 1
 - Send a message in tab 1
-- **It appears instantly in tab 2!** ✨
-- Try sending from tab 2 - appears in tab 1
+- It shows up in tab 2
+- Send from tab 2 and it shows up in tab 1
 
 **Test 2 - Different browsers (isolated sessions):**
 
@@ -321,34 +322,27 @@ Chrome Tab 1       Server (Go)        Chrome Tab 2
     |                   |                     |
 ```
 
-**The magic:**
+What happens, in order:
 
-1. Each browser gets a unique session ID (stored in cookie)
-2. All tabs in the same browser share the session ID
-3. State changes automatically sync to all tabs in the same session
-4. Only changed HTML is sent (tree-diffing)
-5. Zero manual broadcasting code required!
+1. Each browser gets a session group ID in a cookie. Tabs in the same browser
+   share it.
+2. `Mount` subscribes the connection to `ctx.SelfTopic()` — the topic scoped to
+   that session group.
+3. `SendMessage` calls `ctx.Publish(ctx.SelfTopic(), "NewMessage", nil)`, which
+   runs `NewMessage` on the other subscribed tabs.
+4. Each tab re-renders, and the server sends only the parts that changed.
 
-### Why So Simple?
+Both halves are explicit. `main.go` has one `Subscribe` and three `Publish`
+calls, and they are the entire sync mechanism — nothing fans out on its own.
 
-**Traditional approach (what you DON'T need):**
+### What you don't write
 
-- ❌ Manual WebSocket management
-- ❌ Database setup
-- ❌ ORM configuration
-- ❌ Complex directory structure
-- ❌ Separate frontend/backend
-- ❌ API endpoints
-- ❌ State sync logic
+You don't manage the WebSocket, and there are no API endpoints to define. The
+server re-renders the template and sends the diff, so there's no client-side copy
+of the message list to keep in step.
 
-**LiveTemplate simple kit:**
-
-- ✅ Just modify Go structs
-- ✅ 2 files total
-- ✅ Auto-broadcasting
-- ✅ Auto-updates
-- ✅ Standard `html/template`
-- ✅ Standard `net/http`
+What you do write is all on this page: a state struct, four methods, and the
+`Subscribe`/`Publish` pair above.
 
 ## Customization Ideas
 
@@ -492,18 +486,19 @@ tmpl := livetemplate.New("chat",
 
 Now Chrome, Firefox, Safari all see the same messages!
 
-## Key Takeaways
+## What this recipe showed
 
-1. **Two files** - That's it! `main.go` + `chat.tmpl`
-2. **Zero boilerplate** - No cmd/, internal/, database/
-3. **Auto-syncing** - Tabs stay in sync automatically
-4. **Standard Go** - Uses `net/http` and `html/template`
-5. **Type-safe** - Go structs, no JSON marshaling needed
-6. **Efficient** - Tree-diffing sends only changes
+Two files: `main.go` and `chat.tmpl`. Messages are Go structs, so there's no JSON
+marshaling between the server and the template. Tabs stay in step through the
+`Subscribe`/`Publish` pair, and the server sends only the parts of the page that
+changed.
 
-## Comparison with Counter Example
+What it doesn't show is persistence. Messages live in a slice on the controller
+and are gone when the process restarts — see [Add Persistence](#add-persistence).
 
-The simple kit starts with a counter. Here's how we evolved it:
+## Compared with the counter example
+
+The counter is the smaller version of the same shape:
 
 | Counter Example | Chat Example |
 |-----------------|--------------|

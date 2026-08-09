@@ -155,7 +155,7 @@ func main() {
 <script defer src="{{lvtClientScriptURL}}"></script>
 ```
 
-That's it! No JavaScript code needed. The client library auto-initializes and handles:
+That one tag is the whole client setup. It initializes itself and handles:
 - **Button name routing**: `<button name="increment">` routes to `Increment()` method
 - **Automatic WebSocket connection** to `/live` endpoint
 - **Automatic reconnection** on disconnect (configurable)

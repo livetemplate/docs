@@ -7,7 +7,8 @@ source_path: content/recipes/index.md
 
 # Recipes
 
-Everything practical in these docs lives here. A recipe can be a small core concept, a focused UI behavior, a runnable app, or a deeper explanation of the tradeoffs behind an implementation.
+The practical half of the docs. Some recipes are one idea and twenty lines. Some
+are whole apps. Every one of them is running somewhere on this site.
 
 ## Basics
 

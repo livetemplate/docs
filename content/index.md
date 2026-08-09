@@ -139,7 +139,7 @@ func main() {
 <section id="inside" class="intro">
   <div class="eyebrow">What's going on</div>
   <h2>The parts of that worth a second look.</h2>
-  <p class="lead">Every section below points at lines you have just read — except the pending state, which the wall has no slow work to demonstrate, and which says so. Each one also runs here as its own app, so you can check the claim rather than take it.</p>
+  <p class="lead">Every section below points at lines you have just read — except the pending state, which the wall has no slow work to demonstrate, and which says so. Each one also runs here as its own app, so you can try it.</p>
 </section>
 
 <section id="actions" class="step">
