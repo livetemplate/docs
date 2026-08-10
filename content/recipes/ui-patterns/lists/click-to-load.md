@@ -18,7 +18,7 @@ existing ones untouched. A `HasMore` flag hides the button at the end of the lis
 ## Template
 
 The button's `name="loadMore"` names the action; `{{if .HasMore}}` swaps it for an
-"End of list" note once the last page is loaded.
+"End of list" note once the last page loads.
 
 ```html include="/examples/patterns/templates/lists/click-to-load.tmpl"
 ```

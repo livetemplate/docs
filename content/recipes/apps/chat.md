@@ -7,11 +7,11 @@ source_path: "content/recipes/apps/chat.md"
 
 # Building a real-time chat app
 
-A complete tutorial for building a real-time chat application using LiveTemplate's simple kit. This demonstrates **automatic multi-tab syncing**, session management, and reactive UI updates with just **2 files**.
+A tutorial for building a real-time chat room on LiveTemplate's simple kit: multi-tab sync, session management and reactive UI updates, in two files.
 
 ## What you'll build
 
-- Real-time messaging with automatic tab syncing
+- Real-time messaging, synced across a browser's tabs
 - User login and presence tracking
 - Instant UI updates across all tabs in the same browser
 - Browser session isolation (each browser has its own chat room)
@@ -26,8 +26,8 @@ cd examples/chat
 GOWORK=off go run main.go
 ```
 
-Then open <http://localhost:8090> in **multiple browser tabs** to see automatic syncing in action:
-- Messages sent in one tab appear instantly in all other tabs
+Then open <http://localhost:8090> in **two or more browser tabs**:
+- A message sent in one tab shows up in the others
 - Each browser gets its own isolated chat session
 
 ## Building it from scratch
@@ -95,7 +95,7 @@ type User struct {
 
 - Single `ChatState` struct holds all app state
 - `sync.RWMutex` for thread-safe concurrent access
-- Simple Go structs - no database, no ORM, no complexity
+- Plain Go structs. No database and no ORM, because a room this size fits in memory
 
 ### Step 3: implement actions
 

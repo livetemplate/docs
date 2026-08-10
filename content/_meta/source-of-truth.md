@@ -188,10 +188,10 @@ These don't currently exist anywhere and must be written from scratch — likely
 
 ---
 
-## Literate primitives in mirrored content
+## Literate blocks in mirrored content
 
 Mirrored upstream READMEs may use tinkerdown's literate authoring
-primitives (since tinkerdown v0.2.0). The sync tool passes them through
+blocks (since tinkerdown v0.2.0). The sync tool passes them through
 byte-for-byte and mirrors a single adjacency convention so they resolve
 correctly post-sync.
 

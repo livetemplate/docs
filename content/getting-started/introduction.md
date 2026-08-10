@@ -21,16 +21,16 @@ keyboard shortcut, a reactive class toggle), never as boilerplate.
 
 ## When LiveTemplate fits
 
-It's a good fit when you're building app screens in Go and want live behavior —
-forms with inline validation, multi-tab sync, dashboards that update
-themselves, cross-user views — without standing up a separate frontend. Because
-the same program works as a plain form POST first, it
-[degrades gracefully](/recipes/progressive-enhancement/) to environments with no
-JavaScript and upgrades to WebSocket-driven real time where you want it.
+Good fit: app screens in Go that need live behavior. Forms with inline
+validation, multi-tab sync, dashboards that update themselves, views shared
+across users. All of it without standing up a separate frontend.
 
-It's a weaker fit for highly bespoke client-side interaction (canvas editors,
-offline-first apps, animation-heavy UIs) where the logic genuinely belongs in
-the browser.
+The same program works as a plain form POST first, so it
+[keeps working](/recipes/progressive-enhancement/) where JavaScript is off, and
+picks up WebSockets where you want them.
+
+Weaker fit: canvas editors, offline-first apps, animation-heavy UIs. The logic
+really does belong in the browser there, and this would be fighting you.
 
 ## How it compares
 

@@ -9,7 +9,7 @@ source_path: content/recipes/shared-notepad/index.md
 
 The smallest authenticated multi-user app: a textarea, per-user persistence, and multi-tab sync. The whole thing fits in a controller with four action methods, a handler that wires `BasicAuthenticator` as a default option, and ten lines of template — the rest is framework machinery you don't write.
 
-What makes this recipe worth a page is the *seam* between three independently-useful primitives:
+What makes this recipe worth a page is where three separately-useful things meet:
 
 - **`BasicAuthenticator`** turns the HTTP `Authorization` header into a stable identity. Username becomes both `ctx.UserID()` and the session-group ID.
 - **A controller-owned map keyed by `ctx.UserID()`** is enough to isolate per-user state without a database. Alice's notes never leak to Bob.
@@ -56,7 +56,7 @@ The handler exposes two authenticator flavours and lets the caller pick. Product
 ```go include="/examples/shared-notepad/controller.go" region="mount"
 ```
 
-The `Subscribe` line is the receiver-side opt-in. Without it, the Publish in Save would have no subscribers in this session group and the peer tab wouldn't refresh. `SelfTopic()` is ACL-exempt — it always succeeds — and the explicit `_ =` documents that we've considered the return value (a denied developer topic would surface as a `*TopicForbiddenError`; the self-topic can't be denied).
+The `Subscribe` line is the receiver-side opt-in. Without it, the Publish in Save would have no subscribers in this session group and the peer tab wouldn't refresh. `SelfTopic()` is ACL-exempt — it always succeeds — and the explicit `_ =` records that the return value was considered (a denied developer topic would surface as a `*TopicForbiddenError`; the self-topic can't be denied).
 
 The `c.mu.RLock` is the only concurrency primitive in the recipe. Save takes the write lock; Mount, Refresh, and the implicit page-load reads take the read lock. For a production app this would be a database transaction, not a `map[string]NotepadState` — but the controller-shape is the same.
 

@@ -37,7 +37,7 @@ copies a fresh snapshot back into session state; `Restore` refills the table.
 
 ## When to use
 
-- Lists where rows are removed one at a time and the rest should stay put — the
+- Lists where you remove rows one at a time and the rest should stay put — the
   keyed diff keeps every surviving row's DOM intact.
 - When deletions need to outlive a reload — back the list with a shared store rather
   than per-session state.

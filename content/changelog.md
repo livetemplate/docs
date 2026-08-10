@@ -8,8 +8,7 @@ source_path: content/changelog.md
 # Changelog
 
 LiveTemplate ships as three released pieces, each with its own history. Every
-page below is mirrored straight from that repository's `CHANGELOG.md` when it
-releases. Nobody has to remember to copy it across.
+page below mirrors that repository's `CHANGELOG.md` at release time. Nobody has to remember to copy it across.
 
 - [**Core library**](/changelog/livetemplate) — `github.com/livetemplate/livetemplate`.
   The Go server: the reactive tree, actions, sessions, uploads, pub/sub.

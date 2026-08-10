@@ -15,7 +15,7 @@ control tells the browser to skip its native constraint check for that button.
 
 LiveTemplate honors `formnovalidate` **on the server too**. `ctx.ValidateForm()`
 checks which control submitted the form, and when that control carried
-`formnovalidate`, validation is skipped — so the same call enforces the rules for
+`formnovalidate`, LiveTemplate skips validation — so the same call enforces the rules for
 **Publish** and waves them through for **Save draft**. No client code, no second
 code path, and it works whether the submit arrived over the WebSocket, an HTTP
 `fetch()`, or a plain no-JS form POST.
@@ -51,13 +51,13 @@ At parse time the framework records every submit control that carries
 `formnovalidate` into the form schema (`FormSchema.NoValidateSubmitters`, keyed by
 the control's `name`). At request time it compares the form's *submitter* — the
 clicked button — against that set, and `ctx.ValidateForm()` returns `nil` early
-when it matches. Because the decision is keyed on the submitter rather than the
+when it matches. Because the decision keys on the submitter rather than the
 action, it holds even under `lvt-on:submit` routing, where the action is the
 handler and the submitter is a separate button.
 
 ## It works without JavaScript
 
-The skip is enforced on the server, so it survives all the way down to a plain
+The server enforces the skip, so it survives all the way down to a plain
 form POST. The mount below is the same app with `WithWebSocketDisabled()`; with JS
 off, the browser submits natively and the server still skips validation for the
 `save-draft` button.

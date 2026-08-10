@@ -35,7 +35,7 @@ that contact and clears `EditingID`.
 
 ## When to use
 
-- A list/table where rows are edited in place and you only ever edit one at a time.
+- A list/table where you edit rows in place and only ever edit one at a time.
 - The single `EditingID` keeps it simple — no per-row flags.
 
 For a single standalone record, [Click to Edit](/recipes/ui-patterns/forms/click-to-edit)

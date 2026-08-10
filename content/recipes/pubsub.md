@@ -115,7 +115,7 @@ a client action, see [Server push](/recipes/server-push).
 
 [Counter, deeper](/recipes/counter/) shared one integer across a browser's tabs.
 This shares a multi-author message log across the same scope — the same
-Subscribe/Publish primitives, with two design choices that change everything:
+Subscribe/Publish pair, with two design choices that change everything:
 which fields are per-connection vs. persisted, and where the source of truth
 lives. The live demo is the [Pubsub pattern](/recipes/ui-patterns/realtime/pubsub):
 
@@ -141,7 +141,7 @@ choice, not a `Publish` choice.)
 
 Note what's *not* persisted. `Username` looks like a candidate for
 `lvt:"persist"` — it's user identity, surely you want it to survive a reconnect?
-But persist storage is keyed by **session group**, so persisting `Username` would
+But persist storage keys on **session group**, so persisting `Username` would
 force every tab in the same browser to share one identity, defeating the demo
 where two tabs join as different users.
 
@@ -216,7 +216,7 @@ subscribers fire `NewMessage` on their own subscribed connections; the framework
 seen-ring deduplicates the SUBSCRIBE+PSUBSCRIBE double-fire for cross-instance
 wildcard topics).
 
-## What's next
+## What next?
 
 - [Server push](/recipes/server-push) — the other direction: server-owned work
   (`TriggerAction`) pushing without a client action.

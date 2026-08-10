@@ -137,10 +137,10 @@ Click `+1` in one — watch the other update in real time. They're talking to th
 You wrote a counter that:
 
 - works without JavaScript (Tier 1)
-- patches the DOM in place when the JS client is loaded
+- patches the DOM in place once the JS client loads
 - syncs across browser tabs and embedded widgets in real time
 
-…in about 50 lines of Go and HTML, with no build step, no client-side framework, no custom template language. The two embeds above? They're the same code rendered live. Every click you've done has gone through your handler, published to peer tabs via `ctx.Publish`, and patched the DOM.
+…in about 50 lines of Go and HTML. No build step, and the template language is the one in the standard library. The two embeds above? They're the same code rendered live. Every click you've done has gone through your handler, published to peer tabs via `ctx.Publish`, and patched the DOM.
 
 ## What next?
 

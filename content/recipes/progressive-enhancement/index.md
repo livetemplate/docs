@@ -7,7 +7,7 @@ source_path: content/recipes/progressive-enhancement/index.md
 
 # Progressive enhancement: graceful degradation
 
-Most "live" frameworks have a load-bearing assumption: JavaScript is on, the WebSocket connects, and the user agent cooperates. LiveTemplate is built so that those assumptions can fail one at a time without the app breaking. The same controller, the same template, and the same form markup degrade through three modes:
+Most "live" frameworks assume JavaScript is on, the WebSocket connects, and the user agent cooperates. Take any one of those away and the app stops. LiveTemplate is built so that those assumptions can fail one at a time without the app breaking. The same controller, the same template, and the same form markup degrade through three modes:
 
 - **Tier A** — JS on, WS on (default). Actions travel over the WebSocket; UI updates as diff patches.
 - **Tier B** — JS on, WS off (`WithWebSocketDisabled()`). The client falls back to plain HTTP `fetch()`; same diff patches over a different transport.
@@ -42,7 +42,7 @@ When the server rejects the WebSocket upgrade, the client library detects it, fa
 ```embed-lvt path="/apps/progressive-enhancement/no-ws/" upstream="http://localhost:9091" height="420px"
 ```
 
-A WebSocket upgrade against this mount is rejected before negotiation:
+This mount refuses a WebSocket upgrade before negotiation:
 
 ```text
 GET /no-ws/ HTTP/1.1
@@ -70,9 +70,9 @@ add=&title=Pick+up+milk
    Set-Cookie: lvt-flash=success=Added%3A+Pick+up+milk; ...
 ```
 
-The browser follows the redirect, the next `GET` re-renders with the new state, and the flash cookie is consumed and cleared. POST-Redirect-GET is a well-known pattern; LiveTemplate just speaks it natively when the request shape says "no JS interception."
+The browser follows the redirect, the next `GET` re-renders with the new state, and the flash cookie is read once and cleared. POST-Redirect-GET is a well-known pattern; LiveTemplate just speaks it natively when the request shape says "no JS interception."
 
-The template carries one piece of UX scaffolding for this mode — a `<noscript>` banner that's only visible when scripts are disabled:
+The template carries one piece of UX scaffolding for this mode — a `<noscript>` banner that only shows when scripts are off:
 
 ```html include="/examples/progressive-enhancement/progressive-enhancement.tmpl" lines="27-33"
 ```
@@ -99,7 +99,7 @@ All three forms in the template use the same shape:
 
 The form has `name="add"` and a button with `name="add"`. Both naming the same action is intentional belt-and-suspenders:
 
-- **Browser-native POST** (Tier C): the browser only includes form fields in the body. The clicked button's `name=value` pair is included, so the body is `add=&title=...` — the framework reads `add=` from the body to route the action.
+- **Browser-native POST** (Tier C): the browser only includes form fields in the body. The clicked button's `name=value` pair rides along, so the body is `add=&title=...` — the framework reads `add=` from the body to route the action.
 - **JS-intercepted submit** (Tier A/B): the client library reads the form's `name` attribute as the action.
 
 Either path resolves to the controller's `Add` method. The toggle and delete forms follow the same shape with hidden `id` inputs to carry the row identity.

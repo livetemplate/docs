@@ -42,8 +42,9 @@ code driving it.
 ```
 
 That is it. A seat is a `<button name="selectSeat">`; its id rides along as
-the button's `value`, read on the server with `ctx.GetString("value")`. No
-`hx-*`, no `x-*`, no `phx-*`, no client code.
+the button's `value`, read on the server with `ctx.GetString("value")`. Where
+htmx would want `hx-*` and Alpine `x-*`, there is nothing — and no client code
+of your own either.
 
 ## Why it's more than the chat recipe
 

@@ -11,7 +11,7 @@ Show real server-side progress without polling. **Start** sets `Running` and spa
 goroutine that pushes the percentage every 500ms with
 `session.TriggerAction("updateProgress", …)`, climbing 10% at a time until the
 `UpdateProgress` action hits 100%, flips to `Done`, and emits a success flash.
-`Progress` and `Done` are persisted so a finished run survives a brief reconnect, while
+`Progress` and `Done` persist, so a finished run survives a brief reconnect, while
 `Running` is intentionally not — a stale spinner with no goroutine behind it is the
 failure mode to avoid.
 
@@ -45,7 +45,7 @@ tick. `UpdateProgress` writes the value and finalizes at 100%.
 - A long server job with a measurable percentage — file processing, a batch import, a
   multi-step export — where the user wants to watch it advance.
 - You want push-based updates instead of the client hammering a status endpoint.
-- The outcome should survive a flaky connection, so completion state is persisted.
+- The outcome should survive a flaky connection, so completion state persists.
 
 Reach for [Async Operations](/recipes/ui-patterns/loading/async-operations) when the
 work has no measurable progress and you only need loading / success / error, or

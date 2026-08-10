@@ -10,7 +10,7 @@ source_path: "examples/patterns/templates/lists/value-select.tmpl"
 Picking a Make repopulates the Model select server-side. The `Change` handler
 auto-fires when the `make` select changes, looks up that make's models, and
 auto-selects the first one so the cascade is visible — no client JS. The Model select
-stays `disabled` until a Make is chosen, and `Mount` seeds the make list (and any
+stays `disabled` until you pick a Make, and `Mount` seeds the make list (and any
 pre-selected models) on connect.
 
 ```embed-lvt path="/apps/ui-patterns/lists/value-select" upstream="http://localhost:9091" height="340px"

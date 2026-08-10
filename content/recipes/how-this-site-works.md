@@ -7,7 +7,7 @@ description: "How the LiveTemplate docs site dogfoods tinkerdown, embedded recip
 
 A docs site for a framework should answer the implicit question every visitor brings: *"OK, but is this thing real? Could I actually build something with it?"*. The most honest answer is to be one yourself.
 
-This site is a [tinkerdown](https://github.com/livetemplate/tinkerdown) app — markdown files, one configuration file, no React. Every page you see is rendered by tinkerdown, which runs on top of LiveTemplate. The bug-finding loop is a feedback cycle: building the docs uncovers latent issues in the framework, and we fix them in the framework rather than working around them in the site.
+This site is a [tinkerdown](https://github.com/livetemplate/tinkerdown) app — markdown files, one configuration file, no React. tinkerdown renders every page you see, running on top of LiveTemplate. The bug-finding loop is a feedback cycle: building the docs uncovers latent issues in the framework, and we fix them in the framework rather than working around them in the site.
 
 ## The shape of the dogfood loop
 

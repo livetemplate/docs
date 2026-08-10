@@ -9,7 +9,7 @@ source_path: "examples/patterns/templates/navigation/keyboard-shortcuts.tmpl"
 
 Bind global keys directly to server actions with `lvt-on:window:keydown` plus an
 `lvt-key` filter — press `/` to open a command panel and `Escape` to close it, no
-client JavaScript. The bindings are scoped: the `/` listener is attached only while
+client JavaScript. The bindings are scoped: the `/` listener attaches only while
 the panel is closed and the `Escape` listener only while it is open, so stray
 keypresses never fire a no-op round-trip.
 
@@ -39,8 +39,8 @@ activity log.
 
 - Power-user shortcuts (command palette, quick actions) that should work from anywhere
   on the page.
-- You want key bindings to be a function of server state — only live when the relevant
-  UI is rendered.
+- You want key bindings to be a function of server state — only live while the relevant
+  UI is on screen.
 - A no-JavaScript binding is enough; the action runs server-side over the WebSocket.
 
 Pair this with a [Modal Dialog](/recipes/ui-patterns/navigation/modal-dialog) when the

@@ -14,14 +14,17 @@ cd "$(dirname "$0")/.."
 
 MAX_EMOJI=0              # 19 -> 0
 MAX_TITLECASE_HEADING=0  # 43 -> 0
-MAX_EXCLAMATION=3        # 11 -> 3. The 3 left are quoted UI copy ("Changes saved!")
-MAX_PRODUCT_SUBJECT=2    # 3 -> 2. target 0
-MAX_ROYAL_WE=1           # 3 -> 1. target 0
-MAX_META_COMMENTARY=1    # 3 -> 1. target 0
-MAX_CLAUDISM=14          # target 0 — Phase 2b
-MAX_TRIADIC_NEGATION=5   # target 1 (the install page's list is genuine)
-MAX_HYPE=1               # target 0 — "seamless scrolling"
-MAX_PASSIVE=83           # 114 -> 83. target ~35; the rest live in ui-patterns/
+MAX_CLAUDISM=0           # 14 -> 0
+MAX_PRODUCT_SUBJECT=0    # 3 -> 0
+MAX_ROYAL_WE=0           # 4 -> 0
+MAX_META_COMMENTARY=0    # 3 -> 0
+MAX_HYPE=0               # 1 -> 0
+MAX_TRIADIC_NEGATION=1   # 5 -> 1. The one left is the landing's hx-post/onClick/route
+                         # list, where each item names a real thing you'd otherwise write.
+MAX_EXCLAMATION=3        # 11 -> 3. All three are quoted UI copy ("Changes saved!")
+MAX_PASSIVE=34           # 114 -> 34. What remains is mostly legitimate: HTML attributes
+                         # ("is required"), Go terms ("are exported"), quoted strings,
+                         # and adjectives the regex can't tell from verbs.
 
 # Blank fenced code while preserving line numbers, so counts are prose-only.
 strip() { awk '/^```/{c=!c; print ""; next} c{print ""; next} {print}' "$1"; }
@@ -65,7 +68,9 @@ count emoji            "$MAX_EMOJI"             '[\x{2705}\x{2728}\x{1F300}-\x{1
 count exclamation      "$MAX_EXCLAMATION"       '!'
 count product-subject  "$MAX_PRODUCT_SUBJECT"   '^LiveTemplate (is|builds|provides|offers|supports|handles|makes|lets|gives|uses)'
 count royal-we         "$MAX_ROYAL_WE"          "(^|[^a-z])(we'll|we've|we're|let's)"
-count meta-commentary  "$MAX_META_COMMENTARY"   "(the rest of (this|the) page|worth stating|as you can see|it's important to note|in this (guide|section), we)"
+# "the rest of the page" is often literal ("without blocking the rest of the
+# page"). Only the document-describing-itself sense counts, so require a verb.
+count meta-commentary  "$MAX_META_COMMENTARY"   "(the rest of (this|the) (page|section) (elaborates|explains|covers|walks|goes|shows)|worth stating|as you can see|it's important to note|in this (guide|section), we)"
 count hype             "$MAX_HYPE"              '\b(seamless|effortless|blazing|delightful|best-in-class|empower|battle-tested|out of the box)\b'
 count triadic-negation "$MAX_TRIADIC_NEGATION"  '\bno [^.,;]{2,40}, no [^.,;]{2,40}(,| and) no '
 # Pinned in Phase 1. Do not change this regex without restating every baseline.

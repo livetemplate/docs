@@ -7,12 +7,12 @@ source_path: "examples/patterns/templates/lists/infinite-scroll.tmpl"
 
 # Infinite Scroll
 
-A single `<div lvt-scroll-sentinel>` at the end of the list is watched by the
+A single `<div lvt-scroll-sentinel>` at the end of the list is what the
 client's IntersectionObserver. When it scrolls into view the client dispatches the
 `load_more` action on its own — no client JS to wire up. The handler is nearly
 identical to [Click To Load](/recipes/ui-patterns/lists/click-to-load) — it just
 pages a larger dataset; only the trigger really differs. When the last page arrives,
-`HasMore` goes false and the sentinel is removed so it stops firing.
+`HasMore` goes false, the sentinel disappears, and it stops firing.
 
 ```embed-lvt path="/apps/ui-patterns/lists/infinite-scroll" upstream="http://localhost:9091" height="440px"
 ```
@@ -20,14 +20,14 @@ pages a larger dataset; only the trigger really differs. When the last page arri
 ## Template
 
 The sentinel `<div lvt-scroll-sentinel>` doubles as the loading indicator; once
-`HasMore` is false it is replaced by an "End of list" note.
+`HasMore` is false an "End of list" note takes its place.
 
 ```html include="/examples/patterns/templates/lists/infinite-scroll.tmpl"
 ```
 
 ## Handler & state
 
-`LoadMore` is dispatched automatically by the sentinel. It bumps the page, appends
+The sentinel dispatches `LoadMore`. It bumps the page, appends
 the next slice, and updates `HasMore`.
 
 ```go include="/examples/patterns/handlers_lists.go" region="infinite-scroll"
@@ -38,7 +38,7 @@ the next slice, and updates `HasMore`.
 
 ## When to use
 
-- Feeds and long lists where seamless scrolling matters more than an explicit
+- Feeds and long lists where uninterrupted scrolling matters more than an explicit
   pagination control.
 - When you want auto-pagination without writing or maintaining any client-side
   IntersectionObserver code.
