@@ -7,11 +7,12 @@ source_path: content/getting-started/introduction.md
 
 # Introduction
 
-LiveTemplate builds reactive web UIs in **standard HTML and Go**. You write an
-ordinary `html/template` and a small Go controller; the browser sends ordinary
-form data; the server re-renders, diffs, and patches the page. There is no
-client-side framework to learn, no second state model to keep in sync, and no
-build step for the common app screens.
+Write an `html/template` and a small Go controller. The browser posts a form, the
+server re-renders, and only the changed parts of the page get patched.
+
+A client framework does this too, and for a canvas editor it should. But for a
+settings screen it means keeping two copies of the same data in sync. That cost
+is the one thing this is trying to avoid.
 
 The defining idea is that you never leave HTML. A `<button name="increment">`
 *is* the action — you don't annotate it to make it reactive. You reach for an
@@ -20,16 +21,16 @@ keyboard shortcut, a reactive class toggle), never as boilerplate.
 
 ## When LiveTemplate fits
 
-It's a good fit when you're building app screens in Go and want live behavior —
-forms with inline validation, multi-tab sync, dashboards that update
-themselves, cross-user views — without standing up a separate frontend. Because
-the same program works as a plain form POST first, it
-[degrades gracefully](/recipes/progressive-enhancement/) to environments with no
-JavaScript and upgrades to WebSocket-driven real time where you want it.
+Good fit: app screens in Go that need live behavior. Forms with inline
+validation, multi-tab sync, dashboards that update themselves, views shared
+across users. All of it without standing up a separate frontend.
 
-It's a weaker fit for highly bespoke client-side interaction (canvas editors,
-offline-first apps, animation-heavy UIs) where the logic genuinely belongs in
-the browser.
+The same program works as a plain form POST first, so it
+[keeps working](/recipes/progressive-enhancement/) where JavaScript is off, and
+picks up WebSockets where you want them.
+
+Weaker fit: canvas editors, offline-first apps, animation-heavy UIs. The logic
+really does belong in the browser there, and this would be fighting you.
 
 ## How it compares
 

@@ -48,7 +48,7 @@ flowchart TD
 
 ## Why this matters
 
-Every Tier 2 attribute is a small JavaScript dependency in the user's browser — a thing that can fail, can race, can accumulate. The framework was designed so the **escape hatch is opt-in per element**, not a global mode. A page can be 95% Tier 1 with one `<input lvt-on:input>` for live search and that's a feature, not a smell.
+Every Tier 2 attribute is a small JavaScript dependency in the user's browser — a thing that can fail, can race, can accumulate. The framework makes the **escape hatch opt-in per element**, not a global mode. A page can be 95% Tier 1 with one `<input lvt-on:input>` for live search and that's a feature, not a smell.
 
 The most common Tier 2 over-application is **using `lvt-on:click` for a button that's inside a `<form>`**. If the form already has `name="Save"`, you don't need anything — submit dispatches. The Tier 2 layer is for cases where standard form/anchor semantics are inadequate, not for "everything I'd write in React."
 

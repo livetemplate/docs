@@ -7,21 +7,19 @@ source_path: content/getting-started/mental-model.md
 
 # Mental Model
 
-LiveTemplate is server-driven UI for Go applications. You write standard `html/template` markup and a Go controller. The browser sends ordinary form data. The server runs a controller method, re-renders the template, diffs the result, and updates the browser.
+The UI runs on the server. You write standard `html/template` markup and a Go controller; the browser sends ordinary form data. The server runs a controller method, re-renders the template, diffs the result, and updates the browser.
 
 The important constraint is also the useful part: start with HTML that works as a normal form POST, then opt into richer behavior only where the workflow needs it.
 
 ## One model, every surface
 
-This is the idea the rest of the page elaborates, so it's worth stating once up front.
-
-Every reactive thing LiveTemplate does is the same four-step pipeline:
+Every reactive thing here is the same four steps:
 
 ```
 state changes  →  re-render the template  →  diff against the last render  →  patch the browser
 ```
 
-A user clicking a button runs it. A second tab reacting to that click runs it. A *different user* seeing a live update runs it. The server pushing an update on its own — a timer, a job finishing — runs it. There is no separate "real-time engine," no client-side store, no merge logic to reconcile. The only things that differ between these cases are **when** the action is enqueued and **which** connections receive the resulting patch:
+A user clicking a button runs it. A second tab reacting to that click runs it. A *different user* seeing a live update runs it. The server pushing an update on its own — a timer, a job finishing — runs it. There's no separate real-time engine underneath: a second tab catching up and a background job pushing an update are the same pipeline, entered at a different point. What differs is **when** the action is enqueued and **which** connections receive the resulting patch:
 
 | What happened | When the action runs | Who gets the patch |
 |---|---|---|
@@ -60,7 +58,7 @@ func (c *CounterController) Increment(state CounterState, ctx *livetemplate.Cont
 }
 ```
 
-The method receives the current state and returns the next state. If it returns an error, the state is not committed and the error can be rendered back into the template.
+The method receives the current state and returns the next state. Return an error and the state does not commit; the template can render the error instead.
 
 ## Where state lives
 
@@ -88,7 +86,7 @@ That means templates remain the source of truth. The browser client is there to 
 
 Give repeated items a stable `data-key` and the diff can patch a row in place instead of removing and re-inserting it — see [Delete Row](/recipes/ui-patterns/lists/delete-row) for the shape.
 
-This holds for nested structures too. A `{{define}}` block may invoke **itself**, so file trees, comment threads, and nested navigation render as ordinary templates and stay inside the reactive tree — editing one leaf five levels down sends a patch addressing that leaf, not its whole branch. Depth is capped at 128 by default (`WithMaxTemplateDepth`, or `LVT_MAX_TEMPLATE_DEPTH`) so self-referential *data* surfaces an error instead of overflowing the stack. The [File Tree recipe](/recipes/apps/file-tree) is a worked example.
+This holds for nested structures too. A `{{define}}` block may invoke **itself**, so file trees, comment threads, and nested navigation render as ordinary templates and stay inside the reactive tree — editing one leaf five levels down sends a patch addressing that leaf, not its whole branch. The default depth cap is 128 (`WithMaxTemplateDepth`, or `LVT_MAX_TEMPLATE_DEPTH`) so self-referential *data* surfaces an error instead of overflowing the stack. The [File Tree recipe](/recipes/apps/file-tree) is a worked example.
 
 ## When to use lvt-* attributes
 
@@ -105,7 +103,7 @@ Server-owned loading is deliberately *not* on that list. `livetemplate.Async` ru
 
 ## When to use pub/sub
 
-Pub/sub is not needed for a single form updating a single tab. Add it when another connection needs to react to an action.
+You don't need pub/sub for a single form updating a single tab. Add it when another connection needs to react to an action.
 
 The smallest common case is same-user multi-tab sync:
 

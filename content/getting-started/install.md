@@ -5,7 +5,7 @@ description: "Add LiveTemplate to a Go project — one go get and you have what 
 
 # Install
 
-LiveTemplate is a Go framework. The minimum to get a reactive page running is one `go get`.
+One `go get` is the whole install. Everything below is optional.
 
 ## Add the framework
 
@@ -17,7 +17,7 @@ That's it for the server side. The TypeScript client wires up the browser side a
 
 ## Loading the browser client
 
-Add these to your template. The `lvtClientScriptURL` / `lvtClientStyleURL` functions are provided by the framework on every template:
+Add these to your template. The framework hands every template two functions, `lvtClientScriptURL` and `lvtClientStyleURL`:
 
 ```html
 <link rel="stylesheet" href="{{lvtClientStyleURL}}">

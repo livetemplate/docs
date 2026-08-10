@@ -9,7 +9,7 @@ source_path: "examples/patterns/templates/feedback/animations.tmpl"
 
 Add `lvt-fx:animate="fade|slide|scale"` to an element and it plays its entry effect
 exactly once, when it first appears in a render. A `data-key` identity plus an
-internal WeakSet guard keep existing rows still on later renders, so only the genuinely
+internal WeakSet guard keep existing rows still on later renders, so only the actually
 new element animates in. Tune the timing with the `--lvt-animate-duration` CSS variable
 (default 500ms).
 

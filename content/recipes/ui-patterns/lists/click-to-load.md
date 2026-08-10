@@ -5,7 +5,7 @@ source_repo: "https://github.com/livetemplate/docs"
 source_path: "examples/patterns/templates/lists/click-to-load.tmpl"
 ---
 
-# Click To Load
+# Click to Load
 
 Load More asks the server for the next page and appends it to the list. The handler
 bumps `CurrentPage`, fetches that page, and appends the new items; because every row
@@ -18,7 +18,7 @@ existing ones untouched. A `HasMore` flag hides the button at the end of the lis
 ## Template
 
 The button's `name="loadMore"` names the action; `{{if .HasMore}}` swaps it for an
-"End of list" note once the last page is loaded.
+"End of list" note once the last page loads.
 
 ```html include="/examples/patterns/templates/lists/click-to-load.tmpl"
 ```

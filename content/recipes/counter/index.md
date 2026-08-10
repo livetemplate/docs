@@ -38,7 +38,7 @@ LiveTemplate's `Authenticator` interface answers a single question on every HTTP
 - Different browser → different cookie → different group → isolated state
 - Incognito window → its own cookie → its own group → clean slate
 
-For a public docs site, that's the right shape. Every reader gets their own private counter on first visit, can prove peer fan-out within their own browser, and the demo can't be polluted by a stranger's clicks.
+For a public docs site, that's the right shape. Every reader gets their own private counter on first visit, can prove peer fan-out within their own browser, and a stranger's clicks can't pollute the demo.
 
 The alternative — a constant-group authenticator that puts every visitor in one shared group — is a demo-flavored shortcut. It makes a global ticker visible to all visitors, which is punchy on a marketing page but fails the "clean slate for thousands of users" test. We used it briefly during early development; the production switch to `AnonymousAuthenticator` was a one-line change with no other code impact:
 
@@ -88,8 +88,8 @@ Click `+1` on one. The other ticks too — same browser, same cookie, same group
 Worth pausing on what "session group" actually means in time.
 
 1. **First visit**: the browser has no cookie. `AnonymousAuthenticator.GetSessionGroup` issues a fresh group ID and sets it as a cookie. The connection joins that group.
-2. **Subsequent requests** (next tab, page refresh, WebSocket reconnect): the cookie is sent, the same group ID is returned, the connection joins the existing group.
-3. **Cookie cleared / different browser**: a new group ID is issued. Old state is unreachable from the new group.
+2. **Subsequent requests** (next tab, page refresh, WebSocket reconnect): the browser sends the cookie, the server hands back the same group ID, and the connection rejoins the existing group.
+3. **Cookie cleared / different browser**: you get a new group ID. The old state is unreachable from it.
 4. **Server restart**: cookies persist but in-memory session state is gone. New connections start fresh; the publish dispatch queue is empty until clients reconnect and trigger new actions.
 
 The group ID is the *only* thing tying a connection to its peers. Two browsers that somehow had the same cookie value would be in the same group. Two tabs from one browser are in the same group not because of the same TCP connection or anything similar — purely because of the shared cookie.
@@ -110,7 +110,7 @@ This recipe is a deliberately small slice. The scaling story behind it is real:
 
 ## What the wiring file actually does
 
-The full handler in `handler.go` is just the constructor expressed as a function. It exists because this recipe is mounted by the docs site's `cmd/site` aggregator — there's no standalone `main()`. In your own app you'd write a `main()` that does the same thing inline (`livetemplate.Must(...)` → `tmpl.Handle(...)` → `http.ListenAndServe`) and call it a day. Exposing it as a `Handler()` constructor is just so it can be mounted inside another binary's HTTP server.
+The full handler in `handler.go` is just the constructor expressed as a function. It exists because the docs site's `cmd/site` aggregator mounts this recipe — there's no standalone `main()`. In your own app you'd write a `main()` that does the same thing inline (`livetemplate.Must(...)` → `tmpl.Handle(...)` → `http.ListenAndServe`) and call it a day. Exposing it as a `Handler()` constructor is just so another binary's HTTP server can mount it.
 
 ```go include="/examples/counter/handler.go" lines="18-47"
 ```

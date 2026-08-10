@@ -5,13 +5,13 @@ source_repo: "https://github.com/livetemplate/docs"
 source_path: "content/recipes/apps/chat.md"
 ---
 
-# Building a Real-Time Chat App with LiveTemplate
+# Building a real-time chat app
 
-A complete tutorial for building a real-time chat application using LiveTemplate's simple kit. This demonstrates **automatic multi-tab syncing**, session management, and reactive UI updates with just **2 files**.
+A tutorial for building a real-time chat room on LiveTemplate's simple kit: multi-tab sync, session management and reactive UI updates, in two files.
 
-## What You'll Build
+## What you'll build
 
-- Real-time messaging with automatic tab syncing
+- Real-time messaging, synced across a browser's tabs
 - User login and presence tracking
 - Instant UI updates across all tabs in the same browser
 - Browser session isolation (each browser has its own chat room)
@@ -19,20 +19,20 @@ A complete tutorial for building a real-time chat application using LiveTemplate
 
 **All in just 2 files: `main.go` and `chat.tmpl`**
 
-## Quick Start
+## Quick start
 
 ```bash
 cd examples/chat
 GOWORK=off go run main.go
 ```
 
-Then open <http://localhost:8090> in **multiple browser tabs** to see automatic syncing in action:
-- Messages sent in one tab appear instantly in all other tabs
+Then open <http://localhost:8090> in **two or more browser tabs**:
+- A message sent in one tab shows up in the others
 - Each browser gets its own isolated chat session
 
-## Tutorial: Building from Scratch
+## Building it from scratch
 
-### Step 1: Create a New App
+### Step 1: create a new app
 
 Start by creating a new LiveTemplate application with the `simple` kit:
 
@@ -48,9 +48,10 @@ The `simple` kit generates a minimal structure:
 - `go.mod` - Go module configuration
 - `README.md` - Documentation
 
-No cmd/, internal/, or database directories. Perfect for focused applications!
+No `cmd/`, no `internal/`, no database. A larger app will grow some of those; a
+chat room this size doesn't need them.
 
-### Step 2: Define the Chat State
+### Step 2: define the chat state
 
 Open `main.go` and replace the counter example with chat state:
 
@@ -94,9 +95,9 @@ type User struct {
 
 - Single `ChatState` struct holds all app state
 - `sync.RWMutex` for thread-safe concurrent access
-- Simple Go structs - no database, no ORM, no complexity
+- Plain Go structs. No database and no ORM, because a room this size fits in memory
 
-### Step 3: Implement Actions
+### Step 3: implement actions
 
 Add the `Change` method to handle user actions:
 
@@ -171,10 +172,11 @@ func (s *ChatState) updateOnlineCount() {
 
 - Actions route via `<form name="join">` and `<form name="send">` (button/form `name` routing)
 - `ctx.GetString("field")` extracts form data
-- Just modify state - broadcasting happens automatically!
-- No manual WebSocket code needed
+- Mutating state is not enough on its own — `Subscribe` opts a connection in,
+  and `Publish` is what reaches the peers
+- You don't write WebSocket code, but you do write both of those
 
-### Step 4: Initialize and Run
+### Step 4: initialize and run
 
 Add initialization and main function:
 
@@ -213,7 +215,7 @@ func main() {
 }
 ```
 
-### Step 5: Create the UI
+### Step 5: create the UI
 
 Replace `chat.tmpl` with the chat interface. Key template concepts:
 
@@ -280,7 +282,7 @@ Replace `chat.tmpl` with the chat interface. Key template concepts:
 </script>
 ```
 
-### Step 6: Run and Test
+### Step 6: run and test
 
 ```bash
 go run main.go
@@ -293,8 +295,8 @@ Open <http://localhost:8090> in multiple browser tabs:
 - Open 2+ tabs in Chrome
 - Login with any username in tab 1
 - Send a message in tab 1
-- **It appears instantly in tab 2!** ✨
-- Try sending from tab 2 - appears in tab 1
+- It shows up in tab 2
+- Send from tab 2 and it shows up in tab 1
 
 **Test 2 - Different browsers (isolated sessions):**
 
@@ -303,9 +305,9 @@ Open <http://localhost:8090> in multiple browser tabs:
 - Messages in Chrome don't appear in Firefox
 - Each browser maintains separate state
 
-## How It Works
+## How it works
 
-### Automatic Session Syncing
+### How tabs stay in sync
 
 ```text
 Chrome Tab 1       Server (Go)        Chrome Tab 2
@@ -321,38 +323,31 @@ Chrome Tab 1       Server (Go)        Chrome Tab 2
     |                   |                     |
 ```
 
-**The magic:**
+What happens, in order:
 
-1. Each browser gets a unique session ID (stored in cookie)
-2. All tabs in the same browser share the session ID
-3. State changes automatically sync to all tabs in the same session
-4. Only changed HTML is sent (tree-diffing)
-5. Zero manual broadcasting code required!
+1. Each browser gets a session group ID in a cookie. Tabs in the same browser
+   share it.
+2. `Mount` subscribes the connection to `ctx.SelfTopic()` — the topic scoped to
+   that session group.
+3. `SendMessage` calls `ctx.Publish(ctx.SelfTopic(), "NewMessage", nil)`, which
+   runs `NewMessage` on the other subscribed tabs.
+4. Each tab re-renders, and the server sends only the parts that changed.
 
-### Why So Simple?
+Both halves are explicit. `main.go` has one `Subscribe` and three `Publish`
+calls, and they are the entire sync mechanism — nothing fans out on its own.
 
-**Traditional approach (what you DON'T need):**
+### What you don't write
 
-- ❌ Manual WebSocket management
-- ❌ Database setup
-- ❌ ORM configuration
-- ❌ Complex directory structure
-- ❌ Separate frontend/backend
-- ❌ API endpoints
-- ❌ State sync logic
+You don't manage the WebSocket, and there are no API endpoints to define. The
+server re-renders the template and sends the diff, so there's no client-side copy
+of the message list to keep in step.
 
-**LiveTemplate simple kit:**
+What you do write is all on this page: a state struct, four methods, and the
+`Subscribe`/`Publish` pair above.
 
-- ✅ Just modify Go structs
-- ✅ 2 files total
-- ✅ Auto-broadcasting
-- ✅ Auto-updates
-- ✅ Standard `html/template`
-- ✅ Standard `net/http`
+## Things to add
 
-## Customization Ideas
-
-### Add Persistence
+### Add persistence
 
 Store messages in a slice that survives restarts:
 
@@ -372,7 +367,7 @@ func (s *ChatState) Change(ctx *livetemplate.ActionContext) error {
 }
 ```
 
-### Add Typing Indicators
+### Add typing indicators
 
 ```go
 type ChatState struct {
@@ -390,7 +385,7 @@ case "typing":
     // Auto-broadcast!
 ```
 
-### Add Message Reactions
+### Add message reactions
 
 ```go
 type Message struct {
@@ -407,7 +402,7 @@ case "react":
     s.Messages[data.MessageID].Reactions[data.Emoji]++
 ```
 
-### Add Chat Rooms
+### Add chat rooms
 
 ```go
 type ChatState struct {
@@ -421,9 +416,9 @@ type Room struct {
 }
 ```
 
-## Production Considerations
+## Before production
 
-### 1. Load the Client Library from the CDN
+### 1. Load the client library from the CDN
 
 In `chat.tmpl` — the framework function renders the pinned CDN URL for the
 client this server release is wire-compatible with, so the two stay in
@@ -434,7 +429,7 @@ lockstep:
 <script defer src="{{lvtClientScriptURL}}"></script>
 ```
 
-### 2. Add Rate Limiting
+### 2. Add rate limiting
 
 ```go
 case "send":
@@ -444,7 +439,7 @@ case "send":
     // ... process message
 ```
 
-### 3. Add Message Limits
+### 3. Add message limits
 
 ```go
 if len(s.Messages) > 100 {
@@ -452,7 +447,7 @@ if len(s.Messages) > 100 {
 }
 ```
 
-### 4. Add Authentication
+### 4. Add authentication
 
 For production, use real auth instead of just username:
 
@@ -467,7 +462,7 @@ tmpl := livetemplate.New("chat",
 )
 ```
 
-### 5. Create a Global Chat Room (Cross-Browser)
+### 5. Create a global chat room (cross-browser)
 
 By default, each browser has its own isolated chat. To make all users share the same chat room:
 
@@ -490,37 +485,38 @@ tmpl := livetemplate.New("chat",
 )
 ```
 
-Now Chrome, Firefox, Safari all see the same messages!
+Now Chrome, Firefox and Safari share one room instead of getting one each.
 
-## Key Takeaways
+## What this recipe showed
 
-1. **Two files** - That's it! `main.go` + `chat.tmpl`
-2. **Zero boilerplate** - No cmd/, internal/, database/
-3. **Auto-syncing** - Tabs stay in sync automatically
-4. **Standard Go** - Uses `net/http` and `html/template`
-5. **Type-safe** - Go structs, no JSON marshaling needed
-6. **Efficient** - Tree-diffing sends only changes
+Two files: `main.go` and `chat.tmpl`. Messages are Go structs, so there's no JSON
+marshaling between the server and the template. Tabs stay in step through the
+`Subscribe`/`Publish` pair, and the server sends only the parts of the page that
+changed.
 
-## Comparison with Counter Example
+What it doesn't show is persistence. Messages live in a slice on the controller
+and are gone when the process restarts — see [Add Persistence](#add-persistence).
 
-The simple kit starts with a counter. Here's how we evolved it:
+## Compared with the counter example
 
-| Counter Example | Chat Example |
-|-----------------|--------------|
+The counter is the smaller version of the same shape:
+
+| Counter | Chat |
+|---|---|
 | `AppState{Counter int}` | `ChatState{Messages []Message}` |
 | `increment/decrement` actions | `join/send` actions |
 | Single user | Multi-user with broadcasting |
 | Simple int update | List of messages |
 
-Same pattern, different data!
+Same shape, different data.
 
-## Next Steps
+## Next
 
 - Try the `counter` example for a simpler starting point
 - Try the `todos` example for CRUD operations
 - Use `lvt new myapp --kit multi` for apps needing databases
 
-## Related Documentation
+## Related
 
 - [Server API reference](/reference/api)
 - [PubSub reference](/reference/pubsub) — the fan-out this app is built on

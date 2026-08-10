@@ -1,6 +1,6 @@
 ---
 title: "Login: form-based session auth"
-description: "Form-based session login without leaving the framework: an HTTP POST that sets an HttpOnly cookie via ctx.SetCookie, an OnConnect lifecycle hook that pushes a welcome message back via session.TriggerAction, and a symmetric POST-driven logout. All three pieces are framework-native — no custom middleware, no JS auth code, no escape hatches."
+description: "Form-based session login without leaving the framework: an HTTP POST that sets an HttpOnly cookie via ctx.SetCookie, an OnConnect lifecycle hook that pushes a welcome message back via session.TriggerAction, and a symmetric POST-driven logout. All three are framework-native, so there is no custom middleware to write and no auth code in the browser."
 source_repo: https://github.com/livetemplate/docs
 source_path: content/recipes/login/index.md
 ---
@@ -11,7 +11,7 @@ Most LiveTemplate code is reactive — actions arrive over a WebSocket, state mu
 
 This recipe shows the second path. A login form posts to the same handler that renders the dashboard. The controller's `Login` method validates the credentials, sets an HttpOnly cookie via `ctx.SetCookie`, and 303-redirects. When the browser follows the redirect and the WebSocket connects, an `OnConnect` lifecycle hook spawns a goroutine that pushes a welcome message back to the client via `session.TriggerAction`. Logout mirrors the login shape — a POST that deletes the cookie and redirects.
 
-Three pieces of the framework that are easy to miss until you need them: **cookies as first-class context primitives**, **forms that opt out of WebSocket interception** for the auth round-trip, and **server-initiated state updates** for everything after the page loads.
+Three pieces of the framework that are easy to miss until you need them: **setting a cookie from the action context**, **forms that opt out of WebSocket interception** for the auth round-trip, and **server-initiated state updates** for everything after the page loads.
 
 Try it in a new tab — any username; the password is `secret`. After the dashboard loads, watch for the welcome message: it's pushed from the server ~500ms after the WebSocket connects, no client poll involved.
 
@@ -35,13 +35,13 @@ The login form in the template opts out of WebSocket interception with `lvt-form
 ```go include="/examples/login/controller.go" region="login"
 ```
 
-Three framework primitives carry the auth weight here:
+Three pieces of the framework carry the auth weight here:
 
 - **`livetemplate.NewFieldError("field", err)`** — surfaces validation errors keyed to a form input. The template binds them via `{{.lvt.ErrorTag "username"}}` and `{{.lvt.AriaInvalid "username"}}` so the rendered form keeps the user's filled-in fields and decorates the bad one with `aria-invalid` plus an error message.
 
-- **`ctx.SetCookie(&http.Cookie{...})`** — first-class cookie API on the action context. The framework writes the `Set-Cookie` header on the redirect response, so the browser stores it before the WebSocket connects. `HttpOnly`, `SameSite=Strict`, and a 1-hour `MaxAge` are sensible defaults for a session token; production would also set `Secure: true` under HTTPS.
+- **`ctx.SetCookie(&http.Cookie{...})`** — sets a cookie straight from the action context. The framework writes the `Set-Cookie` header on the redirect response, so the browser stores it before the WebSocket connects. `HttpOnly`, `SameSite=Strict`, and a 1-hour `MaxAge` are sensible defaults for a session token; production would also set `Secure: true` under HTTPS.
 
-- **`ctx.Redirect("", http.StatusSeeOther)`** — the action returns its modified state *and* a redirect. POST-Redirect-GET: the framework writes the 303, the browser follows it, and the next GET renders the dashboard branch of the template against the new state. The empty target means **reload self**: the framework emits a relative reference and the *browser* resolves it against the un-stripped request URL, so the recipe works at `/apps/login/` or at the domain root without ever knowing its own prefix. That matters because `http.StripPrefix` removes the mount before the handler sees the URL — an absolute redirect would have to be threaded in from the mount site. Mount under a trailing-slash pattern (`/apps/login/`) for the relative form to resolve back to the app rather than its parent.
+- **`ctx.Redirect("", http.StatusSeeOther)`** — the action returns its modified state *and* a redirect. POST-Redirect-GET: the framework writes the 303, the browser follows it, and the next GET renders the dashboard branch of the template against the new state. The empty target means **reload self**: the framework emits a relative reference and the *browser* resolves it against the un-stripped request URL, so the recipe works at `/apps/login/` or at the domain root without ever knowing its own prefix. That matters because `http.StripPrefix` removes the mount before the handler sees the URL — an absolute redirect would mean threading the URL in from the mount site. Mount under a trailing-slash pattern (`/apps/login/`) for the relative form to resolve back to the app rather than its parent.
 
 The flash message API works the same way it does for non-auth flows — `ctx.SetFlash("error", "Invalid credentials")` stashes the message in a cookie, and the next render reads it via `{{.lvt.FlashTag "error"}}`.
 
@@ -87,9 +87,9 @@ Three things a production auth flow needs that this recipe deliberately doesn't 
 
 - **Server-side session validation on every request.** The session cookie here is opaque, but its contents are advisory — nothing verifies on the next request that `session_<username>_<timestamp>` corresponds to a real prior login. A real implementation would use the cookie as a key into a session store (Redis, SQLite, Postgres) and reject requests whose tokens don't match.
 - **Password hashing.** The demo accepts any username with the hardcoded password `secret`. A real implementation would store bcrypt/argon2 hashes and compare via `subtle.ConstantTimeCompare`.
-- **Authenticator integration.** This recipe runs without an `Authenticator` — every browser gets a fresh session group by default. A real app would implement `Authenticator` and have its `Authenticate` method consult the session store, so `ctx.UserID()` is populated for every action.
+- **Authenticator integration.** This recipe runs without an `Authenticator` — every browser gets a fresh session group by default. A real app would implement `Authenticator` and have its `Authenticate` method consult the session store, so `ctx.UserID()` has a value on every action.
 
-The framework primitives shown here — cookies, no-intercept forms, `OnConnect`, `TriggerAction` — compose cleanly with all three additions. The auth *shape* doesn't change as you harden it; the implementations of the cookie validator, password compare, and `Authenticate` method swap in.
+The four pieces shown here — cookies, no-intercept forms, `OnConnect`, `TriggerAction` — all survive those additions. The auth *shape* doesn't change as you harden it; the implementations of the cookie validator, password compare, and `Authenticate` method swap in.
 
 For a header-driven alternative that does have an `Authenticator`, see the [Shared notepad recipe](../shared-notepad/) — BasicAuth instead of form login, with `ctx.UserID()` driving per-user state isolation.
 

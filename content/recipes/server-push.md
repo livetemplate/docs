@@ -69,7 +69,7 @@ it independent of [Pubsub](/recipes/pubsub): pubsub is "an action fans out to
 `TriggerAction` targets **one** session group. When a single background event
 must refresh **many** sessions — every viewer of a shared dashboard, every tab of
 every user — don't keep a registry of `Session` handles and loop over it. Two
-primitives compose into a registry-free fan-out:
+calls give you a fan-out with no registry at all:
 
 1. Every connection **joins a shared topic in `Mount`** with `ctx.Subscribe(topic)`
    (reconnect-durable, because `Mount` re-runs on reconnect).
@@ -98,7 +98,7 @@ for the full pattern and the per-user vs shared-group distinction.
 | A user action should also update peer tabs after it succeeds | [Pubsub](/recipes/pubsub) — `Subscribe` / `Publish` |
 | The current connection should update from its own action | Return the new state from the action |
 
-## What's next
+## What next?
 
 - [Server Push pattern](/recipes/ui-patterns/realtime/server-push) — a live demo:
   a background goroutine calling `TriggerAction` once per second.

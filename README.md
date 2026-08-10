@@ -16,7 +16,15 @@ Most reference content is mirrored from canonical files in the source repos:
 | Recipes (markdown) | this repo, under `content/recipes/` | Authored directly here |
 | Runnable apps + their tests | this repo, under `examples/<slug>/` | Authored directly here |
 
-The source-of-truth matrix lives at `content/_meta/source-of-truth.md`.
+The source-of-truth matrix lives at `content/_meta/source-of-truth.md`, and
+`content/_meta/source-of-truth.yaml` is the machine-readable version the sync
+reads. Where the two disagree, the YAML wins.
+
+## Writing
+
+`VOICE.md` is how the prose here is written — the register, the vocabulary to
+avoid, and why. Read it before editing anything under `content/`.
+`scripts/voice-check.sh` checks the parts of it that can be checked.
 
 Every runnable demo cited by a recipe lives at `examples/<slug>/` —
 one folder per app, containing the Go package, template, chromedp

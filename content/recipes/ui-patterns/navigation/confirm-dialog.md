@@ -40,7 +40,7 @@ tolerated no-op so client and server lists reconcile silently.
 
 - A destructive, irreversible action (delete, archive) that warrants an explicit
   "are you sure?" step.
-- You need confirmations under a strict CSP where inline `onclick` handlers are banned.
+- You need confirmations under a strict CSP that bans inline `onclick` handlers.
 - Each row needs its own confirmation that can even be deep-linked by hash.
 
 Reach for [Modal Dialog](/recipes/ui-patterns/navigation/modal-dialog) when the

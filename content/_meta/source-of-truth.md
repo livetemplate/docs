@@ -32,7 +32,7 @@ It is consumed by humans deciding where to edit content, and (Phase 3 onwards) b
 | `*/CLAUDE.md` files | NEVER mirrored | They're agent instructions, not user docs |
 | `docs/proposals/`, `docs/plans/`, `docs/archive/`, `design/`, `WORKFLOWS.md`, `ROADMAP.md`, `AGENT_*.md` | NEVER mirrored | Internal RFCs / planning / agent setup |
 | `docs/performance/` | NOT mirrored in v1 | May graduate to public if stabilized |
-| `examples/<app>/README.md` | All mirrored under `/recipes/apps/<app>` | These are user-facing showcases |
+| `examples/<app>/README.md` | NOT mirrored | The `/recipes/apps/<app>` pages are docs-native (see App Recipes below); the READMEs serve the example directory |
 | `examples/patterns/<...>` | NOT mirrored | Served live via reverse proxy at `/recipes/ui-patterns/*` (Phase 1 PR-D) |
 | `*/CONTRIBUTING.md` | All mirrored under `/contributing/<repo>` | Centralizes contributor onboarding |
 | Per-repo `README.md` | Mirrored conditionally; some split (see below) | The four repos each have a different role |
@@ -114,22 +114,23 @@ Order: getting-started -> guides -> reference -> CLI -> client -> recipes -> con
 |---|---|---|---|---|
 | Recipes (8–10 of them) | this repo | `content/recipes/*.md` | `/recipes/<slug>` | recipe (Phase 5 authors directly) |
 
-### App Recipes (mirrored from examples)
+### App Recipes (docs-native)
+
+App recipes used to be mirrored from `livetemplate/examples`. They aren't any
+more. After the consolidation, the pages at `content/recipes/apps/<slug>.md` are
+authored here and this repo is their source of truth; the runnable apps live at
+`examples/<slug>/` and are mounted by `cmd/site`.
+
+The rows below said `Mirror? yes` until 2026-08-09. They were wrong, and the
+mistake was expensive: those ten pages were ported once from the example READMEs
+and then cut loose, so they still carry the README register — Title Case
+headings, emoji, exclamation marks — while the rest of the site moved on. See
+`VOICE.md`.
 
 | Concept | Source repo | Source path | Site URL | Mirror? |
 |---|---|---|---|---|
-| App recipes index | `examples` | `README.md` | `/recipes/apps/` | yes |
-| counter | `examples` | `counter/README.md` | `/recipes/apps/counter` | yes |
-| todos | `examples` | `todos/README.md` | `/recipes/apps/todos` | yes |
-| chat | `examples` | `chat/README.md` | `/recipes/apps/chat` | yes |
-| avatar-upload | `examples` | `avatar-upload/README.md` | `/recipes/apps/avatar-upload` | yes |
-| flash-messages | `examples` | `flash-messages/README.md` | `/recipes/apps/flash-messages` | yes |
-| login | `examples` | `login/README.md` (when present) | `/recipes/apps/login` | yes |
-| dialog-patterns | `examples` | `dialog-patterns/README.md` (when present) | `/recipes/apps/dialog-patterns` | yes |
-| live-preview | `examples` | `live-preview/README.md` (when present) | `/recipes/apps/live-preview` | yes |
-| progressive-enhancement | `examples` | `progressive-enhancement/README.md` | `/recipes/apps/progressive-enhancement` | yes |
-| shared-notepad | `examples` | `shared-notepad/README.md` (when present) | `/recipes/apps/shared-notepad` | yes |
-| ws-disabled | `examples` | `ws-disabled/README.md` | `/recipes/apps/ws-disabled` | yes |
+| App recipes index | this repo | `content/recipes/apps/index.md` | `/recipes/apps/` | no |
+| counter, todos, chat, avatar-upload, flash-messages, login, progressive-enhancement, shared-notepad, ws-disabled, file-tree, seat-picker, upload-modes | this repo | `content/recipes/apps/<slug>.md` | `/recipes/apps/<slug>` | no |
 
 ### Contributing (mirror, per-repo)
 
@@ -187,10 +188,10 @@ These don't currently exist anywhere and must be written from scratch — likely
 
 ---
 
-## Literate primitives in mirrored content
+## Literate blocks in mirrored content
 
 Mirrored upstream READMEs may use tinkerdown's literate authoring
-primitives (since tinkerdown v0.2.0). The sync tool passes them through
+blocks (since tinkerdown v0.2.0). The sync tool passes them through
 byte-for-byte and mirrors a single adjacency convention so they resolve
 correctly post-sync.
 

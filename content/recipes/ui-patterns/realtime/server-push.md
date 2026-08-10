@@ -9,7 +9,7 @@ source_path: "examples/patterns/templates/realtime/server-push.tmpl"
 
 Drive the UI from the server with no client-side polling. `StartTimer` spawns a
 background goroutine that calls `session.TriggerAction(name, data)` once per second,
-firing an action on the originating connection so the re-rendered tree is pushed to
+firing an action on the originating connection so the server pushes the re-rendered tree to
 the browser. `TriggerAction` returns an error when the session group has no live
 connections — checking it each tick is the documented cancellation pattern, so the
 goroutine exits cleanly if the user closes the tab.

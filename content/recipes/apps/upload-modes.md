@@ -24,9 +24,9 @@ source is
 | **Proxied** | browser → server → storage (streamed) | yes | **no** |
 | **Preview** | stays on the device | metadata only | no |
 
-When `Mode` is omitted it defaults to **Volume** (server-side staging). For
+Leave `Mode` out and it defaults to **Volume** (server-side staging). For
 backward compatibility, a config that sets `External` without an explicit
-`Mode` is treated as **Direct**.
+LiveTemplate treats `Mode` as **Direct**.
 
 ## One declaration per mode
 
@@ -65,7 +65,7 @@ recipe's mode. Use it when the server needs to see and keep the bytes.
 With an `External` presigner, the browser PUTs bytes straight to S3/GCS/etc.
 via a presigned URL — they never touch the server. Read the stored reference
 from `entry.ExternalRef`. To keep the example self-contained, its presigner
-points at the server's own `/sink` route, so no real cloud is needed.
+points at the server's own `/sink` route, so it needs no real cloud.
 
 ## Proxied — stream through the server, zero local disk
 
@@ -96,7 +96,7 @@ markup carries both:
 </form>
 ```
 
-1. **The field is marked `lvt-upload-with`.** Since `@livetemplate/client`
+1. **The field carries `lvt-upload-with`.** Since `@livetemplate/client`
    v0.19.1 nothing from the enclosing form travels with an upload unless it is
    marked. The old behaviour serialized every co-located field — CSRF tokens,
    hidden secrets — to the upload endpoint, and a Proxied upload auto-fires on

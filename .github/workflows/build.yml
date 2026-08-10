@@ -30,6 +30,17 @@ jobs:
       - name: Validate content
         run: tinkerdown validate content/
 
+      # The voice ratchet (VOICE.md, scripts/voice-check.sh). Ceilings are the
+      # counts on the day each was last tightened, so this fails when a tell
+      # goes UP. It is scoped to docs-native pages — mirrored ones are owned by
+      # their source repo and would fail the wrong PR.
+      #
+      # It cannot tell whether a page reads well, only whether it regressed in
+      # the ways that are countable. The landing copy was rewritten four times
+      # before this existed; that is what it is here to stop.
+      - name: Voice check
+        run: ./scripts/voice-check.sh
+
       - name: Test sync tool
         working-directory: cmd/sync
         run: go test ./... -count=1

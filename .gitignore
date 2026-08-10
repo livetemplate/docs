@@ -28,3 +28,4 @@ cmd/site/site
 examples/avatar-upload/uploads/*
 !examples/avatar-upload/uploads/.gitkeep
 examples/avatar-upload/.uploads/
+.prereview/

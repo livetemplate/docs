@@ -7,9 +7,9 @@ source_path: "content/recipes/apps/index.md"
 
 # App Recipes
 
-Runnable application recipes demonstrating LiveTemplate usage with various features and patterns. Each page documents an app under [`examples/`](https://github.com/livetemplate/docs/tree/main/examples) in this repository — the apps and these pages are edited together, so a change to one is reviewed alongside the other.
+Runnable application recipes demonstrating LiveTemplate usage with various features and patterns. Each page documents an app under [`examples/`](https://github.com/livetemplate/docs/tree/main/examples) in this repository — you edit the app and its page together, so a change to one turns up in review beside the other.
 
-## Showcase: Todo App
+## Showcase: the todo app
 
 The todo app demonstrates LiveTemplate's core features in ~150 lines of Go + ~80 lines of HTML:
 
@@ -21,11 +21,11 @@ The todo app demonstrates LiveTemplate's core features in ~150 lines of Go + ~80
 - **Entry animations** — `lvt-fx:animate="fade"` on new rows
 - **Loading states** — `lvt-el:setAttr:on:add:pending="aria-busy:true"` for visual feedback
 - **Dark mode** — automatic via `<meta name="color-scheme" content="light dark">`
-- **Progressive enhancement** — standard form actions use HTTP POST fallback; live search/sort and other reactive interactions are enhanced by JavaScript
+- **Progressive enhancement** — standard form actions use HTTP POST fallback; JavaScript enhances live search, sort and the other reactive bits
 
-## Progressive Complexity
+## Progressive complexity
 
-All examples follow the [progressive complexity](https://github.com/livetemplate/livetemplate/blob/main/docs/guides/progressive-complexity.md) model. Tier 1 (standard HTML) is preferred; Tier 2 (`lvt-*` attributes) is used only when necessary.
+All examples follow the [progressive complexity](https://github.com/livetemplate/livetemplate/blob/main/docs/guides/progressive-complexity.md) model. Prefer Tier 1 (standard HTML); reach for Tier 2 (`lvt-*` attributes) only when HTML cannot express the interaction.
 
 | Example | Tier | Description | Tier 2 Attributes |
 |---------|------|-------------|--------------------|
@@ -45,11 +45,11 @@ All examples follow the [progressive complexity](https://github.com/livetemplate
 | `shared-notepad/` | 1+2 | BasicAuth + SharedState | `lvt-form:preserve` |
 | `dialog-patterns/` | 1 | Native `<dialog>` with `command`/`commandfor` | None (polyfilled by client) |
 
-## App Recipes
+## The recipes
 
 The directories listed in the table above are individual app recipes. Each folder contains a minimal, self-contained project that demonstrates a specific LiveTemplate pattern or feature.
 
-## Running App Recipes
+## Running them
 
 Each example is self-contained with its own `go.mod`. To run an example:
 
@@ -59,9 +59,9 @@ go mod download
 go run main.go
 ```
 
-## Testing App Recipes
+## Testing them
 
-### Test All App Recipes
+### Test all of them
 
 Run all working examples at once:
 
@@ -74,7 +74,7 @@ This script will:
 - Skip disabled examples by default (use without `--skip-disabled` to attempt them)
 - Show a summary of passed/failed/skipped tests
 
-### Test Individual App Recipe
+### Test one
 
 App recipes include E2E tests using Chromedp:
 
@@ -87,7 +87,7 @@ go test -v
 
 The test script is also used in GitHub Actions. See `.github/workflows/test.yml` for CI configuration.
 
-## Using the Client Library
+## Using the client library
 
 ### Production (CDN)
 
@@ -100,7 +100,7 @@ with — pinned, never `@latest`:
 <script defer src="{{lvtClientScriptURL}}"></script>
 ```
 
-### Development (Local)
+### Development (local)
 
 For local development, examples can serve the client library locally using `github.com/livetemplate/lvt/testing`.
 
@@ -110,13 +110,13 @@ For local development, examples can serve the client library locally using `gith
 - **LVT Testing** (for examples with E2E tests): `github.com/livetemplate/lvt`
 - **Client Library**: `@livetemplate/client`, pinned to `livetemplate.ClientVersion` and served via CDN by `{{lvtClientScriptURL}}`
 
-## Related Projects
+## Related projects
 
 - **[LiveTemplate Core](https://github.com/livetemplate/livetemplate)** - Go library for server-side rendering
 - **[Client Library](https://github.com/livetemplate/client)** - TypeScript client for browsers
 - **[LVT CLI](https://github.com/livetemplate/lvt)** - Code generator and development server
 
-## Version Synchronization
+## Version synchronization
 
 App recipes follow the LiveTemplate core library's major.minor version:
 - Core: `v0.1.5` -> app recipes: `v0.1.x` (any patch version)

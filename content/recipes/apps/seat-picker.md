@@ -42,8 +42,9 @@ code driving it.
 ```
 
 That is it. A seat is a `<button name="selectSeat">`; its id rides along as
-the button's `value`, read on the server with `ctx.GetString("value")`. No
-`hx-*`, no `x-*`, no `phx-*`, no client code.
+the button's `value`, read on the server with `ctx.GetString("value")`. Where
+htmx would want `hx-*` and Alpine `x-*`, there is nothing — and no client code
+of your own either.
 
 ## Why it's more than the chat recipe
 
@@ -87,7 +88,7 @@ func (c *Controller) SelectSeat(state State, ctx *livetemplate.Context) (State, 
 
 Both the clicking user and every peer end up running the same
 `project`-and-diff path — the [one model, every surface](/getting-started/mental-model#one-model-every-surface)
-pipeline. The publishing connection is excluded from its own fan-out, which
+pipeline. A publish skips the connection that called it, which
 is why `SelectSeat` re-projects its own state *and* publishes.
 
 ## Ownership is your session, not your name
@@ -109,7 +110,7 @@ two owners; the shared topic carries the broadcast between them.
 held or booked by anyone other than you cannot be re-held. A race between
 two users resolves server-side — one wins, the other is told the seat was
 just taken — with no client-side locking or merge logic. Holds expire
-lazily: an abandoned seat is reclaimed the next time anyone touches the
+lazily: the next person to touch the grid reclaims an abandoned seat from
 event.
 
 ## Run it

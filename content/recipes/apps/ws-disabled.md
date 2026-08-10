@@ -5,23 +5,23 @@ source_repo: "https://github.com/livetemplate/docs"
 source_path: "content/recipes/apps/ws-disabled.md"
 ---
 
-# WebSocket Disabled App Recipe
+# WebSocket Disabled
 
 This app recipe demonstrates LiveTemplate's `WithWebSocketDisabled()` mode. The client library is still included and handles all interactions — but uses HTTP fetch instead of WebSocket to send actions and receive tree-based DOM updates.
 
-## When to Use This Mode
+## When to use this mode
 
 - **Constrained environments**: Firewalls, proxies, or platforms that block WebSocket connections
 - **Simpler deployment**: No need for WebSocket-aware load balancers or reverse proxies
 - **API backends**: Serve tree-based JSON updates to htmx, Alpine.js, or custom JS clients
 
-## How It Works
+## How it works
 
-### Client Library Still Active
+### The client library is still there
 
-The LiveTemplate client library is included and works the same as in WebSocket mode:
+The page still loads the client library, and it behaves the same as in WebSocket mode:
 - Standard HTML forms with `<button name="action">` and `<form name="action">` work identically
-- DOM updates are applied via tree diffing — no page reloads
+- The client patches the DOM by tree diffing — no page reloads
 - The only difference is transport: HTTP fetch instead of WebSocket
 
 ### Detection
@@ -30,7 +30,7 @@ The client detects WebSocket availability by checking the `X-LiveTemplate-WebSoc
 - `enabled` — client connects via WebSocket (default)
 - `disabled` — client falls back to HTTP fetch
 
-### Progressive Enhancement
+### Progressive enhancement
 
 Forms use `method="POST"` with button `name` routing, so the app still works without JavaScript via the POST-Redirect-GET pattern.
 

@@ -139,7 +139,7 @@ func main() {
 <section id="inside" class="intro">
   <div class="eyebrow">What's going on</div>
   <h2>The parts of that worth a second look.</h2>
-  <p class="lead">Every section below points at lines you have just read — except the pending state, which the wall has no slow work to demonstrate, and which says so. Each one also runs here as its own app, so you can check the claim rather than take it.</p>
+  <p class="lead">Every section below points at lines you have just read — except the pending state, which the wall has no slow work to demonstrate, and which says so. Each one also runs here as its own app, so you can try it.</p>
 </section>
 
 <section id="actions" class="step">
@@ -311,7 +311,7 @@ func main() {
   <div class="snip">
     <div class="snip-label">app.go · the server can start the same cycle</div>
 <pre class="language-go"><code class="language-go">sess.TriggerAction("ServerRefresh", nil)</code></pre>
-    <p class="note">You already read the <code>WithTopicACL</code> in <code>main</code> that admits <code>"wall"</code> — developer topics are deny-all until one is named. This is the same publish path with no user action behind it: the "the server said hi at …" line in the cards above, pushed on a timer.</p>
+    <p class="note">You already read the <code>WithTopicACL</code> in <code>main</code> that admits <code>"wall"</code> — developer topics are deny-all until you name one. This is the same publish path with no user action behind it: the "the server said hi at …" line in the cards above, pushed on a timer.</p>
   </div>
 
 </section>
@@ -337,7 +337,7 @@ func main() {
 <section id="more" class="step">
   <div class="eyebrow">Everything else</div>
   <h2>Other things in here.</h2>
-  <p class="lead">This is aimed at what Go teams actually ship: admin screens, internal tools, CRUD, dashboards, approvals, uploads, auth, and the occasional shared view.</p>
+  <p class="lead">It targets what Go teams actually ship: admin screens, internal tools, CRUD, dashboards, approvals, uploads, auth, and the occasional shared view.</p>
   <div class="links">
     <a href="/reference/uploads"><span class="link-t">File uploads</span><span class="link-g">live progress, same app</span></a>
     <a href="/reference/pubsub"><span class="link-t">Shared views</span><span class="link-g">Subscribe &amp; Publish</span></a>
@@ -359,7 +359,7 @@ func main() {
       <a class="btn btn-primary" href="/getting-started/install">Get started →</a>
       <a class="btn btn-ghost" href="/recipes/">Browse recipes</a>
     </div>
-    <p class="note">This is alpha: the core works and is tested, but the API may still change before v1.0.</p>
+    <p class="note">This is alpha: the core works and has tests, but the API may still change before v1.0.</p>
   </div>
   <img class="gopher" src="/assets/gopher-front.svg" alt="The Go gopher" width="132">
 </section>

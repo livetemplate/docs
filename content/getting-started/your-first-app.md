@@ -7,7 +7,10 @@ source_path: content/getting-started/your-first-app.md
 
 # Your First App
 
-You're going to build a counter. The plain version takes about 5 minutes. The fully reactive multi-tab version takes another 5. By the end you'll have seen every layer of the LiveTemplate model — and you'll have been clicking the same widget you wrote, embedded right in this page.
+Build a counter. The plain version takes about five minutes, the multi-tab
+version another five.
+
+The widget you end up with is already running further down this page. Click it.
 
 > Prerequisite: Go 1.22 or later, and you've already run [`go get github.com/livetemplate/livetemplate`](/getting-started/install) in some directory.
 
@@ -19,7 +22,7 @@ go mod init counter
 go get github.com/livetemplate/livetemplate
 ```
 
-You'll have a `go.mod` and an empty directory. We'll add three files: `counter.go` (state and handlers), `main.go` (wiring), and `counter.tmpl` (the template).
+You'll have a `go.mod` and an empty directory. Three files go in it: `counter.go` (state and handlers), `main.go` (wiring), and `counter.tmpl` (the template).
 
 ## Step 2 — Define the state and handlers
 
@@ -35,7 +38,7 @@ Then a controller and two action methods:
 ```go include="/examples/counter-basic/counter.go" lines="14-31"
 ```
 
-Action methods are exported on the controller, and their names ARE the action names — `Increment` and `Decrement` are what the template will reference. That's the whole app for now; we'll add multi-tab sync in Step 6 by extending this same file.
+Action methods are exported on the controller, and their names ARE the action names — `Increment` and `Decrement` are what the template will reference. That's the whole app for now. Step 6 adds multi-tab sync by extending this same file.
 
 Now wire it up in `main.go`:
 
@@ -74,7 +77,7 @@ Create `counter.tmpl`:
 
 The `<button name="increment">` attribute is the routing trigger — clicking that button posts the form and the framework calls `Increment()` on the controller.
 
-The two `<link>` and `<script>` tags in `<head>` load the LiveTemplate JS client; we'll see what they do at Step 5.
+The two `<link>` and `<script>` tags in `<head>` load the LiveTemplate JS client. Step 5 covers what they do.
 
 ## Step 4 — Run it
 
@@ -134,10 +137,10 @@ Click `+1` in one — watch the other update in real time. They're talking to th
 You wrote a counter that:
 
 - works without JavaScript (Tier 1)
-- patches the DOM in place when the JS client is loaded
+- patches the DOM in place once the JS client loads
 - syncs across browser tabs and embedded widgets in real time
 
-…in about 50 lines of Go and HTML, with no build step, no client-side framework, no custom template language. The two embeds above? They're the same code rendered live. Every click you've done has gone through your handler, published to peer tabs via `ctx.Publish`, and patched the DOM.
+…in about 50 lines of Go and HTML. No build step, and the template language is the one in the standard library. The two embeds above? They're the same code rendered live. Every click you've done has gone through your handler, published to peer tabs via `ctx.Publish`, and patched the DOM.
 
 ## What next?
 

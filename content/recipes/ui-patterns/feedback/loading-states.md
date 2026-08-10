@@ -63,6 +63,6 @@ state has to do any of that, move it to the server:
 
 The landing page's Step 4 demos the `Async` + `{{.lvt.Pending}}` version. The
 [`greet-loading-server`](/apps/greet-loading-server/) example keeps the manual
-two-action shape, which is still what you want when the spinner has to be recovered
+two-action shape, which is still what you want when the spinner has to come back
 after a reconnect — that requires a real state field, because `{{.lvt.Pending}}` is
 per-render and is false on any render that did not itself start the work.

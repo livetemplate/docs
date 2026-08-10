@@ -52,7 +52,7 @@ sources:
 Two things to notice:
 
 - **Cache TTL of 1 hour.** GitHub's unauthenticated rate limit is 60 requests/hour from a given IP. Without caching, every page view would hit the API directly. The 1h cache means even at hundreds of visits per hour, the API is only called once per hour per docs-site machine.
-- **No authentication.** `releases` is a public endpoint, so no `headers:` block is needed. For private endpoints (a private repo, an internal API behind a token), tinkerdown's `headers:` block supports `${ENV_VAR}` expansion so secrets never live in the YAML.
+- **No authentication.** `releases` is a public endpoint, so it needs no `headers:` block. For private endpoints (a private repo, an internal API behind a token), tinkerdown's `headers:` block supports `${ENV_VAR}` expansion so secrets never live in the YAML.
 
 ## Adding more REST sources
 
