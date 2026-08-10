@@ -87,7 +87,19 @@ concession and understatement have to carry the voice on their own — there's n
 `I` to lean on. Where a blog post would say "too costly for me", a page here says
 "that cost is the thing this avoids".
 
-## Two things that are not drift
+## Four things that are not drift
+
+**Emoji in a comparison table.** ✅ / ⚠️ / ❌ down a column are scan markers doing
+real work — see the "does this scale?" matrix in `recipes/counter/index.md`. The
+checker skips table rows for that reason. In prose they're decoration, and the
+checker still counts them there.
+
+**Title Case in an H1.** The H1 carries the page *name*, and it must be either
+the front-matter `title:` verbatim or `Title — a sentence-case clause`. It feeds
+the nav and breadcrumbs that `docs_ia_test.go` and `breadcrumb_test.go` assert
+on, so downcasing it is a rename, not a copy edit — `breadcrumb_test.go` caught
+exactly that during this pass. Rename a page deliberately or not at all. H2–H6
+are prose and are sentence case.
 
 **`reach for`** appears on 24 pages and is now house idiom, not a slip. Thin it
 where the choosing isn't the point. It's deliberately not in the checker.

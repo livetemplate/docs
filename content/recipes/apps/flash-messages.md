@@ -5,7 +5,7 @@ source_repo: "https://github.com/livetemplate/docs"
 source_path: "content/recipes/apps/flash-messages.md"
 ---
 
-# Flash Messages App Recipe
+# Flash Messages
 
 This app recipe demonstrates flash messages in LiveTemplate - page-level notifications that show once and clear after each action.
 
@@ -18,7 +18,7 @@ go run .
 
 Then open http://localhost:8080
 
-## Flash Message Types
+## The types
 
 | Type | Use Case | Style |
 |------|----------|-------|
@@ -27,7 +27,7 @@ Then open http://localhost:8080
 | `warning` | Caution/duplicate | Yellow |
 | `info` | Informational | Blue |
 
-## Setting Flash Messages (Controller)
+## Setting one (controller)
 
 ```go
 func (c *Controller) MyAction(state State, ctx *livetemplate.Context) (State, error) {
@@ -47,7 +47,7 @@ func (c *Controller) MyAction(state State, ctx *livetemplate.Context) (State, er
 }
 ```
 
-## Reading Flash Messages (Template)
+## Reading one (template)
 
 ```html
 <!-- Check if any flash exists -->
@@ -67,7 +67,7 @@ func (c *Controller) MyAction(state State, ctx *livetemplate.Context) (State, er
 {{end}}
 ```
 
-## Flash vs Field Errors
+## Flash vs field errors
 
 | Aspect | Flash Messages | Field Errors |
 |--------|----------------|--------------|
@@ -77,14 +77,14 @@ func (c *Controller) MyAction(state State, ctx *livetemplate.Context) (State, er
 | **Lifecycle** | Cleared after render | Cleared on next action |
 | **Example** | "Changes saved!" | "Email is required" |
 
-## Key Behaviors
+## How they behave
 
-1. **Show Once**: Flash messages are cleared after each action response
+1. **Shown once**: LiveTemplate clears the flash after each action response
 2. **Per-Connection**: Not shared across browser tabs
 3. **No Persistence**: Don't survive page refresh or WebSocket reconnects
 4. **Don't Block Success**: Unlike field errors, flash messages don't set `Success: false`
 
-## Available Template Helpers
+## Template helpers
 
 | Helper | Description |
 |--------|-------------|

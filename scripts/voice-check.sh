@@ -12,19 +12,24 @@
 set -uo pipefail
 cd "$(dirname "$0")/.."
 
-MAX_EMOJI=5              # was 19 before the Phase 1 rewrites. target 0
-MAX_EXCLAMATION=6        # was 11. target 0 — the rest are in recipes/apps/
-MAX_TITLECASE_HEADING=41 # was 43. target 0 — 36 of these are in recipes/apps/
-MAX_PRODUCT_SUBJECT=2    # was 3. target 0
-MAX_ROYAL_WE=1           # was 3, all in getting-started/your-first-app.md. target 0
-MAX_META_COMMENTARY=1    # was 3. target 0
-MAX_CLAUDISM=14          # target 0
+MAX_EMOJI=0              # 19 -> 0
+MAX_TITLECASE_HEADING=0  # 43 -> 0
+MAX_EXCLAMATION=3        # 11 -> 3. The 3 left are quoted UI copy ("Changes saved!")
+MAX_PRODUCT_SUBJECT=2    # 3 -> 2. target 0
+MAX_ROYAL_WE=1           # 3 -> 1. target 0
+MAX_META_COMMENTARY=1    # 3 -> 1. target 0
+MAX_CLAUDISM=14          # target 0 — Phase 2b
 MAX_TRIADIC_NEGATION=5   # target 1 (the install page's list is genuine)
 MAX_HYPE=1               # target 0 — "seamless scrolling"
-MAX_PASSIVE=114          # target 35 — the largest bucket, and the slowest to move
+MAX_PASSIVE=83           # 114 -> 83. target ~35; the rest live in ui-patterns/
 
 # Blank fenced code while preserving line numbers, so counts are prose-only.
 strip() { awk '/^```/{c=!c; print ""; next} c{print ""; next} {print}' "$1"; }
+
+# Same, but also blanks table rows. Used only for the emoji count: ✅/⚠️/❌ in a
+# comparison matrix are scan markers doing real work (see the "does this scale?"
+# table in recipes/counter/index.md), not decoration. In prose they are.
+strip_tables() { strip "$1" | awk '/^[[:space:]]*\|/{print ""; next} {print}'; }
 
 native() {
   local f r
@@ -37,11 +42,11 @@ native() {
 FILES=$(native)
 fail=0
 
-count() { # count <label> <max> <regex> [grep-flag, default -oE]
-  local label=$1 max=$2 re=$3 flag=${4:--oE}
+count() { # count <label> <max> <regex> [grep-flag=-oE] [stripper=strip]
+  local label=$1 max=$2 re=$3 flag=${4:--oE} pre=${5:-strip}
   local n=0 f hits
   while IFS= read -r f; do
-    hits=$(strip "$f" | grep "$flag" "$re" 2>/dev/null | wc -l)
+    hits=$($pre "$f" | grep "$flag" "$re" 2>/dev/null | wc -l)
     n=$((n + hits))
   done <<< "$FILES"
   if [ "$n" -gt "$max" ]; then
@@ -56,7 +61,7 @@ count() { # count <label> <max> <regex> [grep-flag, default -oE]
 
 echo "voice-check: $(echo "$FILES" | wc -l) docs-native pages"
 
-count emoji            "$MAX_EMOJI"             '[\x{2705}\x{2728}\x{1F300}-\x{1FAFF}\x{2600}-\x{27BF}]' -oP
+count emoji            "$MAX_EMOJI"             '[\x{2705}\x{2728}\x{1F300}-\x{1FAFF}\x{2600}-\x{27BF}]' -oP strip_tables
 count exclamation      "$MAX_EXCLAMATION"       '!'
 count product-subject  "$MAX_PRODUCT_SUBJECT"   '^LiveTemplate (is|builds|provides|offers|supports|handles|makes|lets|gives|uses)'
 count royal-we         "$MAX_ROYAL_WE"          "(^|[^a-z])(we'll|we've|we're|let's)"
@@ -69,14 +74,36 @@ count passive          "$MAX_PASSIVE"           '\b(is|are|was|were|be|been)\s+(
 count claudism         "$MAX_CLAUDISM"          '\b(load-bearing|spine|crisp|delve|testament to|nuanced|at its core|fundamentally|north star|unpack|double-click on|orthogonal|heavy lifting|footgun|batteries included|sane defaults|first-class|opinionated|ergonomic|primitives|earns its keep|tapestry|genuinely|meaningfully)\b'
 
 # Title Case headings: two capitalised words in a row after a lowercase one.
+# H1 is exempt — it carries the page name, which matches front-matter `title:`
+# and feeds the nav and breadcrumbs that docs_ia_test.go and breadcrumb_test.go
+# assert on. "Your First App" is a page's name, not prose.
 n=0
 while IFS= read -r f; do
-  n=$((n + $(strip "$f" | grep -cE '^#{1,4} .*[a-z] [A-Z][a-z]+ [A-Z]')))
+  n=$((n + $(strip "$f" | grep -cE '^#{2,4} .*[a-z] [A-Z][a-z]+ [A-Z]')))
 done <<< "$FILES"
 if [ "$n" -gt "$MAX_TITLECASE_HEADING" ]; then
   printf '  FAIL  %-24s %4s  (ceiling %s)\n' titlecase-heading "$n" "$MAX_TITLECASE_HEADING"; fail=1
 else
   printf '  ok    %-24s %4s  (ceiling %s)\n' titlecase-heading "$n" "$MAX_TITLECASE_HEADING"
+fi
+
+# H1 must be the front-matter title verbatim, or "Title — descriptive clause".
+# The H1 feeds nav and breadcrumbs; sentence-casing it renames the page, which
+# breadcrumb_test.go asserts against. This check exists because that happened.
+drift=""
+while IFS= read -r f; do
+  t=$(grep -m1 '^title:' "$f" | sed 's/^title: *//; s/^"//; s/"$//')
+  # Backticks are markup the front-matter title can't carry; compare without them.
+  h=$(grep -m1 '^# ' "$f" | sed 's/^# //; s/`//g')
+  [ -z "$t" ] || [ -z "$h" ] && continue
+  case "$h" in "$t"|"$t "[—-]*) ;; *) drift="$drift        $f: title=\"$t\" h1=\"$h\"\n";; esac
+done <<< "$FILES"
+# chat.md's H1 is a descriptive sentence that predates this check.
+drift=$(printf "$drift" | grep -v 'recipes/apps/chat.md')
+if [ -n "$drift" ]; then
+  echo "  FAIL  h1-vs-title"; echo "$drift"; fail=1
+else
+  printf '  ok    %-24s\n' h1-vs-title
 fi
 
 # Phrases with no defensible use. Scoped to native pages like everything else —

@@ -60,7 +60,7 @@ LiveTemplate normally **inlines** `{{template}}` calls when it parses: it
 splices the invoked body into the caller, producing one flat template it can
 analyze for statics and dynamics. A self-referential call has no fixed point
 to inline toward — expanding `node` yields another `node` to expand, forever.
-So recursion was rejected at parse time.
+So the parser rejected recursion.
 
 From v0.19.0, the parser first finds templates reachable from themselves and
 leaves *those* calls un-inlined, evaluating them at build time instead. The
@@ -86,7 +86,7 @@ choice. Sibling names repeat across directories: two `README.md` files in
 different folders are different nodes. Keying on name would let the diff
 engine confuse them and move the wrong row; a full path cannot collide.
 
-## Depth is capped
+## There is a depth cap
 
 Recursion runs until the data stops nesting, so data that refers to itself
 would recurse forever. LiveTemplate caps invocation depth at **128** by

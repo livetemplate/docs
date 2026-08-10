@@ -5,26 +5,26 @@ source_repo: "https://github.com/livetemplate/docs"
 source_path: "content/recipes/apps/progressive-enhancement.md"
 ---
 
-# Progressive Enhancement App Recipe
+# Progressive Enhancement
 
 This app recipe demonstrates how LiveTemplate supports progressive enhancement - allowing apps to work both with and without JavaScript enabled.
 
-## How It Works
+## How it works
 
-### With JavaScript (WebSocket Mode)
+### With JavaScript (WebSocket mode)
 - Actions are sent via WebSocket for instant updates
 - No page reloads - UI updates in real-time
 - Best user experience for modern browsers
 
-### Without JavaScript (HTTP Form Mode)
-- Actions are submitted via standard HTML forms
+### Without JavaScript (HTTP form mode)
+- Standard HTML forms carry the actions
 - Server returns full HTML pages using POST-Redirect-GET pattern
 - Page reloads after each action
 - Works on any browser, including text-based browsers
 
-## Key Concepts
+## The moving parts
 
-### Dual-Mode Forms
+### Dual-mode forms
 
 Forms work in both modes using standard HTML with `method="POST"` and button `name` routing:
 
@@ -38,7 +38,7 @@ Forms work in both modes using standard HTML with `method="POST"` and button `na
 - **With JS**: The client intercepts the form and routes via WebSocket/fetch
 - **Without JS**: Standard form submission sends POST request to server
 
-### POST-Redirect-GET (PRG) Pattern
+### POST-Redirect-GET (PRG)
 
 For non-JS clients, successful actions redirect using HTTP 303:
 
@@ -50,19 +50,19 @@ For non-JS clients, successful actions redirect using HTTP 303:
 
 This prevents duplicate submissions when users refresh the page.
 
-### Validation Errors
+### Validation errors
 
 When validation fails:
 - **With JS**: Errors appear instantly via WebSocket update
 - **Without JS**: Server re-renders the page with errors inline (no redirect)
 
-### Flash Messages
+### Flash messages
 
 Success/error messages are shown once after actions:
 - **With JS**: Messages appear in real-time
 - **Without JS**: Messages passed via query params after redirect
 
-## Running the App Recipe
+## Running it
 
 ```bash
 # Development mode (uses local client library)
@@ -79,7 +79,7 @@ Visit http://localhost:8080 and try:
 
 ## Configuration
 
-Progressive enhancement is enabled by default. To disable it:
+Progressive enhancement is on by default. To turn it off:
 
 ```go
 // Via environment variable

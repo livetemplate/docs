@@ -8,8 +8,8 @@ source_path: "content/recipes/apps/avatar-upload.md"
 # Avatar Upload — a profile form with a file field
 
 A profile form with one extra field: an avatar. The file rides the ordinary
-form submit, is validated against a type and size whitelist, and — once the
-form is saved — is moved to a permanent location and shown back instantly.
+form submit. LiveTemplate checks it against a type and size whitelist, and once
+the form saves, moves it somewhere permanent and shows it back straight away.
 No page reload, no custom JavaScript, and **no upload attribute at all**.
 The full source is
 [`examples/avatar-upload/`](https://github.com/livetemplate/docs/tree/main/examples/avatar-upload).
@@ -22,7 +22,7 @@ owns the file's lifecycle (here: move it into `uploads/`). It is the right
 default when you want the server to see and keep the bytes.
 
 Volume is one of [four upload modes](/reference/uploads#upload-modes); the
-mode is chosen purely by server config, leaving the markup unchanged. To
+mode comes purely from server config, and the markup never changes. To
 stream bytes straight to remote storage with zero local disk, or to let the
 browser upload directly to S3/GCS, see the
 [Upload Modes recipe](/recipes/apps/upload-modes) and the
@@ -128,12 +128,12 @@ re-render so a validation error doesn't wipe the form.
 ## Validation
 
 `UploadConfig` enforces the whitelist before your handler runs — a file
-that fails is marked invalid, surfaced via `.lvt.UploadError`, and never
+that fails gets marked invalid, surfaces through `.lvt.UploadError`, and never
 appears in `GetCompletedUploads`:
 
 - **Wrong type** (e.g. a `.txt` or `.pdf`) — rejected by `Accept`.
 - **Too large** (over 5MB) — rejected by `MaxFileSize`.
-- **Too many files** — only the first is accepted (`MaxEntries: 1`).
+- **Too many files** — only the first one gets through (`MaxEntries: 1`).
 
 MIME types can be spoofed, so for security-critical uploads also validate the
 file's actual content in your handler — see

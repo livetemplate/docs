@@ -5,11 +5,11 @@ source_repo: "https://github.com/livetemplate/docs"
 source_path: "content/recipes/apps/chat.md"
 ---
 
-# Building a Real-Time Chat App with LiveTemplate
+# Building a real-time chat app
 
 A complete tutorial for building a real-time chat application using LiveTemplate's simple kit. This demonstrates **automatic multi-tab syncing**, session management, and reactive UI updates with just **2 files**.
 
-## What You'll Build
+## What you'll build
 
 - Real-time messaging with automatic tab syncing
 - User login and presence tracking
@@ -19,7 +19,7 @@ A complete tutorial for building a real-time chat application using LiveTemplate
 
 **All in just 2 files: `main.go` and `chat.tmpl`**
 
-## Quick Start
+## Quick start
 
 ```bash
 cd examples/chat
@@ -30,9 +30,9 @@ Then open <http://localhost:8090> in **multiple browser tabs** to see automatic 
 - Messages sent in one tab appear instantly in all other tabs
 - Each browser gets its own isolated chat session
 
-## Tutorial: Building from Scratch
+## Building it from scratch
 
-### Step 1: Create a New App
+### Step 1: create a new app
 
 Start by creating a new LiveTemplate application with the `simple` kit:
 
@@ -51,7 +51,7 @@ The `simple` kit generates a minimal structure:
 No `cmd/`, no `internal/`, no database. A larger app will grow some of those; a
 chat room this size doesn't need them.
 
-### Step 2: Define the Chat State
+### Step 2: define the chat state
 
 Open `main.go` and replace the counter example with chat state:
 
@@ -97,7 +97,7 @@ type User struct {
 - `sync.RWMutex` for thread-safe concurrent access
 - Simple Go structs - no database, no ORM, no complexity
 
-### Step 3: Implement Actions
+### Step 3: implement actions
 
 Add the `Change` method to handle user actions:
 
@@ -172,10 +172,11 @@ func (s *ChatState) updateOnlineCount() {
 
 - Actions route via `<form name="join">` and `<form name="send">` (button/form `name` routing)
 - `ctx.GetString("field")` extracts form data
-- Just modify state - broadcasting happens automatically!
-- No manual WebSocket code needed
+- Mutating state is not enough on its own — `Subscribe` opts a connection in,
+  and `Publish` is what reaches the peers
+- You don't write WebSocket code, but you do write both of those
 
-### Step 4: Initialize and Run
+### Step 4: initialize and run
 
 Add initialization and main function:
 
@@ -214,7 +215,7 @@ func main() {
 }
 ```
 
-### Step 5: Create the UI
+### Step 5: create the UI
 
 Replace `chat.tmpl` with the chat interface. Key template concepts:
 
@@ -281,7 +282,7 @@ Replace `chat.tmpl` with the chat interface. Key template concepts:
 </script>
 ```
 
-### Step 6: Run and Test
+### Step 6: run and test
 
 ```bash
 go run main.go
@@ -304,9 +305,9 @@ Open <http://localhost:8090> in multiple browser tabs:
 - Messages in Chrome don't appear in Firefox
 - Each browser maintains separate state
 
-## How It Works
+## How it works
 
-### Automatic Session Syncing
+### How tabs stay in sync
 
 ```text
 Chrome Tab 1       Server (Go)        Chrome Tab 2
@@ -344,9 +345,9 @@ of the message list to keep in step.
 What you do write is all on this page: a state struct, four methods, and the
 `Subscribe`/`Publish` pair above.
 
-## Customization Ideas
+## Things to add
 
-### Add Persistence
+### Add persistence
 
 Store messages in a slice that survives restarts:
 
@@ -366,7 +367,7 @@ func (s *ChatState) Change(ctx *livetemplate.ActionContext) error {
 }
 ```
 
-### Add Typing Indicators
+### Add typing indicators
 
 ```go
 type ChatState struct {
@@ -384,7 +385,7 @@ case "typing":
     // Auto-broadcast!
 ```
 
-### Add Message Reactions
+### Add message reactions
 
 ```go
 type Message struct {
@@ -401,7 +402,7 @@ case "react":
     s.Messages[data.MessageID].Reactions[data.Emoji]++
 ```
 
-### Add Chat Rooms
+### Add chat rooms
 
 ```go
 type ChatState struct {
@@ -415,9 +416,9 @@ type Room struct {
 }
 ```
 
-## Production Considerations
+## Before production
 
-### 1. Load the Client Library from the CDN
+### 1. Load the client library from the CDN
 
 In `chat.tmpl` — the framework function renders the pinned CDN URL for the
 client this server release is wire-compatible with, so the two stay in
@@ -428,7 +429,7 @@ lockstep:
 <script defer src="{{lvtClientScriptURL}}"></script>
 ```
 
-### 2. Add Rate Limiting
+### 2. Add rate limiting
 
 ```go
 case "send":
@@ -438,7 +439,7 @@ case "send":
     // ... process message
 ```
 
-### 3. Add Message Limits
+### 3. Add message limits
 
 ```go
 if len(s.Messages) > 100 {
@@ -446,7 +447,7 @@ if len(s.Messages) > 100 {
 }
 ```
 
-### 4. Add Authentication
+### 4. Add authentication
 
 For production, use real auth instead of just username:
 
@@ -461,7 +462,7 @@ tmpl := livetemplate.New("chat",
 )
 ```
 
-### 5. Create a Global Chat Room (Cross-Browser)
+### 5. Create a global chat room (cross-browser)
 
 By default, each browser has its own isolated chat. To make all users share the same chat room:
 
@@ -484,7 +485,7 @@ tmpl := livetemplate.New("chat",
 )
 ```
 
-Now Chrome, Firefox, Safari all see the same messages!
+Now Chrome, Firefox and Safari share one room instead of getting one each.
 
 ## What this recipe showed
 
@@ -500,22 +501,22 @@ and are gone when the process restarts — see [Add Persistence](#add-persistenc
 
 The counter is the smaller version of the same shape:
 
-| Counter Example | Chat Example |
-|-----------------|--------------|
+| Counter | Chat |
+|---|---|
 | `AppState{Counter int}` | `ChatState{Messages []Message}` |
 | `increment/decrement` actions | `join/send` actions |
 | Single user | Multi-user with broadcasting |
 | Simple int update | List of messages |
 
-Same pattern, different data!
+Same shape, different data.
 
-## Next Steps
+## Next
 
 - Try the `counter` example for a simpler starting point
 - Try the `todos` example for CRUD operations
 - Use `lvt new myapp --kit multi` for apps needing databases
 
-## Related Documentation
+## Related
 
 - [Server API reference](/reference/api)
 - [PubSub reference](/reference/pubsub) — the fan-out this app is built on

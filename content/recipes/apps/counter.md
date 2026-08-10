@@ -5,7 +5,7 @@ source_repo: "https://github.com/livetemplate/docs"
 source_path: "content/recipes/apps/counter.md"
 ---
 
-# LiveTemplate Counter App Recipe
+# Counter
 
 A real-time counter application demonstrating LiveTemplate's reactive state management and tree-based optimization.
 
@@ -13,12 +13,12 @@ A real-time counter application demonstrating LiveTemplate's reactive state mana
 
 - **Reactive state**: Changes to state automatically generate and broadcast updates
 - **Transport-agnostic**: Works over WebSocket or plain HTTP/AJAX
-- **Minimal bandwidth**: Only the changed values are transmitted, not the entire HTML
+- **Minimal bandwidth**: sends the changed values, not the whole document
 - **No custom JavaScript**: Uses only the LiveTemplate client library
-- **Template-based**: HTML is generated from Go templates with conditional rendering
+- **Template-based**: Go templates render the HTML, conditionals included
 - **Simple API**: Create handlers with a single method call
 
-## Running the App Recipe
+## Running it
 
 1. **Start the server:**
 
@@ -58,7 +58,7 @@ A real-time counter application demonstrating LiveTemplate's reactive state mana
 
 ## Configuration
 
-This app recipe uses LiveTemplate's environment-based configuration system. All configuration is loaded from environment variables with the `LVT_` prefix:
+This app recipe uses LiveTemplate's environment-based configuration system. It reads every setting from environment variables prefixed `LVT_`:
 
 | Variable | Default | Description |
 |----------|---------|-------------|
@@ -85,9 +85,9 @@ LVT_METRICS_ENABLED=false go run main.go
 
 For more details, see the [Configuration reference](/reference/configuration).
 
-## How It Works
+## How it works
 
-### Server Side (Go)
+### Server side (Go)
 
 The server is extremely simple with the new reactive API:
 
@@ -141,7 +141,7 @@ func main() {
 - **Auto Cloning**: Each WebSocket connection gets its own cloned state via `AsState()`
 - **Session Management**: HTTP connections automatically get session-based state persistence
 
-### Client Side (JavaScript)
+### Client side (JavaScript)
 
 **Zero-config integration** - just add one script tag:
 
@@ -162,7 +162,7 @@ That one tag is the whole client setup. It initializes itself and handles:
 - **Automatic DOM updates** when updates arrive
 - **Event delegation** - works with dynamically updated elements
 
-#### Sending Actions with Data
+#### Sending actions with data
 
 Actions use standard HTML forms with button `name` routing and hidden inputs for data:
 
@@ -184,7 +184,7 @@ Actions use standard HTML forms with button `name` routing and hidden inputs for
 </form>
 ```
 
-Form field values are accessed in the controller via `ctx.GetString()`, `ctx.GetInt()`, or `ctx.BindAndValidate()`:
+The controller reads form values with `ctx.GetString()`, `ctx.GetInt()`, or `ctx.BindAndValidate()`:
 ```go
 func (c *Controller) Delete(state State, ctx *livetemplate.Context) (State, error) {
     id := ctx.GetInt("id")
@@ -201,12 +201,12 @@ func (c *Controller) Delete(state State, ctx *livetemplate.Context) (State, erro
 - `lvt-form:preserve` - Prevent form auto-reset
 - `lvt-form:no-intercept` - Skip WebSocket, use real HTTP POST
 
-### LiveTemplate Integration
+### LiveTemplate integration
 
 - **Tree-based Updates**: Only changed dynamic values are sent over the wire
-- **Static Content Caching**: HTML structure is cached client-side
+- **Static content caching**: the browser keeps the HTML structure
 - **Differential Updates**: Bandwidth savings of 90%+ compared to full page refreshes
-- **Conditional Rendering**: Template conditionals are handled automatically
+- **Conditional rendering**: template conditionals need no extra wiring
 
 ## Architecture
 
@@ -228,7 +228,7 @@ Browser                    WebSocket/HTTP              Go Server
 └─────────────────┘        └──────────┘               └──────────────────┘
 ```
 
-## Example Update Payloads
+## Example update payloads
 
 **Initial State (counter = 0):**
 ```json
@@ -255,7 +255,7 @@ Browser                    WebSocket/HTTP              Go Server
 
 This demonstrates LiveTemplate's bandwidth efficiency - subsequent updates contain only the 4 changed dynamic values instead of the full HTML document.
 
-## Template Structure
+## Template structure
 
 The template follows the same pattern as `testdata/e2e/counter/input.tmpl`:
 
@@ -266,9 +266,9 @@ The template follows the same pattern as `testdata/e2e/counter/input.tmpl`:
 - **Interactive Controls**: Buttons for user actions
 - **Metadata**: Last updated timestamp and session ID
 
-## Development Notes
+## Development notes
 
-- **Port**: Defaults to `:8080`, can be overridden with `PORT` environment variable
+- **Port**: `:8080`, or whatever `PORT` says
 - **Endpoint**: `/live` handles both WebSocket upgrades and HTTP POST requests
 - **Template Path**: Reads from `examples/counter/counter.tmpl`
 - **Client Library**: `{{lvtClientScriptURL}}` renders the pinned CDN URL for the client this server release is wire-compatible with. To serve a local build instead, override the function with `tmpl.Funcs` — see [Install](/getting-started/install#self-hosting-offline-air-gapped-or-csp-strict)
@@ -277,7 +277,7 @@ The template follows the same pattern as `testdata/e2e/counter/input.tmpl`:
 - **Session Management**: HTTP connections use cookie-based sessions for state persistence
 - **Error Handling**: Automatic WebSocket reconnection and comprehensive error logging
 
-## Controller+State Pattern
+## Controller and state pattern
 
 The counter uses the Controller+State pattern introduced in v0.7.0:
 
