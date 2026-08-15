@@ -107,6 +107,44 @@ where the choosing isn't the point. It's deliberately not in the checker.
 **The `ui-patterns/` heading skeleton** — `Template` / `Handler & state` / `When
 to use` — is a catalog template. Fix the prose under it, not the shape.
 
+## Every heading that ends in a period has to earn one
+
+A heading punctuated as a sentence must *be* one: it needs a finite verb and
+something doing the verb. `content/index.md` shipped four that weren't —
+"A shared greeting wall, running on this page.", "The parts of that worth a
+second look.", "Other things in here.", "Getting started." Those are labels. A
+determiner, a noun, maybe a participle, and a full stop pretending.
+
+This isn't passive voice, but it reads as passive for the same reason: no finite
+verb, so nothing is doing anything. The repo owner called it out as passive, and
+that instinct was right about the effect even though the term doesn't fit.
+
+The tell is *where* it happens. Headings that make a technical claim stayed
+sentences — "The button's name is the action", "The HTML rule runs again in Go",
+"Two calls sync your tabs". The four fragments were all headings that orient the
+reader: the demo, the section intro, the catch-all, the CTA. The register breaks
+where the page navigates rather than argues, so check the connective headings
+hardest.
+
+No checker rule for this — "lacks a finite verb" needs a parser, and a fragile
+approximation gets switched off. Read each heading and ask what the verb is.
+
+Keep the rail label, the eyebrow and the h2 of a section saying the same thing.
+When they drifted, all three were vague at once ("What's going on" / "What's
+going on" / "The parts of that worth a second look.") and none named the
+contents.
+
+## A comparison table must concede
+
+Every row of the landing's comparison sat under a neighbour's name and described
+LiveTemplate instead — so the Alpine.js row read as a description of Alpine. Five
+rows, five wins, no losses, from a library whose own eyebrow says alpha. A
+comparison that loses to nobody gets discounted whole.
+
+Describe the neighbour, name what it does better, then say where the line falls.
+Don't make every row concede-then-win in the same shape either; that cadence is
+the same sales pitch in a new suit. Some rows concede and stop.
+
 ## What the checker does
 
 `scripts/voice-check.sh` counts the tells that can be counted: emoji,

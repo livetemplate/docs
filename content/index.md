@@ -1,6 +1,6 @@
 ---
 title: "LiveTemplate — Build interactive web apps in Go with standard HTML templates"
-description: "Write html/template and Go handlers, and the page updates itself. No SPA, no JSON API, no build step."
+description: "Write an html/template and a Go handler. The server re-renders on each action and patches what changed, so app screens work without an SPA or a build step."
 layout: landing
 ---
 
@@ -28,13 +28,12 @@ layout: landing
 <aside class="rail">
   <div class="rail-label">On this page</div>
   <a href="#the-app">The app</a>
-  <a href="#inside">What's going on</a>
+  <a href="#inside">Line by line</a>
   <a class="sub" href="#actions">No attributes</a>
   <a class="sub" href="#nojs">No JavaScript</a>
   <a class="sub" href="#validation">Validation</a>
   <a class="sub" href="#pending">Pending state</a>
   <a class="sub" href="#realtime">Multi-user</a>
-  <a href="#diff">Only the diff</a>
   <a href="#compare">How it compares</a>
   <a href="#more">Everything else</a>
 </aside>
@@ -44,7 +43,7 @@ layout: landing
 <section class="hero">
   <div class="eyebrow">Alpha · a Go library for server-rendered app screens</div>
   <h1>Build interactive web apps in Go with standard HTML templates.</h1>
-  <p class="sub">Write <code>html/template</code> and Go handlers, and the page updates itself. The goal is app-like screens without an SPA, a JSON API or a build step, so there's no JavaScript here that you have to write.</p>
+  <p class="sub">Write <code>html/template</code> and Go handlers. The server re-renders on each action and patches only what changed. Every demo below is a real app running on this page, and none of it is JavaScript you had to write.</p>
   <div class="cta-row">
     <a class="btn btn-primary" href="/getting-started/install">Get started →</a>
     <a class="btn btn-ghost" href="/getting-started/introduction">Read the docs</a>
@@ -54,8 +53,8 @@ layout: landing
 
 <section id="the-app" class="lead-in">
   <div class="eyebrow">The app</div>
-  <h2>A shared greeting wall, running on this page.</h2>
-  <p class="lead">Type a name. Your headline updates and your line joins the wall, along with everyone else's — including anyone else reading this page right now. <a href="/" target="_blank" rel="noopener">Open this page in a second tab</a> and watch it land there too, with no reload. The code for all of it is directly below.</p>
+  <h2>Everyone reading this page writes to the same wall.</h2>
+  <p class="lead">Type a name. Your headline updates and your line joins the wall underneath it, next to whoever else is here right now. <a href="/" target="_blank" rel="noopener">Open this page in a second tab</a> and watch the same line land there, with no reload. The whole program is directly below.</p>
 
   <div class="demo">
     <div class="demo-bar"><span class="dot"></span> greet-wall · live, shared with every visitor</div>
@@ -137,9 +136,9 @@ func main() {
 </section>
 
 <section id="inside" class="intro">
-  <div class="eyebrow">What's going on</div>
-  <h2>The parts of that worth a second look.</h2>
-  <p class="lead">Every section below points at lines you have just read — except the pending state, which the wall has no slow work to demonstrate, and which says so. Each one also runs here as its own app, so you can try it.</p>
+  <div class="eyebrow">Line by line</div>
+  <h2>Four of those lines are worth a second look. One thing is missing.</h2>
+  <p class="lead">Each section below picks out a line you have just read and runs it here as its own app, so you can try it on its own. The exception is the pending state: the wall answers instantly, so it has no slow work to show, and that section borrows two other apps instead.</p>
 </section>
 
 <section id="actions" class="step">
@@ -229,7 +228,7 @@ func main() {
 <section id="pending" class="step">
   <div class="eyebrow">Pending state</div>
   <h2>Slow work has a pending state you can render.</h2>
-  <p class="lead">This is the one thing the app above cannot show you: the wall answers instantly, so it has no pending state to render. Both apps below do have slow work. The first is the way to reach for — the pending flag is a template variable, so the spinner is ordinary Go and ordinary HTML, with no new attribute to learn.</p>
+  <p class="lead">These are the two borrowed apps, and both of them do slow work. Reach for the first one: the pending flag is a template variable, so the spinner is ordinary Go and ordinary HTML, with no new attribute to learn.</p>
 
   <div class="pair">
     <div>
@@ -318,26 +317,26 @@ func main() {
 
 <section id="compare" class="step">
   <div class="eyebrow">How it compares</div>
-  <h2>How this sits next to htmx, templ and LiveView.</h2>
-  <p class="lead">Here a plain <code>&lt;button name="greet"&gt;</code> is already the action. <code>lvt-*</code> attributes are an escape hatch for what HTML cannot express, not the main interface.</p>
+  <h2>This sits between htmx and LiveView.</h2>
+  <p class="lead">Server-rendered HTML over a socket, like LiveView. Ordinary form markup and no state in the browser, like htmx. Both of them are years more mature than this, and each row below says where the other one still wins.</p>
   <div class="rows">
     <div class="row-k">htmx</div>
-    <div class="row-v">A similar HTML-first feel, with server-owned state and diffing built in, so there is less request wiring in the markup.</div>
+    <div class="row-v">Works against any backend in any language, which this does not. Pick it up when the server is already written. Here the server keeps the state and computes the diff, so the markup carries no request wiring.</div>
     <div class="row-k">templ + htmx</div>
-    <div class="row-v">Use Go's built-in <code>html/template</code> and keep live behavior in one app model instead of stacking layers.</div>
+    <div class="row-v">templ type-checks your markup at compile time. <code>html/template</code> cannot, and that is a real thing to give up. The trade is a code generation step and one more library to track.</div>
     <div class="row-k">Alpine.js</div>
-    <div class="row-v">Richer behavior without keeping a second copy of state in the browser.</div>
+    <div class="row-v">Keeps real state in the browser — expressions, loops, computed values — which nothing here does. An <code>lvt-el:</code> attribute toggles a class or an attribute on a DOM event and stops there. That covers a dropdown. It does not cover a widget with its own model.</div>
     <div class="row-k">Phoenix LiveView</div>
-    <div class="row-v">The same server-driven idea, in Go, and it still falls back to plain HTTP forms.</div>
+    <div class="row-v">The same idea, and years ahead of it: production use at scale, and an ecosystem this does not have. This is that idea in Go, on a library still in alpha.</div>
     <div class="row-k">React SPA</div>
-    <div class="row-v">Forms, CRUD, dashboards and shared views without splitting the product into an API and a frontend.</div>
+    <div class="row-v">For a canvas editor or an offline-first app, a client framework is the right call. For a settings screen it means keeping two copies of the same data in sync, and that cost is the one thing this avoids.</div>
   </div>
 </section>
 
 <section id="more" class="step">
   <div class="eyebrow">Everything else</div>
-  <h2>Other things in here.</h2>
-  <p class="lead">It targets what Go teams actually ship: admin screens, internal tools, CRUD, dashboards, approvals, uploads, auth, and the occasional shared view.</p>
+  <h2>The rest of the docs covers the ordinary screens.</h2>
+  <p class="lead">Admin panels, internal tools, CRUD, dashboards, approvals, uploads, auth, and the occasional shared view. That is what this is for.</p>
   <div class="links">
     <a href="/reference/uploads"><span class="link-t">File uploads</span><span class="link-g">live progress, same app</span></a>
     <a href="/reference/pubsub"><span class="link-t">Shared views</span><span class="link-g">Subscribe &amp; Publish</span></a>
@@ -348,12 +347,12 @@ func main() {
     <a href="/guides/observability"><span class="link-t">Observability</span><span class="link-g">metrics &amp; tracing hooks</span></a>
     <a href="/guides/scaling"><span class="link-t">Scaling</span><span class="link-g">session groups &amp; fan-out</span></a>
   </div>
-  <p class="lead">The <a href="/recipes/ui-patterns/">UI patterns catalog</a> has focused examples: loading states, inline validation, SPA-style navigation, sortable tables, pubsub, presence, server push. This site runs on LiveTemplate itself. <a href="/recipes/how-this-site-works">See how it works</a>.</p>
+  <p class="lead">The <a href="/recipes/ui-patterns/">UI patterns catalog</a> has focused examples: loading states, inline validation, SPA-style navigation, sortable tables, pubsub, presence, server push. A LiveTemplate app renders every page on this site, including this one. <a href="/recipes/how-this-site-works">See how it works</a>.</p>
 </section>
 
 <section class="cta">
   <div>
-    <h2>Getting started.</h2>
+    <h2>Install it, then pick a recipe.</h2>
 <pre class="install">$ go get github.com/livetemplate/livetemplate</pre>
     <div class="cta-row">
       <a class="btn btn-primary" href="/getting-started/install">Get started →</a>
