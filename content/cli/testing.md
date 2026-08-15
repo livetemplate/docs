@@ -2,13 +2,13 @@
 title: "LiveTemplate Testing Framework"
 source_repo: "https://github.com/livetemplate/lvt"
 source_path: "testing/README.md"
-source_ref: "v0.2.0"
-source_commit: "2a88feb18e38e6e1b76b12952a1dc68cce094c63"
+source_ref: "v0.2.1"
+source_commit: "444e2a2ed4bbe160ad8a94815f04529bffd3669b"
 ---
 
 # LiveTemplate Testing Framework
 
-A comprehensive e2e testing framework for LiveTemplate applications that reduces boilerplate by 85-90%.
+An e2e testing framework for LiveTemplate applications. It cuts test boilerplate by 85-90%.
 
 ## Installation
 
@@ -54,7 +54,7 @@ func TestMyApp(t *testing.T) {
 - **WebSocket Ready**: Waits for LiveTemplate WebSocket connection
 - **Cleanup**: Automatic teardown of all resources
 
-### Comprehensive Loggers
+### Loggers
 ```go
 // Browser console logs
 test.Console.GetLogs()

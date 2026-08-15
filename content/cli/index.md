@@ -2,8 +2,8 @@
 title: "LiveTemplate CLI (`lvt`) - Complete Guide"
 source_repo: "https://github.com/livetemplate/lvt"
 source_path: "docs/guides/lvt-cli-guide.md"
-source_ref: "v0.2.0"
-source_commit: "2a88feb18e38e6e1b76b12952a1dc68cce094c63"
+source_ref: "v0.2.1"
+source_commit: "444e2a2ed4bbe160ad8a94815f04529bffd3669b"
 ---
 
 # LiveTemplate CLI (`lvt`) - Complete Guide
@@ -168,7 +168,7 @@ lvt gen products name price quantity enabled created_at
 - Form validation
 - Statistics/counts
 - CSS styling (from kit)
-- Comprehensive tests
+- Generated tests covering each flow
 
 **Type Mappings:**
 
@@ -299,7 +299,7 @@ Default names (can be customized):
 - **Auto-updates `go.mod` dependencies**
 - **EmailSender interface** (console logger + SMTP/Mailgun examples)
 - **Case-insensitive email matching**
-- **Production-ready security** (HTTP-only, secure, SameSite cookies)
+- **Secure session cookies** (HTTP-only, Secure, SameSite)
 
 **Next Steps:**
 
@@ -353,7 +353,7 @@ The generated auth templates use Tailwind CSS by default. To use a different CSS
 
 **E2E Testing:**
 
-The auth command generates comprehensive E2E tests using chromedp that test all auth flows:
+The auth command generates E2E tests using chromedp that cover every auth flow:
 - Registration flow (with email confirmation if enabled)
 - Login flow (password and magic-link)
 - Password reset flow (if enabled)
@@ -549,7 +549,7 @@ lvt gen articles title content published_at author email price
 
 ## Testing
 
-Each generated resource includes comprehensive tests.
+Each generated resource comes with tests.
 
 ### WebSocket Tests (`*_ws_test.go`)
 
@@ -828,6 +828,6 @@ go run cmd/mysocial/main.go
 5. **Deploy** - Build and deploy your app
 
 For more information:
-- [API Reference](https://github.com/livetemplate/lvt/blob/v0.2.0/docs/references/api-reference.md)
-- [Template Support Matrix](https://github.com/livetemplate/lvt/blob/v0.2.0/docs/references/template-support-matrix.md)
+- [API Reference](https://livetemplate.fly.dev/reference/api)
+- [Template Support Matrix](https://livetemplate.fly.dev/reference/template-support-matrix)
 - [LiveTemplate Documentation](https://github.com/livetemplate/livetemplate)

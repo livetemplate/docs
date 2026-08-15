@@ -2,15 +2,15 @@
 title: "LiveTemplate Components Library"
 source_repo: "https://github.com/livetemplate/lvt"
 source_path: "components/README.md"
-source_ref: "v0.2.0"
-source_commit: "2a88feb18e38e6e1b76b12952a1dc68cce094c63"
+source_ref: "v0.2.1"
+source_commit: "444e2a2ed4bbe160ad8a94815f04529bffd3669b"
 ---
 
 # LiveTemplate Components Library
 
 ![Components Independence](https://github.com/livetemplate/lvt/actions/workflows/components-independence.yml/badge.svg)
 
-A comprehensive collection of reusable UI components for the [LiveTemplate](https://github.com/livetemplate/livetemplate) framework.
+A set of reusable UI components for the [LiveTemplate](https://github.com/livetemplate/livetemplate) framework.
 
 ## Features
 
@@ -90,7 +90,7 @@ CountrySelect: dropdown.NewSearchable("country", countries,
 |-----------|---------|-----------|-------------|
 | Toast | `toast` | default, container | Toast notifications |
 | Tooltip | `tooltip` | default | Tooltips |
-| Popover | `popover` | default | Rich content popovers |
+| Popover | `popover` | default | Content popovers |
 | Progress | `progress` | default, circular, spinner | Progress indicators |
 | Skeleton | `skeleton` | default, avatar, card | Loading placeholders |
 
@@ -286,7 +286,7 @@ No `lvt` CLI installation required — components are a standalone Go library.
 
 ## Contributing
 
-See [CONTRIBUTING.md](https://github.com/livetemplate/lvt/blob/v0.2.0/components/CONTRIBUTING.md) for guidelines on:
+See [CONTRIBUTING.md](https://github.com/livetemplate/lvt/blob/v0.2.1/components/CONTRIBUTING.md) for guidelines on:
 - Component naming conventions
 - Template requirements
 - Test requirements
