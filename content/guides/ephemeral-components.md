@@ -2,15 +2,15 @@
 title: "Ephemeral Components Guide"
 source_repo: "https://github.com/livetemplate/livetemplate"
 source_path: "docs/guides/ephemeral-components.md"
-source_ref: "v0.23.0"
-source_commit: "8294ce439a46a6a1f92e2a77b8a4978c9e526cc6"
+source_ref: "v0.25.0"
+source_commit: "de4c80d83cf8a18cd629e515904517b2889f3e74"
 ---
 
 # Ephemeral Components Guide
 
 Ephemeral components are UI elements that appear briefly, deliver information, and then disappear — toasts, banners, alerts, and confirmation flashes. They have no meaningful persistent state from the server's perspective.
 
-This guide explains why these components should live **entirely on the client** and how to implement that pattern correctly.
+They belong **entirely on the client**. Below is why, and how to build them that way.
 
 ---
 

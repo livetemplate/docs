@@ -2,15 +2,15 @@
 title: "Standard HTML Reactivity"
 source_repo: "https://github.com/livetemplate/livetemplate"
 source_path: "docs/guides/standard-html-reactivity.md"
-source_ref: "v0.23.0"
-source_commit: "8294ce439a46a6a1f92e2a77b8a4978c9e526cc6"
+source_ref: "v0.25.0"
+source_commit: "de4c80d83cf8a18cd629e515904517b2889f3e74"
 ---
 
 # Standard HTML Reactivity
 
-LiveTemplate makes standard HTML reactive by default. A plain `<form method="POST">` with `<button name="add">` is interactive at every transport level — no framework-specific attributes required. This guide explains how it works, how it compares to other frameworks, and the tradeoffs involved.
+LiveTemplate makes standard HTML reactive by default. A plain `<form method="POST">` with `<button name="add">` is interactive at every transport level — no framework-specific attributes required. How it works, how it compares to the alternatives, and what it costs you.
 
-> **Recent reinforcement:** As of client v0.8.38, the TypeScript client and the generated templates went through a deliberate "attribute reduction" pass that removed `lvt-*` attributes from anything HTML can already express. Tier 1 standard HTML is now the default everywhere; Tier 2 attributes are reserved for behaviors HTML genuinely cannot express (timing, keyboard shortcuts, reactive DOM).
+> **Recent reinforcement:** As of client v0.8.38, the TypeScript client and the generated templates went through a deliberate "attribute reduction" pass that removed `lvt-*` attributes from anything HTML can already express. Tier 1 standard HTML is now the default everywhere; Tier 2 attributes are reserved for behaviors HTML cannot express (timing, keyboard shortcuts, reactive DOM).
 
 ---
 
@@ -151,7 +151,7 @@ LiveTemplate is inspired by Phoenix LiveView but does not yet cover its full fea
 | **Stateful Components** | `LiveComponent` with own lifecycle | Stateless templates only | `{{template}}` invocations work but have no component-level state or event handling. |
 | **Streams** | `stream/3` for large lists | Not yet | LiveView streams handle large/infinite lists without keeping all items in server memory. Streaming-range rendering (PRs #366/#368/#369/#370) is the latest step toward this. |
 | **JS Commands** | `JS.push`, `JS.toggle`, `JS.show` | Partial | [`lvt-*` reactive attributes](/reference/client-attributes) cover common cases (disable, add/remove class, set attribute) but aren't as composable as LiveView's server-defined JS chains. |
-| **Client Hooks** | `phx-hook` lifecycle callbacks | Proposed | [`lvt-hook` proposal](https://github.com/livetemplate/livetemplate/blob/v0.23.0/docs/proposals/lifecycle-hooks-proposal.md) covers third-party JS library integration; not yet shipped. |
+| **Client Hooks** | `phx-hook` lifecycle callbacks | Proposed | [`lvt-hook` proposal](https://github.com/livetemplate/livetemplate/blob/v0.25.0/docs/proposals/lifecycle-hooks-proposal.md) covers third-party JS library integration; not yet shipped. |
 | **Presence** | `Phoenix.Presence` | Not built-in | Can be built on LiveTemplate's session stores; requires manual implementation. |
 | **Testing Helpers** | `live/2`, `render_click/3` | Minimal | `AssertPureState` exists; no view-level test DSL. Browser tests use chromedp. |
 | **Form Recovery** | Automatic on reconnect | Partial — `lvt-form:preserve` retains specific fields across re-renders | Full automatic recovery on WS reconnection is not yet built in. |
@@ -191,7 +191,7 @@ See the [Progressive Complexity Guide](/guides/progressive-complexity) for the c
 **Advantages of LiveTemplate's approach:**
 - Standard HTML works at all transport levels (no-JS, fetch, WebSocket)
 - No framework vocabulary to learn for common interactions
-- Progressive enhancement works out of the box
+- Progressive enhancement needs no extra wiring
 - Less markup to write
 
 **Disadvantages:**

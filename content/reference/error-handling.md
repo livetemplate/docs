@@ -2,8 +2,8 @@
 title: "Error Handling Reference"
 source_repo: "https://github.com/livetemplate/livetemplate"
 source_path: "docs/references/error-handling.md"
-source_ref: "v0.23.0"
-source_commit: "8294ce439a46a6a1f92e2a77b8a4978c9e526cc6"
+source_ref: "v0.25.0"
+source_commit: "de4c80d83cf8a18cd629e515904517b2889f3e74"
 ---
 
 # Error Handling Reference
@@ -26,7 +26,7 @@ Complete guide to error handling in LiveTemplate applications.
 
 ## Overview
 
-LiveTemplate provides a comprehensive error handling system that automatically propagates validation errors from the server to the client and displays them in templates.
+Return an error from an action and it travels to the client and renders in the template. You write no serialization code for it.
 
 ### Error Flow
 

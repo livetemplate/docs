@@ -2,8 +2,8 @@
 title: "LiveTemplate Scaling Guide"
 source_repo: "https://github.com/livetemplate/livetemplate"
 source_path: "docs/guides/SCALING.md"
-source_ref: "v0.23.0"
-source_commit: "8294ce439a46a6a1f92e2a77b8a4978c9e526cc6"
+source_ref: "v0.25.0"
+source_commit: "de4c80d83cf8a18cd629e515904517b2889f3e74"
 ---
 
 # LiveTemplate Scaling Guide
@@ -16,7 +16,7 @@ source_commit: "8294ce439a46a6a1f92e2a77b8a4978c9e526cc6"
 
 ## Overview
 
-This guide covers scaling LiveTemplate applications from **single-host prototypes** to **production systems handling millions of concurrent WebSocket connections**.
+Scaling a LiveTemplate application, from a **single-host prototype** up to **millions of concurrent WebSocket connections**.
 
 ---
 
@@ -199,7 +199,7 @@ handler := livetemplate.Mount(rootStore,
 
 ## Migration Guide: Memory to Redis Session Store
 
-This guide walks through migrating from in-memory session storage to Redis-backed storage for horizontal scaling.
+Moving session storage from memory to Redis, so you can run more than one host.
 
 ### When to Migrate
 
@@ -537,7 +537,7 @@ spec:
 2. **Readiness Probe** (`/health/ready`):
    - **Always use** for all deployments
    - Should check external dependencies (Redis, DB)
-   - Allows application to temporarily become "not ready" without restart
+   - Lets the application go "not ready" for a while without a restart
    - Example: Redis connection lost → readiness fails → no new connections → Redis recovers → readiness passes → traffic resumes
 
 3. **Startup Probe** (`/health/live`):
@@ -625,7 +625,7 @@ func setupHealthChecks(sessionStore *livetemplate.RedisSessionStore, db *sql.DB)
 
 **Advanced Database Health Checks:**
 
-For production deployments with databases, implement comprehensive health checks that verify not just connectivity, but also connection pool health and query performance.
+In production with a database, check more than connectivity: the connection pool and query latency fail separately, and each one takes the app down on its own.
 
 ```go
 package main
@@ -1407,7 +1407,7 @@ See [session.md](/reference/session) for the Session API guide on server-initiat
 
 ## Capacity Planning
 
-This section provides formulas and guidelines for estimating resource requirements based on your expected load.
+Formulas for estimating what a given load will cost you in resources.
 
 ### Memory Estimation
 
@@ -1869,8 +1869,8 @@ redis_connected_clients{instance="redis1"} > 9000  # 90% of Redis max clients
 
 ## Next Steps
 
-- **Roadmap:** See [ROADMAP.md](https://github.com/livetemplate/livetemplate/blob/v0.23.0/ROADMAP.md) for upcoming scaling features
-- **Architecture:** See [ARCHITECTURE.md](https://github.com/livetemplate/livetemplate/blob/v0.23.0/docs/design/ARCHITECTURE.md) for system design
+- **Roadmap:** See [ROADMAP.md](https://github.com/livetemplate/livetemplate/blob/v0.25.0/ROADMAP.md) for upcoming scaling features
+- **Architecture:** See [ARCHITECTURE.md](https://github.com/livetemplate/livetemplate/blob/v0.25.0/docs/design/ARCHITECTURE.md) for system design
 
 ---
 
