@@ -2,8 +2,8 @@
 title: "Changelog"
 source_repo: "https://github.com/livetemplate/lvt"
 source_path: "CHANGELOG.md"
-source_ref: "v0.2.0"
-source_commit: "2a88feb18e38e6e1b76b12952a1dc68cce094c63"
+source_ref: "v0.2.1"
+source_commit: "444e2a2ed4bbe160ad8a94815f04529bffd3669b"
 ---
 
 # Changelog
@@ -13,7 +13,24 @@ All notable changes to the LVT CLI will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v0.2.1] - 2026-08-15
+
+### Changes
+
+- docs: drop the hype words from the mirrored CLI pages (#343) (08914ed)
+- docs: point the cross-repo reference links at the docs site (#342) (5374b32)
+- fix(release): refuse to bump on top of an unpublished release (#340) (beb5608)
+- fix(release): survive an aborted release instead of leaving a half-bumped tree (#339) (dca2768)
+- docs(changelog): note the v0.19.0 wire-format and recursion changes in v0.2.0 (d0d669c)
+
+
+
 ## [v0.2.0] - 2026-07-18
+
+Adopts **livetemplate v0.19.0** (from v0.11.1). Two things matter for apps scaffolded or served by this CLI:
+
+- **Range updates use a different wire format.** The differential range path now emits granular ops (`r`/`u`/`i`/`o`/`p`) instead of re-sending the whole range payload, so deep edits scope to the changed leaf. No app change is required, and published `@livetemplate/client` builds have handled the format since v0.8.2 — but any pinned client older than that should be moved forward.
+- **Recursive `{{template}}` now renders.** Self-referential templates (file trees, comment threads, nested navigation) are supported rather than rejected at parse time.
 
 ### Changes
 

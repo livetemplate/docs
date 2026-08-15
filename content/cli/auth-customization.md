@@ -2,8 +2,8 @@
 title: "Customizing Auth Templates"
 source_repo: "https://github.com/livetemplate/lvt"
 source_path: "docs/guides/auth-customization.md"
-source_ref: "v0.2.0"
-source_commit: "2a88feb18e38e6e1b76b12952a1dc68cce094c63"
+source_ref: "v0.2.1"
+source_commit: "444e2a2ed4bbe160ad8a94815f04529bffd3669b"
 ---
 
 # Customizing Auth Templates
@@ -27,7 +27,7 @@ After running `lvt gen auth`, edit `internal/app/auth/auth.tmpl` to use your pre
 
 ### Option 2: Use a Kit
 
-The lvt kit system allows you to customize templates project-wide.
+The lvt kit system lets you customize templates across the whole project.
 
 1. **Copy the auth template to your project kit:**
    ```bash
