@@ -2,8 +2,8 @@
 title: "Server Actions Reference"
 source_repo: "https://github.com/livetemplate/livetemplate"
 source_path: "docs/references/server-actions.md"
-source_ref: "v0.23.0"
-source_commit: "8294ce439a46a6a1f92e2a77b8a4978c9e526cc6"
+source_ref: "v0.25.0"
+source_commit: "de4c80d83cf8a18cd629e515904517b2889f3e74"
 ---
 
 # Server Actions Reference
@@ -337,7 +337,7 @@ func NotifyUser(userID string, message string) {
 `Session.TriggerAction` targets **one** session group, so refreshing many
 connections at once tempts you to keep a registry of `Session` handles and
 iterate it (the pattern above) — which then needs `OnConnect`/`OnDisconnect`
-bookkeeping and dead-handle pruning. You don't need any of that. Two primitives
+bookkeeping and dead-handle pruning. You don't need any of that. Two calls
 compose into a registry-free fan-out:
 
 1. **Join in `Mount`** with `ctx.Subscribe(topic)`. Because it runs in `Mount`,
@@ -504,7 +504,7 @@ buffer or replay it. The cookie-bound `groupID` is stable across reconnects,
 so the *next* `TriggerAction` after the WebSocket comes back will reach the
 user, but the dispatch that fired during the gap is gone.
 
-This is a deliberate design — see the [TriggerAction reconnect-buffering proposal](https://github.com/livetemplate/livetemplate/blob/v0.23.0/docs/proposals/triggeraction-reconnect-buffering.md).
+This is a deliberate design — see the [TriggerAction reconnect-buffering proposal](https://github.com/livetemplate/livetemplate/blob/v0.25.0/docs/proposals/triggeraction-reconnect-buffering.md).
 
 ### Detecting the gap
 
@@ -585,7 +585,7 @@ Two rules cover the gap:
 
 1. **Push handlers must be idempotent.** A handler that runs once must
    produce the same final state as one that runs twice. The
-   [reconnect-during-loading double-fire race documented under Implementation Notes in `patterns.md`](https://github.com/livetemplate/livetemplate/blob/v0.23.0/docs/proposals/patterns.md#implementation-notes-accumulated-from-completed-sessions)
+   [reconnect-during-loading double-fire race documented under Implementation Notes in `patterns.md`](https://github.com/livetemplate/livetemplate/blob/v0.25.0/docs/proposals/patterns.md#implementation-notes-accumulated-from-completed-sessions)
    makes this concrete: if the client disconnects and reconnects while a
    goroutine is still sleeping, two goroutines may race to dispatch — both
    land successfully on the new connection. Idempotent handlers absorb
@@ -670,7 +670,7 @@ once-only audit log, paid-API result stream, etc.) the implicit contract
 is not enough. Open a new issue referencing
 [#342](https://github.com/livetemplate/livetemplate/issues/342) and
 describing the exact non-idempotency. The
-[buffering proposal](https://github.com/livetemplate/livetemplate/blob/v0.23.0/docs/proposals/triggeraction-reconnect-buffering.md)
+[buffering proposal](https://github.com/livetemplate/livetemplate/blob/v0.25.0/docs/proposals/triggeraction-reconnect-buffering.md)
 captures the design sketch for the durable variant that would solve it,
 gated on a real use case.
 

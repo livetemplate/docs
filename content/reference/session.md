@@ -2,13 +2,13 @@
 title: "Session Reference"
 source_repo: "https://github.com/livetemplate/livetemplate"
 source_path: "docs/references/session.md"
-source_ref: "v0.23.0"
-source_commit: "8294ce439a46a6a1f92e2a77b8a4978c9e526cc6"
+source_ref: "v0.25.0"
+source_commit: "de4c80d83cf8a18cd629e515904517b2889f3e74"
 ---
 
 # Session Reference
 
-Session infrastructure in LiveTemplate handles state storage, connection management, and WebSocket configuration. This guide covers state safety guarantees, session stores, connection management, and performance tuning for production deployments.
+Session infrastructure in LiveTemplate handles state storage, connection management, and WebSocket configuration. Below: the state safety guarantees, the session stores, connection management, and what to tune before production.
 
 For pushing updates from server-side code, see [Server Actions Reference](/reference/server-actions).
 

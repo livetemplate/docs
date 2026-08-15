@@ -2,8 +2,8 @@
 title: "Progressive Complexity Guide"
 source_repo: "https://github.com/livetemplate/livetemplate"
 source_path: "docs/guides/progressive-complexity.md"
-source_ref: "v0.23.0"
-source_commit: "8294ce439a46a6a1f92e2a77b8a4978c9e526cc6"
+source_ref: "v0.25.0"
+source_commit: "de4c80d83cf8a18cd629e515904517b2889f3e74"
 ---
 
 # Progressive Complexity Guide
@@ -13,7 +13,7 @@ LiveTemplate follows a two-tier progressive complexity model:
 - **Tier 1: Standard HTML** — forms, buttons, links, dialogs, validation. No custom attributes.
 - **Tier 2: `lvt-*` Attributes** — debounce, reactive DOM, lifecycle hooks. Only when HTML can't express it.
 
-This guide walks through Tier 1 from the simplest case to full-featured applications.
+What follows is Tier 1, from the simplest case up to a full application.
 
 ---
 
