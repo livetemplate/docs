@@ -32,6 +32,18 @@ Steps:
 
 1. Create the folder + four files (use `examples/counter/` as the template — it's the smallest runnable shape).
 2. Optional: add `content/recipes/foo/index.md` if you want a recipe write-up. Cite source via site-rooted includes: `` ```go include="/examples/foo/foo.go" lines="5-15" `` ``.
+
+   **Include the code, don't retype it.** A pasted snippet drifts from the app
+   the moment either changes, and nothing catches it —
+   `content/recipes/apps/chat.md` documented a `Change(ctx *ActionContext)` API
+   that never existed, plus an undefined variable, for as long as it was
+   hand-written. `include=` cannot drift that way.
+
+   **Read [`VOICE.md`](VOICE.md) before writing the prose.** The ten pages under
+   `content/recipes/apps/` were ported from example READMEs and carried that
+   register — Title Case headings, emoji, "The magic:" — until #137. The
+   `livetemplate/examples` repo that taught it is archived, so this file is now
+   the only place that guidance lives.
 3. Wire `cmd/site/main.go`: import `"github.com/livetemplate/docs/examples/foo"` and add a `mux.Handle("/apps/foo/", ...)` line.
 4. `go build ./...` + `go test ./examples/foo` to confirm.
 
