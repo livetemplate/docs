@@ -19,6 +19,8 @@ Editing it here is work that gets thrown away. Fix it in the source repo.
 
 - Mirrored: `content/reference/*`, `content/changelog/*`, `content/guides/*`
   (except `index.md`), `content/cli/*`, `content/client/*`, `content/contributing/*`
+  **except `contributing/examples.md`** — livetemplate/examples is archived, so
+  that page is docs-native
 - Docs-native: `content/index.md`, `content/getting-started/*`,
   `content/recipes/**` (including `recipes/apps/*`), the section `index.md` files
 
