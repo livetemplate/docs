@@ -139,7 +139,7 @@ headings, emoji, exclamation marks — while the rest of the site moved on. See
 | livetemplate contrib | `livetemplate` | `CONTRIBUTING.md` | `/contributing/livetemplate` | yes |
 | client contrib | `client` | `CONTRIBUTING.md` | `/contributing/client` | yes |
 | lvt contrib | `lvt` | `CONTRIBUTING.md` | `/contributing/cli` | yes |
-| examples contrib | `examples` | `CONTRIBUTING.md` | `/contributing/examples` | yes |
+| examples contrib | this repo | `content/contributing/examples.md` | `/contributing/examples` | no |
 
 ### Changelog (manually concatenated)
 
