@@ -2,8 +2,8 @@
 title: "@livetemplate/client"
 source_repo: "https://github.com/livetemplate/client"
 source_path: "README.md"
-source_ref: "v0.20.0"
-source_commit: "03d463fddee48ef85b58d5d31984f0e941cebbb3"
+source_ref: "v0.25.0"
+source_commit: "bcaba2b8bc6062bdcb56045d3b0ba5bc052ef77d"
 ---
 
 # @livetemplate/client
@@ -14,7 +14,7 @@ TypeScript/JavaScript client library for LiveTemplate - reactive HTML over the w
 
 ## Overview
 
-The LiveTemplate client enables reactive web applications by efficiently applying tree-based HTML updates from the server. It uses DOM morphing, intelligent static content caching, and WebSocket transport for real-time interactivity.
+The server sends tree-based HTML updates; this client applies them to the DOM. It morphs the existing nodes rather than replacing them, keeps the static parts of the page cached, and carries actions and updates over a WebSocket.
 
 ## Features
 
@@ -39,7 +39,7 @@ npm install @livetemplate/client
 ### CDN
 
 ```html
-<script src="https://cdn.jsdelivr.net/npm/@livetemplate/client@0.1.0/dist/livetemplate-client.browser.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@livetemplate/client@0.20.0/dist/livetemplate-client.browser.js"></script>
 ```
 
 ## Quick Start
@@ -50,7 +50,7 @@ npm install @livetemplate/client
 <!DOCTYPE html>
 <html>
 <head>
-    <script src="https://cdn.jsdelivr.net/npm/@livetemplate/client@0.1.0/dist/livetemplate-client.browser.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@livetemplate/client@0.20.0/dist/livetemplate-client.browser.js"></script>
 </head>
 <body>
     <div id="app"></div>
@@ -146,7 +146,7 @@ The client supports six native HTML5 drag events as `lvt-on:*` bindings: `dragst
 - **Throttle dragover**: `dragover` fires at ~60 Hz. Add `lvt-mod:throttle="100"` (or higher) to any `dragover` handler bound to a real action, or use the marker pattern.
 - **v1 limitation**: `effectAllowed` and `dropEffect` are hardcoded to `"move"`. Copy/link drag semantics are not yet configurable.
 
-## How It Works
+## How it works
 
 1. **Initial Render**: Client fetches full HTML from server, caches static structure
 2. **Updates**: Server sends only changed dynamic values as tree updates
@@ -246,7 +246,7 @@ See [CONTRIBUTING.md](/contributing/client) for development guidelines.
 
 ## License
 
-MIT License - see [LICENSE](https://github.com/livetemplate/client/blob/v0.20.0/LICENSE) for details.
+MIT License - see [LICENSE](https://github.com/livetemplate/client/blob/v0.25.0/LICENSE) for details.
 
 ## Support
 

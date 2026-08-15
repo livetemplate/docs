@@ -2,8 +2,8 @@
 title: "Changelog"
 source_repo: "https://github.com/livetemplate/client"
 source_path: "CHANGELOG.md"
-source_ref: "v0.20.0"
-source_commit: "03d463fddee48ef85b58d5d31984f0e941cebbb3"
+source_ref: "v0.25.0"
+source_commit: "bcaba2b8bc6062bdcb56045d3b0ba5bc052ef77d"
 ---
 
 # Changelog
@@ -13,13 +13,44 @@ All notable changes to @livetemplate/client will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [v0.20.0] - 2026-07-20
+## [v0.25.0] - 2026-08-15
 
 ### Changes
 
-- fix(upload): warn when marked fields cannot travel on a chunked upload (#152) (cdf1c3f)
-- fix(release): run tests before mutating, restore files on abort (#151) (769f77e)
-- docs(changelog): curate the v0.19.1 entry after release.sh (588863e)
+- docs(changelog): merge three orphaned [Unreleased] sections into their releases (#158) (9ac9b56)
+- docs(readme): say what the client does, not what it enables (#157) (2c3978b)
+- docs: pin the README CDN snippets, and make the release own them (#156) (ccae125)
+- fix(release): promote the curated [Unreleased] instead of regenerating (#154) (a1d43e5)
+- docs(changelog): curate the v0.20.0 entry after release.sh (6281b3f)
+
+
+
+## [v0.20.0] - 2026-07-20
+
+### Fixed
+
+- **A field marked `lvt-upload-with` that cannot reach the handler now says so.**
+  Fields only ever travel on the multipart upload path. Proxied always uses it,
+  so `OnUpload` always receives them — but Volume goes over the WebSocket in
+  chunks while the socket is up (falling back to multipart when it is down), and
+  Direct PUTs straight to storage and completes with a metadata-only message.
+  Neither carries form fields, so the server builds the
+  `upload_<name>_complete` action's context from an empty map and the handler
+  sees nothing, with nothing in the markup to explain it. The client now warns
+  on both transports, naming the fields and the remedy — which differs: Volume
+  delivers them on its multipart fallback, Direct never delivers them at all.
+  (#152, livetemplate#508)
+
+### Internal
+
+- `scripts/release.sh` runs tests and the build before touching VERSION,
+  package.json or CHANGELOG.md, and restores those files when a run aborts
+  before committing. Previously a failing test left them rewritten, and since
+  the script refuses to start on a dirty tree, the next attempt failed for a
+  reason unrelated to the first. (#151)
+
+  This release jumps 0.19.1 → 0.20.0 to track the core library's v0.20.0, which
+  `scripts/release.sh` enforces on major.minor.
 
 
 
@@ -501,7 +532,6 @@ For the full design rationale, see the [attribute-reduction proposal](https://gi
 
 
 
-## [Unreleased]
 
 ### Added
 
@@ -575,7 +605,6 @@ The `__navigate__` in-band action is a no-op on server versions before livetempl
 
 
 
-## [Unreleased]
 
 ### Added
 
@@ -591,7 +620,6 @@ The `__navigate__` in-band action is a no-op on server versions before livetempl
 
 
 
-## [Unreleased]
 
 ### Added
 
