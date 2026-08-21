@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"net/http/httptest"
 	"os"
 	"path/filepath"
@@ -57,6 +58,45 @@ func newChromiumCtx(t *testing.T) context.Context {
 	return ctx
 }
 
+// waitClientReady blocks until the client bundle has loaded and bound its
+// listeners. Every upload here is driven by a change event on an
+// input[lvt-upload], and the input is server-rendered: it is visible in the
+// initial HTML, long before the deferred bundle loads. Firing the change event
+// in that gap drops it silently, no upload starts, and the WaitVisible on the
+// result element then burns the whole 60s context deadline — which is what
+// upload-modes_test.go:119 kept failing with in CI.
+//
+// isReady() is the right signal rather than the weaker "client object exists"
+// check used elsewhere in the repo: measured against this app with the socket
+// killed, the object appears after ~2ms and isReady() only goes true at ~640ms.
+// It resolves on the HTTP-fallback path too, so the WS-disabled tests can wait
+// on the same condition.
+func waitClientReady(timeout time.Duration) chromedp.Action {
+	return chromedp.ActionFunc(func(ctx context.Context) error {
+		start := time.Now()
+		for {
+			var ready bool
+			if err := chromedp.Evaluate(
+				`!!(window.liveTemplateClient && window.liveTemplateClient.isReady && window.liveTemplateClient.isReady())`,
+				&ready,
+			).Do(ctx); err != nil {
+				return fmt.Errorf("evaluate client readiness: %w", err)
+			}
+			if ready {
+				return nil
+			}
+			if time.Since(start) > timeout {
+				return fmt.Errorf("client not ready after %v", timeout)
+			}
+			select {
+			case <-ctx.Done():
+				return ctx.Err()
+			case <-time.After(10 * time.Millisecond):
+			}
+		}
+	})
+}
+
 // newUploadModesApp clears the storage dirs, starts the example server, and
 // returns it with its base URL wired into the controller's presigner.
 func newUploadModesApp(t *testing.T) (*httptest.Server, *UploadModesController) {
@@ -109,6 +149,7 @@ func TestUploadModes_E2E(t *testing.T) {
 	if err := chromedp.Run(ctx,
 		chromedp.Navigate(srv.URL),
 		chromedp.WaitVisible(`input[lvt-upload="proxied"]`, chromedp.ByQuery),
+		waitClientReady(20*time.Second),
 		// Set the record id before selecting the file: the client serializes it
 		// into the multipart POST ahead of the file part, and OnUpload reads it.
 		chromedp.SetValue(`#proxied-record-id`, "invoice-42", chromedp.ByQuery),
@@ -189,6 +230,7 @@ func TestUploadModes_ProxiedWSDisabled_E2E(t *testing.T) {
 		}),
 		chromedp.Navigate(srv.URL),
 		chromedp.WaitVisible(`input[lvt-upload="proxied"]`, chromedp.ByQuery),
+		waitClientReady(20*time.Second),
 		// The form field rides the multipart POST on the HTTP-fallback path too.
 		chromedp.SetValue(`#proxied-record-id`, "offline-9", chromedp.ByQuery),
 		chromedp.SetUploadFiles(`input[lvt-upload="proxied"]`, []string{img}, chromedp.ByQuery),
@@ -232,6 +274,7 @@ func TestUploadModes_DirectWSDisabled_E2E(t *testing.T) {
 		}),
 		chromedp.Navigate(srv.URL),
 		chromedp.WaitVisible(`input[lvt-upload="direct"]`, chromedp.ByQuery),
+		waitClientReady(20*time.Second),
 		chromedp.SetUploadFiles(`input[lvt-upload="direct"]`, []string{img}, chromedp.ByQuery),
 		// #direct-result only renders after the HTTP upload_complete handshake
 		// reconstructs the entry and UploadDirectComplete sets the ref.
@@ -272,6 +315,7 @@ func TestUploadModes_VolumeWSDisabled_E2E(t *testing.T) {
 		}),
 		chromedp.Navigate(srv.URL),
 		chromedp.WaitVisible(`input[lvt-upload="volume"]`, chromedp.ByQuery),
+		waitClientReady(20*time.Second),
 		chromedp.SetUploadFiles(`input[lvt-upload="volume"]`, []string{img}, chromedp.ByQuery),
 		chromedp.WaitVisible(`#volume-result`, chromedp.ByQuery),
 		chromedp.Text(`#volume-result`, &volumeText, chromedp.ByQuery),
