@@ -35,7 +35,7 @@ layout: landing
   <a class="sub" href="#pending">Pending state</a>
   <a class="sub" href="#realtime">Multi-user</a>
   <a href="#compare">How it compares</a>
-  <a href="#more">Everything else</a>
+  <a href="#more">More capabilities</a>
 </aside>
 
 <main class="doc">
@@ -206,7 +206,7 @@ func main() {
   <h2>The HTML rule runs again in Go.</h2>
   <p class="lead">Both halves are in the app above. The input carries <code>required</code>, and <code>ctx.ValidateForm()</code> re-runs exactly that rule on the server — a client that skipped it, scripting off or a direct POST, gets the same answer. Then <code>strings.EqualFold(name, "admin")</code> adds the rule HTML has no way to state.</p>
 
-  <p class="lead">The template side is the other two lines you read: <code>{{.lvt.AriaInvalid "name"}}</code> marks the field, <code>{{.lvt.ErrorTag "name"}}</code> is where the message lands. Returning an error from <code>Greet</code> is the whole mechanism — there's nothing to route. Scroll up and type <em>admin</em>, or try the smaller app here.</p>
+  <p class="lead">On the template side: <code>{{.lvt.AriaInvalid "name"}}</code> marks the field, <code>{{.lvt.ErrorTag "name"}}</code> is where the message lands. Returning an <a href="/reference/error-handling">error</a> from <code>Greet</code> is the whole mechanism — there's nothing to route. Scroll up and type <em>admin</em>, or try the smaller app here.</p>
 
   <div class="demo">
     <div class="demo-bar"><span class="dot"></span> greet-validate · the same pair, on its own</div>
@@ -310,7 +310,7 @@ func main() {
   <div class="snip">
     <div class="snip-label">app.go · the server can start the same cycle</div>
 <pre class="language-go"><code class="language-go">sess.TriggerAction("ServerRefresh", nil)</code></pre>
-    <p class="note">You already read the <code>WithTopicACL</code> in <code>main</code> that admits <code>"wall"</code> — developer topics are deny-all until you name one. This is the same publish path with no user action behind it: the "the server said hi at …" line in the cards above, pushed on a timer.</p>
+    <p class="note">You already read the <a href="/reference/pubsub"><code>WithTopicACL</code></a> in <code>main</code> that admits <code>"wall"</code> — developer topics are deny-all until you name one. This is the same publish path with no user action behind it: the "the server said hi at …" line in the cards above, pushed on a timer.</p>
   </div>
 
 </section>
@@ -334,14 +334,14 @@ func main() {
 </section>
 
 <section id="more" class="step">
-  <div class="eyebrow">Everything else</div>
-  <h2>The rest of the docs covers the ordinary screens.</h2>
-  <p class="lead">Admin panels, internal tools, CRUD, dashboards, approvals, uploads, auth, and the occasional shared view. That is what this is for.</p>
+  <div class="eyebrow">More capabilities</div>
+  <h2>Your app has file uploads and a login. Both are here.</h2>
+  <p class="lead">Admin screens, internal tools, CRUD and dashboards are the point.</p>
   <div class="links">
     <a href="/reference/uploads"><span class="link-t">File uploads</span><span class="link-g">live progress, same app</span></a>
-    <a href="/reference/pubsub"><span class="link-t">Shared views</span><span class="link-g">Subscribe &amp; Publish</span></a>
+    <a href="/recipes/login/"><span class="link-t">Auth &amp; login</span><span class="link-g">form-based sessions, no middleware</span></a>
     <a href="/reference/session"><span class="link-t">Sessions &amp; state</span><span class="link-g">scoped per browser or user</span></a>
-    <a href="/reference/error-handling"><span class="link-t">Forms &amp; errors</span><span class="link-g">Go errors, same template</span></a>
+    <a href="/reference/navigate"><span class="link-t">Navigation</span><span class="link-g">move between pages, no reload</span></a>
     <a href="/cli/"><span class="link-t">Scaffolding</span><span class="link-g">generate common app shapes</span></a>
     <a href="/client/"><span class="link-t">Browser client</span><span class="link-g">transport &amp; DOM patching</span></a>
     <a href="/guides/observability"><span class="link-t">Observability</span><span class="link-g">metrics &amp; tracing hooks</span></a>
