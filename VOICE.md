@@ -69,6 +69,13 @@ back on every rewrite because it reads as thoughtful:
 Say the plain thing. "load-bearing" is "this line is what makes it work".
 "surfaces an error" is "shows the error". "primitives" is usually "functions".
 
+**A pointer bolted onto a finished paragraph.** "The pubsub reference has the
+topic rules and the ACL in full." "…and the error handling reference has the
+rest." Both were links that needed a home after a nav change, and a trailing
+sentence was the lazy place to put them. Hang the link on the noun or the API
+symbol the reader is already looking at, and let the paragraph keep its ending —
+usually an imperative, which a trailing pointer flattens.
+
 **The rhetorical reversal.** A contrast whose second half exists only to make the
 sentence land:
 
@@ -133,6 +140,38 @@ Keep the rail label, the eyebrow and the h2 of a section saying the same thing.
 When they drifted, all three were vague at once ("What's going on" / "What's
 going on" / "The parts of that worth a second look.") and none named the
 contents.
+
+## Labels are not sentences
+
+That rule is about headings. It stops at the slots around them — the eyebrow
+over an h2, the rail link pointing at it, a nav item, the gloss under a link.
+Those name a topic. They don't argue, concede, or set anything up.
+
+Three on the landing took two attempts each before landing somewhere plain:
+
+    Everything else         ->  More capabilities
+    What the wall skipped   ->  More capabilities
+    What's going on         ->  Line by line
+
+Every attempt in between was a phrase doing rhetorical work — meeting an
+objection, or naming a gap. The slot wanted a name. A
+reader scanning the rail is asking whether the thing they want is in there, and
+only a name answers that.
+
+The test: read the label with the page hidden. If it doesn't say what's in the
+section, it's decoration.
+
+## If the heading won't come, the section is the problem
+
+The landing's last section carried three subjects at once — a heading about the
+documentation, a lead listing app types, and eight links listing capabilities.
+Three rewrites of the heading failed in a row, because no heading summarises
+three subjects.
+
+Cut the section to one subject first; the heading writes itself afterwards. The
+same pass also deleted a lead that enumerated the eight links sitting directly
+below it, each of which already carried its own gloss. A lead that lists what
+the layout is already showing is doing the layout's job.
 
 ## A comparison table must concede
 
