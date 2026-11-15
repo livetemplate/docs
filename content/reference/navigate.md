@@ -2,8 +2,8 @@
 title: "Navigate Action Reference"
 source_repo: "https://github.com/livetemplate/livetemplate"
 source_path: "docs/references/navigate.md"
-source_ref: "v0.25.1"
-source_commit: "684d51af83d42352cbef933672129df32ccfa1b2"
+source_ref: "v0.25.2"
+source_commit: "165e6b5a10d065f56974c2a6cb651a317cd9faa6"
 ---
 
 # Navigate Action Reference
@@ -121,7 +121,7 @@ The test that proves this is `TestNavigateActionReMountsWithNewQueryData` in `na
 3. Sends `{action: "__navigate__", data: {s: "beta"}}` over the same WS.
 4. Confirms the next render flips `Selected` to `"beta"` and bumps `MountCount` to `2` — proving Mount re-ran without any reconnect.
 
-Browser-level chromedp tests live in the lvt repo at `e2e/livetemplate_core_test.go` per the [test strategy](https://github.com/livetemplate/livetemplate/blob/v0.25.1/CLAUDE.md). Both layers must stay green.
+Browser-level chromedp tests live in the lvt repo at `e2e/livetemplate_core_test.go` per the [test strategy](https://github.com/livetemplate/livetemplate/blob/v0.25.2/CLAUDE.md). Both layers must stay green.
 
 ---
 

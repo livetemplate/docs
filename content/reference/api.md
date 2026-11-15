@@ -2,8 +2,8 @@
 title: "Go Library API Reference"
 source_repo: "https://github.com/livetemplate/livetemplate"
 source_path: "docs/references/api-reference.md"
-source_ref: "v0.25.1"
-source_commit: "684d51af83d42352cbef933672129df32ccfa1b2"
+source_ref: "v0.25.2"
+source_commit: "165e6b5a10d065f56974c2a6cb651a317cd9faa6"
 ---
 
 # Go Library API Reference
