@@ -2,8 +2,8 @@
 title: "@livetemplate/client"
 source_repo: "https://github.com/livetemplate/client"
 source_path: "README.md"
-source_ref: "v0.25.0"
-source_commit: "bcaba2b8bc6062bdcb56045d3b0ba5bc052ef77d"
+source_ref: "v0.25.4"
+source_commit: "877eb004b813b26517749c96a951576fe24c4a44"
 ---
 
 # @livetemplate/client
@@ -39,7 +39,7 @@ npm install @livetemplate/client
 ### CDN
 
 ```html
-<script src="https://cdn.jsdelivr.net/npm/@livetemplate/client@0.20.0/dist/livetemplate-client.browser.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@livetemplate/client@0.25.4/dist/livetemplate-client.browser.js"></script>
 ```
 
 ## Quick Start
@@ -50,7 +50,7 @@ npm install @livetemplate/client
 <!DOCTYPE html>
 <html>
 <head>
-    <script src="https://cdn.jsdelivr.net/npm/@livetemplate/client@0.20.0/dist/livetemplate-client.browser.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@livetemplate/client@0.25.4/dist/livetemplate-client.browser.js"></script>
 </head>
 <body>
     <div id="app"></div>
@@ -135,6 +135,56 @@ window.addEventListener("livetemplate:update", (e) => {
     console.log("Received update:", e.detail);
 });
 ```
+
+### Attribute handlers
+
+Add your own `lvt-*` attribute without forking the client. Push the handler onto
+`window.lvtAttributes`, which works in any load order. An inline `<script>`
+ignores `defer`, so it runs *before* the deferred client; the client registers
+whatever was queued when it loads.
+
+```html
+<button lvt-x:copy="{{.ShareURL}}">Copy link</button>
+<script src="{{ lvtClientScriptURL }}" defer></script>
+<script>
+  (window.lvtAttributes ||= []).push({
+    attribute: "lvt-x:copy",
+    onElementAdded(el, ctx) {
+      el.addEventListener("click", () => navigator.clipboard.writeText(ctx.value));
+    },
+  });
+</script>
+```
+
+Code that runs after the client (a deferred bundle, an ES module import) can call
+`LiveTemplateClient.registerAttribute(handler)` directly instead. Either way, a
+handler registered before the client connects runs over the server-rendered page
+at connect, and one registered later runs against the live DOM immediately.
+
+- `needsServerChannel: true` gives the handler `ctx.send({ action, data })`.
+- `delegatedEvents: ["my-widget-change"]` makes `lvt-on:my-widget-change="Save"`
+  reach the server. Event types must be lowercase, and the event must bubble.
+- A low-level handler (`selectors` + `setup()`) declares the names it implements
+  in `claims`, so the census below counts them as handled. Its `setup()` runs on
+  every render that changes the DOM (and at connect with `runOnConnect: true`),
+  so it must be safe to call again over elements it has already wired.
+- Once the client has loaded, `window.lvtAttributes` only supports `push`; it is
+  no longer an array.
+
+**Attribute census.** The server tells the client every `lvt-*` attribute the
+template uses. After the window `load` event, the client warns once for each
+name nothing claims. That attribute does nothing, usually because the script
+that registers it didn't load, or because of a typo. A handler registered after
+`load` (a lazily imported chunk, say) is reported even though it arrives later.
+
+**Stability.** The handler interface (`AttributeHandler` and its context types)
+is public API under semver:
+
+- **Minor release:** may add *optional* members.
+- **Major release:** needed to remove or rename a member, add a required one,
+  change a callback's arguments, or change when a callback fires.
+- **Deprecation:** a member being removed logs a deprecation warning for at least
+  one minor release first.
 
 ### Drag-and-drop notes
 
@@ -246,7 +296,7 @@ See [CONTRIBUTING.md](/contributing/client) for development guidelines.
 
 ## License
 
-MIT License - see [LICENSE](https://github.com/livetemplate/client/blob/v0.25.0/LICENSE) for details.
+MIT License - see [LICENSE](https://github.com/livetemplate/client/blob/v0.25.4/LICENSE) for details.
 
 ## Support
 
