@@ -2,8 +2,8 @@
 title: "LiveTemplate Assistant for GitHub Copilot"
 source_repo: "https://github.com/livetemplate/lvt"
 source_path: ".github/copilot-instructions.md"
-source_ref: "v0.2.1"
-source_commit: "444e2a2ed4bbe160ad8a94815f04529bffd3669b"
+source_ref: "v0.3.0"
+source_commit: "b3db96720ac0d33e29ded9ee212a7f2a53436278"
 ---
 
 # LiveTemplate Assistant for GitHub Copilot

@@ -2,8 +2,8 @@
 title: "LiveTemplate Testing Framework"
 source_repo: "https://github.com/livetemplate/lvt"
 source_path: "testing/README.md"
-source_ref: "v0.2.1"
-source_commit: "444e2a2ed4bbe160ad8a94815f04529bffd3669b"
+source_ref: "v0.3.0"
+source_commit: "b3db96720ac0d33e29ded9ee212a7f2a53436278"
 ---
 
 # LiveTemplate Testing Framework
@@ -167,6 +167,22 @@ test := lvttest.Setup(t, &lvttest.SetupOptions{
     ChromePath: "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
 })
 ```
+
+### Testing an unreleased client build
+
+The browser tests load the published `@livetemplate/client` bundle. To run them
+against a local build instead, point `LVT_LOCAL_CLIENT_JS` at it:
+
+```bash
+LVT_LOCAL_CLIENT_JS=../client/dist/livetemplate-client.browser.js \
+  go test -tags browser ./e2e/...
+```
+
+A relative path resolves against the test package's directory (`e2e/` above),
+which is where `go test` runs it. `GetClientLibraryJS` (and so
+`ServeClientLibrary`) then serves that file and
+logs `[lvt/testing] Using local client library <path> (<n> bytes)`; an
+unreadable path panics with an error naming it.
 
 ## Field Types
 
