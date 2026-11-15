@@ -2,8 +2,8 @@
 title: "Changelog"
 source_repo: "https://github.com/livetemplate/livetemplate"
 source_path: "CHANGELOG.md"
-source_ref: "v0.25.1"
-source_commit: "684d51af83d42352cbef933672129df32ccfa1b2"
+source_ref: "v0.25.2"
+source_commit: "165e6b5a10d065f56974c2a6cb651a317cd9faa6"
 ---
 
 # Changelog
@@ -12,6 +12,17 @@ All notable changes to LiveTemplate will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [v0.25.2] - 2026-11-15
+
+### Fixed
+
+- **`ClientScriptURL` and `ClientStyleURL` now serve `@livetemplate/client`
+  0.25.4, up from 0.25.3.** That client release fixes an update that switches
+  an `{{if}}`/`{{else}}` branch between a range and a non-range at the same
+  position. The client used to merge the two nodes, kept the old range data,
+  and dropped the new branch's content. It now replaces the node
+  (livetemplate/client#164).
 
 ## [v0.25.1] - 2026-11-14
 
