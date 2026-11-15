@@ -2,8 +2,8 @@
 title: "Client Attributes Reference"
 source_repo: "https://github.com/livetemplate/livetemplate"
 source_path: "docs/references/client-attributes.md"
-source_ref: "v0.25.0"
-source_commit: "de4c80d83cf8a18cd629e515904517b2889f3e74"
+source_ref: "v0.25.1"
+source_commit: "684d51af83d42352cbef933672129df32ccfa1b2"
 ---
 
 # Client Attributes Reference
@@ -1251,5 +1251,5 @@ form.addEventListener('lvt:pending', (e) => {
 - **[Go API Reference](https://pkg.go.dev/github.com/livetemplate/livetemplate)** - Server-side API
 - **[Error Handling Reference](/reference/error-handling)** - Validation, error display, client-side handling
 - **[Template Support Matrix](/reference/template-support-matrix)** - Supported Go template features
-- **[Architecture](https://github.com/livetemplate/livetemplate/blob/v0.25.0/docs/design/ARCHITECTURE.md)** - System architecture
+- **[Architecture](https://github.com/livetemplate/livetemplate/blob/v0.25.1/docs/design/ARCHITECTURE.md)** - System architecture
 - **[Contributing Guide](/contributing/livetemplate)** - How to contribute
