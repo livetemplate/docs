@@ -60,6 +60,7 @@ Order: getting-started -> guides -> reference -> CLI -> client -> recipes -> con
 | Ephemeral Components | `livetemplate` | `docs/guides/ephemeral-components.md` | `/guides/ephemeral-components` | yes |
 | Observability | `livetemplate` | `docs/guides/OBSERVABILITY.md` | `/guides/observability` | yes |
 | Scaling | `livetemplate` | `docs/guides/SCALING.md` | `/guides/scaling` | yes |
+| Custom attributes | `livetemplate` | `docs/guides/custom-attributes.md` | `/guides/custom-attributes` | yes |
 | New Contributor Walkthrough | `livetemplate` | `docs/guides/new-contributor-walkthrough.md` | `/contributing/livetemplate/walkthrough` | yes (under contributing) |
 
 ### Reference (mirror)

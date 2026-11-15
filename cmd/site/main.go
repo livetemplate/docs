@@ -23,6 +23,7 @@ import (
 
 	"github.com/livetemplate/docs/examples/counter"
 	counterbasic "github.com/livetemplate/docs/examples/counter-basic"
+	customattributes "github.com/livetemplate/docs/examples/custom-attributes"
 	draftform "github.com/livetemplate/docs/examples/draft-form"
 	filetree "github.com/livetemplate/docs/examples/file-tree"
 	"github.com/livetemplate/docs/examples/greet"
@@ -103,6 +104,14 @@ func main() {
 	// several levels down scopes the update to that leaf rather than re-sending
 	// the branch, which is what makes deep trees practical over the wire.
 	mux.Handle("/apps/file-tree/", http.StripPrefix("/apps/file-tree", filetree.Handler(
+		livetemplate.WithAllowedOrigins(allowedOrigins),
+	)))
+
+	// custom-attributes is the authoring recipe for app-defined lvt-x:*
+	// attributes: a star rating that dispatches an action, a copy button, and
+	// keyboard shortcuts the server can switch off. The handlers are pushed
+	// onto window.lvtAttributes from an inline script in the template.
+	mux.Handle("/apps/custom-attributes/", http.StripPrefix("/apps/custom-attributes", customattributes.Handler(
 		livetemplate.WithAllowedOrigins(allowedOrigins),
 	)))
 
