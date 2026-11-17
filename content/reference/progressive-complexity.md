@@ -2,8 +2,8 @@
 title: "Progressive Complexity Reference"
 source_repo: "https://github.com/livetemplate/livetemplate"
 source_path: "docs/references/progressive-complexity-reference.md"
-source_ref: "v0.25.2"
-source_commit: "165e6b5a10d065f56974c2a6cb651a317cd9faa6"
+source_ref: "main"
+source_commit: "5e0029bc7fed2cc6d9c94e42901752dc47bcd3c2"
 ---
 
 # Progressive Complexity Reference
