@@ -15,9 +15,14 @@ import (
 	"time"
 
 	"github.com/chromedp/cdproto/network"
+	"github.com/chromedp/cdproto/page"
 	"github.com/chromedp/cdproto/runtime"
 	"github.com/chromedp/chromedp"
 )
+
+// preConnectLatencyMs is the latency added to every request, the WebSocket
+// handshake included.
+const preConnectLatencyMs = 1500
 
 func TestRecipeCustomAttributesEmbed(t *testing.T) {
 	ctx, cancel := newCtx(t)
@@ -26,11 +31,14 @@ func TestRecipeCustomAttributesEmbed(t *testing.T) {
 	consoleErrs := captureConsoleErrors(ctx)
 	// The census warns rather than errors, so captureConsoleErrors misses it.
 	var warnings []string
-	// Handlers attach when the first render arrives over the WebSocket, so a
-	// click before then does nothing. On a remote site the button is visible
-	// well before that.
+	// On a remote site the server-rendered button is clickable before the
+	// embed's WebSocket opens. The client arms the handlers on that markup
+	// before it creates the socket, and holds their sends until the socket
+	// opens, so a click in that window still rates. The test clicks as soon as
+	// the socket is created; added latency keeps the handshake open past it.
+	wsCreated := make(chan struct{})
 	firstFrame := make(chan struct{})
-	var once sync.Once
+	var createdOnce, frameOnce sync.Once
 	chromedp.ListenTarget(ctx, func(ev interface{}) {
 		switch e := ev.(type) {
 		case *runtime.EventConsoleAPICalled:
@@ -39,8 +47,10 @@ func TestRecipeCustomAttributesEmbed(t *testing.T) {
 					warnings = append(warnings, string(a.Value))
 				}
 			}
+		case *network.EventWebSocketCreated:
+			createdOnce.Do(func() { close(wsCreated) })
 		case *network.EventWebSocketFrameReceived:
-			once.Do(func() { close(firstFrame) })
+			frameOnce.Do(func() { close(firstFrame) })
 		}
 	})
 
@@ -53,18 +63,31 @@ func TestRecipeCustomAttributesEmbed(t *testing.T) {
 
 	if err := chromedp.Run(ctx,
 		network.Enable(),
-		chromedp.Navigate(baseURL()+"/recipes/custom-attributes"),
-		chromedp.WaitVisible(mount+` [data-star="3"]`, chromedp.ByQuery),
+		network.EmulateNetworkConditions(false, preConnectLatencyMs, -1, -1),
+		// page.Navigate, unlike chromedp.Navigate, does not wait for the load
+		// event, which can come after the handshake.
+		chromedp.ActionFunc(func(ctx context.Context) error {
+			_, _, _, _, err := page.Navigate(baseURL() + "/recipes/custom-attributes").Do(ctx)
+			return err
+		}),
 		chromedp.ActionFunc(func(context.Context) error {
 			select {
-			case <-firstFrame:
+			case <-wsCreated:
 				return nil
-			case <-time.After(15 * time.Second):
-				return errors.New("no WebSocket frame from the embed")
+			case <-time.After(30 * time.Second):
+				return errors.New("the embed never created a WebSocket")
 			}
 		}),
 		chromedp.Click(mount+` [data-star="3"]`, chromedp.ByQuery),
-		chromedp.Poll(rating("3"), nil, chromedp.WithPollingTimeout(15*time.Second)),
+		chromedp.ActionFunc(func(context.Context) error {
+			select {
+			case <-firstFrame:
+				return errors.New("the WebSocket delivered a frame before the click, so the click was not in the pre-connect window")
+			default:
+				return nil
+			}
+		}),
+		chromedp.Poll(rating("3"), nil, chromedp.WithPollingTimeout(30*time.Second)),
 	); err != nil {
 		t.Fatalf("lvt-x:rating did not rate inside the embed: %v\nconsole errors: %v", err, consoleErrs())
 	}
@@ -89,8 +112,8 @@ func TestRecipeCustomAttributesEmbed(t *testing.T) {
 }
 
 // The guide is synced from livetemplate, and tinkerdown serves only the pages
-// tinkerdown.yaml lists, falling back to the landing page for the rest. So a
-// synced guide without a nav entry renders the home page at its own URL.
+// tinkerdown.yaml lists. A synced guide without a nav entry is a 404 (before
+// tinkerdown v0.4.2 it rendered the landing page with a 200).
 func TestGuideCustomAttributesIsRouted(t *testing.T) {
 	ctx, cancel := newCtx(t)
 	defer cancel()
