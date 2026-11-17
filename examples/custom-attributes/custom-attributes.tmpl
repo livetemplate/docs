@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Custom attributes</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
+    <link rel="stylesheet" href="{{lvtClientStyleURL}}">
+    <style>
+        .stars button { font-size: 2rem; padding: 0 .25rem; background: none; border: none; color: var(--pico-muted-color); }
+        .stars button.on { color: #e0a800; }
+        kbd { font-size: .8rem; }
+    </style>
+    <script defer src="{{lvtClientScriptURL}}"></script>
+</head>
+<body>
+        <script>
+            // An inline script ignores `defer`, so this runs before the client
+            // has loaded. Queue the handlers; the client registers them when it
+            // loads. It sits inside <body> so it survives a host page (the docs
+            // site) inlining only the app's body.
+            (window.lvtAttributes ||= []).push(
+                {
+                    // Declarative, sends an action. ctx.value is the action name.
+                    attribute: "lvt-x:rating",
+                    needsServerChannel: true,
+                    onElementAdded(el, ctx) {
+                        el.addEventListener("click", (e) => {
+                            const star = e.target.closest("[data-star]");
+                            if (!star) return;
+                            ctx.send?.({ action: ctx.value, data: { stars: Number(star.dataset.star) } });
+                        }, { signal: ctx.signal });
+                    },
+                },
+                {
+                    // Declarative, visual only. ctx.value is read at click time,
+                    // so it is the link for the current rating.
+                    attribute: "lvt-x:copy",
+                    onElementAdded(el, ctx) {
+                        el.addEventListener("click", async () => {
+                            await navigator.clipboard.writeText(ctx.value);
+                            el.textContent = "Copied";
+                            setTimeout(() => { el.textContent = "Copy link"; }, 1500);
+                        }, { signal: ctx.signal });
+                    },
+                },
+            );
+
+            // Low-level: one keydown listener for the whole page, mapping each key
+            // to the element that claims it. That shared state is what the
+            // declarative layer has no place for.
+            (() => {
+                // One key map per client: the registry is shared by every
+                // client on the page, and setup() runs for each one's renders.
+                const keysByRoot = new Map();
+                const onKey = (e) => {
+                    if (e.ctrlKey || e.metaKey || e.altKey) return;
+                    if (e.target.closest?.("input, textarea, select, [contenteditable]")) return;
+                    for (const keys of keysByRoot.values()) {
+                        const el = keys.get(e.key);
+                        if (el) return el.click();
+                    }
+                };
+                window.lvtAttributes.push({
+                    name: "lvt-x:hotkey",
+                    selectors: ["[lvt-x\\:hotkey]"],
+                    claims: ["lvt-x:hotkey"],
+                    runOnConnect: true,
+                    setup({ wrapperRoot }) {
+                        // Sweep and re-arm in one step: rebuild this client's map
+                        // from what its page carries now. A key whose attribute
+                        // the server removed is simply not in it.
+                        const keys = new Map();
+                        for (const el of wrapperRoot.querySelectorAll("[lvt-x\\:hotkey]")) {
+                            keys.set(el.getAttribute("lvt-x:hotkey"), el);
+                        }
+                        keysByRoot.set(wrapperRoot, keys);
+                        // setup() runs after every render. Adding the same function
+                        // again is a no-op in the DOM, so this never stacks.
+                        document.addEventListener("keydown", onKey);
+                    },
+                    teardown(root) {
+                        keysByRoot.delete(root);
+                    },
+                    dispose() {
+                        document.removeEventListener("keydown", onKey);
+                    },
+                });
+            })();
+        </script>
+    <main class="container">
+        <h1>Rate this recipe</h1>
+        <div class="stars" lvt-x:rating="SetRating">
+            {{range .Stars}}<button type="button" data-star="{{.}}" aria-label="{{.}} stars"{{if $.Shortcuts}} lvt-x:hotkey="{{.}}"{{end}}{{if ge $.Rating .}} class="on"{{end}}>★</button>{{end}}
+        </div>
+        <p id="rating">{{if .Rating}}Rated {{.Rating}} of 5.{{else}}Not rated yet.{{end}}</p>
+        <p>
+            <button type="button" id="copy" class="outline" lvt-x:copy="{{.ShareURL}}">Copy link</button>
+            <small id="share">{{.ShareURL}}</small>
+        </p>
+        <p>
+            <button type="button" id="shortcuts" class="secondary" lvt-on:click="ToggleShortcuts">{{if .Shortcuts}}Turn shortcuts off{{else}}Turn shortcuts on{{end}}</button>
+            <small id="shortcut-state">{{if .Shortcuts}}Press <kbd>1</kbd>–<kbd>5</kbd> to rate.{{else}}Keys 1–5 do nothing.{{end}}</small>
+        </p>
+    </main>
+</body>
+</html>

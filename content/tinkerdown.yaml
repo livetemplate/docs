@@ -192,6 +192,8 @@ navigation:
         path: "recipes/apps/seat-picker.md"
       - title: "File Tree"
         path: "recipes/apps/file-tree.md"
+      - title: "Custom Attributes"
+        path: "recipes/custom-attributes.md"
       - title: "Avatar Upload"
         path: "recipes/apps/avatar-upload.md"
       - title: "Upload Modes"

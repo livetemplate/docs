@@ -37,6 +37,9 @@ pages:
   - site_url: /guides/scaling
     source_repo: https://github.com/livetemplate/livetemplate
     source_path: docs/guides/SCALING.md
+  - site_url: /guides/custom-attributes
+    source_repo: https://github.com/livetemplate/livetemplate
+    source_path: docs/guides/custom-attributes.md
 
   # ---- Reference ----
   - site_url: /reference/api

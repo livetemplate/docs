@@ -34,6 +34,7 @@ Larger runnable recipes with more production shape:
 - [Seat picker](/recipes/apps/seat-picker) — cross-user realtime over a shared topic, all standard HTML.
 - [Shared notepad](/recipes/shared-notepad/) — per-user state with explicit peer refresh.
 - [File tree](/recipes/apps/file-tree) — a self-invoking recursive template; deep edits patch one leaf.
+- [Custom attributes](/recipes/custom-attributes) — three `lvt-x:*` attributes the app writes itself, one of them switched off by the server.
 - [Avatar upload](/recipes/apps/avatar-upload) — file upload on the ordinary form submit.
 - [Upload modes](/recipes/apps/upload-modes) — one input, four destinations, chosen by server config.
 - [Flash messages](/recipes/apps/flash-messages) — page-level notifications.
