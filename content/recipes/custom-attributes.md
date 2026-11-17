@@ -5,10 +5,10 @@ source_repo: "https://github.com/livetemplate/docs"
 source_path: "content/recipes/custom-attributes.md"
 ---
 
-# Custom Attributes — three handlers in one template
+# Custom Attributes
 
-None of these attributes ship with LiveTemplate: the app defines all three in an
-inline `<script>`. The [custom attributes guide](/guides/custom-attributes)
+The app below writes its own three attributes, `lvt-x:rating`, `lvt-x:copy` and
+`lvt-x:hotkey`, in an inline `<script>`. The [custom attributes guide](/guides/custom-attributes)
 explains the interface; the source is
 [`examples/custom-attributes/`](https://github.com/livetemplate/docs/tree/main/examples/custom-attributes).
 
