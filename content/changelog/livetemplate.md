@@ -2,8 +2,8 @@
 title: "Changelog"
 source_repo: "https://github.com/livetemplate/livetemplate"
 source_path: "CHANGELOG.md"
-source_ref: "v0.25.2"
-source_commit: "165e6b5a10d065f56974c2a6cb651a317cd9faa6"
+source_ref: "main"
+source_commit: "5e0029bc7fed2cc6d9c94e42901752dc47bcd3c2"
 ---
 
 # Changelog
@@ -12,6 +12,59 @@ All notable changes to LiveTemplate will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [v0.25.6] - 2026-11-16
+
+### Fixed
+
+- **A `{{with}}` inside a `{{range}}` no longer shifts an item's values on a live
+  update.** `{{with}}` now always yields one wrapped slot, like `{{if}}`. Before,
+  its slot shape depended on the data, so in a range (one shared statics array) an
+  item whose `with` differed from the first item's had its values land one slot to
+  the right and the `with`'s markup dropped. Full renders were unaffected. This
+  changes `{{with}}`'s wire shape; the client already handles it.
+- **`ClientScriptURL` and `ClientStyleURL` now serve `@livetemplate/client`
+  0.25.7, up from 0.25.6.** On a touch screen, the text-selection Comment button
+  is pinned bottom-centre, clear of iOS's Copy callout, and it commits the range it
+  was shown for, since iOS clears the selection on the tap (livetemplate/client#167).
+
+## [v0.25.5] - 2026-11-16
+
+### Fixed
+
+- **A `<script>` early in `<body>` no longer pushes the page out of the
+  wrapper.** The wrapper excluded body scripts by splitting at the first one,
+  so everything after a leading or mid-body `<script>` was server-rendered
+  outside the `data-lvt-id` wrapper. The first client render then filled the
+  wrapper with a second copy of the page, and the stale server-rendered copy
+  stayed visible after it. Now only the trailing run of top-level scripts (the
+  client bundle at the end of `<body>`, typically) goes after the wrapper; a
+  script with content after it stays in place.
+
+## [v0.25.4] - 2026-11-15
+
+### Fixed
+
+- **`ClientScriptURL` and `ClientStyleURL` now serve `@livetemplate/client`
+  0.25.6, up from 0.25.5.** That client release adds `ctx.signal` to a
+  declarative attribute handler's context, an `AbortSignal` that aborts when
+  the element disarms. Before it, a listener added in `onElementAdded`
+  outlived the attribute: the element kept reacting after the server removed
+  it, and re-adding the attribute stacked a second listener. Pass the signal to
+  the listener: `addEventListener(type, fn, { signal: ctx.signal })`
+  (livetemplate/client#166).
+
+## [v0.25.3] - 2026-11-15
+
+### Changed
+
+- **`ClientScriptURL` and `ClientStyleURL` now serve `@livetemplate/client`
+  0.25.5, up from 0.25.4.** That client release changes how
+  `lvt-fx:region-select` handles a box drawn over an HTML preview's empty
+  space: when the box touches no content block, the smallest enclosing wrapper
+  block answers instead of the selection doing nothing. Preview bridges opt in
+  by marking wrapper blocks `wrap: true`. Blocks without the flag behave as
+  before (livetemplate/client#165).
 
 ## [v0.25.2] - 2026-11-15
 

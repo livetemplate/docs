@@ -2,8 +2,8 @@
 title: "Progressive Complexity Guide"
 source_repo: "https://github.com/livetemplate/livetemplate"
 source_path: "docs/guides/progressive-complexity.md"
-source_ref: "v0.25.2"
-source_commit: "165e6b5a10d065f56974c2a6cb651a317cd9faa6"
+source_ref: "main"
+source_commit: "5e0029bc7fed2cc6d9c94e42901752dc47bcd3c2"
 ---
 
 # Progressive Complexity Guide
@@ -618,6 +618,8 @@ When disabled, POST requests from non-JS browsers return JSON instead of HTML. O
 ## 13. Tier 2: `lvt-*` Attributes
 
 Use `lvt-*` attributes only when standard HTML cannot express the behavior. For the complete attribute reference, see the [Client Attributes Reference](/reference/client-attributes).
+
+When no built-in attribute fits, write your own: see [Custom attributes](/guides/custom-attributes).
 
 ### 13.1 Event Bindings Outside Forms
 

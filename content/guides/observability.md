@@ -2,8 +2,8 @@
 title: "LiveTemplate Observability Guide"
 source_repo: "https://github.com/livetemplate/livetemplate"
 source_path: "docs/guides/OBSERVABILITY.md"
-source_ref: "v0.25.2"
-source_commit: "165e6b5a10d065f56974c2a6cb651a317cd9faa6"
+source_ref: "main"
+source_commit: "5e0029bc7fed2cc6d9c94e42901752dc47bcd3c2"
 ---
 
 # LiveTemplate Observability Guide
@@ -409,6 +409,6 @@ func RequestIDMiddleware(next http.Handler) http.Handler {
 
 ## Related Documentation
 
-- [ARCHITECTURE.md](https://github.com/livetemplate/livetemplate/blob/v0.25.2/docs/design/ARCHITECTURE.md) - System architecture overview
-- [internal/observe/](https://github.com/livetemplate/livetemplate/tree/v0.25.2/internal/observe) - Package implementation
+- [ARCHITECTURE.md](https://github.com/livetemplate/livetemplate/blob/main/docs/design/ARCHITECTURE.md) - System architecture overview
+- [internal/observe/](https://github.com/livetemplate/livetemplate/tree/main/internal/observe) - Package implementation
 - [Go slog documentation](https://pkg.go.dev/log/slog) - Standard library reference
