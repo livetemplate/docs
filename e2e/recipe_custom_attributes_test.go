@@ -7,10 +7,14 @@
 package e2e
 
 import (
+	"context"
+	"errors"
 	"strings"
+	"sync"
 	"testing"
 	"time"
 
+	"github.com/chromedp/cdproto/network"
 	"github.com/chromedp/cdproto/runtime"
 	"github.com/chromedp/chromedp"
 )
@@ -22,11 +26,21 @@ func TestRecipeCustomAttributesEmbed(t *testing.T) {
 	consoleErrs := captureConsoleErrors(ctx)
 	// The census warns rather than errors, so captureConsoleErrors misses it.
 	var warnings []string
+	// Handlers attach when the first render arrives over the WebSocket, so a
+	// click before then does nothing. On a remote site the button is visible
+	// well before that.
+	firstFrame := make(chan struct{})
+	var once sync.Once
 	chromedp.ListenTarget(ctx, func(ev interface{}) {
-		if e, ok := ev.(*runtime.EventConsoleAPICalled); ok && e.Type == runtime.APITypeWarning {
-			for _, a := range e.Args {
-				warnings = append(warnings, string(a.Value))
+		switch e := ev.(type) {
+		case *runtime.EventConsoleAPICalled:
+			if e.Type == runtime.APITypeWarning {
+				for _, a := range e.Args {
+					warnings = append(warnings, string(a.Value))
+				}
 			}
+		case *network.EventWebSocketFrameReceived:
+			once.Do(func() { close(firstFrame) })
 		}
 	})
 
@@ -38,8 +52,17 @@ func TestRecipeCustomAttributesEmbed(t *testing.T) {
 	}
 
 	if err := chromedp.Run(ctx,
+		network.Enable(),
 		chromedp.Navigate(baseURL()+"/recipes/custom-attributes"),
 		chromedp.WaitVisible(mount+` [data-star="3"]`, chromedp.ByQuery),
+		chromedp.ActionFunc(func(context.Context) error {
+			select {
+			case <-firstFrame:
+				return nil
+			case <-time.After(15 * time.Second):
+				return errors.New("no WebSocket frame from the embed")
+			}
+		}),
 		chromedp.Click(mount+` [data-star="3"]`, chromedp.ByQuery),
 		chromedp.Poll(rating("3"), nil, chromedp.WithPollingTimeout(15*time.Second)),
 	); err != nil {
