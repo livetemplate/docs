@@ -44,7 +44,7 @@ range like any other input.
 ```js include="/examples/custom-attributes/custom-attributes.tmpl" lines="35-47"
 ```
 
-The link includes the rating, which changes after the button is wired, so the
+The link includes the rating, which changes after the handler attaches, so the
 click reads `ctx.value` when it runs.
 
 ## Shortcuts the server can take away
