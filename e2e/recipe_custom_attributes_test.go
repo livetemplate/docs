@@ -87,3 +87,33 @@ func TestRecipeCustomAttributesEmbed(t *testing.T) {
 		}
 	}
 }
+
+// The guide is synced from livetemplate, and tinkerdown serves only the pages
+// tinkerdown.yaml lists, falling back to the landing page for the rest. So a
+// synced guide without a nav entry renders the home page at its own URL.
+func TestGuideCustomAttributesIsRouted(t *testing.T) {
+	ctx, cancel := newCtx(t)
+	defer cancel()
+	consoleErrs := captureConsoleErrors(ctx)
+
+	var h1s []string
+	var navLinks, recipeLinks int
+	if err := chromedp.Run(ctx,
+		chromedp.Navigate(baseURL()+"/guides/custom-attributes"),
+		chromedp.WaitReady("body", chromedp.ByQuery),
+		chromedp.Evaluate(`[...document.querySelectorAll('h1')].map(h => h.textContent.trim())`, &h1s),
+		chromedp.Evaluate(`document.querySelectorAll('nav a[href*="guides/custom-attributes"], aside a[href*="guides/custom-attributes"]').length`, &navLinks),
+		chromedp.Evaluate(`document.querySelectorAll('a[href*="/recipes/custom-attributes"]').length`, &recipeLinks),
+	); err != nil {
+		t.Fatalf("load guide: %v\nconsole errors: %v", err, consoleErrs())
+	}
+	if len(h1s) == 0 || h1s[0] != "Custom attributes" {
+		t.Errorf("guide h1s = %q, want the first to be %q", h1s, "Custom attributes")
+	}
+	if navLinks == 0 {
+		t.Error("sidebar has no link to the guide")
+	}
+	if recipeLinks == 0 {
+		t.Error("guide has no link to the recipe")
+	}
+}
