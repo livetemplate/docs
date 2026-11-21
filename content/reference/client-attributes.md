@@ -831,7 +831,15 @@ User-toggled `checked` state on `<input type="checkbox">` and `<input type="radi
 <input type="checkbox" {{if .Done}}checked{{end}} lvt-on:click="Toggle" data-id="{{.ID}}">
 ```
 
-If instead you want the user's selection to win for a checkbox that *also* sends a click to the server (e.g. a click handler that only logs a side effect), use `lvt-on:change` — only `lvt-on:click` opts into server authority.
+**`lvt-on:change` controls keep the user's selection until the server changes its own.** A checkbox or radio whose change is routed by `lvt-on:change` keeps what the user picked. The handler can sit on the control or on an ancestor such as its form. It takes the server's `checked` only when the server renders a different value than it did last time. That happens when something else changed the state, such as a keyboard shortcut or another control bound to it. So a change handler that only logs a side effect leaves the user's selection alone. A radio group that posts a choice also shows the choice when the server makes it.
+
+```html
+<!-- The user's pick posts to the server; a shortcut that sets .View server-side moves the radios too -->
+<form>
+  <label><input type="radio" name="view" value="diff" {{if not .FileView}}checked{{end}} lvt-on:change="SetView"> Diff</label>
+  <label><input type="radio" name="view" value="file" {{if .FileView}}checked{{end}} lvt-on:change="SetView"> File</label>
+</form>
+```
 
 **Radio group caveat:** Browser mutual exclusion fires synchronously during the morphdom pass. If you need to force-reset a radio group from the server, make the server send the authoritative state (via `lvt-on:click` or `data-lvt-force-update`) on *all* radios in the group, not just the one being checked.
 
