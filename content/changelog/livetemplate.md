@@ -2,8 +2,8 @@
 title: "Changelog"
 source_repo: "https://github.com/livetemplate/livetemplate"
 source_path: "CHANGELOG.md"
-source_ref: "main"
-source_commit: "5e0029bc7fed2cc6d9c94e42901752dc47bcd3c2"
+source_ref: "v0.25.11"
+source_commit: "ff098d92bad273ce354e9a3c8067109d82f69cfc"
 ---
 
 # Changelog
@@ -12,6 +12,76 @@ All notable changes to LiveTemplate will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [v0.25.11] - 2026-11-21
+
+### Fixed
+
+- **A range item whose key holds a quote, `&` or `<` now updates in place.**
+  Item keys come from the rendered template, where html/template had already
+  escaped them, so `data-key="a\"b"` reached the client's range ops as
+  `a&#34;b` and matched no item. An update or removal for such an item then
+  left a stale row behind. Keys in range ops are now decoded first (#550).
+- **The embedded client is now 0.25.10.** Because the focus manager built its
+  `#id`, `[name="..."]` and `[data-key="..."]` selectors from raw values, an
+  id, field name or key holding a quote, colon or bracket broke focus restore;
+  every selector the client builds is now escaped (client #170). A checkbox or
+  radio wired with `lvt-on:change` now also shows a change the server makes by
+  itself (client #171).
+
+## [v0.25.10] - 2026-11-19
+
+### Fixed
+
+- **A range item's key is the whole `data-key` value, not just its first part
+  (#547).** A key with a prefix or several parts used to be cut down to its
+  first dynamic: `data-key="row-{{.Old}}-{{.New}}"` became `{{.Old}}`. Items
+  whose first part matched then shared a key. A live update to
+  one of them was applied to another: in prereview, a comment draft typed on
+  one diff line appeared inside another line. The key now includes every
+  static and dynamic part, with a nested `{{if}}` written out as text. A key
+  that is one plain value, such as `data-key="{{.ID}}"`, is sent as before.
+- **Keys that still repeat resend the whole range.** When two items share a
+  key, an update now replaces the range instead of patching the first item
+  that holds the key.
+
+## [v0.25.9] - 2026-11-18
+
+### Fixed
+
+- **An `lvt-on:*` click before the WebSocket opens is no longer lost.** The
+  embedded client is now 0.25.9 (client #169), which sets up the `lvt-on:*`
+  and `lvt-on:window:*` delegators before the handshake and queues what they
+  send until a transport is chosen. Until then a form submit is left to the
+  browser, so with the loading indicator off it still reaches the server as a
+  native POST.
+
+## [v0.25.8] - 2026-11-17
+
+### Security
+
+- **HTTP action requests get the same origin check as the WebSocket
+  handshake.** This covers any request that can dispatch an action, which is
+  every method but GET and HEAD. It gets a 403 when its `Origin` isn't the
+  page's own or on `WithAllowedOrigins`. A request with no `Origin` header
+  still passes, as on the WebSocket.
+- **One origin policy per template, resolved in `New`.** The WebSocket and
+  HTTP actions share it. Two combinations behave differently as a result:
+  `WithDevMode` now allows any origin even when `WithAllowedOrigins` is set,
+  and `WithPermissiveOriginCheck` now wins over a list instead of being
+  replaced by it. A check installed with `WithGorillaCheckOrigin` or
+  `SetCheckOrigin` is still used as is.
+
+## [v0.25.7] - 2026-11-17
+
+### Fixed
+
+- **`ClientScriptURL` and `ClientStyleURL` now serve `@livetemplate/client`
+  0.25.8, up from 0.25.7.** Custom attribute handlers now arm on the
+  server-rendered markup before the WebSocket handshake. A click in that window
+  is queued and sent once the client has chosen WebSocket or HTTP. Before, the
+  page was clickable before any handler listened, so on a slow remote site an
+  early click did nothing.
 
 ## [v0.25.6] - 2026-11-16
 
