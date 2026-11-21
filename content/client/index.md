@@ -2,8 +2,8 @@
 title: "@livetemplate/client"
 source_repo: "https://github.com/livetemplate/client"
 source_path: "README.md"
-source_ref: "v0.25.5"
-source_commit: "745f46174db015902332c8d973f26b7e981322d3"
+source_ref: "v0.25.10"
+source_commit: "600793500df3b21ff05cc73689d01867bb59ce85"
 ---
 
 # @livetemplate/client
@@ -39,7 +39,7 @@ npm install @livetemplate/client
 ### CDN
 
 ```html
-<script src="https://cdn.jsdelivr.net/npm/@livetemplate/client@0.25.5/dist/livetemplate-client.browser.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@livetemplate/client@0.25.10/dist/livetemplate-client.browser.js"></script>
 ```
 
 ## Quick Start
@@ -50,7 +50,7 @@ npm install @livetemplate/client
 <!DOCTYPE html>
 <html>
 <head>
-    <script src="https://cdn.jsdelivr.net/npm/@livetemplate/client@0.25.5/dist/livetemplate-client.browser.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@livetemplate/client@0.25.10/dist/livetemplate-client.browser.js"></script>
 </head>
 <body>
     <div id="app"></div>
@@ -150,11 +150,20 @@ whatever was queued when it loads.
   (window.lvtAttributes ||= []).push({
     attribute: "lvt-x:copy",
     onElementAdded(el, ctx) {
-      el.addEventListener("click", () => navigator.clipboard.writeText(ctx.value));
+      el.addEventListener("click", () => navigator.clipboard.writeText(ctx.value), {
+        signal: ctx.signal,
+      });
     },
   });
 </script>
 ```
+
+`ctx.signal` aborts when the element stops being armed: the server removes or
+empties the attribute, or the element leaves the page. Pass it to anything
+`onElementAdded` wires up, and the wiring is undone for you. Without it the
+button keeps copying after the server disarms it, and gets a second listener
+when the attribute comes back. `ctx.value` is read at click time, so it is
+always the current value.
 
 Code that runs after the client (a deferred bundle, an ES module import) can call
 `LiveTemplateClient.registerAttribute(handler)` directly instead. Either way, a
@@ -181,6 +190,9 @@ that registers it didn't load, or because of a typo. A handler registered after
 is public API under semver:
 
 - **Minor release:** may add *optional* members.
+- **Any release:** the context types the client constructs and hands to your
+  callbacks (`ElementContext`, `SetupContext`) may gain members. Only a test stub
+  builds one; type those as `Partial<ElementContext>` and cast.
 - **Major release:** needed to remove or rename a member, add a required one,
   change a callback's arguments, or change when a callback fires.
 - **Deprecation:** a member being removed logs a deprecation warning for at least
@@ -296,7 +308,7 @@ See [CONTRIBUTING.md](/contributing/client) for development guidelines.
 
 ## License
 
-MIT License - see [LICENSE](https://github.com/livetemplate/client/blob/v0.25.5/LICENSE) for details.
+MIT License - see [LICENSE](https://github.com/livetemplate/client/blob/v0.25.10/LICENSE) for details.
 
 ## Support
 
