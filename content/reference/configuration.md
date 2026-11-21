@@ -2,8 +2,8 @@
 title: "LiveTemplate Configuration Guide"
 source_repo: "https://github.com/livetemplate/livetemplate"
 source_path: "docs/references/CONFIGURATION.md"
-source_ref: "main"
-source_commit: "5e0029bc7fed2cc6d9c94e42901752dc47bcd3c2"
+source_ref: "v0.25.11"
+source_commit: "ff098d92bad273ce354e9a3c8067109d82f69cfc"
 ---
 
 # LiveTemplate Configuration Guide
@@ -425,6 +425,6 @@ if err := envConfig.Validate(); err != nil {
 
 ## See Also
 
-- [ROADMAP.md](https://github.com/livetemplate/livetemplate/blob/main/ROADMAP.md) - Project roadmap
+- [ROADMAP.md](https://github.com/livetemplate/livetemplate/blob/v0.25.11/ROADMAP.md) - Project roadmap
 - [OBSERVABILITY.md](/guides/observability) - Logging and metrics guide
 - [SCALING.md](/guides/scaling) - Scaling recommendations
