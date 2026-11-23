@@ -2,8 +2,8 @@
 title: "Custom attributes"
 source_repo: "https://github.com/livetemplate/livetemplate"
 source_path: "docs/guides/custom-attributes.md"
-source_ref: "main"
-source_commit: "5e0029bc7fed2cc6d9c94e42901752dc47bcd3c2"
+source_ref: "v0.26.0"
+source_commit: "a1b345771089648d252d30edffca041905b25b57"
 ---
 
 # Custom attributes
@@ -120,7 +120,9 @@ A low-level handler that sends reads `send` from each `setup()` call; the one fr
 
 Use `lvt-x:` or a prefix of your own, such as `lvt-acme:`. `lvt-fx:`, `lvt-el:` and `lvt-form:` belong to the framework and will grow.
 
-After the page's `load` event, the client warns once for each `lvt-*` name in the template that no handler claims. That usually means a typo or a script that failed to load:
+After the page's `load` event, the client warns once for each `lvt-*` name in the template that no handler claims. A handler that omits `claims` claims its own `name`, and `claims: []` claims nothing.
+
+A warning usually means a typo or a script that failed to load:
 
 ```
 lvt-x:hotky is used by this page's template, but no attribute handler claims it, …
@@ -136,6 +138,14 @@ Push onto the queue and never bundle `@livetemplate/client`: a bundled copy has 
   integrity="sha384-…"
   crossorigin="anonymous"></script>
 ```
+
+If a handler sends its attribute's value as an action, as `lvt-x:rating` does, declare that attribute on the server (from v0.26.0):
+
+```go
+tmpl, err := livetemplate.New("app", livetemplate.WithActionAttributes("lvt-x:rating"))
+```
+
+Then `ctx.Publish` warns when it publishes an action an element on the page also sends, as it does for `<button name>` and `lvt-on:`. Without the declaration the server can't tell an action name from any other value. Only double-quoted values are read.
 
 ## Testing a handler
 

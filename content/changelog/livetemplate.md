@@ -2,8 +2,8 @@
 title: "Changelog"
 source_repo: "https://github.com/livetemplate/livetemplate"
 source_path: "CHANGELOG.md"
-source_ref: "main"
-source_commit: "5e0029bc7fed2cc6d9c94e42901752dc47bcd3c2"
+source_ref: "v0.26.0"
+source_commit: "a1b345771089648d252d30edffca041905b25b57"
 ---
 
 # Changelog
@@ -12,6 +12,174 @@ All notable changes to LiveTemplate will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [v0.26.0] - 2026-11-23
+
+### Added
+
+- **`WithActionAttributes` declares custom attributes whose value is an action
+  name**, such as `lvt-x:rating="SetRating"` whose handler sends its value.
+  Their values join the wired-action set, so `ctx.Publish` warns when it
+  publishes one of those names, as it already does for `<button name>` and
+  `lvt-on:`. Names match case-insensitively, only double-quoted values are
+  read, and `New` returns an error for a malformed name or one starting with
+  `lvt-on:` (#473 Phase 5).
+
+## [v0.25.15] - 2026-11-23
+
+### Fixed
+
+- **An `{{if}}` that flips inside one range item updates that item, not the
+  whole range.** The item's fingerprint covers everything nested in it. So a
+  flip failed both range paths: stream mode's same-shape check, then the
+  per-item check. Every item then went out again with its markup. In prereview
+  each code line is a range item with a cursor conditional, so one ArrowDown
+  resent the file: about 490 KB per keystroke on 300 lines, now about 300 bytes.
+  The changed item now gets a `["u"]` that carries the flipped slot's new
+  statics. A new item of another shape gets an `["a"]` or `["i"]`. An item whose
+  own template changes still resends the range.
+
+### Changed
+
+- **A `["u"]` may carry statics inside a nested node** whose shape is new to the
+  client, never at the item's own level. The tree-update specification and the
+  fuzz `UpdateMinimality` invariant say so. Clients already merge them: the
+  TypeScript-oracle fuzz suite finds no divergence.
+
+## [v0.25.14] - 2026-11-22
+
+### Fixed
+
+- **An `{{if}}` that flips inside another conditional sends only itself.** Each
+  nested node was compared by a fingerprint of everything below it. So one change
+  deep down made all its ancestors look new, and every enclosing branch went out
+  again with all its markup, on every flip. A page whose body sits in one
+  `{{if}}`/`{{else}}` resent the whole page each time a toast or panel appeared.
+  In prereview that was about 40 KB per flip on a small review and 420 KB on a
+  large one (prereview#273). A nested node is now compared by its own markup and
+  filled slots, and a change below it is diffed in its own slot. A node holding a
+  range still goes whole when its structure changes (#489).
+
+## [v0.25.13] - 2026-11-22
+
+### Fixed
+
+- **A range item whose whole body is another range now renders** (#554).
+  Each outer item lost its content, as in
+  `{{range $w := …}}{{range $p := …}}…{{end}}{{end}}`. Every item then got
+  the same key, and the page showed nothing.
+  The inner range is now kept, as it already was when a tag wrapped it.
+- **Repeated plain values in a range get their own keys (#554).** Items are
+  keyed by a hash of their content. A word that appears twice gave two items
+  one key, so every update resent the whole range. The second and
+  later copies now get `-2`, `-3` and so on, and every other key is unchanged.
+- **A range over a map visits its keys in sorted order**, as Go's
+  `text/template` does. The order was Go's random map order, so it could
+  differ between the first page and live updates, and every update sent a
+  reorder.
+- **`and` and `or` stop at the argument that decides them (#554)**, as Go's
+  `text/template` does. A later argument is no longer evaluated, so
+  `{{if and (ge (len .S) 7) (eq (slice .S 0 7) "http://")}}` no longer
+  panics on a short `.S`. A page's own function named `and` or `or` is still
+  called with every argument.
+
+## [v0.25.12] - 2026-11-22
+
+### Removed
+
+- **The embedded client is now 0.25.12, which no longer ships prereview's
+  attribute handlers.** `lvt-fx:area-select`, `lvt-fx:region-select`,
+  `lvt-fx:text-select`, `lvt-fx:viewport-report`, `lvt-fx:proxy-bridge`,
+  `lvt-fx:preview-bridge`, `lvt-fx:url-hash`, `lvt-fx:resize`,
+  `lvt-fx:auto-click` and `lvt-spy` now live in prereview's own bundle, which
+  registers them through `window.lvtAttributes` (#473 Phase 4, client #172).
+  `lvt-fx:iframe-autoheight` is gone; nothing used it. The minified bundle is
+  31 KB smaller. A page that still uses one of these without a bundle that
+  registers it gets the "no attribute handler claims it" warning after `load`.
+
+### Changed
+
+- **A low-level handler that omits `claims` now claims its own `name`**, as the
+  built-ins already did (client #172). Before, such a handler claimed nothing
+  and the census warned about its attribute. `claims: []` still claims
+  nothing.
+
+### Fixed
+
+- **`lvt-fx:scroll="bottom-sticky"` keeps following when one render adds many
+  rows** (client 0.25.11, client #173). It used to decide from the position
+  after the render, so a list that went from empty to 200 rows stopped
+  following. The reader's own scrolling now decides.
+
+## [v0.25.11] - 2026-11-21
+
+### Fixed
+
+- **A range item whose key holds a quote, `&` or `<` now updates in place.**
+  Item keys come from the rendered template, where html/template had already
+  escaped them, so `data-key="a\"b"` reached the client's range ops as
+  `a&#34;b` and matched no item. An update or removal for such an item then
+  left a stale row behind. Keys in range ops are now decoded first (#550).
+- **The embedded client is now 0.25.10.** Because the focus manager built its
+  `#id`, `[name="..."]` and `[data-key="..."]` selectors from raw values, an
+  id, field name or key holding a quote, colon or bracket broke focus restore;
+  every selector the client builds is now escaped (client #170). A checkbox or
+  radio wired with `lvt-on:change` now also shows a change the server makes by
+  itself (client #171).
+
+## [v0.25.10] - 2026-11-19
+
+### Fixed
+
+- **A range item's key is the whole `data-key` value, not just its first part
+  (#547).** A key with a prefix or several parts used to be cut down to its
+  first dynamic: `data-key="row-{{.Old}}-{{.New}}"` became `{{.Old}}`. Items
+  whose first part matched then shared a key. A live update to
+  one of them was applied to another: in prereview, a comment draft typed on
+  one diff line appeared inside another line. The key now includes every
+  static and dynamic part, with a nested `{{if}}` written out as text. A key
+  that is one plain value, such as `data-key="{{.ID}}"`, is sent as before.
+- **Keys that still repeat resend the whole range.** When two items share a
+  key, an update now replaces the range instead of patching the first item
+  that holds the key.
+
+## [v0.25.9] - 2026-11-18
+
+### Fixed
+
+- **An `lvt-on:*` click before the WebSocket opens is no longer lost.** The
+  embedded client is now 0.25.9 (client #169), which sets up the `lvt-on:*`
+  and `lvt-on:window:*` delegators before the handshake and queues what they
+  send until a transport is chosen. Until then a form submit is left to the
+  browser, so with the loading indicator off it still reaches the server as a
+  native POST.
+
+## [v0.25.8] - 2026-11-17
+
+### Security
+
+- **HTTP action requests get the same origin check as the WebSocket
+  handshake.** This covers any request that can dispatch an action, which is
+  every method but GET and HEAD. It gets a 403 when its `Origin` isn't the
+  page's own or on `WithAllowedOrigins`. A request with no `Origin` header
+  still passes, as on the WebSocket.
+- **One origin policy per template, resolved in `New`.** The WebSocket and
+  HTTP actions share it. Two combinations behave differently as a result:
+  `WithDevMode` now allows any origin even when `WithAllowedOrigins` is set,
+  and `WithPermissiveOriginCheck` now wins over a list instead of being
+  replaced by it. A check installed with `WithGorillaCheckOrigin` or
+  `SetCheckOrigin` is still used as is.
+
+## [v0.25.7] - 2026-11-17
+
+### Fixed
+
+- **`ClientScriptURL` and `ClientStyleURL` now serve `@livetemplate/client`
+  0.25.8, up from 0.25.7.** Custom attribute handlers now arm on the
+  server-rendered markup before the WebSocket handshake. A click in that window
+  is queued and sent once the client has chosen WebSocket or HTTP. Before, the
+  page was clickable before any handler listened, so on a slow remote site an
+  early click did nothing.
 
 ## [v0.25.6] - 2026-11-16
 
