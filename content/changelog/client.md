@@ -2,8 +2,8 @@
 title: "Changelog"
 source_repo: "https://github.com/livetemplate/client"
 source_path: "CHANGELOG.md"
-source_ref: "v0.25.5"
-source_commit: "745f46174db015902332c8d973f26b7e981322d3"
+source_ref: "v0.25.12"
+source_commit: "64fec86d8580c45b2651b2a7ff76e7e29d460377"
 ---
 
 # Changelog
@@ -12,6 +12,125 @@ All notable changes to @livetemplate/client will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [v0.25.12] - 2026-11-22
+
+### Removed
+
+- **prereview's ten attribute handlers left the client.** They now ship in
+  prereview's own bundle, which registers them through the public API
+  (livetemplate#473 Phase 4). prereview was their only user:
+  - `lvt-fx:area-select`, `lvt-fx:region-select`, `lvt-fx:text-select`,
+    `lvt-fx:viewport-report`, `lvt-fx:proxy-bridge`, `lvt-fx:preview-bridge`,
+    `lvt-fx:url-hash`, `lvt-fx:resize`, `lvt-fx:auto-click` and
+    `lvt-spy`/`lvt-spy-link`.
+
+  The minified bundle is 31 KB smaller (153,375 to 122,218 bytes). A page that
+  still uses one of these attributes without loading a bundle that registers
+  it gets the existing "no attribute handler claims it" warning after `load`.
+- **`lvt-fx:iframe-autoheight` is gone.** Nothing used it;
+  `lvt-fx:preview-bridge` had replaced it.
+
+### Changed
+
+- **A low-level handler that omits `claims` now claims its own `name`.** The
+  built-ins already got this default, but a handler registered from outside the
+  client claimed nothing, so a page using its attribute warned that nothing
+  handled it. `claims: []` still claims nothing.
+
+## [v0.25.11] - 2026-11-22
+
+### Fixed
+
+- **`lvt-fx:scroll="bottom-sticky"` keeps following when one render adds
+  many rows.** Whether to follow was decided from the position after the
+  render. A list that started empty and then got 200 rows at once was left
+  far from its new bottom, as if the reader had scrolled up, and stopped
+  following. Following is now decided by the reader's scrolling: scrolling
+  up away from the bottom stops it, and scrolling back near the bottom
+  resumes it. A scroll moving down, such as a smooth scroll in progress,
+  never stops it.
+
+## [v0.25.10] - 2026-11-21
+
+### Fixed
+
+- **A checkbox or radio wired with `lvt-on:change` now shows a change the
+  server makes by itself.** The client keeps a checkbox or radio the user set.
+  So a change the server made on its own never reached it: a keyboard
+  shortcut, say, or another control bound to the same state. Such a control
+  now takes the server's `checked` when the server renders a different value
+  than it did last time. That includes a handler on an ancestor such as the
+  form. A handler that only logs never changes what it renders, so the user's
+  selection still wins there, as documented.
+- **Focus restore survives an id, field name or key holding a quote, colon or
+  bracket.** The focus manager built `#id`, `[name="..."]` and
+  `[data-key="..."]` selectors from raw values, so such a value broke the
+  lookup. Every selector the client builds is now escaped (#170).
+
+## [v0.25.9] - 2026-11-18
+
+### Fixed
+
+- **An `lvt-on:*` click before the WebSocket opens is no longer lost.** The
+  `lvt-on:*` and `lvt-on:window:*` delegators were set up only after the
+  handshake, so on a slow connection a click on an `lvt-on:click` button, or on
+  a named button outside a form, did nothing. They are now set up before the handshake,
+  and what they send is queued until `connect()` has chosen WebSocket or HTTP,
+  like a custom attribute's send since v0.25.8. A form submit is the
+  exception: until the first transport is chosen, the client leaves it to the
+  browser, so it still reaches the server as a native POST if the connection
+  never opens. With the loading indicator on (the default), form controls stay
+  disabled until the first render, as before.
+
+## [v0.25.8] - 2026-11-17
+
+### Fixed
+
+- **A click on a custom attribute before the WebSocket opens is no longer
+  lost.** `connect()` armed registered handlers only after the handshake, so on
+  a slow connection the server-rendered page was clickable with nothing
+  listening. Handlers now arm on the SSR'd markup before the handshake. What
+  they send while the transport is still being chosen is queued, then sent once
+  `connect()` has picked WebSocket or HTTP. The queue avoids the HTTP fallback
+  for a socket still connecting, whose POST would race the WebSocket mount.
+
+## [v0.25.7] - 2026-11-16
+
+### Fixed
+
+- **`lvt-fx:text-select`: tapping the Comment button on iOS sends the selection.**
+  iOS dismisses a non-editable selection when you tap outside it, and web
+  events can't stop that. The button used to read `getSelection()` when its
+  click ran, found it empty, and sent nothing. It now sends the range it was
+  shown for. A collapse while you're still pressing the button no longer hides
+  it. A touch or pen release inside the button commits, so the tap works even
+  if the platform drops the click; sliding off still cancels. Keyboard Enter
+  still reads the live selection.
+- **`lvt-fx:text-select`: on a coarse pointer the Comment button is pinned to
+  the bottom centre of the viewport.** iOS draws its Copy / Look Up callout
+  above or below the selection depending on where it sits on screen, so a
+  button placed beside the selection could end up under it. The offset is
+  `env(safe-area-inset-bottom)` plus `--lvt-text-select-bottom` (default
+  `16px`). A mouse keeps the button just above the selection.
+
+## [v0.25.6] - 2026-11-15
+
+### Added
+
+- **`ctx.signal` on a declarative handler's `ElementContext`.** An `AbortSignal`
+  that aborts when the element stops being armed: its attribute is removed or
+  emptied by a server diff, it detaches, or its client tears down. It aborts
+  just before `onElementRemoved` runs. Pass it to what `onElementAdded` wires up
+  (`addEventListener(type, fn, { signal: ctx.signal })`). Without it, a listener
+  added in `onElementAdded` outlived the attribute, so the element kept reacting
+  after the server disarmed it, and a re-armed element got a second listener.
+  The README's copy-button example had this bug and now passes the signal.
+
+  `signal` is a required member of `ElementContext`, so a TypeScript test stub
+  typed as a full `ElementContext` stops compiling until it adds one. Type the
+  stub as `Partial<ElementContext>` and cast it, as the README's Stability
+  section now says.
 
 ## [v0.25.5] - 2026-11-15
 
