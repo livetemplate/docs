@@ -22,6 +22,9 @@ func Handler(opts ...livetemplate.Option) http.Handler {
 	baseOpts := []livetemplate.Option{
 		livetemplate.WithParseFS(templateFS, "custom-attributes.tmpl"),
 		livetemplate.WithAuthenticator(&livetemplate.AnonymousAuthenticator{}),
+		// lvt-x:rating's handler sends its value as an action, so declare it:
+		// a ctx.Publish of SetRating would then warn, as for a <button name>.
+		livetemplate.WithActionAttributes("lvt-x:rating"),
 	}
 	tmpl := livetemplate.Must(livetemplate.New("custom-attributes", append(baseOpts, opts...)...))
 	return tmpl.Handle(&Controller{}, livetemplate.AsState(&State{Shortcuts: true}))
