@@ -2,8 +2,8 @@
 title: "PubSub Reference"
 source_repo: "https://github.com/livetemplate/livetemplate"
 source_path: "docs/references/pubsub.md"
-source_ref: "main"
-source_commit: "5e0029bc7fed2cc6d9c94e42901752dc47bcd3c2"
+source_ref: "v0.26.0"
+source_commit: "a1b345771089648d252d30edffca041905b25b57"
 ---
 
 # PubSub Reference
@@ -160,7 +160,7 @@ LiveTemplate uses two independent isolation models:
 
 ### Session Isolation (State Boundaries)
 
-Handled by the session store and connection registry. All connections with the same `groupID` share the same state instance. Different groups have completely separate state. This is unaffected by pubsub. See [Multi-Session Isolation](https://github.com/livetemplate/livetemplate/blob/main/docs/design/multi-session-isolation.md) for details.
+Handled by the session store and connection registry. All connections with the same `groupID` share the same state instance. Different groups have completely separate state. This is unaffected by pubsub. See [Multi-Session Isolation](https://github.com/livetemplate/livetemplate/blob/v0.26.0/docs/design/multi-session-isolation.md) for details.
 
 ### Message Routing Isolation (PubSub)
 
@@ -265,6 +265,6 @@ Grep for `event=topic_action_subscribe_failed` in production logs (the structure
 
 - [Server Actions Reference](/reference/server-actions) — `TriggerAction` API
 - [Session Reference](/reference/session) — Session stores and connection management
-- [Multi-Session Isolation](https://github.com/livetemplate/livetemplate/blob/main/docs/design/multi-session-isolation.md) — State isolation model
+- [Multi-Session Isolation](https://github.com/livetemplate/livetemplate/blob/v0.26.0/docs/design/multi-session-isolation.md) — State isolation model
 - [Scaling Guide](/guides/scaling) — Redis configuration and scaling tiers
 - [Configuration Reference](/reference/configuration) — Environment variables and WebSocket settings
