@@ -2,8 +2,8 @@
 title: "Contributing to @livetemplate/client"
 source_repo: "https://github.com/livetemplate/client"
 source_path: "CONTRIBUTING.md"
-source_ref: "v0.25.12"
-source_commit: "64fec86d8580c45b2651b2a7ff76e7e29d460377"
+source_ref: "v0.26.0"
+source_commit: "461d113c1dd11509ce306fdf98dd13fd325c415e"
 ---
 
 # Contributing to @livetemplate/client

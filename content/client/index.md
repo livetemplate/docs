@@ -2,8 +2,8 @@
 title: "@livetemplate/client"
 source_repo: "https://github.com/livetemplate/client"
 source_path: "README.md"
-source_ref: "v0.25.12"
-source_commit: "64fec86d8580c45b2651b2a7ff76e7e29d460377"
+source_ref: "v0.26.0"
+source_commit: "461d113c1dd11509ce306fdf98dd13fd325c415e"
 ---
 
 # @livetemplate/client
@@ -39,7 +39,7 @@ npm install @livetemplate/client
 ### CDN
 
 ```html
-<script src="https://cdn.jsdelivr.net/npm/@livetemplate/client@0.25.12/dist/livetemplate-client.browser.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@livetemplate/client@0.26.0/dist/livetemplate-client.browser.js"></script>
 ```
 
 ## Quick Start
@@ -50,7 +50,7 @@ npm install @livetemplate/client
 <!DOCTYPE html>
 <html>
 <head>
-    <script src="https://cdn.jsdelivr.net/npm/@livetemplate/client@0.25.12/dist/livetemplate-client.browser.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@livetemplate/client@0.26.0/dist/livetemplate-client.browser.js"></script>
 </head>
 <body>
     <div id="app"></div>
@@ -308,7 +308,7 @@ See [CONTRIBUTING.md](/contributing/client) for development guidelines.
 
 ## License
 
-MIT License - see [LICENSE](https://github.com/livetemplate/client/blob/v0.25.12/LICENSE) for details.
+MIT License - see [LICENSE](https://github.com/livetemplate/client/blob/v0.26.0/LICENSE) for details.
 
 ## Support
 

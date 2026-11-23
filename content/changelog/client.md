@@ -2,8 +2,8 @@
 title: "Changelog"
 source_repo: "https://github.com/livetemplate/client"
 source_path: "CHANGELOG.md"
-source_ref: "v0.25.12"
-source_commit: "64fec86d8580c45b2651b2a7ff76e7e29d460377"
+source_ref: "v0.26.0"
+source_commit: "461d113c1dd11509ce306fdf98dd13fd325c415e"
 ---
 
 # Changelog
@@ -12,6 +12,18 @@ All notable changes to @livetemplate/client will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [v0.26.0] - 2026-11-23
+
+### Added
+
+- **The client reads a message's statics table.** livetemplate releases after
+  v0.26.1 send each statics array that repeats within one message once, in a
+  top-level `"S"`, with `"s": <index>` where it repeats (tree-update spec §2.5).
+  `expandStaticsTable` resolves the indexes as a message arrives, before
+  anything reads or merges it, so the rest of the client sees arrays as before.
+  A message without `"S"` is unchanged, so this client also works with older
+  servers.
 
 ## [v0.25.12] - 2026-11-22
 
