@@ -2,8 +2,8 @@
 title: "Changelog"
 source_repo: "https://github.com/livetemplate/lvt"
 source_path: "CHANGELOG.md"
-source_ref: "v0.3.0"
-source_commit: "b3db96720ac0d33e29ded9ee212a7f2a53436278"
+source_ref: "v0.3.1"
+source_commit: "57610b1af9713e18d9217e8f561d67339f2578fa"
 ---
 
 # Changelog
@@ -13,7 +13,28 @@ All notable changes to the LVT CLI will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v0.3.1] - 2026-11-25
+
+### Changes
+
+- chore(kits): drop the data-expected-value select workaround (#359) (73b12ce)
+- chore(kits): drop scripts and an action the client replaced (#355) (ad05cc1)
+- chore(deps): livetemplate v0.25.15; regenerate the two todos goldens (#354) (e924743)
+- chore(deps): livetemplate v0.25.14; regenerate the counter reset golden (#353) (6d0ce02)
+- test(e2e): cover lvt-on:click and form submits before the WebSocket opens (#352) (7bb62ca)
+- test(e2e): custom-attribute click before the WebSocket opens (#351) (d09d5ae)
+- test(e2e): a ctx.signal listener stops when the attribute goes and does not stack when it returns (#350) (386985c)
+- docs(changelog): note the livetemplate v0.25.2 adoption and lvt/testing changes in v0.3.0 (#349) (146655c)
+
+
+
 ## [v0.3.0] - 2026-11-15
+
+Adopts **livetemplate v0.25.2** (from v0.19.0), so apps that load the client through `ClientScriptURL` get **client 0.25.4**, including the `lvt-*` attribute handler registry (livetemplate#473). Also:
+
+- **`lvt gen auth` apps build without a manual `go mod tidy`** (#345). Generated auth apps had been fetching `chromedp@latest`, which no longer compiles against `lvt/testing`.
+- **`lvt/testing` removes `WaitForMessageCount` and `WaitForActionResponse`** (#348). Both polled client debug globals the client no longer sets, so they could only time out. To wait on or inspect WebSocket traffic, use `RecordWSFrames` and its logger.
+- **`lvt/testing` honours `LVT_LOCAL_CLIENT_JS`** (#346): point it at a local client build to run the browser suite against an unreleased client.
 
 ### Changes
 

@@ -2,8 +2,8 @@
 title: "LiveTemplate Components Library"
 source_repo: "https://github.com/livetemplate/lvt"
 source_path: "components/README.md"
-source_ref: "v0.3.0"
-source_commit: "b3db96720ac0d33e29ded9ee212a7f2a53436278"
+source_ref: "v0.3.1"
+source_commit: "57610b1af9713e18d9217e8f561d67339f2578fa"
 ---
 
 # LiveTemplate Components Library
@@ -286,7 +286,7 @@ No `lvt` CLI installation required — components are a standalone Go library.
 
 ## Contributing
 
-See [CONTRIBUTING.md](https://github.com/livetemplate/lvt/blob/v0.3.0/components/CONTRIBUTING.md) for guidelines on:
+See [CONTRIBUTING.md](https://github.com/livetemplate/lvt/blob/v0.3.1/components/CONTRIBUTING.md) for guidelines on:
 - Component naming conventions
 - Template requirements
 - Test requirements
