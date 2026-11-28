@@ -380,25 +380,34 @@ nav.page-nav {
   padding-top: 24px;
   border-top: 1px solid var(--border-color);
 }
+/* Plain text links, not cards. The theme caps each link at max-width: 45%
+   for its own flex row; inside this grid that cap applied to the column, so
+   on a phone each card shrank to ~95px and its title spilled out. */
 nav.page-nav a {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   gap: 4px;
-  padding: 14px 16px;
+  max-width: none;
+  min-width: 0;
+  padding: 0;
   background: none;
-  border: 1px solid var(--card-border);
-  border-radius: 6px;
+  border: none;
+  border-radius: 0;
   color: var(--text-heading);
   text-decoration: none;
 }
-/* Cards darken their border. They do not lift, scale, or cast a shadow —
-   nothing on this page moves unless the app itself is updating. */
+/* The title underlines. Nothing lifts, scales, or casts a shadow: nothing on
+   this page moves unless the app itself is updating. */
 nav.page-nav a:hover {
-  border-color: var(--text-heading);
   background: none;
   transform: none;
   box-shadow: none;
+}
+nav.page-nav a:hover .label,
+nav.page-nav a:focus-visible .label {
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 /* The theme emits the prev card as [arrow, label] and the next card as
    [label, arrow]. Both want the mono direction cue above the title, so the

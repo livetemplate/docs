@@ -126,12 +126,26 @@ This isn't passive voice, but it reads as passive for the same reason: no finite
 verb, so nothing is doing anything. The repo owner called it out as passive, and
 that instinct was right about the effect even though the term doesn't fit.
 
-The tell is *where* it happens. Headings that make a technical claim stayed
-sentences — "The button's name is the action", "The HTML rule runs again in Go",
-"Two calls sync your tabs". The four fragments were all headings that orient the
-reader: the demo, the section intro, the catch-all, the CTA. The register breaks
-where the page navigates rather than argues, so check the connective headings
-hardest.
+The tell is *where* it happens. The four fragments were all headings that orient
+the reader: the demo, the section intro, the catch-all, the CTA. The register
+breaks where the page navigates rather than argues, so check the connective
+headings hardest.
+
+## Landing headings name the feature
+
+The landing's h2s were once technical claims written as sentences: "The button's
+name is the action", "The HTML rule runs again in Go", "Two calls sync your
+tabs". The repo owner read them as nonsensical, closer to a dramatic blog post
+than a framework's landing page. Each one compressed an idea into an aphorism the
+reader had to decode, using words the page hadn't introduced yet ("the wall",
+"topic", "pending state").
+
+Framework landings (Livewire, Fiber, Phoenix, htmx) title each section with a
+short label for the feature it shows: "Data binding", "Loading states", "Built
+into the Core". So the landing does the same: "Buttons call Go methods", "Form
+validation on the server", "Loading states for slow actions". Two to six words,
+sentence case, no full stop, in the reader's terms. The argument goes in the lead
+under the heading, never in the heading.
 
 No checker rule for this — "lacks a finite verb" needs a parser, and a fragile
 approximation gets switched off. Read each heading and ask what the verb is.
