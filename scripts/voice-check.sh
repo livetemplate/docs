@@ -19,8 +19,8 @@ MAX_PRODUCT_SUBJECT=0    # 3 -> 0
 MAX_ROYAL_WE=0           # 4 -> 0
 MAX_META_COMMENTARY=0    # 3 -> 0
 MAX_HYPE=0               # 1 -> 0
-MAX_TRIADIC_NEGATION=1   # 5 -> 1. The one left is the landing's hx-post/onClick/route
-                         # list, where each item names a real thing you'd otherwise write.
+MAX_TRIADIC_NEGATION=0   # 5 -> 1 -> 0. The landing's hx-post/onClick/route list is now one
+                         # negation ("no hx-post, onClick or route"), which doesn't match.
 MAX_EXCLAMATION=3        # 11 -> 3. All three are quoted UI copy ("Changes saved!")
 MAX_PASSIVE=34           # 114 -> 34. What remains is mostly legitimate: HTML attributes
                          # ("is required"), Go terms ("are exported"), quoted strings,
